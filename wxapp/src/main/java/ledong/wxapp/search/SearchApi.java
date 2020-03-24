@@ -14,8 +14,10 @@ import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -35,7 +37,6 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -51,7 +52,7 @@ import response.ErrorResponse;
  */
 public class SearchApi {
     public static final String TYPE = "_doc";
-    public static final String ID = "fileId";
+    public static final String ID = "Id";
     public static final String TASKID = "taskId";
     public static final String VERSION = "version";
     public static final String SUM = "query_fileSize";
@@ -539,7 +540,9 @@ public class SearchApi {
             Integer size) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.sort(sortField, order);
+        if (sortField != null && order != null) {
+            searchSourceBuilder.sort(sortField, order);
+        }
         @SuppressWarnings("unchecked")
         Set<String> set = multiTerms.keySet();
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
@@ -738,10 +741,10 @@ public class SearchApi {
      * @param doc
      * @return
      */
-    public static DocWriteResponse insertDocument(String indexName, String type, String doc) {
-        IndexRequest indexRequest = new IndexRequest(indexName, type);
+    public static boolean insertDocument(String indexName, String doc) {
+        IndexRequest indexRequest = new IndexRequest(indexName);
         indexRequest.source(doc, XContentType.JSON);
-        return insertDocumentBase(indexRequest);
+        return parseInsertResponse(indexRequest, null);
     }
 
     /**
@@ -753,7 +756,7 @@ public class SearchApi {
      * @return
      */
     public static DocWriteResponse insertDocument(String indexName, String type, String doc, String id) {
-        IndexRequest indexRequest = new IndexRequest(indexName, type, id);
+        IndexRequest indexRequest = new IndexRequest(indexName, id);
         indexRequest.source(doc, XContentType.JSON);
         return insertDocumentBase(indexRequest);
     }
@@ -872,6 +875,7 @@ public class SearchApi {
      */
     private static DocWriteResponse insertDocumentBase(IndexRequest indexRequest) {
         try {
+
             return client.index(indexRequest, RequestOptions.DEFAULT);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -994,28 +998,23 @@ public class SearchApi {
         return null;
     }
 
-    private static HashMap<String, Object> parseAggregationDcsLogs(SearchRequest searchRequest, String agg) {
-
+    /**
+     * 搜索数据，生成结果
+     * 
+     * @param searchRequest
+     * @param idName
+     * @return
+     */
+    private static boolean parseInsertResponse(IndexRequest searchRequest, String idName) {
         try {
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-
-            // 每日的结构体
-            Terms t = searchResponse.getAggregations().get("clearStatus");
-            HashMap<String, Object> s = new HashMap<String, Object>(16);
-            @SuppressWarnings("unchecked")
-            List<Terms.Bucket> tBuckets = (List<Terms.Bucket>) t.getBuckets();
-            for (Terms.Bucket tBuck : tBuckets) {
-                s.put(String.valueOf(tBuck.getKey()), tBuck.getDocCount());
-
+            IndexResponse indexResponse = client.index(searchRequest, RequestOptions.DEFAULT);
+            if (Result.CREATED.toString().equals(indexResponse.getResult().name())) {
+                return true;
             }
-
-            return s.size() != 0 ? s : null;
-
         } catch (IOException e) {
             log.error(e.getMessage());
-
         }
-        return null;
+        return false;
     }
 
 }
