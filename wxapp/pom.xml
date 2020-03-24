@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.0.M3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>1.5.9.RELEASE</version>
 	</parent>
 	<groupId>ledong</groupId>
 	<artifactId>wxapp</artifactId>
@@ -16,6 +15,8 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+  <elasticsearch.version>7.6.0</elasticsearch.version>
+     <swagger.version>2.2.2</swagger.version>
 	</properties>
 
 	<dependencies>
@@ -23,7 +24,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		
+		  <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>  ${elasticsearch.version}</version>    
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -35,6 +44,16 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+          <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+              <version>2.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -47,7 +66,6 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -65,7 +83,6 @@
 			<plugin>    
 				<groupId>org.apache.maven.plugins</groupId>    
 				<artifactId>maven-surefire-plugin</artifactId>    
-				<version>2.5</version>    
 				<configuration>    
 					<skip>true</skip>    
 				</configuration>    
