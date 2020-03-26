@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import io.swagger.annotations.ApiModelProperty;
 
 public class UserVo implements Serializable {
-    private static final long serialVersionUID = -820211110052857928L;
+    private static final long serialVersionUID = -820219110052857921L;
 
     @NotEmpty
     @ApiModelProperty(value = "phone")
