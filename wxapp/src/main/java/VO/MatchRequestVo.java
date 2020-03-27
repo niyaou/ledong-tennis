@@ -15,6 +15,8 @@ import io.swagger.annotations.ApiModelProperty;
 public class MatchRequestVo implements Serializable {
     private static final long serialVersionUID = -120211110052857928L;
 
+    public static final String MATCHREQUESTFROM = "MATCHREQUESTFROM";
+
     @NotEmpty
     @ApiModelProperty(value = "request userName")
     private String userName;
