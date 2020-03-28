@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.redis.RedisUtil;
+import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IUserService;
 import ledong.wxapp.utils.DateUtil;
 
@@ -32,6 +33,8 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+    @Autowired
+    private IMatchService matchService;
     @Autowired
     private RedisUtil redis;
 
@@ -50,30 +53,13 @@ public class UserController {
     @ApiOperation(value = "认证管理-token有效认证", notes = "")
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> validate() {
-        // Object successed = userService.tokenAuthorize(token);
 
-        Object a = redis.get("key");
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        // redis.expire("key", 1);
-        // redis.set("key", vo,10);
-        redis.submitChannelMessage("key", 12, vo);
-        System.out.println(redis.hasKey("key"));
-        // Object a = redis;
-        try {
-            Thread.sleep(1200);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-       System.out.println(redis.hasKey("key"));
-    //    if (null == successed) {
-    //        // 认证失败
-    //        return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.TOKEN_PERMSSION_ERROR),
-    //                HttpStatus.OK);
-    //    }
-       return new ResponseEntity<Object>(CommonResponse.success(a), HttpStatus.OK);
-   }
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.requestMatching("jerry", "123.1,54.6")),
+                HttpStatus.OK);
+    }
+
 //
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value = "认证管理-用户登录", notes = "")

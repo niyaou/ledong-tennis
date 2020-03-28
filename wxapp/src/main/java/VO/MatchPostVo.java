@@ -20,7 +20,6 @@ public class MatchPostVo implements Serializable {
     private String id;
     public static final String ID = "id";
 
-    @NotEmpty
     @ApiModelProperty(value = "parendId ")
     private String parendId;
     public static final String PARENDID = "parendId";
@@ -36,24 +35,24 @@ public class MatchPostVo implements Serializable {
     public static final String CHALLENGER = "challenger";
 
     @NotEmpty
-    @ApiModelProperty(value = "holderAcknowaged , 0 no-acknowaged,  1 acknowaged ")
-    private Integer holderAcknowaged;
-    public static final String HOLDERACKNOWAGED = "holderAcknowaged";
+    @ApiModelProperty(value = "holderAcknowaged , 1000 un-Acknowledged,  1001 Acknowledged ")
+    private Integer holderAcknowledged;
+    public static final String HOLDERACKNOWLEDGED = "holderAcknowledged";
 
     @NotEmpty
-    @ApiModelProperty(value = "challengerAcknowaged ,0 no-acknowaged,  1 acknowaged")
-    private Integer challengerAcknowaged;
-    public static final String CHALLENGERACKNOWAGED = "challengerAcknowaged";
+    @ApiModelProperty(value = "challengerAcknowledged ,1000 un-Acknowledged,  1001 Acknowledged")
+    private Integer challengerAcknowledged;
+    public static final String CHALLENGERACKNOWLEDGED = "challengerAcknowledged";
 
     @NotEmpty
-    @ApiModelProperty(value = "match post status , 0 : matching, 1 : playing , 2 : gamed")
+    @ApiModelProperty(value = "match post status , 2000 : matching, 2001 : Acknowledged  , 2002 : playing , 2003 : gamed")
     private Integer status;
     public static final String STATUS = "status";
 
     @NotEmpty
-    @ApiModelProperty(value = "match post type , 0 : intentional pick , 1 : random ")
-    private Integer matchStatus;
-    public static final String MATCHSTATUS = "matchStatus";
+    @ApiModelProperty(value = "match post type , 3000 : intentional pick , 3001 : random ")
+    private Integer matchType;
+    public static final String MATCHTYPE = "matchType";
 
     @NotEmpty
     @ApiModelProperty(value = "sessionId")
@@ -61,11 +60,10 @@ public class MatchPostVo implements Serializable {
     public static final String SESSIONID = "id";
 
     @NotEmpty
-    @ApiModelProperty(value = "clubMatch status , 0 : non-club match, 1: club match")
+    @ApiModelProperty(value = "clubMatch status , 4000 : non-club match, 4001: club match")
     private Integer clubMatch;
     public static final String CLUBMATCH = "clubMatch";
 
-    @NotEmpty
     @ApiModelProperty(value = "courtName")
     private String courtName;
     public static final String COURTNAME = "courtName";
@@ -75,34 +73,36 @@ public class MatchPostVo implements Serializable {
     private String courtGPS;
     public static final String COURTGPS = "courtGPS";
 
-    @NotEmpty
-    @ApiModelProperty(value = "winner , 0 : holder wins, 1: challenger wins")
+    @ApiModelProperty(value = "winner , 5000 : holder wins, 5001: challenger wins")
     private Integer winner;
     public static final String WINNER = "winner";
 
     @NotEmpty
-    @ApiModelProperty(value = "ranked status , 1 : ranked , 0 : un-ranked ")
+    @ApiModelProperty(value = "ranked status , 6001 : ranked , 6000 : un-ranked ")
     private Integer ranked;
     public static final String RANKED = "ranked";
 
-    @NotEmpty
     @ApiModelProperty(value = "winScore ")
     private Integer winScore;
     public static final String WINSCORE = "winScore";
 
-    @NotEmpty
     @ApiModelProperty(value = "loseScore ")
     private Integer loseScore;
     public static final String LOSESCORE = "loseScore";
 
     @NotEmpty
-    @ApiModelProperty(value = "canceled , 0: not-canceled , 1: canceled")
+    @ApiModelProperty(value = "canceled , 7000: not-canceled , 7001: canceled")
     private Integer canceled;
     public static final String CANCELED = "canceled";
 
+    @NotEmpty
     @ApiModelProperty(value = "createTime format : yyyy-MM-dd HH:mm:ss")
     private String createTime;
     public static final String CREATETIME = "createTime";
+
+    @ApiModelProperty(value = "orderTime format : yyyy-MM-dd HH:mm:ss")
+    private String orderTime;
+    public static final String ORDERTIME = "orderTime";
 
     @ApiModelProperty(value = "playingTime format : yyyy-MM-dd HH:mm:ss")
     private String playingTime;
@@ -128,20 +128,24 @@ public class MatchPostVo implements Serializable {
         return challenger;
     }
 
-    public Integer getHolderAcknowaged() {
-        return holderAcknowaged;
+    public Integer getHolderAcknowledged() {
+        return holderAcknowledged;
     }
 
-    public Integer getChallengerAcknowaged() {
-        return challengerAcknowaged;
+    public Integer getChallengerAcknowledged() {
+        return challengerAcknowledged;
+    }
+
+    public void setHolderAcknowledged(Integer holderAcknowledged) {
+        this.holderAcknowledged = holderAcknowledged;
+    }
+
+    public void setChallengerAcknowledged(Integer challengerAcknowledged) {
+        this.challengerAcknowledged = challengerAcknowledged;
     }
 
     public Integer getStatus() {
         return status;
-    }
-
-    public Integer getMatchStatus() {
-        return matchStatus;
     }
 
     public String getSessionId() {
@@ -208,20 +212,16 @@ public class MatchPostVo implements Serializable {
         this.challenger = challenger;
     }
 
-    public void setHolderAcknowaged(Integer holderAcknowaged) {
-        this.holderAcknowaged = holderAcknowaged;
-    }
-
-    public void setChallengerAcknowaged(Integer challengerAcknowaged) {
-        this.challengerAcknowaged = challengerAcknowaged;
-    }
-
     public void setStatus(Integer status) {
         this.status = status;
     }
 
-    public void setMatchStatus(Integer matchStatus) {
-        this.matchStatus = matchStatus;
+    public Integer getMatchType() {
+        return matchType;
+    }
+
+    public void setMatchType(Integer matchType) {
+        this.matchType = matchType;
     }
 
     public void setSessionId(String sessionId) {
@@ -270,6 +270,14 @@ public class MatchPostVo implements Serializable {
 
     public void setGamedTime(String gamedTime) {
         this.gamedTime = gamedTime;
+    }
+
+    public String getOrderTime() {
+        return orderTime;
+    }
+
+    public void setOrderTime(String orderTime) {
+        this.orderTime = orderTime;
     }
 
 }

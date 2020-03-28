@@ -252,4 +252,16 @@ public final class StringUtil {
         return new StringBuffer(path).append(name).append(".").append(prefix).toString();
     }
 
+    /**
+     * 生成特定的user-key
+     * 
+     * @param user
+     * @return
+     */
+    public static String combiningSpecifiedUserKey(String user) {
+
+        return String.format("[%s]", user);
+
+    }
+
 }

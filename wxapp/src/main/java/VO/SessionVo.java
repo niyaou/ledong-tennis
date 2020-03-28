@@ -33,8 +33,8 @@ public class SessionVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "challenger id")
-    private String challenger;
-    public static final String CHALLENGER = "challenger";
+    private String challengerId;
+    public static final String CHALLENGERID = "challengerId";
 
     @ApiModelProperty(value = " holder dialog Context ")
     private dialogDetail[] holderContext;
@@ -69,11 +69,11 @@ public class SessionVo implements Serializable {
     }
 
     public String getChallenger() {
-        return challenger;
+        return challengerId;
     }
 
-    public void setChallenger(String challenger) {
-        this.challenger = challenger;
+    public void setChallenger(String challengerId) {
+        this.challengerId = challengerId;
     }
 
     public dialogDetail[] getHolderContext() {

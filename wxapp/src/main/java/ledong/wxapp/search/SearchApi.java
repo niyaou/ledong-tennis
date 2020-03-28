@@ -741,7 +741,7 @@ public class SearchApi {
      * @param doc
      * @return
      */
-    public static boolean insertDocument(String indexName, String doc) {
+    public static String insertDocument(String indexName, String doc) {
         IndexRequest indexRequest = new IndexRequest(indexName);
         indexRequest.source(doc, XContentType.JSON);
         return parseInsertResponse(indexRequest, null);
@@ -755,10 +755,11 @@ public class SearchApi {
      * @param id
      * @return
      */
-    public static DocWriteResponse insertDocument(String indexName, String type, String doc, String id) {
-        IndexRequest indexRequest = new IndexRequest(indexName, id);
+    public static String insertDocument(String indexName, String doc, String id) {
+        IndexRequest indexRequest = new IndexRequest(indexName);
+        indexRequest.id(id);
         indexRequest.source(doc, XContentType.JSON);
-        return insertDocumentBase(indexRequest);
+        return parseInsertResponse(indexRequest, null);
     }
 
     /**
@@ -1005,16 +1006,16 @@ public class SearchApi {
      * @param idName
      * @return
      */
-    private static boolean parseInsertResponse(IndexRequest searchRequest, String idName) {
+    private static String parseInsertResponse(IndexRequest searchRequest, String idName) {
         try {
             IndexResponse indexResponse = client.index(searchRequest, RequestOptions.DEFAULT);
             if (Result.CREATED.toString().equals(indexResponse.getResult().name())) {
-                return true;
+                return indexResponse.getId();
             }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-        return false;
+        return null;
     }
 
 }

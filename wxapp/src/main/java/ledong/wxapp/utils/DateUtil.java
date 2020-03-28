@@ -28,6 +28,9 @@ public final class DateUtil {
     /** 日期格式： yyyyMMdd */
     public static final String FORMAT_DATE_NUM = "yyyyMMdd";
 
+    /** 日期格式： yyyyMMddHHMMSS */
+    public static final String FORMAT_DATETIME_NUM = "yyyyMMddHHmmss";
+
     public static final int DAYCOUNT = 86400000;
 
     /**
