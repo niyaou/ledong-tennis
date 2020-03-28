@@ -57,7 +57,7 @@ public class MatchPostVo implements Serializable {
     @NotEmpty
     @ApiModelProperty(value = "sessionId")
     private String sessionId;
-    public static final String SESSIONID = "id";
+    public static final String SESSIONID = "sessionId";
 
     @NotEmpty
     @ApiModelProperty(value = "clubMatch status , 4000 : non-club match, 4001: club match")

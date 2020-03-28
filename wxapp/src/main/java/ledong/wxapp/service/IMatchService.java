@@ -33,6 +33,37 @@ public interface IMatchService {
      */
     public String requestMatching(String user, String courtGps);
 
+
+    /**
+     * create a intentional match post data.
+     * 
+     * @param user
+     * @param orderTime
+     * @param courtName
+     * @param courtGps
+     * @return
+     */
+    public String postIntentionalMatch(String user ,String orderTime,String courtName,String courtGps);
+
+
+    /**
+     * start a challenge match
+     * @param holder
+     * @param challenger
+     * @return
+     */
+    public String postChallengeMatch(String holder,String challenger);
+
+
+    /**
+     * accept a exist intentional  post match
+     * 
+     * @param challenger
+     * @return
+     */
+    public String  acceptIntentionalMatch(String parentId,String challenger);
+
+
     /**
      * create a match post
      * 
@@ -54,8 +85,11 @@ public interface IMatchService {
             String orderTime, String courtName, String courtGps);
 
     /**
-     * create a session id which attached to the given match id
+     * create a session 
      * 
+     * find match in given id,does not create if match not existed.
+     * 
+     * set session id to match post data 
      * 
      * 
      * @param matchId

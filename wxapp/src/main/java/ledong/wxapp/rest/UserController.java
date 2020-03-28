@@ -41,8 +41,8 @@ public class UserController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ApiOperation(value = "authority -- user register", notes = "")
     public ResponseEntity<?> register(@RequestBody @Validated UserVo user) {
-        boolean info = userService.addUser(user);
-        if (!info) {
+        String info = userService.addUser(user);
+        if (info == null) {
             return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
         } else {
             return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
@@ -60,7 +60,6 @@ public class UserController {
                 HttpStatus.OK);
     }
 
-//
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value = "认证管理-用户登录", notes = "")
     @ApiImplicitParams({

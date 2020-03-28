@@ -14,7 +14,7 @@ public interface IUserService {
      * @param nickName
      * @return
      */
-    public boolean addUser(UserVo user);
+    public String addUser(UserVo user);
 
     /**
      * 

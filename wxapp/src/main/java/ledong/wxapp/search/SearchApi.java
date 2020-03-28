@@ -26,6 +26,8 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -110,20 +112,20 @@ public class SearchApi {
     }
 
     /**
-     * 根据ID查询
+     * 根据ID查询,返回一个对象
      * 
      * @param indexName
      * @param type
      * @param id
      * @return
      */
-    public static LinkedList<HashMap<String, Object>> searchById(String indexName, String type, String id) {
+    public static HashMap<String, Object> searchById(String indexName, String id) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.version(true);
-        searchSourceBuilder.query(QueryBuilders.idsQuery(type).addIds(id));
+        searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(id));
         searchRequest.source(searchSourceBuilder);
-        return parseResponse(searchRequest);
+        return parseSingleResponse(searchRequest);
     }
 
     /**
@@ -437,7 +439,7 @@ public class SearchApi {
      * @param indexName
      * @param key
      * @param value
-     * @param type 0.早于某个时间范围，1.晚于某个时间范围
+     * @param type      0.早于某个时间范围，1.晚于某个时间范围
      * @param pageNo
      * @param size
      * @return
@@ -821,6 +823,39 @@ public class SearchApi {
         }
     }
 
+
+    /**
+     * 更新指定字段
+     * @param indexName
+     * @param field
+     * @param value
+     * @param id
+     * @return
+     */
+    public static String updateFieldValueById(String indexName, String field, String value, String id) {
+      
+       
+        // updateRequest.script(new Script(String.format("ctx._source.%s=%s", field, value)));
+        // updateRequest.upsertRequest();
+        try {
+            XContentBuilder builder = XContentFactory.jsonBuilder();
+            builder.startObject();
+            {
+                builder.field(field, value);
+             
+            }
+            builder.endObject();
+            // return client.update(updateRequest, RequestOptions.DEFAULT);
+            UpdateRequest updateRequest = new UpdateRequest(indexName, id).doc(builder);
+
+            DocWriteResponse res = client.update(updateRequest, RequestOptions.DEFAULT);
+            return res.getResult().equals(Result.UPDATED) ? res.getId() : null;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
     public static DocWriteResponse removeDocumentSource(String indexName, String type, String doc, String id,
             String... fields) {
         try {
@@ -924,6 +959,22 @@ public class SearchApi {
             return new int[] { PAGE, DEFAULT_SIZE };
         }
 
+    }
+
+    private static HashMap<String, Object> parseSingleResponse(SearchRequest searchRequest) {
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHit[] searchHits = searchResponse.getHits().getHits();
+            for (SearchHit hit : searchHits) {
+                HashMap<String, Object> m = (HashMap<String, Object>) hit.getSourceAsMap();
+                m.put(ID, hit.getId());
+                m.put(VERSION, hit.getVersion());
+                return m;
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return null;
     }
 
     /**

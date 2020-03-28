@@ -17,7 +17,7 @@ import ledong.wxapp.utils.DateUtil;
 public class UserServiceImpl implements IUserService {
 
     @Override
-    public boolean addUser(UserVo user) {
+    public String addUser(UserVo user) {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
         return SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user));
@@ -25,7 +25,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public HashMap<String, Object> login(String user, String password) {
-        // TODO Auto-generated method stub
 
         HashMap<String, String> vo = new HashMap<String, String>();
         vo.put(UserVo.USERNAME, user);
