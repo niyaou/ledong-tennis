@@ -1,5 +1,7 @@
 package ledong.wxapp.service;
 
+import java.util.List;
+
 public interface IMatchService {
 
     /**
@@ -33,7 +35,6 @@ public interface IMatchService {
      */
     public String requestMatching(String user, String courtGps);
 
-
     /**
      * create a intentional match post data.
      * 
@@ -43,26 +44,24 @@ public interface IMatchService {
      * @param courtGps
      * @return
      */
-    public String postIntentionalMatch(String user ,String orderTime,String courtName,String courtGps);
-
+    public String postIntentionalMatch(String user, String orderTime, String courtName, String courtGps);
 
     /**
      * start a challenge match
+     * 
      * @param holder
      * @param challenger
      * @return
      */
-    public String postChallengeMatch(String holder,String challenger);
-
+    public String postChallengeMatch(String holder, String challenger);
 
     /**
-     * accept a exist intentional  post match
+     * accept a exist intentional post match
      * 
      * @param challenger
      * @return
      */
-    public String  acceptIntentionalMatch(String parentId,String challenger);
-
+    public String acceptIntentionalMatch(String parentId, String challenger);
 
     /**
      * create a match post
@@ -85,11 +84,11 @@ public interface IMatchService {
             String orderTime, String courtName, String courtGps);
 
     /**
-     * create a session 
+     * create a session
      * 
      * find match in given id,does not create if match not existed.
      * 
-     * set session id to match post data 
+     * set session id to match post data
      * 
      * 
      * @param matchId
@@ -98,4 +97,13 @@ public interface IMatchService {
      * @return
      */
     public String attachedMatchSession(String matchId, String holderId, String challengerId);
+
+    /**
+     * find a exist intentional matchs
+     * 
+     * @param postUser return list which post by given user
+     * @param exclusiveUser return list which NOT post by given user
+     * @return
+     */
+    public List<String> getIntentionalMatchs(String postUser, String exclusiveUser);
 }

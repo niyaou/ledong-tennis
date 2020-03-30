@@ -439,7 +439,7 @@ public class SearchApi {
      * @param indexName
      * @param key
      * @param value
-     * @param type      0.早于某个时间范围，1.晚于某个时间范围
+     * @param type 0.早于某个时间范围，1.晚于某个时间范围
      * @param pageNo
      * @param size
      * @return
@@ -649,7 +649,7 @@ public class SearchApi {
      * @param queries
      * @return
      */
-    public static SearchResponse searchByMultiQueriesAndOrders(String indexName, String type,
+    public static LinkedList<HashMap<String, Object>> searchByMultiQueriesAndOrders(String indexName,
             Map<String, SortOrder> sortProperties, Integer pageNo, Integer size, QueryBuilder... queries) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -670,14 +670,15 @@ public class SearchApi {
         searchSourceBuilder.version(true);
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
         searchRequest.source(searchSourceBuilder);
-        try {
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            return searchResponse;
-        } catch (IOException e) {
-            log.error(e.getMessage());
 
-        }
-        return null;
+//        try {
+//            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+//            return searchResponse;
+//        } catch (IOException e) {
+//            log.error(e.getMessage());
+//
+//        }
+        return parseResponse(searchRequest);
     }
 
     /**
@@ -823,9 +824,9 @@ public class SearchApi {
         }
     }
 
-
     /**
      * 更新指定字段
+     * 
      * @param indexName
      * @param field
      * @param value
@@ -833,16 +834,16 @@ public class SearchApi {
      * @return
      */
     public static String updateFieldValueById(String indexName, String field, String value, String id) {
-      
-       
-        // updateRequest.script(new Script(String.format("ctx._source.%s=%s", field, value)));
+
+        // updateRequest.script(new Script(String.format("ctx._source.%s=%s", field,
+        // value)));
         // updateRequest.upsertRequest();
         try {
             XContentBuilder builder = XContentFactory.jsonBuilder();
             builder.startObject();
             {
                 builder.field(field, value);
-             
+
             }
             builder.endObject();
             // return client.update(updateRequest, RequestOptions.DEFAULT);

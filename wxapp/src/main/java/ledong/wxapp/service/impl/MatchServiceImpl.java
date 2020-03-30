@@ -1,8 +1,13 @@
 package ledong.wxapp.service.impl;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +64,6 @@ public class MatchServiceImpl implements IMatchService {
                 } else {
                     System.out.println("the Key = " + entry.getKey() + " has been locked ");
                 }
-
             }
         } else {
 
@@ -139,19 +143,44 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     @Override
-    public String acceptIntentionalMatch(String parentId,String challenger) {
+    public String acceptIntentionalMatch(String parentId, String challenger) {
         HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, parentId);
-        if(match==null){
+        if (match == null) {
             return null;
         }
-        String holder=(String) match.get(MatchPostVo.HOLDER);
-        String matchId = postMatches((String) match.get(MatchPostVo.ID), holder,
-                challenger,
-                MatchStatusCodeEnum.MATCH_TYPE_PICK
-                        .getCode(),
-                MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null, null);
+        String holder = (String) match.get(MatchPostVo.HOLDER);
+        String matchId = postMatches((String) match.get(MatchPostVo.ID), holder, challenger,
+                MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(), MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null,
+                null);
         attachedMatchSession(matchId, holder, challenger);
         return matchId;
+    }
+
+    @Override
+    public List<String> getIntentionalMatchs(String postUser, String exclusiveUser) {
+        try {
+            ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+            if (!StringUtil.isEmpty(postUser)) {
+                params.add(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, postUser));
+            }
+            if (!StringUtil.isEmpty(postUser)) {
+                params.add(SearchApi.createNotSearchSource(MatchPostVo.HOLDER, exclusiveUser));
+            }
+            if (params.size() == 0) {
+                params.add(SearchApi.createSearchAll());
+            }
+            String endTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
+            String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(), DateUtil.FORMAT_DATETIME_NUM);
+            params.add(SearchApi.createSearchByFieldRangeSource(MatchPostVo.ORDERTIME, startTime, endTime));
+            SearchResponse searchResponse = SearchApi.searchByMultiQueriesAndOrders(
+                    DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, pageNo, pageSize,
+                    params.toArray(values));
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }
