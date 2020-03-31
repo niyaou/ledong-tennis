@@ -1,6 +1,7 @@
 package ledong.wxapp.service;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public interface IMatchService {
 
@@ -105,5 +106,5 @@ public interface IMatchService {
      * @param exclusiveUser return list which NOT post by given user
      * @return
      */
-    public List<String> getIntentionalMatchs(String postUser, String exclusiveUser);
+    public LinkedList<HashMap<String, Object>> getIntentionalMatchs(String postUser, String exclusiveUser);
 }

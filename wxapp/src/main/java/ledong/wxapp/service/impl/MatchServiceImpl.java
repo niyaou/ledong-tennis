@@ -3,11 +3,11 @@ package ledong.wxapp.service.impl;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,12 +38,12 @@ public class MatchServiceImpl implements IMatchService {
         vo.setLocation(courtGps);
         vo.setUserName("niyaou");
 
-        redis.hdel(MatchRequestVo.MATCHREQUESTFROM, StringUtil.combiningSpecifiedUserKey(user));// child key expired
-                                                                                                // time specification
-                                                                                                // should add future by
-                                                                                                // reddision
-
-        redis.hset(MatchRequestVo.MATCHREQUESTFROM, StringUtil.combiningSpecifiedUserKey(vo.getUserName()), vo, 10);
+        redis.hdel(MatchRequestVo.MATCHREQUESTFROM, StringUtil.combiningSpecifiedUserKey(user, null));
+        // child key
+        // expired
+        // time specification
+        // should add future by
+        // reddision
 
         Map<Object, Object> map = redis.hmget(MatchRequestVo.MATCHREQUESTFROM);
         if (map.size() != 0) {
@@ -60,17 +60,44 @@ public class MatchServiceImpl implements IMatchService {
                             MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, "南湖", "54.6,123.1");
                     System.out.println(String.format(" create match post : %s", user));
                     attachedMatchSession(matchId, user, otherRequest.getUserName());
+                    redis.set(StringUtil.combiningSpecifiedUserKey(otherRequest.getUserName(), "receive"), matchId, 7);
                     return matchId;
                 } else {
                     System.out.println("the Key = " + entry.getKey() + " has been locked ");
                 }
             }
         } else {
-
+            LinkedList<HashMap<String, Object>> matches = getIntentionalMatchs(null, user);
+            if (matches != null) {
+                String pickMatchId = (String) matches.get(0).get(SearchApi.ID);
+                String hodler = (String) matches.get(0).get(MatchPostVo.HOLDER);
+                System.out.println(String.format(" create pick match post : %s", user));
+                attachedMatchSession(pickMatchId, hodler, user);
+                return pickMatchId;
+            } else {
+                redis.hset(MatchRequestVo.MATCHREQUESTFROM,
+                        StringUtil.combiningSpecifiedUserKey(vo.getUserName(), null), vo, 10);
+                long interval = 6000;
+                while (interval > 0) {
+                    String receiveKey = StringUtil.combiningSpecifiedUserKey(vo.getUserName(), "receive");
+                    if (redis.hasKey(receiveKey)) {
+                        String receiveVo = (String) redis.get(receiveKey);
+                        return receiveVo;
+                    } else {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        interval -= 200;
+                    }
+                    ;
+                }
+            }
         }
 
         System.out.print(map.toString());
-        return "" + redis.hset(MatchRequestVo.MATCHREQUESTFROM, StringUtil.combiningSpecifiedUserKey(user), vo, 10);
+        return null;
     }
 
     @Override
@@ -157,7 +184,7 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     @Override
-    public List<String> getIntentionalMatchs(String postUser, String exclusiveUser) {
+    public LinkedList<HashMap<String, Object>> getIntentionalMatchs(String postUser, String exclusiveUser) {
         try {
             ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
             if (!StringUtil.isEmpty(postUser)) {
@@ -172,14 +199,19 @@ public class MatchServiceImpl implements IMatchService {
             String endTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
             String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(), DateUtil.FORMAT_DATETIME_NUM);
             params.add(SearchApi.createSearchByFieldRangeSource(MatchPostVo.ORDERTIME, startTime, endTime));
-            SearchResponse searchResponse = SearchApi.searchByMultiQueriesAndOrders(
-                    DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, pageNo, pageSize,
-                    params.toArray(values));
+            Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
+            sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
+            QueryBuilder[] values = new QueryBuilder[8];
+            LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
+                    DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
+//            List<String> matches = new ArrayList<String>();
+//            for (HashMap<String, Object> resp : searchResponse) {
+//                matches.add((String) resp.get(SearchApi.ID));
+//            }
+            return searchResponse.size() != 0 ? searchResponse : null;
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
         return null;
     }
 

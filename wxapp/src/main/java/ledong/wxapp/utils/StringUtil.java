@@ -258,9 +258,12 @@ public final class StringUtil {
      * @param user
      * @return
      */
-    public static String combiningSpecifiedUserKey(String user) {
-
-        return String.format("[%s]", user);
+    public static String combiningSpecifiedUserKey(String user, String appendex) {
+        String combine = String.format("[%s]", user);
+        if (isNotEmpty(appendex)) {
+            combine = String.format("%s-%s", user, appendex);
+        }
+        return combine;
 
     }
 
