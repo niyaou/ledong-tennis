@@ -20,7 +20,7 @@ import ledong.wxapp.redis.RedisUtil;
 // //告诉JUnitSpring配置文件
 // @ContextConfiguration(classes = DemoApplicationTests.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes=RedisUtil.class)
+@SpringBootTest(classes = RedisUtil.class)
 class DemoApplicationTests {
 
     @Autowired
@@ -31,6 +31,18 @@ class DemoApplicationTests {
         Object a = redis.get("key");
         System.out.println(a.toString());
         assertTrue(false);
+        // if(!ctx._source.containsKey("challengerContext")){
+        //     ctx._source.challengerContext=[params.challengerContext]
+        // } else { 
+        //     for(int i=0; i<ctx._source.challengerContext.size(); i++){ 
+        //         if (ctx._source.challengerContext[i]['postTime'] == params.challengerContext.postTime){
+            
+        //             break;
+        //         }else{
+        //             ctx._source.challengerContext.add(params.challengerContext);
+        //         }
+        //     }
+        // }
     }
 
 }

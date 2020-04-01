@@ -3,6 +3,8 @@ package ledong.wxapp.service;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import VO.SessionVo;
+
 public interface IMatchService {
 
     /**
@@ -102,9 +104,29 @@ public interface IMatchService {
     /**
      * find a exist intentional matchs
      * 
-     * @param postUser return list which post by given user
+     * @param postUser      return list which post by given user
      * @param exclusiveUser return list which NOT post by given user
      * @return
      */
     public LinkedList<HashMap<String, Object>> getIntentionalMatchs(String postUser, String exclusiveUser);
+
+    /**
+     * get list of session dialog context
+     * 
+     * 
+     * @param sessionId
+     * @param seconds   0: all context , others : recent seconds context
+     * @return
+     */
+    public Object getSessionContext(String sessionId, int seconds);
+
+    /**
+     * insert session context
+     * 
+     * @param sessionId
+     * @param context
+     * @param type      0: holder context , 1: challenger context
+     * @return
+     */
+    public String insertSessionContext(String sessionId, String context, int type);
 }

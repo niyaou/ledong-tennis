@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.fastjson.JSON;
+
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.join.ScoreMode;
@@ -23,6 +25,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
@@ -36,13 +39,14 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-
+import org.slf4j.LoggerFactory;
 import ledong.wxapp.config.EsClientFactory;
 import response.ErrorResponse;
 
@@ -54,7 +58,7 @@ import response.ErrorResponse;
  */
 public class SearchApi {
     public static final String TYPE = "_doc";
-    public static final String ID = "Id";
+    public static final String ID = "id";
     public static final String TASKID = "taskId";
     public static final String VERSION = "version";
     public static final String SUM = "query_fileSize";
@@ -122,7 +126,7 @@ public class SearchApi {
     public static HashMap<String, Object> searchById(String indexName, String id) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.version(true);
+        // searchSourceBuilder.version(true);
         searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(id));
         searchRequest.source(searchSourceBuilder);
         return parseSingleResponse(searchRequest);
@@ -388,6 +392,58 @@ public class SearchApi {
     }
 
     /**
+     * @param index
+     * @param type
+     * @param id
+     * @param field  需更新的字段
+     * @param value
+     * @param delete : (default false) -----> true delete an element from array
+     *               -----> false add an element to array
+     *
+     */
+    public static String updateExistListObject(String indexName, String id, Map<String, String> o, String field,
+            boolean isDelete)  {
+
+        Map<String, String> map = (Map<String, String>) o;
+        String property = (String) map.keySet().toArray()[0];
+        Map<String, Object> params = new HashMap<>();
+        params.put(field, o);
+        String script_str = null;
+        Script script = null;
+        UpdateResponse updateResponse = null;
+        if (isDelete) {
+            script_str = "for (int i=0;i<ctx._source." + field + ".size();i++)" + "{ if(ctx._source." + field + "[i]['"
+                    + property + "'] == params." + field + "." + property + ")" + "{ctx._source." + field
+                    + ".remove(i)}}";
+        } else {
+            // 表示如果该doc不包含该字段，在该doc新建字段并赋值value，
+            // 如果存在该字段,会比较传入的对象是否存在于list中存在的对象相等，如果不相等就添加，相等就更新
+            script_str = "if(!ctx._source.containsKey('"+field+"'))" + "{ctx._source."+field+"=[params."+field+"]} " +
+                    "else { ctx._source."+field+".add(params."+field+")}";
+
+            script = new Script(ScriptType.INLINE,Script.DEFAULT_SCRIPT_LANG,script_str,params );
+   
+            // logger.info("script:\n"+script);
+            log.warn(String.format("错误信息 ： %s", script_str));
+
+   log.warn(String.format("params ： %s", script.getParams()));
+        }
+
+        try {
+            UpdateRequest updateRequest = new UpdateRequest(indexName, id);
+
+            updateRequest.script(script);
+            updateRequest.upsertRequest();
+            updateResponse = client.update(updateRequest, RequestOptions.DEFAULT);
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+
+        }
+        return updateResponse.getResult().equals(Result.UPDATED) ? updateResponse.getId() : null;
+    }
+
+    /**
      * 模糊查询特定字段的指定值,按指定规则排序结果
      * 
      * @param indexName
@@ -439,7 +495,7 @@ public class SearchApi {
      * @param indexName
      * @param key
      * @param value
-     * @param type 0.早于某个时间范围，1.晚于某个时间范围
+     * @param type      0.早于某个时间范围，1.晚于某个时间范围
      * @param pageNo
      * @param size
      * @return
@@ -671,13 +727,14 @@ public class SearchApi {
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
         searchRequest.source(searchSourceBuilder);
 
-//        try {
-//            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-//            return searchResponse;
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//
-//        }
+        // try {
+        // SearchResponse searchResponse = client.search(searchRequest,
+        // RequestOptions.DEFAULT);
+        // return searchResponse;
+        // } catch (IOException e) {
+        // log.error(e.getMessage());
+        //
+        // }
         return parseResponse(searchRequest);
     }
 

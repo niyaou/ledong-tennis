@@ -2,10 +2,16 @@ package ledong.wxapp.service.impl;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
 import VO.SessionVo;
+import VO.SessionVo.dialogDetail;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
@@ -26,7 +33,7 @@ import ledong.wxapp.utils.StringUtil;
 
 @Service
 public class MatchServiceImpl implements IMatchService {
-
+    private final static Logger log = Logger.getLogger(MatchServiceImpl.class);
     @Autowired
     private RedisUtil redis;
 
@@ -204,15 +211,68 @@ public class MatchServiceImpl implements IMatchService {
             QueryBuilder[] values = new QueryBuilder[8];
             LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
                     DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
-//            List<String> matches = new ArrayList<String>();
-//            for (HashMap<String, Object> resp : searchResponse) {
-//                matches.add((String) resp.get(SearchApi.ID));
-//            }
+            // List<String> matches = new ArrayList<String>();
+            // for (HashMap<String, Object> resp : searchResponse) {
+            // matches.add((String) resp.get(SearchApi.ID));
+            // }
             return searchResponse.size() != 0 ? searchResponse : null;
         } catch (ParseException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public Object getSessionContext(String sessionId, int seconds) {
+        HashMap<String, Object> session = SearchApi.searchById(DataSetConstant.SESSION_INFORMATION, sessionId);
+        SessionVo vo = null;
+        if (session == null) {
+            return null;
+        } else if (Integer.valueOf(0).equals(seconds)) {
+            log.warn(session);
+            log.warn(String.format("    session %s:",JSON.toJSONString(session)));
+            // vo = JSON.parseObject(JSON.toJSONString(session), SessionVo.class);
+           return  session.get(SessionVo.HOLDERCONTEXT);
+        } else {
+            log.warn(session);
+            log.warn(String.format("    session %s:",JSON.toJSONString(session)));
+            return  session.get(SessionVo.HOLDERCONTEXT);
+            // vo = JSON.parseObject(JSON.toJSONString(session), SessionVo.class);
+
+            // Predicate<SessionVo.dialogDetail> p = new Predicate<SessionVo.dialogDetail>() {
+
+            //     @Override
+            //     public boolean test(SessionVo.dialogDetail t) {
+            //         return (DateUtil.getDateLong(t.getPostTime()) - seconds * 1000) > 0;
+            //     }
+            // };
+            // SessionVo.dialogDetail[] challengerContext = vo.getHolderContext();
+            // Arrays.stream(challengerContext).filter(p);
+            // vo.setChallengerContext(challengerContext);
+
+            // SessionVo.dialogDetail[] holderContext = vo.getHolderContext();
+            // Arrays.stream(holderContext).filter(p);
+            // vo.setHolderContext(holderContext);
+
+        }
+     
+    }
+
+    @Override
+    public String insertSessionContext(String sessionId, String context, int type) {
+        HashMap<String, Object> session = SearchApi.searchById(DataSetConstant.SESSION_INFORMATION, sessionId);
+        // SessionVo vo = null;
+        if (session == null) {
+            System.out.println("session is not existed");
+            return null;
+        } else {
+            Map<String, String> o = new HashMap<String, String>();
+            o.put(SessionVo.dialogDetail.POSTTIME, DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME) );
+            o.put(SessionVo.dialogDetail.CONTEXT, context);
+            return SearchApi.updateExistListObject(DataSetConstant.SESSION_INFORMATION, sessionId, o,type == 0 ? SessionVo.HOLDERCONTEXT : SessionVo.CHALLENGERCONTEXT,
+                    false);
+        }
+
     }
 
 }

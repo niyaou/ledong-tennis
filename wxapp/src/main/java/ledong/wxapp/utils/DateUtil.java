@@ -312,6 +312,12 @@ public final class DateUtil {
         return null;
     }
 
+    /**
+     * 比较时间远近
+     * @param d1
+     * @param d2
+     * @return
+     */
     public static int compareDate(String d1, String d2) {
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm");
@@ -378,6 +384,7 @@ public final class DateUtil {
         return DateUtil.getDate(d, DateUtil.FORMAT_DATE_TIME);
     }
 
+    
     public static String getDateDiff(Long diff) throws Exception {
         // 输出结果
         StringBuilder builder = new StringBuilder();

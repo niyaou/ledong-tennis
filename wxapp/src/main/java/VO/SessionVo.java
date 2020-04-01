@@ -92,7 +92,7 @@ public class SessionVo implements Serializable {
         this.challengerContext = challengerContext;
     }
 
-    class dialogDetail {
+    public class dialogDetail {
         @ApiModelProperty(value = "postTime format : yyyy-MM-dd HH:mm:ss")
         private String postTime;
         public static final String POSTTIME = "postTime";
@@ -100,5 +100,21 @@ public class SessionVo implements Serializable {
         @ApiModelProperty(value = "dialog context ")
         private String context;
         public static final String CONTEXT = "context";
+
+        public void setPostTime(String postTime) {
+            this.postTime = postTime;
+        }
+
+        public String getPostTime() {
+            return this.postTime;
+        }
+
+        public void setContext(String context) {
+            this.context = context;
+        }
+
+        public String getContext() {
+            return this.context;
+        }
     }
 }
