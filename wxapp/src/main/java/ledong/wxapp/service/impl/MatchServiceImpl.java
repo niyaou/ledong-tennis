@@ -3,12 +3,16 @@ package ledong.wxapp.service.impl;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -223,39 +227,35 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object getSessionContext(String sessionId, int seconds) {
         HashMap<String, Object> session = SearchApi.searchById(DataSetConstant.SESSION_INFORMATION, sessionId);
-        SessionVo vo = null;
+
+        List<HashMap<String, Object>> challengerContext = null;
+        List<HashMap<String, Object>> holderContext = null;
         if (session == null) {
             return null;
         } else if (Integer.valueOf(0).equals(seconds)) {
-            log.warn(session);
-            log.warn(String.format("    session %s:",JSON.toJSONString(session)));
-            // vo = JSON.parseObject(JSON.toJSONString(session), SessionVo.class);
-           return  session.get(SessionVo.HOLDERCONTEXT);
+            challengerContext = (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT);
+            holderContext = (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT);
         } else {
-            log.warn(session);
-            log.warn(String.format("    session %s:",JSON.toJSONString(session)));
-            return  session.get(SessionVo.HOLDERCONTEXT);
-            // vo = JSON.parseObject(JSON.toJSONString(session), SessionVo.class);
-
-            // Predicate<SessionVo.dialogDetail> p = new Predicate<SessionVo.dialogDetail>() {
-
-            //     @Override
-            //     public boolean test(SessionVo.dialogDetail t) {
-            //         return (DateUtil.getDateLong(t.getPostTime()) - seconds * 1000) > 0;
-            //     }
-            // };
-            // SessionVo.dialogDetail[] challengerContext = vo.getHolderContext();
-            // Arrays.stream(challengerContext).filter(p);
-            // vo.setChallengerContext(challengerContext);
-
-            // SessionVo.dialogDetail[] holderContext = vo.getHolderContext();
-            // Arrays.stream(holderContext).filter(p);
-            // vo.setHolderContext(holderContext);
-
+            challengerContext = (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT);
+            holderContext = (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT);
+            Predicate<HashMap<String, Object>> p = new Predicate<HashMap<String, Object>>() {
+                @Override
+                public boolean test(HashMap<String, Object> t) {
+                            long div= (System.currentTimeMillis()
+                            - DateUtil.getDateLong((String) t.get(SessionVo.dialogDetail.POSTTIME)));
+                    return div < seconds * 1000;
+                }
+            };
+            challengerContext = challengerContext.stream().filter(p).collect(Collectors.toList());
+            holderContext = holderContext.stream().filter(p).collect(Collectors.toList());
         }
-     
+        HashMap<String, Object> content = new HashMap<String, Object>();
+        content.put(SessionVo.CHALLENGERCONTEXT, challengerContext);
+        content.put(SessionVo.HOLDERCONTEXT, holderContext);
+        return content;
     }
 
     @Override
@@ -267,10 +267,10 @@ public class MatchServiceImpl implements IMatchService {
             return null;
         } else {
             Map<String, String> o = new HashMap<String, String>();
-            o.put(SessionVo.dialogDetail.POSTTIME, DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME) );
+            o.put(SessionVo.dialogDetail.POSTTIME, DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
             o.put(SessionVo.dialogDetail.CONTEXT, context);
-            return SearchApi.updateExistListObject(DataSetConstant.SESSION_INFORMATION, sessionId, o,type == 0 ? SessionVo.HOLDERCONTEXT : SessionVo.CHALLENGERCONTEXT,
-                    false);
+            return SearchApi.updateExistListObject(DataSetConstant.SESSION_INFORMATION, sessionId, o,
+                    type == 0 ? SessionVo.HOLDERCONTEXT : SessionVo.CHALLENGERCONTEXT, false);
         }
 
     }
