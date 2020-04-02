@@ -1,6 +1,7 @@
 package VO;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -90,6 +91,9 @@ public class SessionVo implements Serializable {
 
     public void setChallengerContext(dialogDetail[] challengerContext) {
         this.challengerContext = challengerContext;
+    }
+    public static String comparingByTime(Map<String, Object> map){
+        return (String) map.get(dialogDetail.POSTTIME);
     }
 
     public class dialogDetail {

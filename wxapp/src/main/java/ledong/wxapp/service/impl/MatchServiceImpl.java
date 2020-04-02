@@ -231,26 +231,37 @@ public class MatchServiceImpl implements IMatchService {
     public Object getSessionContext(String sessionId, int seconds) {
         HashMap<String, Object> session = SearchApi.searchById(DataSetConstant.SESSION_INFORMATION, sessionId);
 
-        List<HashMap<String, Object>> challengerContext = null;
-        List<HashMap<String, Object>> holderContext = null;
+        LinkedList<HashMap<String, Object>> challengerContext = null;
+        LinkedList<HashMap<String, Object>> holderContext = null;
         if (session == null) {
             return null;
         } else if (Integer.valueOf(0).equals(seconds)) {
-            challengerContext = (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT);
-            holderContext = (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT);
+            // challengerContext = (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT);
+            challengerContext =( (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
+            holderContext =( (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
+         
         } else {
-            challengerContext = (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT);
-            holderContext = (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT);
-            Predicate<HashMap<String, Object>> p = new Predicate<HashMap<String, Object>>() {
-                @Override
-                public boolean test(HashMap<String, Object> t) {
-                            long div= (System.currentTimeMillis()
-                            - DateUtil.getDateLong((String) t.get(SessionVo.dialogDetail.POSTTIME)));
-                    return div < seconds * 1000;
-                }
-            };
-            challengerContext = challengerContext.stream().filter(p).collect(Collectors.toList());
-            holderContext = holderContext.stream().filter(p).collect(Collectors.toList());
+            challengerContext =( (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
+            holderContext =( (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
+         // Predicate<HashMap<String, Object>> p = new Predicate<HashMap<String, Object>>() {
+            //     @Override
+            //     public boolean test(HashMap<String, Object> t) {
+                          
+            //         return div < seconds * 1000;
+            //     }
+            // };
+            // challengerContext = challengerContext.stream().filter(p).collect(Collectors.toList());
+            // holderContext = holderContext.stream().filter(p).collect(Collectors.toList());
+
+            challengerContext = challengerContext.stream().sorted(Comparator.comparing(SessionVo::comparingByTime).reversed()).collect(Collectors.toCollection(LinkedList::new));
+            holderContext = holderContext.stream().sorted(Comparator.comparing(SessionVo::comparingByTime).reversed()).collect(Collectors.toCollection(LinkedList::new));
+            while(seconds>0){
+                challengerContext.pollLast();
+                holderContext.pollLast();
+                seconds--;
+            }
+  
+           
         }
         HashMap<String, Object> content = new HashMap<String, Object>();
         content.put(SessionVo.CHALLENGERCONTEXT, challengerContext);
