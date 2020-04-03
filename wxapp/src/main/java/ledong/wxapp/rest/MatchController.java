@@ -76,6 +76,27 @@ public class MatchController {
                 CommonResponse.success(matchService.acceptIntentionalMatch(matchId, challenger)), HttpStatus.OK);
     }
 
+
+
+
+    @RequestMapping(value = "/matchResult/${matchId}", method = RequestMethod.POST)
+    @ApiOperation(value = "finish match ,upload score result", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "holderScore", value = "holderScore", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "challengerScore", value = "challengerScore", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "matchId", value = "  match id", required = true, dataType = "string", paramType = "path") })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> finishMatch(
+            @RequestParam(value = "holderScore", required = true) Integer holderScore,
+            @RequestParam(value = "challengerScore", required = true) Integer challengerScore,
+            @PathVariable(value = "matchId", required = true) String matchId) {
+        MatchRequestVo vo = new MatchRequestVo();
+        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        return new ResponseEntity<Object>(
+                CommonResponse.success(matchService.finishMatch(matchId, holderScore, challengerScore) ), HttpStatus.OK);
+    }
+
+
     @RequestMapping(value = "/challengeMatch/${holder}", method = RequestMethod.POST)
     @ApiOperation(value = "challenge a player", notes = "")
     @ApiImplicitParams({

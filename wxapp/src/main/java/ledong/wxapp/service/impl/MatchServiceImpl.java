@@ -317,23 +317,20 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public String finishMatch(String matchId, int holderScore, int challengerScore) {
-
         HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
-
         if (match == null) {
             return null;
         }
-
         String score = iRankService.matchRank(matchId, holderScore, challengerScore);
-
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
-
         vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
                 : MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode());
         vo.setWinScore(holderScore > challengerScore ? holderScore : challengerScore);
         vo.setLoseScore(holderScore < challengerScore ? holderScore : challengerScore);
-
-        return null;
+        vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
+        vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        vo.setStatus(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
+        return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
     }
 
 }
