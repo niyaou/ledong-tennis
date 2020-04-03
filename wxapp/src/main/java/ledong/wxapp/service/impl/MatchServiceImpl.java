@@ -2,18 +2,12 @@ package ledong.wxapp.service.impl;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -26,7 +20,6 @@ import com.alibaba.fastjson.JSON;
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
 import VO.SessionVo;
-import VO.SessionVo.dialogDetail;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
@@ -107,7 +100,7 @@ public class MatchServiceImpl implements IMatchService {
             }
         }
 
-        System.out.print(map.toString());
+        log.warn(map.toString());
         return null;
     }
 
@@ -236,32 +229,29 @@ public class MatchServiceImpl implements IMatchService {
         if (session == null) {
             return null;
         } else if (Integer.valueOf(0).equals(seconds)) {
-            // challengerContext = (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT);
-            challengerContext =( (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
-            holderContext =( (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
-         
-        } else {
-            challengerContext =( (List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
-            holderContext =( (List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT)).stream().collect(Collectors.toCollection(LinkedList::new));
-         // Predicate<HashMap<String, Object>> p = new Predicate<HashMap<String, Object>>() {
-            //     @Override
-            //     public boolean test(HashMap<String, Object> t) {
-                          
-            //         return div < seconds * 1000;
-            //     }
-            // };
-            // challengerContext = challengerContext.stream().filter(p).collect(Collectors.toList());
-            // holderContext = holderContext.stream().filter(p).collect(Collectors.toList());
+            // challengerContext = (List<HashMap<String, Object>>)
+            // session.get(SessionVo.CHALLENGERCONTEXT);
+            challengerContext = ((List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT)).stream()
+                    .collect(Collectors.toCollection(LinkedList::new));
+            holderContext = ((List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT)).stream()
+                    .collect(Collectors.toCollection(LinkedList::new));
 
-            challengerContext = challengerContext.stream().sorted(Comparator.comparing(SessionVo::comparingByTime).reversed()).collect(Collectors.toCollection(LinkedList::new));
-            holderContext = holderContext.stream().sorted(Comparator.comparing(SessionVo::comparingByTime).reversed()).collect(Collectors.toCollection(LinkedList::new));
-            while(seconds>0){
+        } else {
+            challengerContext = ((List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT)).stream()
+                    .collect(Collectors.toCollection(LinkedList::new));
+            holderContext = ((List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT)).stream()
+                    .collect(Collectors.toCollection(LinkedList::new));
+            challengerContext = challengerContext.stream()
+                    .sorted(Comparator.comparing(SessionVo::comparingByTime).reversed())
+                    .collect(Collectors.toCollection(LinkedList::new));
+            holderContext = holderContext.stream().sorted(Comparator.comparing(SessionVo::comparingByTime).reversed())
+                    .collect(Collectors.toCollection(LinkedList::new));
+            while (seconds > 0) {
                 challengerContext.pollLast();
                 holderContext.pollLast();
                 seconds--;
             }
-  
-           
+
         }
         HashMap<String, Object> content = new HashMap<String, Object>();
         content.put(SessionVo.CHALLENGERCONTEXT, challengerContext);
@@ -284,6 +274,40 @@ public class MatchServiceImpl implements IMatchService {
                     type == 0 ? SessionVo.HOLDERCONTEXT : SessionVo.CHALLENGERCONTEXT, false);
         }
 
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Object getSessionContextWithQuantity(String sessionId, int holderCount, int challengerCount) {
+        HashMap<String, Object> session = SearchApi.searchById(DataSetConstant.SESSION_INFORMATION, sessionId);
+
+        LinkedList<HashMap<String, Object>> challengerContext = null;
+        LinkedList<HashMap<String, Object>> holderContext = null;
+        if (session == null) {
+            return null;
+        } else {
+            challengerContext = ((List<HashMap<String, Object>>) session.get(SessionVo.CHALLENGERCONTEXT)).stream()
+                    .collect(Collectors.toCollection(LinkedList::new));
+            holderContext = ((List<HashMap<String, Object>>) session.get(SessionVo.HOLDERCONTEXT)).stream()
+                    .collect(Collectors.toCollection(LinkedList::new));
+            challengerContext = challengerContext.stream()
+                    .sorted(Comparator.comparing(SessionVo::comparingByTime).reversed())
+                    .collect(Collectors.toCollection(LinkedList::new));
+            holderContext = holderContext.stream().sorted(Comparator.comparing(SessionVo::comparingByTime).reversed())
+                    .collect(Collectors.toCollection(LinkedList::new));
+            while (holderCount > 0) {
+                holderContext.pollLast();
+                holderCount--;
+            }
+            while (challengerCount > 0) {
+                challengerContext.pollLast();
+                challengerCount--;
+            }
+        }
+        HashMap<String, Object> content = new HashMap<String, Object>();
+        content.put(SessionVo.CHALLENGERCONTEXT, challengerContext);
+        content.put(SessionVo.HOLDERCONTEXT, holderContext);
+        return content;
     }
 
 }
