@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
@@ -25,6 +26,7 @@ import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IMatchService;
+import ledong.wxapp.service.IRankService;
 import ledong.wxapp.utils.DateUtil;
 import ledong.wxapp.utils.StringUtil;
 
@@ -33,6 +35,9 @@ public class MatchServiceImpl implements IMatchService {
     private final static Logger log = Logger.getLogger(MatchServiceImpl.class);
     @Autowired
     private RedisUtil redis;
+
+    @Autowired
+    private IRankService iRankService;
 
     @Override
     public String requestMatching(String user, String courtGps) {
@@ -308,6 +313,27 @@ public class MatchServiceImpl implements IMatchService {
         content.put(SessionVo.CHALLENGERCONTEXT, challengerContext);
         content.put(SessionVo.HOLDERCONTEXT, holderContext);
         return content;
+    }
+
+    @Override
+    public String finishMatch(String matchId, int holderScore, int challengerScore) {
+
+        HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
+
+        if (match == null) {
+            return null;
+        }
+
+        String score = iRankService.matchRank(matchId, holderScore, challengerScore);
+
+        MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
+
+        vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
+                : MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode());
+        vo.setWinScore(holderScore > challengerScore ? holderScore : challengerScore);
+        vo.setLoseScore(holderScore < challengerScore ? holderScore : challengerScore);
+
+        return null;
     }
 
 }

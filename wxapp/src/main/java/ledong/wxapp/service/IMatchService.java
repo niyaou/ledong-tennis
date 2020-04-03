@@ -138,4 +138,15 @@ public interface IMatchService {
      * @return
      */
     public String insertSessionContext(String sessionId, String context, int type);
+
+    /**
+     * 
+     * finish the given match ,upload score of this match ,and auto ranking
+     * 
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public String finishMatch(String matchId, int holderScore, int challengerScore);
 }

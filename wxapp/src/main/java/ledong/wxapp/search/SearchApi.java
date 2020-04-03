@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.alibaba.fastjson.JSON;
-
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.join.ScoreMode;
@@ -46,7 +44,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.slf4j.LoggerFactory;
+
 import ledong.wxapp.config.EsClientFactory;
 import response.ErrorResponse;
 
@@ -395,16 +393,16 @@ public class SearchApi {
      * @param index
      * @param type
      * @param id
-     * @param field  需更新的字段
+     * @param field 需更新的字段
      * @param value
      * @param delete : (default false) -----> true delete an element from array
-     *               -----> false add an element to array
+     * -----> false add an element to array
      *
      */
     public static String updateExistListObject(String indexName, String id, Map<String, String> o, String field,
-            boolean isDelete)  {
+            boolean isDelete) {
 
-        Map<String, String> map = (Map<String, String>) o;
+        Map<String, String> map = o;
         String property = (String) map.keySet().toArray()[0];
         Map<String, Object> params = new HashMap<>();
         params.put(field, o);
@@ -418,15 +416,15 @@ public class SearchApi {
         } else {
             // 表示如果该doc不包含该字段，在该doc新建字段并赋值value，
             // 如果存在该字段,会比较传入的对象是否存在于list中存在的对象相等，如果不相等就添加，相等就更新
-            script_str = "if(!ctx._source.containsKey('"+field+"'))" + "{ctx._source."+field+"=[params."+field+"]} " +
-                    "else { ctx._source."+field+".add(params."+field+")}";
+            script_str = "if(!ctx._source.containsKey('" + field + "'))" + "{ctx._source." + field + "=[params." + field
+                    + "]} " + "else { ctx._source." + field + ".add(params." + field + ")}";
 
-            script = new Script(ScriptType.INLINE,Script.DEFAULT_SCRIPT_LANG,script_str,params );
-   
+            script = new Script(ScriptType.INLINE, Script.DEFAULT_SCRIPT_LANG, script_str, params);
+
             // logger.info("script:\n"+script);
             log.warn(String.format("错误信息 ： %s", script_str));
 
-   log.warn(String.format("params ： %s", script.getParams()));
+            log.warn(String.format("params ： %s", script.getParams()));
         }
 
         try {
@@ -495,7 +493,7 @@ public class SearchApi {
      * @param indexName
      * @param key
      * @param value
-     * @param type      0.早于某个时间范围，1.晚于某个时间范围
+     * @param type 0.早于某个时间范围，1.晚于某个时间范围
      * @param pageNo
      * @param size
      * @return
@@ -869,16 +867,12 @@ public class SearchApi {
      * @param id
      * @return
      */
-    public static DocWriteResponse updateDocument(String indexName, String type, String doc, String id) {
-        UpdateRequest updateRequest = new UpdateRequest(indexName, type, id);
+    public static String updateDocument(String indexName, String doc, String id) {
+        UpdateRequest updateRequest = new UpdateRequest(indexName, id);
         updateRequest.doc(doc, XContentType.JSON);
         updateRequest.upsertRequest();
-        try {
-            return client.update(updateRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            return new ErrorResponse();
-        }
+        return parseUpdateResponse(updateRequest);
+
     }
 
     /**
@@ -1028,6 +1022,18 @@ public class SearchApi {
                 m.put(ID, hit.getId());
                 m.put(VERSION, hit.getVersion());
                 return m;
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return null;
+    }
+
+    private static String parseUpdateResponse(UpdateRequest searchRequest) {
+        try {
+            DocWriteResponse updateResponse = client.update(searchRequest, RequestOptions.DEFAULT);
+            if (updateResponse.getResult().equals(Result.UPDATED)) {
+                return updateResponse.getId();
             }
         } catch (IOException e) {
             log.error(e.getMessage());
