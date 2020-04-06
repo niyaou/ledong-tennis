@@ -27,8 +27,13 @@ public class Swagger2 {
 
     @Bean
     public Docket createRestApi() {
+        ParameterBuilder ticketPar = new ParameterBuilder();
+        List<Parameter> pars = new ArrayList<Parameter>();
+        ticketPar.name("Authorization").description("token").modelRef(new ModelRef("string")).parameterType("header")
+                .defaultValue("Bearer ").required(true).build();
+        pars.add(ticketPar.build());
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("ledong.wxapp")).paths(PathSelectors.any()).build();
+                .apis(RequestHandlerSelectors.basePackage("ledong.wxapp")).paths(PathSelectors.any()).build().globalOperationParameters(pars);
     }
 
     private ApiInfo apiInfo() {

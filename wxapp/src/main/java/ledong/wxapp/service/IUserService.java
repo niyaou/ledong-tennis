@@ -22,5 +22,5 @@ public interface IUserService {
      * @param password
      * @return
      */
-    public HashMap<String, Object> login(String user, String password);
+    public String login(String user, String password);
 }

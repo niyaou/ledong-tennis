@@ -3,11 +3,13 @@ package ledong.wxapp.service.impl;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 
 import VO.UserVo;
+import ledong.wxapp.auth.JwtToken;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IUserService;
@@ -15,6 +17,9 @@ import ledong.wxapp.utils.DateUtil;
 
 @Service
 public class UserServiceImpl implements IUserService {
+
+    @Autowired
+    private JwtToken jwtToken;
 
     @Override
     public String addUser(UserVo user) {
@@ -24,7 +29,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public HashMap<String, Object> login(String user, String password) {
+    public String login(String user, String password) {
 
         HashMap<String, String> vo = new HashMap<String, String>();
         vo.put(UserVo.USERNAME, user);
@@ -34,7 +39,8 @@ public class UserServiceImpl implements IUserService {
         if (loginUser != null) {
             String passwordStore = (String) loginUser.get(0).get(UserVo.PASSWORD);
             if (passwordStore.equals(password)) {
-                return loginUser.get(0);
+               
+                return  jwtToken.generateToken(user);
             }
         }
         return null;
