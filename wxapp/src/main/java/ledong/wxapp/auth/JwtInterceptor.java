@@ -51,7 +51,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
                     request.setAttribute("user",userId);
                 } catch (Exception e) {
-                    throw new RuntimeException("令牌不正确");
+                    throw new AuthenticationException("令牌不正确");
                 }
             }
 
