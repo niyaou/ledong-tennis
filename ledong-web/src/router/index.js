@@ -1,24 +1,26 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import index from '../components/index'
+import register from '../components/register'
 
 Vue.use(Router)
-
-// export default new Router({
-//   routes: [
-//     {
-//       path: '/',
-//       name: 'HelloWorld',
-//       component: HelloWorld
-//     }
-//   ]
-// })
 
 const routes = [
   {
     path: '/',
-    component: require('../components/index'),
+    name: 'index',
+    component: index,
     meta: {
       requiresAuth: true
+    }
+
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: register,
+    meta: {
+      requiresAuth: false
     }
   }
 ]
@@ -30,11 +32,13 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   let token = window.localStorage.getItem('token')
 
+  console.info(to)
+
   if (to.matched.some(record => record.meta.requiresAuth) && (!token || token === null)) {
     console.info('  auth ', 1)
     next({
-      path: '../components/login',
-      query: { redirect: to.fullPath }
+      path: '/register',
+      query: { redirect: to.name }
     })
   } else {
     console.info('  auth ', 2)

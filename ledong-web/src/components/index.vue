@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    565765765756
+    index
   </div>
 </template>
 

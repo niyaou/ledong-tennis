@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-   1212121212121
+   register
   </div>
 </template>
 
