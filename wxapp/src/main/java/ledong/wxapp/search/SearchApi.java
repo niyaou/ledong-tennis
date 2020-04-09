@@ -239,6 +239,28 @@ public class SearchApi {
         return parseResponse(searchRequest);
     }
 
+
+    /**
+     * 
+     * 根据排序条件查询指定条目
+     * @param indexName
+     * @param sortField
+     * @param order
+     * @param size
+     * @return
+     */
+    public static LinkedList<HashMap<String, Object>> searchByFieldSorted(String indexName, 
+    String sortField, SortOrder order, Integer size) {
+SearchRequest searchRequest = new SearchRequest(indexName);
+SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+searchSourceBuilder.sort(sortField, order);
+searchSourceBuilder.query(createSearchAll()).size(size);
+searchRequest.source(searchSourceBuilder);
+return parseResponse(searchRequest);
+}
+
+
+
     /**
      * *查询所有数据
      * 

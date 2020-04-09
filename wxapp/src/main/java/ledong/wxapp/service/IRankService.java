@@ -35,4 +35,12 @@ public interface IRankService {
      */
     public String updateRankInfo(String userId, RankInfoVo vo);
 
+
+    /**
+     * get ranking list 
+     * 
+     * @return
+     */
+    public Object getRankingList();
+
 }

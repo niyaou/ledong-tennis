@@ -2,6 +2,7 @@ package ledong.wxapp.service.impl;
 
 import java.util.Map;
 
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -49,6 +50,11 @@ public class RankServiceImpl implements IRankService {
     @Override
     public String updateRankInfo(String userId, RankInfoVo vo) {
         return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), userId);
+    }
+
+    @Override
+    public Object getRankingList() {
+        return  SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,RankInfoVo.SCORE,SortOrder.DESC,500 );
     }
 
 }

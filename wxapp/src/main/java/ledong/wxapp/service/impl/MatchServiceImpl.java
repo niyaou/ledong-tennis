@@ -333,4 +333,10 @@ public class MatchServiceImpl implements IMatchService {
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
     }
 
+    @Override
+    public Object getIntentionalMatch(Integer count) {
+        return  SearchApi.searchByFieldSorted(DataSetConstant.GAME_MATCH_INFORMATION,MatchPostVo.STATUS,String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()),
+        MatchPostVo.CREATETIME,SortOrder.DESC,1,count );
+    }
+
 }

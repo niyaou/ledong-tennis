@@ -31,9 +31,8 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   let token = window.localStorage.getItem('token')
-
-  console.info(to)
-
+  // console.info('token', token)
+  // console.info('to', to.matched)
   if (to.matched.some(record => record.meta.requiresAuth) && (!token || token === null)) {
     console.info('  auth ', 1)
     next({

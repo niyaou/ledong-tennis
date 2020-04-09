@@ -5,16 +5,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import VO.MatchRequestVo;
+import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import ledong.wxapp.auth.JwtToken;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.utils.DateUtil;
@@ -24,18 +27,21 @@ import ledong.wxapp.utils.DateUtil;
 @Api(value = "match management", tags = "MatchController")
 @Validated
 public class MatchController {
-
+        @Autowired
+        private JwtToken tokenService;
     @Autowired
     private IMatchService matchService;
 
     @RequestMapping(value = "/randomMatch", method = RequestMethod.POST)
     @ApiOperation(value = "request a random match", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "random request user", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "courtGPS", value = "random request user's location", required = true, dataType = "string", paramType = "query") })
+          
+            @ApiImplicitParam(name = "courtGPS", value = "random request user's location \"latitude,longitude\"", required = true, dataType = "string", paramType = "query") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> randomMatch(@RequestParam(value = "userId", required = true) String userId,
-            @RequestParam(value = "userId", required = true) String courtGPS) {
+    public ResponseEntity<?> randomMatch(@RequestHeader("Authorization") String authHeader,
+            @RequestParam(value = "courtGPS", required = true) String courtGPS) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(CommonResponse.success(matchService.requestMatching(userId, courtGPS)),
@@ -45,21 +51,39 @@ public class MatchController {
     @RequestMapping(value = "/intentionalMatch", method = RequestMethod.POST)
     @ApiOperation(value = "request a intentional match", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "intentional request user", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "courtName", value = "intentional request court name", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "courtGPS", value = "intentional request court location", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "courtGPS", value = "intentional request court location \"latitude,longitude\"", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "orderTime", value = "intentional request time", required = true, dataType = "string", paramType = "query") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> postIntentionalMatch(@RequestParam(value = "userId", required = true) String userId,
+    public ResponseEntity<?> postIntentionalMatch(@RequestHeader("Authorization") String authHeader,
             @RequestParam(value = "courtName", required = true) String courtName,
             @RequestParam(value = "courtGPS", required = true) String courtGPS,
             @RequestParam(value = "orderTime", required = true) String orderTime) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.postIntentionalMatch(userId, courtName, courtGPS, orderTime)),
+                CommonResponse.success(matchService.postIntentionalMatch(userId,orderTime, courtName, courtGPS )),
                 HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/intentionalMatch/{count}", method = RequestMethod.GET)
+    @ApiOperation(value = "request a intentional match", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "count", value = "intentional request count", required = true, dataType = "int", paramType = "path")
+            })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> exploreIntentionalMatch(@PathVariable(value = "count", required = true) Integer count) {
+        MatchRequestVo vo = new MatchRequestVo();
+        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        return new ResponseEntity<Object>(
+                CommonResponse.success(matchService.getIntentionalMatch(count)),
+                HttpStatus.OK);
+    }
+
+
 
     @RequestMapping(value = "/intentionalMatch/${matchId}", method = RequestMethod.POST)
     @ApiOperation(value = "pick a intentional request  match", notes = "")
