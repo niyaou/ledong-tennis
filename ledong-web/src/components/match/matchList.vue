@@ -1,9 +1,9 @@
 <template>
   <div class="component-container">
-
+已发布比赛列表
 <ul id="example-1" class="wt-flex">
   <li v-for="item in matchs" v-bind:key="item.id">
- <div> 发布者 : {{ item.holder }}     ||   场地 : {{ item.courtName}}    ||   时间 : {{ item.orderTime}} </div>
+ <div> 发布者 : {{ item.holder }}      ||  挑战者 : {{ item.challenger }}        ||  场地 : {{ item.courtName}}    ||   时间 : {{ item.orderTime}} </div>
   </li>
 </ul>
   <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button>

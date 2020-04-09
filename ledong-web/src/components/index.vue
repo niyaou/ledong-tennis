@@ -7,6 +7,7 @@
         <list />
         <match-list />
         <random />
+           <intentional />
   </div>
 
 </template>
@@ -17,6 +18,7 @@ import detail from './rank/detail'
 import list from './rank/list'
 import matchList from './match/matchList'
 import random from './match/random'
+import intentional from './match/intentional'
 export default {
   name: 'index',
   data () {
@@ -28,7 +30,8 @@ export default {
     detail,
     list,
     matchList,
-    random
+    random,
+    intentional
   },
   methods: {
     logout () {

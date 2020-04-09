@@ -1,6 +1,6 @@
 <template>
   <div class="component-container">
-
+选手排名表
 <ul id="example-1" class="wt-flex">
   <li v-for="item in ranks" v-bind:key="item.id">
  <div> name : {{ item.id }}     ||   score : {{ item.score}} </div>
@@ -52,7 +52,6 @@ ul {
   list-style-type: none;
   padding: 0;
 }
-
 
 a {
   color: #42b983;

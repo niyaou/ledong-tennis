@@ -38,7 +38,7 @@ export default {
  }
  li {
   display: inline-block;
-  margin: 30px;
+  margin: 5px;
   border-color:#42b983;
   border-width: 1px;
   border-style: solid;

@@ -45,8 +45,8 @@ public class MatchServiceImpl implements IMatchService {
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         vo.setLocation(courtGps);
-        vo.setUserName("niyaou");
-
+        vo.setUserName(user);
+        long requestStart = System.currentTimeMillis();
         redis.hdel(MatchRequestVo.MATCHREQUESTFROM, StringUtil.combiningSpecifiedUserKey(user, null));
         // child key
         // expired
@@ -66,7 +66,7 @@ public class MatchServiceImpl implements IMatchService {
                     otherRequest = otherRequest == null ? otherRequest : otherRequest;
                     String matchId = postMatches(null, user, otherRequest.getUserName(),
                             MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode(),
-                            MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, "南湖", "54.6,123.1");
+                            MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null, courtGps);
                     System.out.println(String.format(" create match post : %s", user));
                     attachedMatchSession(matchId, user, otherRequest.getUserName());
                     redis.set(StringUtil.combiningSpecifiedUserKey(otherRequest.getUserName(), "receive"), matchId, 7);
@@ -79,32 +79,44 @@ public class MatchServiceImpl implements IMatchService {
             LinkedList<HashMap<String, Object>> matches = getIntentionalMatchs(null, user);
             if (matches != null) {
                 String pickMatchId = (String) matches.get(0).get(SearchApi.ID);
-                String hodler = (String) matches.get(0).get(MatchPostVo.HOLDER);
+                // String hodler = (String) matches.get(0).get(MatchPostVo.HOLDER);
                 System.out.println(String.format(" create pick match post : %s", user));
-                attachedMatchSession(pickMatchId, hodler, user);
-                return pickMatchId;
+                
+                return acceptIntentionalMatch(pickMatchId,  user);
             } else {
                 redis.hset(MatchRequestVo.MATCHREQUESTFROM,
                         StringUtil.combiningSpecifiedUserKey(vo.getUserName(), null), vo, 10);
                 long interval = 6000;
-                while (interval > 0) {
+                int count = 0 ;
+                long startTime = System.currentTimeMillis();
+                long endTime = 0;
+                while ((endTime - startTime) < interval) {
+                    // System.out.println(String.format(" interval remains : %d", interval));
                     String receiveKey = StringUtil.combiningSpecifiedUserKey(vo.getUserName(), "receive");
+                 
+                    count++;
+                    // System.out.println(String.format("endTime: %d     startTime : %d     delta: %d ,  check redis   %d   times",endTime,startTime,(endTime - startTime)
+                    // , count));
                     if (redis.hasKey(receiveKey)) {
                         String receiveVo = (String) redis.get(receiveKey);
                         return receiveVo;
                     } else {
+                        endTime = System.currentTimeMillis();
                         try {
-                            Thread.sleep(200);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        interval -= 200;
+                       
+                        // System.out.println(String.format(" interval minus : %d", interval));
                     }
-                    ;
+                  
                 }
+                System.out.println(String.format(" check redis   %d   times", count));
             }
         }
-
+        // long requestStart = System.currentTimeMillis();
+        System.out.println(String.format(" request spend time   %d   ", ( System.currentTimeMillis()-requestStart)));
         log.warn(map.toString());
         return null;
     }
@@ -186,8 +198,8 @@ public class MatchServiceImpl implements IMatchService {
         }
         String holder = (String) match.get(MatchPostVo.HOLDER);
         String matchId = postMatches((String) match.get(MatchPostVo.ID), holder, challenger,
-                MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(), MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null,
-                null);
+                MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(), MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), (String) match.get(MatchPostVo.ORDERTIME), (String) match.get(MatchPostVo.COURTNAME),
+                (String) match.get(MatchPostVo.COURTGPS));
         attachedMatchSession(matchId, holder, challenger);
         return matchId;
     }
@@ -199,14 +211,15 @@ public class MatchServiceImpl implements IMatchService {
             if (!StringUtil.isEmpty(postUser)) {
                 params.add(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, postUser));
             }
-            if (!StringUtil.isEmpty(postUser)) {
+            if (!StringUtil.isEmpty(exclusiveUser)) {
                 params.add(SearchApi.createNotSearchSource(MatchPostVo.HOLDER, exclusiveUser));
             }
             if (params.size() == 0) {
                 params.add(SearchApi.createSearchAll());
             }
-            String endTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
-            String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(), DateUtil.FORMAT_DATETIME_NUM);
+            String endTime =  DateUtil.getDate(DateUtil.getSundayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
+           
+            String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
             params.add(SearchApi.createSearchByFieldRangeSource(MatchPostVo.ORDERTIME, startTime, endTime));
             Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
             sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
@@ -217,7 +230,7 @@ public class MatchServiceImpl implements IMatchService {
             // for (HashMap<String, Object> resp : searchResponse) {
             // matches.add((String) resp.get(SearchApi.ID));
             // }
-            return searchResponse.size() != 0 ? searchResponse : null;
+            return searchResponse;
         } catch (ParseException e) {
             e.printStackTrace();
         }

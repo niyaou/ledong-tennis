@@ -1,5 +1,6 @@
 <template>
   <div class="component-container">
+    选手积分等级
  <div>  name:{{name}}</div>
  <div>  score:{{score}}</div>
        <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button>
