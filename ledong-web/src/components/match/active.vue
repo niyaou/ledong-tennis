@@ -1,20 +1,24 @@
 <template>
   <div class="component-container">
- <div style="margin:10px;font-weight:600">寻找对手的比赛列表</div>
+ <div style="margin:10px;font-weight:600">匹配中的比赛</div>
 <ul id="example-1" class="wt-flex">
   <li v-for="item in matchs" v-bind:key="item.id">
- <div> 发布者 : {{ item.holder }}      ||  挑战者 : {{ item.challenger }}        ||  场地 : {{ item.courtName}}    ||   时间 : {{ item.orderTime}} </div>
- <button v-on:click="challenge(item.id)" class="ui-button" ><span>应战</span></button>
+ <div> 发布者 : {{ item.holder }}      ||  挑战者 : {{ item.challenger }}        ||  场地 : {{ item.courtName}}    ||   时间 : {{ item.orderTime}}
+
+ </div>
+ <button v-on:click="challenge(item.id)" class="ui-button" ><span>协商</span></button>
   </li>
 </ul>
-  <button v-on:click="getScore()" class="ui-button" ><span>刷新</span></button>
+  <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button>
   </div>
 </template>
 
 <script>
 
+import constant from '../../utils/constant'
+import eventBus from '../../main'
 export default {
-  name: 'matchList',
+  name: 'active',
   data () {
     return {
       matchs: []
@@ -22,6 +26,7 @@ export default {
   },
   mounted () {
     // this.initList()
+    this.getScore()
   },
   methods: {
     initList () {
@@ -32,6 +37,7 @@ export default {
       }, 4000)
     },
     challenge (matchId) {
+      eventBus.$emit(constant.EVENT_DEALING_MATCH, matchId)
       console.info(matchId)
     },
     getScore () {
@@ -39,7 +45,7 @@ export default {
 
       this.$axios({
         method: 'get',
-        url: 'http://localhost:8081/match/intentionalMatch/100'
+        url: 'http://localhost:8081/match/matchedGames/100'
       })
         .then((res) => {
           // console.info(res)

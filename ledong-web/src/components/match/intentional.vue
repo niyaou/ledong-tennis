@@ -1,6 +1,6 @@
 <template>
   <div class="component-container" style="height:200px">
-    <div>发布比赛</div>
+     <div style="margin:10px;font-weight:600">发布比赛</div>
     <form v-on:submit.prevent="submit()">
       <input placeholder="球场" maxlength="15" type="text" v-model="court" />
       <!-- <input placeholder="位置" maxlength="13" type="text" v-model="gps" /> -->

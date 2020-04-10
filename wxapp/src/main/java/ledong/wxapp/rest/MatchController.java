@@ -83,6 +83,69 @@ public class MatchController {
                 HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/matchedGames/{count}", method = RequestMethod.GET)
+    @ApiOperation(value = "request  matched games", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "count", value = "matched request count", required = true, dataType = "int", paramType = "path")
+            })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> exploreMatchedGames(@PathVariable(value = "count", required = true) Integer count,@RequestHeader("Authorization") String authHeader) {
+        MatchRequestVo vo = new MatchRequestVo();
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
+        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        return new ResponseEntity<Object>(
+                CommonResponse.success(matchService.getMatchedList(userId,count)),
+                HttpStatus.OK);
+    }
+
+
+
+    @RequestMapping(value = "/matchInfo/{matchId}", method = RequestMethod.GET)
+    @ApiOperation(value = "get  match infos", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "matchId", value = "matched request count", required = true, dataType = "string", paramType = "path")
+            })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> getMatchInfos(@PathVariable(value = "matchId", required = true) String matchId) {
+        return new ResponseEntity<Object>(
+                CommonResponse.success(matchService.getMatchInfos(matchId)),
+                HttpStatus.OK);
+    }
+
+
+    
+    @RequestMapping(value = "/matchInfo/{matchId}", method = RequestMethod.POST)
+    @ApiOperation(value = "update  match infos", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "matchId", value = "matched id", required = true, dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "courtName", value = "intentional request court name", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "orderTime", value = "intentional request time", required = false, dataType = "string", paramType = "query")
+            })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> updateMatchInfos(@PathVariable(value = "matchId", required = true) String matchId,
+    @RequestParam(value = "courtName", required = false) String courtName,
+    @RequestParam(value = "orderTime", required = false) String orderTime) {
+        return new ResponseEntity<Object>(
+                CommonResponse.success(matchService.updateMatchInfos(matchId,orderTime,courtName)),
+                HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/matchConfirm/{matchId}/{type}", method = RequestMethod.POST)
+    @ApiOperation(value = "confirm   match ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "matchId", value = "matched id ", required = true, dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "type", value = "user type , 0 : holder , 1 : challenger", required = true, dataType = "string", paramType = "query")
+
+            })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> confirmMatch(@PathVariable(value = "matchId", required = true) String matchId,
+    @PathVariable(value = "type", required = true) Integer type) {
+        return new ResponseEntity<Object>(
+                CommonResponse.success(matchService.confirmMatch(matchId,type)),
+                HttpStatus.OK);
+    }
+
 
 
     @RequestMapping(value = "/intentionalMatch/${matchId}", method = RequestMethod.POST)
@@ -121,7 +184,7 @@ public class MatchController {
     }
 
 
-    @RequestMapping(value = "/challengeMatch/${holder}", method = RequestMethod.POST)
+    @RequestMapping(value = "/challengeMatch/{holder}", method = RequestMethod.POST)
     @ApiOperation(value = "challenge a player", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "challenger", value = "challenger uers id ", required = true, dataType = "string", paramType = "query"),
@@ -135,7 +198,7 @@ public class MatchController {
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/sessionContext/${sessionId}/${type}", method = RequestMethod.POST)
+    @RequestMapping(value = "/sessionContext/{sessionId}/{type}", method = RequestMethod.POST)
     @ApiOperation(value = "post a session context", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "context", value = "dialog context ", required = true, dataType = "string", paramType = "query"),
@@ -153,7 +216,7 @@ public class MatchController {
                 CommonResponse.success(matchService.insertSessionContext(sessionId, context, type)), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/sessionContext/${sessionId}/${seconds}", method = RequestMethod.GET)
+    @RequestMapping(value = "/sessionContext/{sessionId}/{seconds}", method = RequestMethod.GET)
     @ApiOperation(value = "explore a session context with seconds diviation", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "sessionId", value = "session  id", required = true, dataType = "string", paramType = "path"),
@@ -167,7 +230,7 @@ public class MatchController {
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/sessionContext/${sessionId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/sessionContext/{sessionId}", method = RequestMethod.GET)
     @ApiOperation(value = "explore a session context with quantity already have", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "sessionId", value = "session  id", required = true, dataType = "string", paramType = "path"),

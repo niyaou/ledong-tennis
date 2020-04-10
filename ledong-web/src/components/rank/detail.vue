@@ -1,6 +1,6 @@
 <template>
   <div class="component-container">
-    选手积分等级
+    <div style="margin:10px;font-weight:600">选手积分等级</div>
  <div>  name:{{name}}</div>
  <div>  score:{{score}}</div>
        <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button>
@@ -8,7 +8,8 @@
 </template>
 
 <script>
-
+import eventBus from '../../main'
+import constant from '../../utils/constant'
 export default {
   name: 'detail',
   data () {
@@ -29,13 +30,13 @@ export default {
         url: 'http://localhost:8081/rank/rankInfo'
       })
         .then((res) => {
-          console.info(res)
+          // console.info(res)
           //   if (res.data.code === 0) {
           that.name = res.data.data.id
           that.score = res.data.data.score
+          eventBus.$emit(constant.EVENT_USER_ID, res.data.data.id)
 
           //   }
-          console.info(that.data.name)
         }).catch(e => {
           // that.$router.push({name: 'index'})
         })

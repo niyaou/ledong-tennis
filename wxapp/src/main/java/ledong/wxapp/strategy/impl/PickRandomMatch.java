@@ -46,8 +46,8 @@ public class PickRandomMatch extends MatchStrategy {
                     }
 
                     filter = new RankFilter();
-                    if (!filter.filtering(rankService.getUserRank(user),
-                            rankService.getUserRank(otherRequest.getUserName()))) {
+                    if (!filter.filtering(rankService.getUserRank(user).getScore(),
+                            rankService.getUserRank(otherRequest.getUserName()).getScore())) {
                         continue;
                     }
 

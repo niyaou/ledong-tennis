@@ -10,7 +10,7 @@ public enum MatchStatusCodeEnum {
     /**/
     USER_ACKNOWLADGED(1001, "用户已确认"), USER_UN_ACKNOWLADGED(1000, "用户未确认"),
     /**/
-    MATCH_MATCHING_STATUS(2000, "比赛匹配中"), MATCH_ACKNOWLEDGED_MATCHING(2001, "比赛已确认，等待开始"),
+    MATCH_MATCHING_STATUS(2000, "比赛等待匹配"), MATCH_ACKNOWLEDGED_MATCHING(2001, "比赛匹配中，等待确认"),
     MATCH_PLAYING_MATCHING(2002, "比赛中"), MATCH_GAMED_MATCHING(2003, "比赛结束"),
     /**/
     MATCH_TYPE_PICK(3000, "指定比赛"), MATCH_TYPE_RANDOM(3001, "随机匹配比赛"),

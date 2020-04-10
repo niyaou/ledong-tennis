@@ -1,9 +1,10 @@
 <template>
   <div class="component-container">
-选手排名表
+ <div style="margin:10px;font-weight:600">选手排名表</div>
 <ul id="example-1" class="wt-flex">
   <li v-for="item in ranks" v-bind:key="item.id">
  <div> name : {{ item.id }}     ||   score : {{ item.score}} </div>
+ <button v-on:click="challenge(item.id)" class="ui-button" ><span>挑战</span></button>
   </li>
 </ul>
 
@@ -24,6 +25,9 @@ export default {
     this.getScore()
   },
   methods: {
+    challenge (matchId) {
+      console.info(matchId)
+    },
     getScore () {
       // let that = this
 
@@ -32,7 +36,7 @@ export default {
         url: 'http://localhost:8081/rank/rankList'
       })
         .then((res) => {
-          console.info(res)
+          // console.info(res)
           this.ranks = res.data.data
         }).catch(e => {
           // that.$router.push({name: 'index'})

@@ -170,6 +170,32 @@ public class SearchApi {
         return parseResponse(searchRequest);
     }
 
+
+    /**
+     * 查询多个字段满足某个条件
+     * @param indexName
+     * @param value
+     * @param pageNo
+     * @param size
+     * @param keys
+     * @return
+     */
+    public static QueryBuilder createMultiFieldsWithSingleValue(String value, 
+    String... keys           ) {
+   
+        // searchSourceBuilder.version(true);
+        BoolQueryBuilder matchQueryBuilder = QueryBuilders.boolQuery();
+        for (String key : keys) {
+            matchQueryBuilder.should( QueryBuilders.termQuery(key, value));
+        }
+        return matchQueryBuilder;
+        // searchSourceBuilder.query(matchQueryBuilder);
+        // searchSourceBuilder = createPageAble(searchSourceBuilder, 1, size);
+        // searchRequest.source(searchSourceBuilder);
+        // return parseResponse(searchRequest);
+    }
+
+
     /**
      * 查询特定字段的指定值
      * 

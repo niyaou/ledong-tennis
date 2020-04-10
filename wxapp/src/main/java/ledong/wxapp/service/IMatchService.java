@@ -55,6 +55,17 @@ public interface IMatchService {
      */
     public Object getIntentionalMatch(Integer count);
 
+
+    /**
+     * 
+     * get the list of matched games
+     * 
+     * @param user
+     * @param count
+     * @return
+     */
+    public Object getMatchedList(String user,Integer count);
+
     /**
      * start a challenge match
      * 
@@ -137,6 +148,40 @@ public interface IMatchService {
      */
     public Object getSessionContextWithQuantity(String sessionId, int holderCount, int challengerCount);
 
+
+
+    /**
+     * 
+     * get the given match infos
+     * 
+     * @param matchId
+     * @return
+     */
+    public Object getMatchInfos(String matchId);
+
+
+
+    /**
+     * 
+     * update match infos
+     * 
+     * @param matchId
+     * @param orderTime
+     * @param courtName
+     * @return
+     */
+    public Object updateMatchInfos(String matchId,String orderTime,String courtName);
+
+
+    /**
+     * 
+     * user confirm match
+     * 
+     * @param matchId
+     * @param type  0: holder,  1:  challenger
+     * @return
+     */
+    public Object confirmMatch(String matchId,Integer type);
     /**
      * insert session context
      * 

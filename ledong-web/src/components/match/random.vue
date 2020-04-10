@@ -1,6 +1,6 @@
 <template>
   <div class="component-container" style="height:200px">
-    随机匹配
+   <div style="margin:10px;font-weight:600">  随机匹配</div>
      <button v-on:click="getScore" class="ui-button" style="margin-top:100px"  v-if="matchStatus===0"><span>开始匹配</span></button>
 <div v-else-if="matchStatus===1" style="margin-top:100px" > 匹配中 。。。。。。</div>
 
@@ -35,15 +35,15 @@ export default {
         })
       })
         .then((res) => {
-          console.info(res)
           //   if (res.data.code === 0) {
-          console.info(res)
-          that.matchId = res.data.data
-          that.matchStatus = res.data.data === null ? 0 : 2
+          // console.info(that.matchId, that.data.matchStatus)
+          this.matchId = res.data.data
+          this.matchStatus = res.data.data === null ? 0 : 2
           //   }
-          console.info(that.data.name)
+          console.info('res.data', res.data.data)
         }).catch(e => {
           // that.$router.push({name: 'index'})
+          this.matchStatus = 0
         })
     }
 

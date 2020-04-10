@@ -33,7 +33,16 @@ public abstract class MatchStrategy {
         if (!StringUtil.isEmpty(challenger)) {
             vo.setChallenger(challenger);
         }
-        vo.setStatus(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode());
+        MatchStatusCodeEnum status=null;
+        if(!StringUtil.isEmpty(challenger) && !StringUtil.isEmpty(holder)){
+            status = MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING;
+        }else{
+            status = MatchStatusCodeEnum.MATCH_MATCHING_STATUS;
+        }
+        System.out.println(holder);
+        System.out.println(challenger);
+        System.out.println(status.getMessage());
+        vo.setStatus(status.getCode());
         vo.setMatchType(matchType);
         vo.setClubMatch(clubMatch);
 
@@ -50,6 +59,7 @@ public abstract class MatchStrategy {
         String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
         id = String.format("%s-%s-%s", id, holder, StringUtil.isEmpty(challenger) ? "" : challenger);
         id = SearchApi.insertDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), id);
+        System.out.println(JSON.toJSONString(vo));
         return id;
     }
 

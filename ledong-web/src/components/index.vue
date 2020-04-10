@@ -3,11 +3,19 @@
     index
     <button v-on:click="logout" class="ui-button" ><span>退出</span></button>
       <button v-on:click="validate" class="ui-button" ><span>验证</span></button>
-        <detail/>
-        <list />
+      <div class="wt-flex-row">
+         <detail style="width:30%"/>
+          <random style="width:30%"/>
+        <list style="width:30%"/>
+      </div>
+      <div class="wt-flex-row">
+          <active style="width:50%"/>
+                  <dealing style="width:50%"/>
+      </div>
         <match-list />
-        <random />
+
            <intentional />
+
   </div>
 
 </template>
@@ -19,6 +27,9 @@ import list from './rank/list'
 import matchList from './match/matchList'
 import random from './match/random'
 import intentional from './match/intentional'
+import active from './match/active'
+import dealing from './match/dealing'
+
 export default {
   name: 'index',
   data () {
@@ -31,7 +42,9 @@ export default {
     list,
     matchList,
     random,
-    intentional
+    intentional,
+    active,
+    dealing
   },
   methods: {
     logout () {
@@ -47,7 +60,7 @@ export default {
 
       })
         .then((res) => {
-          console.info(res)
+          // console.info(res)
         }).catch(e => {
           // that.$router.push({name: 'index'})
         })

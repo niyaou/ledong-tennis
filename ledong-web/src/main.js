@@ -7,6 +7,7 @@ import qs from 'qs'
 import router from './router'
 // import store from './router'
 
+const eventBus = new Vue()
 Vue.prototype.$axios = axios // 全局注册，使用方法为:this.$axios
 Vue.prototype.qs = qs // 全局注册，使用方法为:this.qs
 // Vue.prototype.$router = router
@@ -27,6 +28,8 @@ axios.interceptors.request.use(
     return Promise.error(error)
   }
 )
+
+export default eventBus
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
