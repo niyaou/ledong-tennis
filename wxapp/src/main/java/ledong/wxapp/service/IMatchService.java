@@ -47,15 +47,13 @@ public interface IMatchService {
      */
     public String postIntentionalMatch(String user, String orderTime, String courtName, String courtGps);
 
-
     /**
      * get intentional match list by count number
      * 
      * @param count
      * @return
      */
-    public Object getIntentionalMatch(Integer  count);
-
+    public Object getIntentionalMatch(Integer count);
 
     /**
      * start a challenge match

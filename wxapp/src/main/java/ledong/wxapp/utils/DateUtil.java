@@ -286,21 +286,6 @@ public final class DateUtil {
         return betweendays;
     }
 
-    /**
-     * 计算开始时间和结束时间直到今天的比例
-     * 
-     * @param smdate 开始时间
-     * @param bdate 结束时间
-     * @return
-     * @throws ParseException
-     */
-    public static int daysBetweenScale(Date smdate, Date bdate) throws ParseException {
-        double dateBetween = DateUtil.daysBetween(smdate, bdate);
-        double dateBetween2 = DateUtil.daysBetween(smdate, new Date());
-        double timeProcessClass = (dateBetween2 < 0) ? 0.00 : Math.round(dateBetween2 / dateBetween * 100) / 100.00;
-        return (int) Math.abs(timeProcessClass * 100);
-    }
-
     public static Date addDateSecond(String str) {
         if (StringUtil.isNotEmpty(str)) {
             Calendar calendar = Calendar.getInstance();
@@ -314,13 +299,14 @@ public final class DateUtil {
 
     /**
      * 比较时间远近
+     * 
      * @param d1
      * @param d2
      * @return
      */
     public static int compareDate(String d1, String d2) {
 
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        DateFormat df = new SimpleDateFormat(FORMAT_DATE_TIME);
         try {
             Date dt1 = df.parse(d1);
             Date dt2 = df.parse(d2);
@@ -384,7 +370,6 @@ public final class DateUtil {
         return DateUtil.getDate(d, DateUtil.FORMAT_DATE_TIME);
     }
 
-    
     public static String getDateDiff(Long diff) throws Exception {
         // 输出结果
         StringBuilder builder = new StringBuilder();

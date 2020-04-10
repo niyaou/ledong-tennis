@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -27,12 +28,18 @@ import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IRankService;
+import ledong.wxapp.strategy.MatchStrategy;
+import ledong.wxapp.strategy.context.MatchContext;
+import ledong.wxapp.strategy.impl.PickIntentionalMatch;
+import ledong.wxapp.strategy.impl.PickRandomMatch;
+import ledong.wxapp.strategy.impl.PostRandomMatch;
 import ledong.wxapp.utils.DateUtil;
 import ledong.wxapp.utils.StringUtil;
 
 @Service
 public class MatchServiceImpl implements IMatchService {
     private final static Logger log = Logger.getLogger(MatchServiceImpl.class);
+
     @Autowired
     private RedisUtil redis;
 
@@ -46,134 +53,40 @@ public class MatchServiceImpl implements IMatchService {
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         vo.setLocation(courtGps);
         vo.setUserName(user);
-        long requestStart = System.currentTimeMillis();
-        redis.hdel(MatchRequestVo.MATCHREQUESTFROM, StringUtil.combiningSpecifiedUserKey(user, null));
-        // child key
-        // expired
-        // time specification
-        // should add future by
-        // reddision
+        MatchContext strategy = null;
+        String matchId = null;
 
-        Map<Object, Object> map = redis.hmget(MatchRequestVo.MATCHREQUESTFROM);
-        if (map.size() != 0) {
-            for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                if (redis.lockKey((String) entry.getKey(), 30)) {
-                    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-
-                    MatchRequestVo otherRequest = (MatchRequestVo) entry.getValue();
-
-                    // some strategy to match request
-                    otherRequest = otherRequest == null ? otherRequest : otherRequest;
-                    String matchId = postMatches(null, user, otherRequest.getUserName(),
-                            MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode(),
-                            MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null, courtGps);
-                    System.out.println(String.format(" create match post : %s", user));
-                    attachedMatchSession(matchId, user, otherRequest.getUserName());
-                    redis.set(StringUtil.combiningSpecifiedUserKey(otherRequest.getUserName(), "receive"), matchId, 7);
-                    return matchId;
-                } else {
-                    System.out.println("the Key = " + entry.getKey() + " has been locked ");
-                }
-            }
-        } else {
-            LinkedList<HashMap<String, Object>> matches = getIntentionalMatchs(null, user);
-            if (matches != null) {
-                String pickMatchId = (String) matches.get(0).get(SearchApi.ID);
-                // String hodler = (String) matches.get(0).get(MatchPostVo.HOLDER);
-                System.out.println(String.format(" create pick match post : %s", user));
-                
-                return acceptIntentionalMatch(pickMatchId,  user);
-            } else {
-                redis.hset(MatchRequestVo.MATCHREQUESTFROM,
-                        StringUtil.combiningSpecifiedUserKey(vo.getUserName(), null), vo, 10);
-                long interval = 6000;
-                int count = 0 ;
-                long startTime = System.currentTimeMillis();
-                long endTime = 0;
-                while ((endTime - startTime) < interval) {
-                    // System.out.println(String.format(" interval remains : %d", interval));
-                    String receiveKey = StringUtil.combiningSpecifiedUserKey(vo.getUserName(), "receive");
-                 
-                    count++;
-                    // System.out.println(String.format("endTime: %d     startTime : %d     delta: %d ,  check redis   %d   times",endTime,startTime,(endTime - startTime)
-                    // , count));
-                    if (redis.hasKey(receiveKey)) {
-                        String receiveVo = (String) redis.get(receiveKey);
-                        return receiveVo;
-                    } else {
-                        endTime = System.currentTimeMillis();
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                       
-                        // System.out.println(String.format(" interval minus : %d", interval));
-                    }
-                  
-                }
-                System.out.println(String.format(" check redis   %d   times", count));
-            }
+        strategy = new MatchContext(new PickRandomMatch(redis, iRankService));
+        matchId = strategy.getMatchId(vo);
+        if (!TextUtils.isEmpty(matchId)) {
+            return matchId;
         }
-        // long requestStart = System.currentTimeMillis();
-        System.out.println(String.format(" request spend time   %d   ", ( System.currentTimeMillis()-requestStart)));
-        log.warn(map.toString());
+
+        strategy = new MatchContext(new PickIntentionalMatch());
+        matchId = strategy.getMatchId(vo);
+        if (!TextUtils.isEmpty(matchId)) {
+            return matchId;
+        }
+
+        strategy = new MatchContext(new PostRandomMatch(redis));
+        matchId = strategy.getMatchId(vo);
+        if (!TextUtils.isEmpty(matchId)) {
+            return matchId;
+        }
+
         return null;
     }
 
     @Override
     public String postMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
             String orderTime, String courtName, String courtGps) {
-        MatchPostVo vo = new MatchPostVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-
-        if (!StringUtil.isEmpty(parendId)) {
-            vo.setParendId(parendId);
-        }
-        vo.setHolder(holder);
-        if (!StringUtil.isEmpty(challenger)) {
-            vo.setChallenger(challenger);
-        }
-
-        vo.setStatus(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode());
-        vo.setMatchType(matchType);
-        vo.setClubMatch(clubMatch);
-
-        if (!StringUtil.isEmpty(orderTime)) {
-            vo.setOrderTime(orderTime);
-        }
-        if (!StringUtil.isEmpty(courtName)) {
-            vo.setCourtName(courtName);
-        }
-        if (!StringUtil.isEmpty(courtGps)) {
-            vo.setCourtGPS(courtGps);
-        }
-
-        String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
-        id = String.format("%s-%s-%s", id, holder, StringUtil.isEmpty(challenger) ? "" : challenger);
-        id = SearchApi.insertDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), id);
-        return id;
+        return MatchStrategy.postMatches(parendId, holder, challenger, matchType, clubMatch, orderTime, courtName,
+                courtGps);
     }
 
     @Override
     public String attachedMatchSession(String matchId, String holderId, String challengerId) {
-
-        SessionVo vo = new SessionVo();
-
-        if (!StringUtil.isEmpty(matchId)) {
-            vo.setMatchId(matchId);
-        }
-        if (!StringUtil.isEmpty(holderId)) {
-            vo.setHolderId(holderId);
-        }
-
-        if (!StringUtil.isEmpty(challengerId)) {
-            vo.setChallenger(challengerId);
-        }
-        String id = SearchApi.insertDocument(DataSetConstant.SESSION_INFORMATION, JSON.toJSONString(vo));
-        matchId = SearchApi.updateFieldValueById(DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.SESSIONID, id,
-                matchId);
-        return id;
+        return MatchStrategy.attachedMatchSession(matchId, holderId, challengerId);
     }
 
     @Override
@@ -198,7 +111,8 @@ public class MatchServiceImpl implements IMatchService {
         }
         String holder = (String) match.get(MatchPostVo.HOLDER);
         String matchId = postMatches((String) match.get(MatchPostVo.ID), holder, challenger,
-                MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(), MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), (String) match.get(MatchPostVo.ORDERTIME), (String) match.get(MatchPostVo.COURTNAME),
+                MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(), MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(),
+                (String) match.get(MatchPostVo.ORDERTIME), (String) match.get(MatchPostVo.COURTNAME),
                 (String) match.get(MatchPostVo.COURTGPS));
         attachedMatchSession(matchId, holder, challenger);
         return matchId;
@@ -217,8 +131,8 @@ public class MatchServiceImpl implements IMatchService {
             if (params.size() == 0) {
                 params.add(SearchApi.createSearchAll());
             }
-            String endTime =  DateUtil.getDate(DateUtil.getSundayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
-           
+            String endTime = DateUtil.getDate(DateUtil.getSundayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
+
             String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
             params.add(SearchApi.createSearchByFieldRangeSource(MatchPostVo.ORDERTIME, startTime, endTime));
             Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
@@ -226,10 +140,6 @@ public class MatchServiceImpl implements IMatchService {
             QueryBuilder[] values = new QueryBuilder[8];
             LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
                     DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
-            // List<String> matches = new ArrayList<String>();
-            // for (HashMap<String, Object> resp : searchResponse) {
-            // matches.add((String) resp.get(SearchApi.ID));
-            // }
             return searchResponse;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -348,8 +258,9 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public Object getIntentionalMatch(Integer count) {
-        return  SearchApi.searchByFieldSorted(DataSetConstant.GAME_MATCH_INFORMATION,MatchPostVo.STATUS,String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()),
-        MatchPostVo.CREATETIME,SortOrder.DESC,1,count );
+        return SearchApi.searchByFieldSorted(DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.STATUS,
+                String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()), MatchPostVo.CREATETIME,
+                SortOrder.DESC, 1, count);
     }
 
 }
