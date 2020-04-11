@@ -9,7 +9,7 @@
  <button v-on:click="challenge(item.id)" class="ui-button" ><span>协商</span></button>
   </li>
 </ul>
-  <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button>
+  <!-- <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button> -->
   </div>
 </template>
 
@@ -25,8 +25,8 @@ export default {
     }
   },
   mounted () {
-    // this.initList()
-    this.getScore()
+    this.initList()
+    // this.getScore()
   },
   methods: {
     initList () {
@@ -34,7 +34,7 @@ export default {
       setInterval(function () {
         console.info('-----interval -------')
         that.getScore()
-      }, 4000)
+      }, 2000)
     },
     challenge (matchId) {
       eventBus.$emit(constant.EVENT_DEALING_MATCH, matchId)

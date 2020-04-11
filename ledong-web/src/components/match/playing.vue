@@ -1,16 +1,19 @@
 <template>
-  <div class="component-container">
- <div style="margin:10px;font-weight:600">比赛协商</div>
+  <div class="component-container" >
+ <div style="margin:10px;font-weight:600">正在进行得比赛</div>
 <div  class="wt-flex">
     {{matchId}}
  <div> 发布者 : {{ matchs.holder }}      ||  挑战者 : {{ matchs.challenger }}        ||  场地 : {{ matchs.courtName}}    ||   时间 : {{ matchs.orderTime}}
-     {{startTime.time}} </div>
+   </div>
+
+     <div> {{ matchs.holder }}   :{{matchs.holderScore}}   ||   {{ matchs.challenger }}   :     {{ matchs.challengerScore}}
+     </div>
 
  <form v-on:submit.prevent="confirmed()">
-      <input placeholder="球场" maxlength="15" type="text" v-model="courtName" />
+      <input placeholder="发起者比分" maxlength="15" type="text" v-model="holderScore" />
       <!-- <input placeholder="位置" maxlength="13" type="text" v-model="gps" /> -->
       <!-- <input placeholder="比赛时间" maxlength="13" type="text" v-model="time" /> -->
-        <myDatepicker :date="startTime" :option="multiOption" :limit="limit" v-model="dataForm.createDate" ></myDatepicker>
+    <input placeholder="挑战者比分" maxlength="15" type="text" v-model="challengerScore" />
       <button type="submit"  class="ui-button" :disabled="disabled">
         <span>确认</span>
       </button>
@@ -42,7 +45,7 @@ import constant from '../../utils/constant'
 import eventBus from '../../main'
 
 export default {
-  name: 'dealing',
+  name: 'playing',
   data () {
     return {
       message: '',
@@ -53,6 +56,8 @@ export default {
       challengerContext: [],
       court: '',
       gps: '',
+      holderScore: '',
+      challengerScore: '',
       time: '',
       disabled: false,
       courtName: '',
@@ -113,22 +118,23 @@ export default {
   mounted () {
     // this.initList()
     let that = this
-    eventBus.$on(constant.EVENT_DEALING_MATCH, matchId => {
-      this.matchId = matchId
-      // console.info('  event on :', matchId)
-      this.holderContext = []
-      this.challengerContext = []
-      this.getMatchInfo()
-      // setInterval(function () {
-      //   that.getSessionInfo()
-      // }, 2000)
-      setInterval(function () {
+          setInterval(function () {
         that.getMatchInfo()
       }, 5000)
-    })
+    // eventBus.$on(constant.EVENT_DEALING_MATCH, matchId => {
+    //   this.matchId = matchId
+    //   console.info('  event on :', matchId)
+    //   this.holderContext = []
+    //   this.challengerContext = []
+    //   this.getMatchInfo()
+    //   // setInterval(function () {
+    //   //   that.getSessionInfo()
+    //   // }, 2000)
+
+    // })
     eventBus.$on(constant.EVENT_USER_ID, userId => {
       this.userId = userId
-      // console.info('  event on :', userId)
+      console.info('  event on :', userId)
     })
   },
   methods: {
@@ -145,8 +151,8 @@ export default {
         }).catch(e => {
 
         })
-      // console.info(' this.disabled', this.disabled)
-      // console.info('-----confirm--------')
+      console.info(' this.disabled', this.disabled)
+      console.info('-----confirm--------')
     },
     submit () {
       let that = this
@@ -172,7 +178,7 @@ export default {
     initList () {
       // let that = this
       setInterval(function () {
-        // console.info('-----interval -------')
+        console.info('-----interval -------')
       }, 4000)
     },
     getSessionInfo () {
@@ -211,10 +217,11 @@ export default {
       // console.info(' this.disabled', this.disabled)
       this.$axios({
         method: 'get',
-        url: `http://localhost:8081/match/matchInfo/${this.matchId}`
+        url: `http://localhost:8081/match/playingMatch`
       })
         .then((res) => {
-          // console.info(res)
+          console.info(res)
+          this.matchId =  res.data.data.id
           this.matchs = res.data.data
           this.getSessionInfo()
         }).catch(e => {
@@ -229,28 +236,26 @@ export default {
     }
   },
   watch: {
-    newTime (val) {
+    challengerScore (val) {
       console.info(val)
-      this.time = val
-
       this.$axios({
         method: 'post',
-        url: `http://localhost:8081/match/matchInfo/${this.matchId}`,
+        url: `http://localhost:8081/match/matchScore/${this.matchId}`,
         data: this.qs.stringify({
-          orderTime: val
+          challengerScore: val
         })
       })
         .then((res) => {
         }).catch(e => {
         })
     },
-    courtName (val) {
+    holderScore (val) {
       console.info(val)
       this.$axios({
         method: 'post',
-        url: `http://localhost:8081/match/matchInfo/${this.matchId}`,
+        url: `http://localhost:8081/match/matchScore/${this.matchId}`,
         data: this.qs.stringify({
-          courtName: val
+          holderScore: val
         })
       })
         .then((res) => {

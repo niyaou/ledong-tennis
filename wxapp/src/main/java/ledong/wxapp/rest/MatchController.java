@@ -111,6 +111,19 @@ public class MatchController {
         return new ResponseEntity<Object>(CommonResponse.success(matchService.playingMatchInfo(userId)), HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = "/matchResult", method = RequestMethod.GET)
+    @ApiOperation(value = "get last match result", notes = "")
+    public ResponseEntity<?> exploreLastResult(@RequestHeader("Authorization") String authHeader) {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.lastMatchResult(userId)), HttpStatus.OK);
+    }
+
+
+
+
+
     @RequestMapping(value = "/matchInfo/{matchId}", method = RequestMethod.GET)
     @ApiOperation(value = "get  match infos", notes = "")
     @ApiImplicitParams({
@@ -133,6 +146,23 @@ public class MatchController {
         return new ResponseEntity<Object>(
                 CommonResponse.success(matchService.updateMatchInfos(matchId, orderTime, courtName)), HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/matchScore/{matchId}", method = RequestMethod.POST)
+    @ApiOperation(value = "update  match score", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "matchId", value = "matched id", required = true, dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "holderScore", value = "holder score", required = false, dataType = "integer", paramType = "query"),
+            @ApiImplicitParam(name = "challengerScore", value = "challengerScore", required = false, dataType = "integer", paramType = "query") })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> updateMatchScore(@PathVariable(value = "matchId", required = true) String matchId,
+            @RequestParam(value = "holderScore", required = false) Integer holderScore,
+            @RequestParam(value = "challengerScore", required = false) Integer challengerScore) {
+        return new ResponseEntity<Object>(
+                CommonResponse.success(matchService.updateMatchScore(matchId, holderScore, challengerScore)), HttpStatus.OK);
+    }
+
+
 
     @RequestMapping(value = "/matchConfirm/{matchId}/{type}", method = RequestMethod.POST)
     @ApiOperation(value = "confirm   match ", notes = "")

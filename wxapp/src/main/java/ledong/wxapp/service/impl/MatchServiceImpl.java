@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.http.util.TextUtils;
@@ -255,11 +256,12 @@ public class MatchServiceImpl implements IMatchService {
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
                 : MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode());
-        vo.setWinScore(holderScore > challengerScore ? holderScore : challengerScore);
-        vo.setLoseScore(holderScore < challengerScore ? holderScore : challengerScore);
+        vo.setHolderScore(holderScore);
+        vo.setChallengerScore(challengerScore);
         vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
         vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        vo.setStatus(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
+        vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+        System.out.println(JSON.toJSONString(vo));
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
     }
 
@@ -302,7 +304,7 @@ public class MatchServiceImpl implements IMatchService {
         }
 
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
-        if (MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode().equals(vo.getStatus())) {
+        if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING .getCode().equals(vo.getStatus())) {
             return null;
         }
         if (!TextUtils.isEmpty(orderTime)) {
@@ -328,9 +330,22 @@ public class MatchServiceImpl implements IMatchService {
         } else {
             vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
         }
+        System.out.println(vo.getChallengerAcknowledged());
+        System.out.println(vo.getHolderAcknowledged());
+        System.out.println(vo.getStatus());
         if (MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getChallengerAcknowledged())
                 && MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getHolderAcknowledged())) {
+
+           if(!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())){
             vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
+            vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+            vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+            System.out.println("update acknowledged");
+           }else{
+               vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+               finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
+               System.out.println("finished game");
+           }     
         }
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
     }
@@ -355,6 +370,48 @@ public class MatchServiceImpl implements IMatchService {
     public Object rankedMatchInfo(String user) {
         String matchId = (String) redis.get(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
         redis.del(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
+        return getMatchInfos(matchId);
+    }
+
+    @Override
+    public Object updateMatchScore(String matchId, Integer holderScore, Integer challengerScore) {
+
+        HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
+        if (match == null) {
+            return null;
+        }
+
+        MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
+        if (!MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode().equals(vo.getStatus())) {
+            return null;
+        }
+
+        // vo.setHolderScore(holderScore);
+        // Optional.ofNullable(holderScore).ifPresent(i -> {
+        if (holderScore != null) {
+            vo.setHolderScore(holderScore);
+        }
+        // vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+        // });
+        ;
+        // Optional.ofNullable(challengerScore).ifPresent(i -> {
+        if (challengerScore != null) {
+            vo.setChallengerScore(challengerScore);
+        }
+        // vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+        // });
+        // ;
+        vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+        vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+       
+        return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+    }
+
+    @Override
+    public Object lastMatchResult(String user) {
+        String key = StringUtil.combiningSpecifiedUserKey(user, "ranked");
+      String matchId= (String) redis.get(key);
+      redis.del(key);
         return getMatchInfos(matchId);
     }
 

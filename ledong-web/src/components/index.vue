@@ -1,23 +1,35 @@
 <template>
   <div class="hello">
     index
-    <button v-on:click="logout" class="ui-button" ><span>退出</span></button>
-      <button v-on:click="validate" class="ui-button" ><span>验证</span></button>
-      <div class="wt-flex-row">
-         <detail style="width:30%"/>
-          <random style="width:30%"/>
-        <list style="width:30%"/>
-      </div>
-      <div class="wt-flex-row">
-          <active style="width:50%"/>
-                  <dealing style="width:50%"/>
-      </div>
-        <match-list />
+    <button v-on:click="logout" class="ui-button">
+      <span>退出</span>
+    </button>
+    <!-- <button v-on:click="validate" class="ui-button">
+      <span>验证</span>
+    </button> -->
+    <div class="wt-flex-row">
+      <detail style="width:30%" />
+      <random style="width:30%" />
+      <list style="width:30%" />
+    </div>
 
-           <intentional />
+    <div class="wt-flex-row">
+      <active style="width:50%" />
+      <dealing style="width:50%" />
+    </div>
 
+    <div class="wt-flex-row" style="margin-top:50px">
+      <playing style="width:50%" />
+
+      <result style="width:50%" />
+    </div>
+
+    <div class="wt-flex-row" style="margin-top:50px">
+      <match-list style="width:50%" />
+
+      <intentional style="width:50%" />
+    </div>
   </div>
-
 </template>
 
 <script>
@@ -29,7 +41,8 @@ import random from './match/random'
 import intentional from './match/intentional'
 import active from './match/active'
 import dealing from './match/dealing'
-
+import playing from './match/playing'
+import result from './match/result'
 export default {
   name: 'index',
   data () {
@@ -44,12 +57,14 @@ export default {
     random,
     intentional,
     active,
-    dealing
+    dealing,
+    playing,
+    result
   },
   methods: {
     logout () {
       window.localStorage.removeItem('token')
-      router.push({name: 'register'})
+      router.push({ name: 'register' })
       console.info('111111111111111')
     },
     validate () {
@@ -57,11 +72,11 @@ export default {
         method: 'get',
         // url: 'http://www.ledongtennis.cn/user/login',
         url: 'http://localhost:8081/user/validate'
-
       })
-        .then((res) => {
+        .then(res => {
           // console.info(res)
-        }).catch(e => {
+        })
+        .catch(e => {
           // that.$router.push({name: 'index'})
         })
     }
@@ -71,7 +86,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {

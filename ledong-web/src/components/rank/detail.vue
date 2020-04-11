@@ -3,7 +3,7 @@
     <div style="margin:10px;font-weight:600">选手积分等级</div>
  <div>  name:{{name}}</div>
  <div>  score:{{score}}</div>
-       <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button>
+       <!-- <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button> -->
   </div>
 </template>
 
@@ -19,7 +19,11 @@ export default {
     }
   },
   mounted () {
-    this.getScore()
+      let that = this
+    setInterval(function(){
+  that.getScore()
+    },5000)
+  
   },
   methods: {
     getScore () {

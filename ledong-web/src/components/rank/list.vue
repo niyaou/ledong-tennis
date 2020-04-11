@@ -8,7 +8,7 @@
   </li>
 </ul>
 
-       <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button>
+       <!-- <button v-on:click="getScore" class="ui-button" ><span>刷新</span></button> -->
   </div>
 </template>
 
@@ -22,7 +22,11 @@ export default {
     }
   },
   mounted () {
-    this.getScore()
+    // this.getScore()
+    let that = this
+ setInterval(function(){
+  that.getScore()
+    },5000)
   },
   methods: {
     challenge (matchId) {

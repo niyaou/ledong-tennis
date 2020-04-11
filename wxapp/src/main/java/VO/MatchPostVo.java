@@ -82,13 +82,13 @@ public class MatchPostVo implements Serializable {
     private Integer ranked;
     public static final String RANKED = "ranked";
 
-    @ApiModelProperty(value = "winScore ")
-    private Integer winScore;
-    public static final String WINSCORE = "winScore";
+    @ApiModelProperty(value = "holderScore ")
+    private Integer holderScore;
+    public static final String HOLDERSCORE = "holderScore";
 
-    @ApiModelProperty(value = "loseScore ")
-    private Integer loseScore;
-    public static final String LOSESCORE = "loseScore";
+    @ApiModelProperty(value = "challengerScore ")
+    private Integer challengerScore;
+    public static final String CHALLENGERSCORE  = "challengerScore";
 
     @NotEmpty
     @ApiModelProperty(value = "canceled , 7000: not-canceled , 7001: canceled")
@@ -172,12 +172,12 @@ public class MatchPostVo implements Serializable {
         return ranked;
     }
 
-    public Integer getWinScore() {
-        return winScore;
+    public Integer getHolderScore() {
+        return holderScore;
     }
 
-    public Integer getLoseScore() {
-        return loseScore;
+    public Integer getChallengerScore() {
+        return challengerScore;
     }
 
     public Integer getCanceled() {
@@ -248,12 +248,12 @@ public class MatchPostVo implements Serializable {
         this.ranked = ranked;
     }
 
-    public void setWinScore(Integer winScore) {
-        this.winScore = winScore;
+    public void setHolderScore(Integer holderScore) {
+        this.holderScore = holderScore;
     }
 
-    public void setLoseScore(Integer loseScore) {
-        this.loseScore = loseScore;
+    public void setChallengerScore(Integer challengerScore) {
+        this.challengerScore = challengerScore;
     }
 
     public void setCanceled(Integer canceled) {

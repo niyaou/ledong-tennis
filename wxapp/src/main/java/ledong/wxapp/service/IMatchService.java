@@ -167,6 +167,20 @@ public interface IMatchService {
      */
     public Object updateMatchInfos(String matchId, String orderTime, String courtName);
 
+
+
+    /**
+     * update match score 
+     * 
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public Object updateMatchScore(String matchId, Integer holderScore, Integer challengerScore);
+
+
+
     /**
      * 
      * user confirm match
@@ -214,4 +228,13 @@ public interface IMatchService {
      * @return
      */
     public Object rankedMatchInfo(String user);
+
+
+    /**
+     * get last match result
+     * 
+     * @param user
+     * @return
+     */
+    public Object lastMatchResult(String user);
 }

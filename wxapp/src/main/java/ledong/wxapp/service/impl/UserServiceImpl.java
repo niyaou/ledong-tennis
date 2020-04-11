@@ -30,7 +30,7 @@ public class UserServiceImpl implements IUserService {
     public String addUser(UserVo user) {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
-        String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user));
+        String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),user.getUserName());
         Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getUserName()));
         return userId;
     }

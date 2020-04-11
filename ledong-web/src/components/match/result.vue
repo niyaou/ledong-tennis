@@ -1,20 +1,17 @@
 <template>
   <div class="component-container">
- <div style="margin:10px;font-weight:600">比赛协商</div>
+ <div style="margin:10px;font-weight:600">比赛结果</div>
 <div  class="wt-flex">
     {{matchId}}
  <div> 发布者 : {{ matchs.holder }}      ||  挑战者 : {{ matchs.challenger }}        ||  场地 : {{ matchs.courtName}}    ||   时间 : {{ matchs.orderTime}}
-     {{startTime.time}} </div>
+   </div>
 
- <form v-on:submit.prevent="confirmed()">
-      <input placeholder="球场" maxlength="15" type="text" v-model="courtName" />
-      <!-- <input placeholder="位置" maxlength="13" type="text" v-model="gps" /> -->
-      <!-- <input placeholder="比赛时间" maxlength="13" type="text" v-model="time" /> -->
-        <myDatepicker :date="startTime" :option="multiOption" :limit="limit" v-model="dataForm.createDate" ></myDatepicker>
-      <button type="submit"  class="ui-button" :disabled="disabled">
-        <span>确认</span>
-      </button>
- </form>
+  <div> {{ matchs.holder }}   :{{matchs.holderScore}}   ||   {{ matchs.challenger }}   :     {{ matchs.challengerScore}}
+     </div>
+
+     <div>{{message}}</div>
+
+
 
 </div>
 <div  class="wt-flex-row" style="height:50%;overflow-y:scroll">
@@ -29,10 +26,10 @@
   </li>
 </ul>
 </div>
-  <form v-on:submit.prevent="submit()">
+  <!-- <form v-on:submit.prevent="submit()">
     <input placeholder="请输入协商内容。。。" maxlength="30" type="text" v-model="message" style="width:80%" />
 
-<button type="submit" class="ui-button" ><span>发送</span></button></form>
+<button type="submit" class="ui-button" ><span>发送</span></button></form> -->
   </div>
 </template>
 
@@ -42,7 +39,7 @@ import constant from '../../utils/constant'
 import eventBus from '../../main'
 
 export default {
-  name: 'dealing',
+  name: 'result',
   data () {
     return {
       message: '',
@@ -113,54 +110,40 @@ export default {
   mounted () {
     // this.initList()
     let that = this
-    eventBus.$on(constant.EVENT_DEALING_MATCH, matchId => {
-      this.matchId = matchId
-      // console.info('  event on :', matchId)
-      this.holderContext = []
-      this.challengerContext = []
-      this.getMatchInfo()
-      // setInterval(function () {
-      //   that.getSessionInfo()
-      // }, 2000)
+    // eventBus.$on(constant.EVENT_DEALING_MATCH, matchId => {
+    //   this.matchId = matchId
+    //   console.info('  event on :', matchId)
+    //   this.holderContext = []
+    //   this.challengerContext = []
+    //   this.getMatchInfo()
+    //   // setInterval(function () {
+    //   //   that.getSessionInfo()
+    //   // }, 2000)
+       
       setInterval(function () {
         that.getMatchInfo()
+         that.lastResult ()
       }, 5000)
-    })
+
+
     eventBus.$on(constant.EVENT_USER_ID, userId => {
       this.userId = userId
-      // console.info('  event on :', userId)
+      console.info('  event on :', userId)
     })
   },
   methods: {
-    confirmed () {
-      let type = this.userId === this.matchs.holder ? 0 : 1
-      this.$axios({
-        method: 'post',
 
-        url: `http://localhost:8081/match/matchConfirm/${this.matchId}/${type}`
-
-      })
-        .then((res) => {
-
-        }).catch(e => {
-
-        })
-      // console.info(' this.disabled', this.disabled)
-      // console.info('-----confirm--------')
-    },
-    submit () {
+    lastResult () {
       let that = this
       let type = this.userId === this.matchs.holder ? 0 : 1
       this.$axios({
-        method: 'post',
+        method: 'get',
 
-        url: `http://localhost:8081/match/sessionContext/${this.matchs.sessionId}/${type}`,
-        data: this.qs.stringify({
-          context: this.message
-        })
+        url: `http://localhost:8081/match/matchResult/`
+       
       })
         .then((res) => {
-          that.message = ''
+         this.matchId = res.data.data.id
           // setTimeout(function () {
           //   that.getSessionInfo()
           //   console.info('-------refresh session--------')
@@ -172,7 +155,7 @@ export default {
     initList () {
       // let that = this
       setInterval(function () {
-        // console.info('-----interval -------')
+        console.info('-----interval -------')
       }, 4000)
     },
     getSessionInfo () {
@@ -208,15 +191,20 @@ export default {
           this.disabled = this.matchs.challengerAcknowledged === 1001
           break
       }
-      // console.info(' this.disabled', this.disabled)
+      console.info(' this.disabled', this.disabled)
       this.$axios({
         method: 'get',
         url: `http://localhost:8081/match/matchInfo/${this.matchId}`
       })
         .then((res) => {
           // console.info(res)
-          this.matchs = res.data.data
-          this.getSessionInfo()
+          if(res.data.data!=null){
+             this.matchs = res.data.data
+             this.getSessionInfo()
+             this.message =  this.matchs.holder=== this.userId? this.matchs.winner===5000?'胜利':'失败' : this.matchs.winner===5001?'胜利':'失败'
+             console.info(' this.message', this.message)
+          }
+       
         }).catch(e => {
           // that.$router.push({name: 'index'})
         })

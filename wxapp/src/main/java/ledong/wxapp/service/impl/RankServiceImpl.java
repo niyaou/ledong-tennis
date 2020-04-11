@@ -31,6 +31,7 @@ public class RankServiceImpl implements IRankService {
     public String matchRank(String matchId, int holderScore, int challengerScor) {
         int[] scores = new int[2];
         int[] tempScore = new int[2];
+        System.out.println("-----ranking match :"+matchId);
         Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
 
@@ -55,6 +56,8 @@ public class RankServiceImpl implements IRankService {
 
         holder.setPoolRemain(holder.getPoolRemain() + scores[0]);
         challenger.setPoolRemain(challenger.getPoolRemain() + scores[1]);
+        holder.setScore(holder.getScore()+  scores[0]);
+        challenger.setScore(challenger.getScore()+ scores[1]);
         updateRankInfo(holder);
         updateRankInfo(challenger);
         redis.set(StringUtil.combiningSpecifiedUserKey(holder.getId(), "ranked"), matchId, 60 * 60 * 24 * 7);

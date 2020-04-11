@@ -40,6 +40,7 @@ export default {
 
  .component-container{
     margin: 10px;
+    height:100%;
   border-color:#272727;
   border-width: 1px;
   border-style: solid;
