@@ -1,4 +1,4 @@
-package ledong.wxapp.strategy.impl;
+package ledong.wxapp.strategy.impl.match;
 
 import java.util.Map;
 
@@ -8,6 +8,8 @@ import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.strategy.MatchFilter;
 import ledong.wxapp.strategy.MatchStrategy;
+import ledong.wxapp.strategy.impl.filter.LocationFilter;
+import ledong.wxapp.strategy.impl.filter.RankFilter;
 import ledong.wxapp.utils.StringUtil;
 
 public class PickRandomMatch extends MatchStrategy {

@@ -3,58 +3,88 @@ package ledong.wxapp.service.impl;
 import java.util.Map;
 
 import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import VO.MatchPostVo;
 import VO.RankInfoVo;
 import ledong.wxapp.constant.DataSetConstant;
+import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
+import ledong.wxapp.strategy.RankingStrategy;
+import ledong.wxapp.strategy.context.RankingContext;
+import ledong.wxapp.strategy.impl.rank.ConsecutiveRanking;
+import ledong.wxapp.strategy.impl.rank.PondRanking;
+import ledong.wxapp.strategy.impl.rank.VictoryRanking;
+import ledong.wxapp.utils.StringUtil;
 
 @Service
 public class RankServiceImpl implements IRankService {
 
+    @Autowired
+    private RedisUtil redis;
+
     @Override
     public String matchRank(String matchId, int holderScore, int challengerScor) {
+        int[] scores = new int[2];
+        int[] tempScore = new int[2];
         Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
 
         RankInfoVo holder = getUserRank(vo.getHolder());
         RankInfoVo challenger = getUserRank(vo.getChallenger());
         int scoreChanged = 0;
-        // do some strategy
-        if (holderScore > challengerScor) {
-            scoreChanged = 30;
-            holder.setScore(holder.getScore() + scoreChanged);
-            challenger.setScore(challenger.getScore() - scoreChanged);
-        } else {
-            scoreChanged = -30;
-            holder.setScore(holder.getScore() + scoreChanged);
-            challenger.setScore(challenger.getScore() - scoreChanged);
-        }
-        updateRankInfo(holder.getId(), holder);
-        updateRankInfo(challenger.getId(), challenger);
+
+        RankingContext context = new RankingContext(new VictoryRanking());
+        scores = context.rankMatch(matchId, holderScore, challengerScor);
+
+        context = new RankingContext(new ConsecutiveRanking());
+        tempScore = context.rankMatch(matchId, holderScore, challengerScor);
+
+        scores[0] += tempScore[0];
+        scores[1] += tempScore[1];
+
+        context = new RankingContext(new PondRanking());
+
+        tempScore = context.rankMatch(matchId, holderScore, challengerScor);
+        scores[0] += tempScore[0];
+        scores[1] += tempScore[1];
+
+        holder.setPoolRemain(holder.getPoolRemain() + scores[0]);
+        challenger.setPoolRemain(challenger.getPoolRemain() + scores[1]);
+        updateRankInfo(holder);
+        updateRankInfo(challenger);
+        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
     }
 
     @Override
     public RankInfoVo getUserRank(String userId) {
-        Map<String, Object> match = SearchApi.searchById(DataSetConstant.USER_RANK_INFORMATION, userId);
-        RankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), RankInfoVo.class);
-        return vo;
+//        Map<String, Object> match = SearchApi.searchById(DataSetConstant.USER_RANK_INFORMATION, userId);
+//        RankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), RankInfoVo.class);
+        return RankingStrategy.getUserRank(userId);
     }
 
     @Override
-    public String updateRankInfo(String userId, RankInfoVo vo) {
-        return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), userId);
+    public String updateRankInfo(RankInfoVo vo) {
+        return RankingStrategy.updateRankInfo(vo);
     }
 
     @Override
     public Object getRankingList() {
-        return  SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,RankInfoVo.SCORE,SortOrder.DESC,500 );
+        return SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION, RankInfoVo.SCORE, SortOrder.DESC,
+                500);
+    }
+
+    @Override
+    public String createRankInfo(String userId) {
+        RankInfoVo vo = new RankInfoVo();
+        vo.setId(userId);
+        return RankingStrategy.createRankInfo(vo);
     }
 
 }

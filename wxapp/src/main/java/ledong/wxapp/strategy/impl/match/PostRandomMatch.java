@@ -1,4 +1,4 @@
-package ledong.wxapp.strategy.impl;
+package ledong.wxapp.strategy.impl.match;
 
 import VO.MatchRequestVo;
 import ledong.wxapp.redis.RedisUtil;

@@ -27,21 +27,21 @@ import ledong.wxapp.utils.DateUtil;
 @Api(value = "match management", tags = "MatchController")
 @Validated
 public class MatchController {
-        @Autowired
-        private JwtToken tokenService;
+    @Autowired
+    private JwtToken tokenService;
     @Autowired
     private IMatchService matchService;
 
     @RequestMapping(value = "/randomMatch", method = RequestMethod.POST)
     @ApiOperation(value = "request a random match", notes = "")
     @ApiImplicitParams({
-          
+
             @ApiImplicitParam(name = "courtGPS", value = "random request user's location \"latitude,longitude\"", required = true, dataType = "string", paramType = "query") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> randomMatch(@RequestHeader("Authorization") String authHeader,
             @RequestParam(value = "courtGPS", required = true) String courtGPS) {
-                Claims claims = tokenService.getClaimByToken(authHeader);
-                String userId = claims.getSubject();
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(CommonResponse.success(matchService.requestMatching(userId, courtGPS)),
@@ -59,76 +59,79 @@ public class MatchController {
             @RequestParam(value = "courtName", required = true) String courtName,
             @RequestParam(value = "courtGPS", required = true) String courtGPS,
             @RequestParam(value = "orderTime", required = true) String orderTime) {
-                Claims claims = tokenService.getClaimByToken(authHeader);
-                String userId = claims.getSubject();
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.postIntentionalMatch(userId,orderTime, courtName, courtGPS )),
+                CommonResponse.success(matchService.postIntentionalMatch(userId, orderTime, courtName, courtGPS)),
                 HttpStatus.OK);
     }
-
 
     @RequestMapping(value = "/intentionalMatch/{count}", method = RequestMethod.GET)
     @ApiOperation(value = "request a intentional match", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "count", value = "intentional request count", required = true, dataType = "int", paramType = "path")
-            })
+            @ApiImplicitParam(name = "count", value = "intentional request count", required = true, dataType = "int", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> exploreIntentionalMatch(@PathVariable(value = "count", required = true) Integer count) {
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.getIntentionalMatch(count)),
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.getIntentionalMatch(count)),
                 HttpStatus.OK);
     }
 
     @RequestMapping(value = "/matchedGames/{count}", method = RequestMethod.GET)
     @ApiOperation(value = "request  matched games", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "count", value = "matched request count", required = true, dataType = "int", paramType = "path")
-            })
+            @ApiImplicitParam(name = "count", value = "matched request count", required = true, dataType = "int", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> exploreMatchedGames(@PathVariable(value = "count", required = true) Integer count,@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> exploreMatchedGames(@PathVariable(value = "count", required = true) Integer count,
+            @RequestHeader("Authorization") String authHeader) {
         MatchRequestVo vo = new MatchRequestVo();
         Claims claims = tokenService.getClaimByToken(authHeader);
         String userId = claims.getSubject();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.getMatchedList(userId,count)),
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.getMatchedList(userId, count)),
                 HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/rankedMatch", method = RequestMethod.GET)
+    @ApiOperation(value = "get current randed match", notes = "")
+    public ResponseEntity<?> exploreRankedGame(@RequestHeader("Authorization") String authHeader) {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.rankedMatchInfo(userId)), HttpStatus.OK);
+    }
 
+    @RequestMapping(value = "/playingMatch", method = RequestMethod.GET)
+    @ApiOperation(value = "get current playing match", notes = "")
+    public ResponseEntity<?> explorePlayingGame(@RequestHeader("Authorization") String authHeader) {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.playingMatchInfo(userId)), HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/matchInfo/{matchId}", method = RequestMethod.GET)
     @ApiOperation(value = "get  match infos", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "matchId", value = "matched request count", required = true, dataType = "string", paramType = "path")
-            })
+            @ApiImplicitParam(name = "matchId", value = "matched request count", required = true, dataType = "string", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> getMatchInfos(@PathVariable(value = "matchId", required = true) String matchId) {
-        return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.getMatchInfos(matchId)),
-                HttpStatus.OK);
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.getMatchInfos(matchId)), HttpStatus.OK);
     }
 
-
-    
     @RequestMapping(value = "/matchInfo/{matchId}", method = RequestMethod.POST)
     @ApiOperation(value = "update  match infos", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "matchId", value = "matched id", required = true, dataType = "string", paramType = "path"),
             @ApiImplicitParam(name = "courtName", value = "intentional request court name", required = false, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "orderTime", value = "intentional request time", required = false, dataType = "string", paramType = "query")
-            })
+            @ApiImplicitParam(name = "orderTime", value = "intentional request time", required = false, dataType = "string", paramType = "query") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> updateMatchInfos(@PathVariable(value = "matchId", required = true) String matchId,
-    @RequestParam(value = "courtName", required = false) String courtName,
-    @RequestParam(value = "orderTime", required = false) String orderTime) {
+            @RequestParam(value = "courtName", required = false) String courtName,
+            @RequestParam(value = "orderTime", required = false) String orderTime) {
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.updateMatchInfos(matchId,orderTime,courtName)),
-                HttpStatus.OK);
+                CommonResponse.success(matchService.updateMatchInfos(matchId, orderTime, courtName)), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/matchConfirm/{matchId}/{type}", method = RequestMethod.POST)
@@ -137,16 +140,13 @@ public class MatchController {
             @ApiImplicitParam(name = "matchId", value = "matched id ", required = true, dataType = "string", paramType = "path"),
             @ApiImplicitParam(name = "type", value = "user type , 0 : holder , 1 : challenger", required = true, dataType = "string", paramType = "query")
 
-            })
+    })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> confirmMatch(@PathVariable(value = "matchId", required = true) String matchId,
-    @PathVariable(value = "type", required = true) Integer type) {
-        return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.confirmMatch(matchId,type)),
+            @PathVariable(value = "type", required = true) Integer type) {
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.confirmMatch(matchId, type)),
                 HttpStatus.OK);
     }
-
-
 
     @RequestMapping(value = "/intentionalMatch/${matchId}", method = RequestMethod.POST)
     @ApiOperation(value = "pick a intentional request  match", notes = "")
@@ -163,9 +163,6 @@ public class MatchController {
                 CommonResponse.success(matchService.acceptIntentionalMatch(matchId, challenger)), HttpStatus.OK);
     }
 
-
-
-
     @RequestMapping(value = "/matchResult/${matchId}", method = RequestMethod.POST)
     @ApiOperation(value = "finish match ,upload score result", notes = "")
     @ApiImplicitParams({
@@ -173,16 +170,14 @@ public class MatchController {
             @ApiImplicitParam(name = "challengerScore", value = "challengerScore", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "matchId", value = "  match id", required = true, dataType = "string", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> finishMatch(
-            @RequestParam(value = "holderScore", required = true) Integer holderScore,
+    public ResponseEntity<?> finishMatch(@RequestParam(value = "holderScore", required = true) Integer holderScore,
             @RequestParam(value = "challengerScore", required = true) Integer challengerScore,
             @PathVariable(value = "matchId", required = true) String matchId) {
         MatchRequestVo vo = new MatchRequestVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.finishMatch(matchId, holderScore, challengerScore) ), HttpStatus.OK);
+                CommonResponse.success(matchService.finishMatch(matchId, holderScore, challengerScore)), HttpStatus.OK);
     }
-
 
     @RequestMapping(value = "/challengeMatch/{holder}", method = RequestMethod.POST)
     @ApiOperation(value = "challenge a player", notes = "")

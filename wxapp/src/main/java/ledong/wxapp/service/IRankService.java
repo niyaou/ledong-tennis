@@ -33,14 +33,21 @@ public interface IRankService {
      * @param RankInfoVo
      * @return
      */
-    public String updateRankInfo(String userId, RankInfoVo vo);
-
+    public String updateRankInfo(RankInfoVo vo);
 
     /**
-     * get ranking list 
+     * get ranking list
      * 
      * @return
      */
     public Object getRankingList();
+
+    /**
+     * create user rank info
+     * 
+     * @param userId
+     * @return
+     */
+    public String createRankInfo(String userId);
 
 }

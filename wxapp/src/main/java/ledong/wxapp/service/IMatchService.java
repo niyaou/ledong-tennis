@@ -55,7 +55,6 @@ public interface IMatchService {
      */
     public Object getIntentionalMatch(Integer count);
 
-
     /**
      * 
      * get the list of matched games
@@ -64,7 +63,7 @@ public interface IMatchService {
      * @param count
      * @return
      */
-    public Object getMatchedList(String user,Integer count);
+    public Object getMatchedList(String user, Integer count);
 
     /**
      * start a challenge match
@@ -148,8 +147,6 @@ public interface IMatchService {
      */
     public Object getSessionContextWithQuantity(String sessionId, int holderCount, int challengerCount);
 
-
-
     /**
      * 
      * get the given match infos
@@ -158,8 +155,6 @@ public interface IMatchService {
      * @return
      */
     public Object getMatchInfos(String matchId);
-
-
 
     /**
      * 
@@ -170,18 +165,18 @@ public interface IMatchService {
      * @param courtName
      * @return
      */
-    public Object updateMatchInfos(String matchId,String orderTime,String courtName);
-
+    public Object updateMatchInfos(String matchId, String orderTime, String courtName);
 
     /**
      * 
      * user confirm match
      * 
      * @param matchId
-     * @param type  0: holder,  1:  challenger
+     * @param type 0: holder, 1: challenger
      * @return
      */
-    public Object confirmMatch(String matchId,Integer type);
+    public Object confirmMatch(String matchId, Integer type);
+
     /**
      * insert session context
      * 
@@ -194,7 +189,8 @@ public interface IMatchService {
 
     /**
      * 
-     * finish the given match ,upload score of this match ,and auto ranking
+     * finish the given match ,upload score of this match ,and auto ranking , and
+     * cache ranked match to redis
      * 
      * @param matchId
      * @param holderScore
@@ -202,4 +198,20 @@ public interface IMatchService {
      * @return
      */
     public String finishMatch(String matchId, int holderScore, int challengerScore);
+
+    /**
+     * get playing match
+     * 
+     * @param user
+     * @return
+     */
+    public Object playingMatchInfo(String user);
+
+    /**
+     * get currently ranked match
+     * 
+     * @param user
+     * @return
+     */
+    public Object rankedMatchInfo(String user);
 }

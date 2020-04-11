@@ -30,9 +30,9 @@ import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.strategy.MatchStrategy;
 import ledong.wxapp.strategy.context.MatchContext;
-import ledong.wxapp.strategy.impl.PickIntentionalMatch;
-import ledong.wxapp.strategy.impl.PickRandomMatch;
-import ledong.wxapp.strategy.impl.PostRandomMatch;
+import ledong.wxapp.strategy.impl.match.PickIntentionalMatch;
+import ledong.wxapp.strategy.impl.match.PickRandomMatch;
+import ledong.wxapp.strategy.impl.match.PostRandomMatch;
 import ledong.wxapp.utils.DateUtil;
 import ledong.wxapp.utils.StringUtil;
 
@@ -296,15 +296,13 @@ public class MatchServiceImpl implements IMatchService {
     @Override
     public Object updateMatchInfos(String matchId, String orderTime, String courtName) {
 
-
-
         HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
         if (match == null) {
             return null;
         }
-  
+
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
-        if(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode().equals(vo.getStatus())){
+        if (MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode().equals(vo.getStatus())) {
             return null;
         }
         if (!TextUtils.isEmpty(orderTime)) {
@@ -330,11 +328,34 @@ public class MatchServiceImpl implements IMatchService {
         } else {
             vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
         }
-        if(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getChallengerAcknowledged()) && 
-       MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals( vo.getHolderAcknowledged())){
+        if (MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getChallengerAcknowledged())
+                && MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getHolderAcknowledged())) {
             vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
         }
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+    }
+
+    @Override
+    public Object playingMatchInfo(String user) {
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        if (!StringUtil.isEmpty(user)) {
+            params.add(SearchApi.createMultiFieldsWithSingleValue(user, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
+        }
+        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode()));
+        Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
+        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
+        QueryBuilder[] values = new QueryBuilder[8];
+        LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
+                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 1, params.toArray(values));
+        return searchResponse == null ? null : searchResponse.get(0);
+    }
+
+    @Override
+    public Object rankedMatchInfo(String user) {
+        String matchId = (String) redis.get(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
+        redis.del(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
+        return getMatchInfos(matchId);
     }
 
 }

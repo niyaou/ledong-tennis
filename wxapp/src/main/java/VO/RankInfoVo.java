@@ -27,7 +27,7 @@ public class RankInfoVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "score  ")
-    private Integer score;
+    private Integer score = 4000;
     public static final String SCORE = "score";
 
     @NotEmpty
@@ -47,7 +47,7 @@ public class RankInfoVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "poolRemain  ")
-    private Integer poolRemain;
+    private Integer poolRemain = 0;
     public static final String POOLREMAIN = "poolRemain";
 
     public String getId() {

@@ -170,9 +170,9 @@ public class SearchApi {
         return parseResponse(searchRequest);
     }
 
-
     /**
      * 查询多个字段满足某个条件
+     * 
      * @param indexName
      * @param value
      * @param pageNo
@@ -180,21 +180,16 @@ public class SearchApi {
      * @param keys
      * @return
      */
-    public static QueryBuilder createMultiFieldsWithSingleValue(String value, 
-    String... keys           ) {
-   
+    public static QueryBuilder createMultiFieldsWithSingleValue(String value, String... keys) {
+
         // searchSourceBuilder.version(true);
         BoolQueryBuilder matchQueryBuilder = QueryBuilders.boolQuery();
         for (String key : keys) {
-            matchQueryBuilder.should( QueryBuilders.termQuery(key, value));
+            matchQueryBuilder.should(QueryBuilders.termQuery(key, value));
         }
         return matchQueryBuilder;
-        // searchSourceBuilder.query(matchQueryBuilder);
-        // searchSourceBuilder = createPageAble(searchSourceBuilder, 1, size);
-        // searchRequest.source(searchSourceBuilder);
-        // return parseResponse(searchRequest);
-    }
 
+    }
 
     /**
      * 查询特定字段的指定值
@@ -265,27 +260,25 @@ public class SearchApi {
         return parseResponse(searchRequest);
     }
 
-
     /**
      * 
      * 根据排序条件查询指定条目
+     * 
      * @param indexName
      * @param sortField
      * @param order
      * @param size
      * @return
      */
-    public static LinkedList<HashMap<String, Object>> searchByFieldSorted(String indexName, 
-    String sortField, SortOrder order, Integer size) {
-SearchRequest searchRequest = new SearchRequest(indexName);
-SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-searchSourceBuilder.sort(sortField, order);
-searchSourceBuilder.query(createSearchAll()).size(size);
-searchRequest.source(searchSourceBuilder);
-return parseResponse(searchRequest);
-}
-
-
+    public static LinkedList<HashMap<String, Object>> searchByFieldSorted(String indexName, String sortField,
+            SortOrder order, Integer size) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.sort(sortField, order);
+        searchSourceBuilder.query(createSearchAll()).size(size);
+        searchRequest.source(searchSourceBuilder);
+        return parseResponse(searchRequest);
+    }
 
     /**
      * *查询所有数据

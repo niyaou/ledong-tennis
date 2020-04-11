@@ -1,4 +1,4 @@
-package ledong.wxapp.strategy.impl;
+package ledong.wxapp.strategy.impl.filter;
 
 import java.text.ParseException;
 
