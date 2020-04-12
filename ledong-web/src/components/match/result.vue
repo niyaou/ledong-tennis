@@ -134,7 +134,7 @@ export default {
       this.$axios({
         method: 'get',
 
-        url: `http://localhost:8081/match/matchResult/`
+        url: `http://106.54.80.211:8081/match/matchResult/`
 
       })
         .then((res) => {
@@ -160,8 +160,8 @@ export default {
       // 20200328224429-jerry-niyaou
       this.$axios({
         method: 'get',
-        url: `http://localhost:8081/match/sessionContext/${this.matchs.sessionId}?holderCount=${holderCount}&challengerCount=${challengerCount}`
-        // url: `http://localhost:8081/match/sessionContext/srTBNnEB-AzPenbiXM6x?holderCount=${holderCount}&challengerCount=${challengerCount}`
+        url: `http://106.54.80.211:8081/match/sessionContext/${this.matchs.sessionId}?holderCount=${holderCount}&challengerCount=${challengerCount}`
+        // url: `http://106.54.80.211:8081/match/sessionContext/srTBNnEB-AzPenbiXM6x?holderCount=${holderCount}&challengerCount=${challengerCount}`
       })
         .then((res) => {
           if (res.data.data.holderContext != null) {
@@ -189,7 +189,7 @@ export default {
       console.info(' this.disabled', this.disabled)
       this.$axios({
         method: 'get',
-        url: `http://localhost:8081/match/matchInfo/${this.matchId}`
+        url: `http://106.54.80.211:8081/match/matchInfo/${this.matchId}`
       })
         .then((res) => {
           // console.info(res)
@@ -217,7 +217,7 @@ export default {
 
       this.$axios({
         method: 'post',
-        url: `http://localhost:8081/match/matchInfo/${this.matchId}`,
+        url: `http://106.54.80.211:8081/match/matchInfo/${this.matchId}`,
         data: this.qs.stringify({
           orderTime: val
         })
@@ -230,7 +230,7 @@ export default {
       console.info(val)
       this.$axios({
         method: 'post',
-        url: `http://localhost:8081/match/matchInfo/${this.matchId}`,
+        url: `http://106.54.80.211:8081/match/matchInfo/${this.matchId}`,
         data: this.qs.stringify({
           courtName: val
         })

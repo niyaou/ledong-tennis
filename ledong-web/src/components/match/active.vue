@@ -45,7 +45,7 @@ export default {
 
       this.$axios({
         method: 'get',
-        url: 'http://localhost:8081/match/matchedGames/100'
+        url: 'http://106.54.80.211:8081/match/matchedGames/100'
       })
         .then((res) => {
           // console.info(res)

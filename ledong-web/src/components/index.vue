@@ -71,7 +71,7 @@ export default {
       this.$axios({
         method: 'get',
         // url: 'http://www.ledongtennis.cn/user/login',
-        url: 'http://localhost:8081/user/validate'
+        url: 'http://106.54.80.211:8081/user/validate'
       })
         .then(res => {
           // console.info(res)

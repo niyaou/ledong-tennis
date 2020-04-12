@@ -88,7 +88,7 @@ export default {
       this.matchStatus = 1
       this.$axios({
         method: 'post',
-        url: 'http://localhost:8081/match/intentionalMatch',
+        url: 'http://106.54.80.211:8081/match/intentionalMatch',
         data: that.qs.stringify({
           courtGPS: '54.1,112.3',
           courtName: that.court,

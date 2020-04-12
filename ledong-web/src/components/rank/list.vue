@@ -40,7 +40,7 @@ export default {
       this.$axios({
         method: 'post',
 
-        url: `http://localhost:8081/match/challengeMatch/${holder}`
+        url: `http://106.54.80.211:8081/match/challengeMatch/${holder}`
 
       })
         .then((res) => {
@@ -54,7 +54,7 @@ export default {
 
       this.$axios({
         method: 'get',
-        url: 'http://localhost:8081/rank/rankList'
+        url: 'http://106.54.80.211:8081/rank/rankList'
       })
         .then((res) => {
           // console.info(res)

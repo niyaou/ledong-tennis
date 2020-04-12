@@ -30,7 +30,7 @@ export default {
 
       this.$axios({
         method: 'get',
-        url: 'http://localhost:8081/rank/rankInfo'
+        url: 'http://106.54.80.211:8081/rank/rankInfo'
       })
         .then((res) => {
           // console.info(res)

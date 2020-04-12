@@ -44,7 +44,7 @@ export default {
     challenge (matchId) {
       this.$axios({
         method: 'post',
-        url: `http://localhost:8081/match/intentionalMatch/${matchId}`
+        url: `http://106.54.80.211:8081/match/intentionalMatch/${matchId}`
       })
         .then((res) => {
 
@@ -58,7 +58,7 @@ export default {
 
       this.$axios({
         method: 'get',
-        url: 'http://localhost:8081/match/intentionalMatch/100'
+        url: 'http://106.54.80.211:8081/match/intentionalMatch/100'
       })
         .then((res) => {
           // console.info(res)

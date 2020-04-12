@@ -44,7 +44,7 @@ export default {
       this.$axios({
         method: 'post',
         // url: 'http://www.ledongtennis.cn/user/login',
-        url: 'http://localhost:8081/user/register',
+        url: 'http://106.54.80.211:8081/user/register',
         headers: {
           'Content-Type': 'application/json;charset=UTF-8'
         },
@@ -70,7 +70,7 @@ export default {
       this.$axios({
         method: 'post',
         // url: 'http://www.ledongtennis.cn/user/login',
-        url: 'http://localhost:8081/user/login',
+        url: 'http://106.54.80.211:8081/user/login',
         data: this.qs.stringify({
           userId: this.user.name,
           password: this.user.psw
