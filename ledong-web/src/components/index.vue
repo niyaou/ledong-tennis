@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    index
+
     <button v-on:click="logout" class="ui-button">
       <span>退出</span>
     </button>

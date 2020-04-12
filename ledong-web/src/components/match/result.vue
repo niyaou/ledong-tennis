@@ -11,8 +11,6 @@
 
      <div>{{message}}</div>
 
-
-
 </div>
 <div  class="wt-flex-row" style="height:50%;overflow-y:scroll">
 <ul  class="wt-flex" style="height:50%;" >
@@ -119,12 +117,11 @@ export default {
     //   // setInterval(function () {
     //   //   that.getSessionInfo()
     //   // }, 2000)
-       
-      setInterval(function () {
-        that.getMatchInfo()
-         that.lastResult ()
-      }, 5000)
 
+    setInterval(function () {
+      that.getMatchInfo()
+      that.lastResult()
+    }, constant.REFRESH_INTERVAL_SLOW)
 
     eventBus.$on(constant.EVENT_USER_ID, userId => {
       this.userId = userId
@@ -134,16 +131,14 @@ export default {
   methods: {
 
     lastResult () {
-      let that = this
-      let type = this.userId === this.matchs.holder ? 0 : 1
       this.$axios({
         method: 'get',
 
         url: `http://localhost:8081/match/matchResult/`
-       
+
       })
         .then((res) => {
-         this.matchId = res.data.data.id
+          this.matchId = res.data.data.id
           // setTimeout(function () {
           //   that.getSessionInfo()
           //   console.info('-------refresh session--------')
@@ -198,13 +193,12 @@ export default {
       })
         .then((res) => {
           // console.info(res)
-          if(res.data.data!=null){
-             this.matchs = res.data.data
-             this.getSessionInfo()
-             this.message =  this.matchs.holder=== this.userId? this.matchs.winner===5000?'胜利':'失败' : this.matchs.winner===5001?'胜利':'失败'
-             console.info(' this.message', this.message)
+          if (res.data.data != null) {
+            this.matchs = res.data.data
+            this.getSessionInfo()
+            this.message = this.matchs.holder === this.userId ? this.matchs.winner === 5000 ? '胜利' : '失败' : this.matchs.winner === 5001 ? '胜利' : '失败'
+            console.info(' this.message', this.message)
           }
-       
         }).catch(e => {
           // that.$router.push({name: 'index'})
         })

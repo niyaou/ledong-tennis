@@ -178,19 +178,17 @@ public class MatchController {
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/intentionalMatch/${matchId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/intentionalMatch/{matchId}", method = RequestMethod.POST)
     @ApiOperation(value = "pick a intentional request  match", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "challenger", value = "pick random request user", required = true, dataType = "string", paramType = "query"),
+    @ApiImplicitParams({        
             @ApiImplicitParam(name = "matchId", value = "intentional  request id", required = true, dataType = "string", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> pickIntentionalMatch(
-            @RequestParam(value = "challenger", required = true) String challenger,
+    public ResponseEntity<?> pickIntentionalMatch(@RequestHeader("Authorization") String authHeader,
             @PathVariable(value = "matchId", required = true) String matchId) {
-        MatchRequestVo vo = new MatchRequestVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.acceptIntentionalMatch(matchId, challenger)), HttpStatus.OK);
+                CommonResponse.success(matchService.acceptIntentionalMatch(matchId, userId)), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/matchResult/${matchId}", method = RequestMethod.POST)
@@ -211,14 +209,13 @@ public class MatchController {
 
     @RequestMapping(value = "/challengeMatch/{holder}", method = RequestMethod.POST)
     @ApiOperation(value = "challenge a player", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "challenger", value = "challenger uers id ", required = true, dataType = "string", paramType = "query"),
+    @ApiImplicitParams({         
             @ApiImplicitParam(name = "holder", value = "holder who been challenged user  id", required = true, dataType = "string", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> challengeMatch(@RequestParam(value = "challenger", required = true) String challenger,
+    public ResponseEntity<?> challengeMatch(@RequestHeader("Authorization") String authHeader,
             @PathVariable(value = "holder", required = true) String holder) {
-        MatchRequestVo vo = new MatchRequestVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String challenger = claims.getSubject();
         return new ResponseEntity<Object>(CommonResponse.success(matchService.postChallengeMatch(holder, challenger)),
                 HttpStatus.OK);
     }

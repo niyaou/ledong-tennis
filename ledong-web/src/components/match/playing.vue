@@ -118,9 +118,9 @@ export default {
   mounted () {
     // this.initList()
     let that = this
-          setInterval(function () {
-        that.getMatchInfo()
-      }, 5000)
+    setInterval(function () {
+      that.getMatchInfo()
+    }, constant.REFRESH_INTERVAL_FAST)
     // eventBus.$on(constant.EVENT_DEALING_MATCH, matchId => {
     //   this.matchId = matchId
     //   console.info('  event on :', matchId)
@@ -221,7 +221,7 @@ export default {
       })
         .then((res) => {
           console.info(res)
-          this.matchId =  res.data.data.id
+          this.matchId = res.data.data.id
           this.matchs = res.data.data
           this.getSessionInfo()
         }).catch(e => {

@@ -19,11 +19,10 @@ export default {
     }
   },
   mounted () {
-      let that = this
-    setInterval(function(){
-  that.getScore()
-    },5000)
-  
+    let that = this
+    setInterval(function () {
+      that.getScore()
+    }, constant.REFRESH_INTERVAL_SLOW)
   },
   methods: {
     getScore () {

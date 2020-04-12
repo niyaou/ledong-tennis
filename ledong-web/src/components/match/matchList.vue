@@ -4,24 +4,34 @@
 <ul id="example-1" class="wt-flex">
   <li v-for="item in matchs" v-bind:key="item.id">
  <div> 发布者 : {{ item.holder }}      ||  挑战者 : {{ item.challenger }}        ||  场地 : {{ item.courtName}}    ||   时间 : {{ item.orderTime}} </div>
- <button v-on:click="challenge(item.id)" class="ui-button" ><span>应战</span></button>
+ <button v-on:click="challenge(item.id)" class="ui-button"   :disabled="item.holder === userId"><span>应战</span></button>
   </li>
 </ul>
-  <button v-on:click="getScore()" class="ui-button" ><span>刷新</span></button>
+  <!-- <button v-on:click="getScore()" class="ui-button" ><span>刷新</span></button> -->
   </div>
 </template>
 
 <script>
-
+import constant from '../../utils/constant'
+import eventBus from '../../main'
 export default {
   name: 'matchList',
   data () {
     return {
-      matchs: []
+      matchs: [],
+      userId: ''
     }
   },
   mounted () {
     // this.initList()
+    let that = this
+    setInterval(function () {
+      that.getScore()
+    }, 5000)
+    eventBus.$on(constant.EVENT_USER_ID, userId => {
+      this.userId = userId
+      console.info('  event on :', userId)
+    })
   },
   methods: {
     initList () {
@@ -29,9 +39,18 @@ export default {
       setInterval(function () {
         console.info('-----interval -------')
         that.getScore()
-      }, 4000)
+      }, constant.REFRESH_INTERVAL_FAST)
     },
     challenge (matchId) {
+      this.$axios({
+        method: 'post',
+        url: `http://localhost:8081/match/intentionalMatch/${matchId}`
+      })
+        .then((res) => {
+
+        }).catch(e => {
+
+        })
       console.info(matchId)
     },
     getScore () {

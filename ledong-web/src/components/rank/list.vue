@@ -4,7 +4,7 @@
 <ul id="example-1" class="wt-flex">
   <li v-for="item in ranks" v-bind:key="item.id">
  <div> name : {{ item.id }}     ||   score : {{ item.score}} </div>
- <button v-on:click="challenge(item.id)" class="ui-button" ><span>挑战</span></button>
+ <button v-on:click="challenge(item.id)" class="ui-button" :disabled="item.id === userId"><span>挑战</span></button>
   </li>
 </ul>
 
@@ -13,24 +13,41 @@
 </template>
 
 <script>
-
+import constant from '../../utils/constant'
+import eventBus from '../../main'
 export default {
   name: 'list',
   data () {
     return {
-      ranks: []
+      ranks: [],
+      userId: ''
     }
   },
   mounted () {
     // this.getScore()
     let that = this
- setInterval(function(){
-  that.getScore()
-    },5000)
+    setInterval(function () {
+      that.getScore()
+    }, constant.REFRESH_INTERVAL_SLOW)
+
+    eventBus.$on(constant.EVENT_USER_ID, userId => {
+      this.userId = userId
+      console.info('  event on :', userId)
+    })
   },
   methods: {
-    challenge (matchId) {
-      console.info(matchId)
+    challenge (holder) {
+      this.$axios({
+        method: 'post',
+
+        url: `http://localhost:8081/match/challengeMatch/${holder}`
+
+      })
+        .then((res) => {
+
+        }).catch(e => {
+
+        })
     },
     getScore () {
       // let that = this

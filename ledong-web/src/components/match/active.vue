@@ -34,7 +34,7 @@ export default {
       setInterval(function () {
         console.info('-----interval -------')
         that.getScore()
-      }, 2000)
+      }, constant.REFRESH_INTERVAL_FAST)
     },
     challenge (matchId) {
       eventBus.$emit(constant.EVENT_DEALING_MATCH, matchId)

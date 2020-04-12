@@ -9,7 +9,6 @@
       <button type="submit" class="ui-button">
         <span>发布比赛</span>
       </button>
-      {{startTime.time}}
 
     </form>
 

@@ -124,7 +124,7 @@ export default {
       // }, 2000)
       setInterval(function () {
         that.getMatchInfo()
-      }, 5000)
+      }, constant.REFRESH_INTERVAL_FAST)
     })
     eventBus.$on(constant.EVENT_USER_ID, userId => {
       this.userId = userId
