@@ -2919,7 +2919,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // SRS consts values
 ///////////////////////////////////////////////////////////
 #define SRS_CONSTS_NULL_FILE "/dev/null"
-#define SRS_CONSTS_LOCALHOST "127.0.0.1"
+#define SRS_CONSTS_106.54.80.211 "127.0.0.1"
 
 ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
@@ -11082,7 +11082,7 @@ typedef void* srs_amf0_t;
 /**
  * create/destroy a rtmp protocol stack.
  * @url rtmp url, for example:
- *         rtmp://localhost/live/livestream
+ *         rtmp://106.54.80.211/live/livestream
  * @remark default timeout to 30s if not set by srs_rtmp_set_timeout.
  *
  * @return a rtmp handler, or NULL if error occured.
@@ -11091,7 +11091,7 @@ extern srs_rtmp_t srs_rtmp_create(const char* url);
 /**
  * create rtmp with url, used for connection specified application.
  * @param url the tcUrl, for exmple:
- *         rtmp://localhost/live
+ *         rtmp://106.54.80.211/live
  * @remark this is used to create application connection-oriented,
  *       for example, the bandwidth client used this, no stream specified.
  * @remark default timeout to 30s if not set by srs_rtmp_set_timeout.

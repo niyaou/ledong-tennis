@@ -1,0 +1,33 @@
+<!--index.wxml-->
+<view class="container">
+	<!-- <div style='height:{{totalBarHeight}}rpx;color:#fff;padding-top:{{statusBarHeight}}rpx;'>乐动网球天梯</div> -->
+	<view class="banner">
+		<button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" bindtap="gps"> 微信登录 </button>
+		<block wx:else>
+			<div class="detail" style='padding-top:{{totalBarHeight}}rpx;'>
+				<!-- <image src="../../assets/banner.png" class="banner-image" /> -->
+				<div class="avitorleft">
+					<image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover" style="z-index:30"></image>
+				</div>
+				<div class="avitorright">
+					<div class="nickname">{{userInfo.nickName}} </div>
+					<div class="rank">3.5 <span style="background:#0a90dd;padding-left: 10rpx;padding-right: 10rpx">钻石</span></div>
+				</div>
+			</div>
+
+			<view class="content">
+				12313231
+			</view>
+
+
+		
+		</block>
+	</view>
+			<view class="functionbarTotal">
+				<view class="functionbar">
+					<text>技术统计</text> <text>|</text> <text>比赛 </text> <text>|</text> <text>天梯排行</text>
+				</view>
+				<div class="indicator" />
+			</view>
+				<button bindtap="login">login</button>
+</view>
