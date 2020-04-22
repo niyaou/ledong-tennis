@@ -3,5 +3,6 @@
     "analyze": "../component/analyze/analyze",
     "match": "../component/match/match",
     "ladder": "../component/ladder/ladder"
-  }
+  },
+  "disableScroll": true
 }

@@ -7,6 +7,7 @@
 
 
 .columndiv {
+  font-size:24rpx;
   display: flex;
   flex-direction: column;
 }
@@ -28,5 +29,9 @@
   flex-direction: row;
   justify-content: space-around;
   color:rgb(117, 117, 117);
+}
 
+.fontbold{
+  font-size: 36rpx;
+  font-weight: bolder;
 }

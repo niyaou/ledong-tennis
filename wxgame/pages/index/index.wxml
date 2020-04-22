@@ -14,7 +14,6 @@
 					<div class="rank">3.5 <span style="background:#0a90dd;padding-left: 10rpx;padding-right: 10rpx">钻石</span></div>
 				</div>
 			</div>
-
 			<view class="content">
 				12313231
 			</view>
@@ -34,9 +33,9 @@
 		<div class="indicator" />
 	</view>
 	<view class="componentview">
-		<analyze  wx:if="{{tabBarStatus==0}}" />
-		<match   wx:elif="{{tabBarStatus==1}}"/>
-		<ladder wx:else/>
+		<analyze  wx:if="{{tabBarStatus==0}}" isPicked="{{tabBarStatus==0}}"/>
+		<match   wx:elif="{{tabBarStatus==1}}" isPicked="{{tabBarStatus==1}}"/>
+		<ladder wx:else isPicked="{{tabBarStatus==2}}"/>
 	</view>
 	<!-- <button bindtap="login">login</button> -->
 </view>

@@ -1,7 +1,7 @@
 <!--component/analyze/analyze.wxml-->
 
-
-<view class="rowdiv" style="height:100%;width:100%;">
+<view style="width:100%;height:100%">
+<view class="rowdiv" style="height:30%;width:100%;">
 	<div class="analyzebanner">
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/dimand.png" style="width:64rpx;height:64rpx" />
@@ -16,5 +16,6 @@
 			<image src="../../icon/bronze.png" style="width:64rpx;height:64rpx" />
 		</div>
 	</div>
-
+</view>
+<div>123</div>
 </view>

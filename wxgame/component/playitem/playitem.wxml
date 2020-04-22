@@ -1,0 +1,40 @@
+<!--component/playitem/playitem.wxml-->
+
+<view class="rowdiv">
+	<div class="item">
+		<div class="title">寻找球友的比赛</div>
+		<div class="divid" />
+		<div class="user">
+			<div class="avator">
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{holderName}}
+					<div class="rank">青铜</div>
+				</div>
+
+			</div>
+      <div class="score win">6</div>
+			<div class="dividv" />
+         <div class="score lose">0</div>
+			<div class="avator">
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{challengerAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{challengerName}}
+					<div class="rank">钻石</div>
+				</div>
+			</div>
+		</div>
+		<div class="divid" />
+		<div class="bottom">
+			<div class="zone">
+				<image src="../../icon/position.png" class="bottomimg" />
+				<div> 南湖</div>
+			</div>
+			<!-- <div class="dividv" /> -->
+			<div class="zone">
+				<image src="../../icon/cal.png" class="bottomimg" />
+				<div> 周三上午</div>
+			</div>
+		</div>
+	</div>
+
+
+</view>
