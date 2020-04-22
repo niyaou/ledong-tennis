@@ -2,6 +2,8 @@
 page {
   width: 100%;
   height: 100%;
+  background-color:rgb(177, 177, 177);
+  /* overflow: hidden; */
 }
 
 
@@ -83,10 +85,12 @@ page {
   color: rgba(255, 255, 255, 0.533);
   display: flex;
   flex-direction: column;
-  align-items: center;
   /* align-items: center; */
-  /* justify-content: space-around; */
+
 }
+.start{align-items: flex-start;}
+.center{align-items: center;}
+.end{align-items: flex-end;}
 .functionbar {
   height: 70rpx;
   background-color: #000;
@@ -105,6 +109,15 @@ page {
   background-color: red;
   width:30%;
 }
+.componentview{
+  height:70%;
+  width:100%;
+}
+
+
+
+
+
 
 .banner {
   width: 100%;

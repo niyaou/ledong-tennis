@@ -1,9 +1,6 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/logs/logs",
-    "pages/match/match",
-    "pages/ladder/ladder"
+    "pages/index/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

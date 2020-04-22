@@ -10,7 +10,8 @@ Page({
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
-    ratio: getApp().globalData.ratio
+    ratio: getApp().globalData.ratio,
+    tabBarStatus:1 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
   },
   //事件处理函数
   bindViewTap: function() {
@@ -75,5 +76,11 @@ Page({
       }
      })
     console.info('----gps----')
+  },
+  tabStatus(event){
+    this.setData({
+      tabBarStatus:event.currentTarget.dataset.gid
+    })
+    console.log(event.currentTarget.dataset.gid)
   }
 })

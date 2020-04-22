@@ -20,14 +20,23 @@
 			</view>
 
 
-		
+
 		</block>
 	</view>
-			<view class="functionbarTotal">
-				<view class="functionbar">
-					<text>技术统计</text> <text>|</text> <text>比赛 </text> <text>|</text> <text>天梯排行</text>
-				</view>
-				<div class="indicator" />
-			</view>
-				<button bindtap="login">login</button>
+	<view class="functionbarTotal {{tabBarStatus==0?'start':tabBarStatus==1?'center':'end'}}">
+		<view class="functionbar">
+			<text bindtap="tabStatus" data-gid='0'>技术统计</text> 
+			<text>|</text>
+			 <text bindtap="tabStatus" data-gid='1'>比赛 </text> 
+			 <text>|</text>
+			  <text bindtap="tabStatus" data-gid='2'>天梯排行</text>
+		</view>
+		<div class="indicator" />
+	</view>
+	<view class="componentview">
+		<analyze  wx:if="{{tabBarStatus==0}}" />
+		<match   wx:elif="{{tabBarStatus==1}}"/>
+		<ladder wx:else/>
+	</view>
+	<!-- <button bindtap="login">login</button> -->
 </view>

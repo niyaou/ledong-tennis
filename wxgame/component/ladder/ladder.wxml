@@ -1,0 +1,20 @@
+<!--component/analyze/analyze.wxml-->
+
+
+<view class="rowdiv" style="height:100%;width:100%;">
+	<div class="analyzebanner">
+		<div class="analyzeicon rowdiv">
+			<image src="../../icon/dimand.png" style="width:64rpx;height:64rpx" />
+		</div>
+			<div class="analyzeicon rowdiv">
+			<image src="../../icon/golden.png" style="width:64rpx;height:64rpx" />
+		</div>
+				<div class="analyzeicon rowdiv">
+			<image src="../../icon/silver.png" style="width:64rpx;height:64rpx" />
+		</div>
+				<div class="analyzeicon rowdiv">
+			<image src="../../icon/bronze.png" style="width:64rpx;height:64rpx" />
+		</div>
+	</div>
+
+</view>

@@ -8,3 +8,14 @@
   justify-content: flex-start;
   box-sizing: border-box;
 } 
+
+
+.columndiv{
+  display: flex;
+  flex-direction: column;
+}
+
+.rowdiv{
+  display: flex;
+  flex-direction: row;
+}

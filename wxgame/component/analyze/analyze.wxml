@@ -1,0 +1,23 @@
+<!--component/analyze/analyze.wxml-->
+
+
+<view class="rowdiv" style="height:100%;width:100%;">
+	<div class="analyzebanner">
+		<div class="analyzeicon rowdiv">
+			<image src="../../icon/rank.png" style="width:80rpx;height:80rpx" />
+			<div class="columndiv">
+				<div style="font-size:36rpx;color:#000;"> 35%</div>
+				<div style="font-size:24rpx;"> 胜率</div>
+			</div>
+		</div>
+
+		<div class="analyzeicon rowdiv">
+			<image src="../../icon/ranklist.png" style="width:80rpx;height:80rpx" />
+			<div class="columndiv">
+				<div  style="font-size:24rpx;color:#000;"> 第32名</div>
+				<div style="font-size:24rpx;"> 全服</div>
+			</div>
+		</div>
+	</div>
+
+</view>

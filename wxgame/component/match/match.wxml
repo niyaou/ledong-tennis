@@ -1,0 +1,34 @@
+<!--component/analyze/analyze.wxml-->
+
+
+<view class="rowdiv" style="height:100%;width:100%;">
+	<div class="analyzebanner">
+		<div class="analyzeicon rowdiv">
+			<image src="../../icon/match-s.png" style="width:80rpx;height:80rpx" />
+			<div class="columndiv">
+				<!-- <div style="font-size:24rpx;color:#000;"> 发布比赛</div> -->
+				<div style="font-size:24rpx;"> 胜率</div>
+			</div>
+		</div>
+
+		<div class="analyzeicon rowdiv">
+			<image src="../../icon/matching.png" style="width:80rpx;height:80rpx" />
+			<div class="columndiv">
+				<!-- <div  style="font-size:24rpx;color:#000;"> 第32名</div> -->
+				<div style="font-size:24rpx;"> 比赛中</div>
+			</div>
+		</div>
+
+		
+		<div class="analyzeicon rowdiv">
+			<image src="../../icon/court-s.png" style="width:80rpx;height:80rpx" />
+			<div class="columndiv">
+				<!-- <div  style="font-size:24rpx;color:#000;"> 第32名</div> -->
+				<div style="font-size:24rpx;">选手约球</div>
+			</div>
+		</div>
+
+
+	</div>
+
+</view>
