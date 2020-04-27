@@ -1,7 +1,7 @@
 <!--component/analyze/analyze.wxml-->
 
 
-<view class="rowdiv" style="height:100%;width:100%;">
+<view class="columndiv" style="height:100%;width:100%;">
 	<div class="analyzebanner">
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/rank.png" style="width:80rpx;height:80rpx" />
@@ -19,5 +19,8 @@
 			</div>
 		</div>
 	</div>
-
+<div class="rest">
+<nearcourt />
+<nearplayer style="padding-top:5%" />
+</div>
 </view>

@@ -1,0 +1,57 @@
+<view class="contain">
+	<view class="cl">
+  <div class="head" style='padding-top:{{totalBarHeight}}rpx;'>
+  <div style='top:{{totalBarHeight-70}}rpx;'> <text decode="true">&nbsp;&nbsp; &lt;</text></div>
+
+  </div>
+		<div class="user">
+			<div class="avator">
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{holderName}}
+					<div class="rank">青铜</div>
+				</div>
+			</div>
+
+			<div class="score win">6</div>
+			<div class="dividv" />
+			<div class="score lose">7</div>
+			<div class="avator">
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{challengerAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{challengerName}}
+					<div class="rank">钻石</div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+		<div class="bottom">
+			<div class="zone">
+				<image src="../../icon/positiond.png" class="bottomimg" />
+				<div> 南湖</div>
+			</div>
+			<!-- <div class="dividv" /> -->
+			<div class="zone">
+				<image src="../../icon/cald.png" class="bottomimg" />
+         <picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{startDate}}
+
+    
+        </picker>
+		
+			</div>
+		</div>
+		<div class="divid" />
+		<!-- <text class='dialog-close' decode='true'>&lt;</text> -->
+
+	</view>
+	<scroll-view scroll-y class="swiper" >
+		<view wx:for="{{arrs}}">
+			<dialog  isSelf="{{item %2 == 0}}"/>
+		</view>
+	</scroll-view>
+	<div class="message">
+		<input class="context" placeholder="告诉球友你的想法。。。"></input>
+		<image src="../../icon/send.png" class="send" />
+	</div>
+</view>

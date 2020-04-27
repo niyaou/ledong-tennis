@@ -1,0 +1,16 @@
+<!--component/playitem/playitem.wxml-->
+
+<view class="columndiv" bindtap="detail">
+	
+	<div class="title">附近的球友</div>
+	<div class="divid" >1</div>
+	<scroll-view scroll-x style="width: 90%; height: 100%;white-space: nowrap;" >
+		<view wx:for="{{arrs}}" style="display:inline-block;background:#fafbf9">
+					<div class="avator">
+						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
+							<div>{{holderName}}</div>
+					</div>
+		</view>
+	</scroll-view>
+
+</view>

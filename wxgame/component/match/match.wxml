@@ -4,10 +4,10 @@
 <view class="rowdiv" >
 	<div class="analyzebanner">
 		<div class="analyzeicon rowdiv"  bindtap="tapTabStatus" data-gid='0'>
-			<image src="../../icon/match-s.png" style="width:80rpx;height:80rpx" />
+			<image src="{{tabStatus==0?'../../icon/match-s.png':'../../icon/match.png'}}" style="width:80rpx;height:80rpx" />
 			<div class="columndiv">
 				<!-- <div style="font-size:24rpx;color:#000;"> 发布比赛</div> -->
-				<div  class="{{tabStatus==0?'fontbold':''}}"> 胜率</div>
+				<div  class="{{tabStatus==0?'fontbold':''}}">约球</div>
 			</div>
 		</div>
 
@@ -15,16 +15,16 @@
 			<image src="../../icon/matching.png" style="width:80rpx;height:80rpx" />
 			<div class="columndiv">
 				<!-- <div  style="font-size:24rpx;color:#000;"> 第32名</div> -->
-				<div  class="{{tabStatus==1?'fontbold':''}}"> 比赛中</div>
+				<div  class="{{tabStatus==1?'fontbold':''}}">匹配比赛</div>
 			</div>
 		</div>
 
 		
 		<div class="analyzeicon rowdiv" bindtap="tapTabStatus" data-gid='2'>
-			<image src="../../icon/court-s.png" style="width:80rpx;height:80rpx" />
+			<image src="{{tabStatus==2?'../../icon/court-s.png':'../../icon/court.png'}}" style="width:80rpx;height:80rpx" />
 			<div class="columndiv">
 				<!-- <div  style="font-size:24rpx;color:#000;"> 第32名</div> -->
-				<div  class="{{tabStatus==2?'fontbold':''}}">选手约球</div>
+				<div  class="{{tabStatus==2?'fontbold':''}}">协商</div>
 			</div>
 		</div>
 
@@ -32,7 +32,7 @@
 	</div>
 
 </view>
-<scroll-view scroll-y style="width: 100%; height: 90%;padding-top:30rpx" >
+<scroll-view scroll-y style="width: 100%; height: 90%;" >
  <view slot="refresher" class="refresh-container"
     style="display: block; width: 100%; height: 80px; background: blue; display: flex; align-items: center;"
   >

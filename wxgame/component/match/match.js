@@ -15,7 +15,7 @@ isPicked:{
    */
   data: {
      matching:false,
-     arrs:[1,2,3],
+     arrs:[1],
      tabStatus:0 //栏目选择状态
   },
 

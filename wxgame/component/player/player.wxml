@@ -1,0 +1,27 @@
+<!--component/playitem/playitem.wxml-->
+
+<view class="rowdiv" bindtap="detail">
+	<div class="{{rankType==1?'brass item':rankType==2?'silver item':rankType==3?'golden item':'diamond item'}}">
+		<div class="user">
+			<div class="avator">
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
+			</div>
+      <div class="rest">  
+      <div class="info" >
+            <div class="nickname">{{holderName}}		</div>
+					<div class="rank">青铜</div>
+		
+      </div>
+  
+			<div class="zone">
+				<image src="../../icon/position.png" class="bottomimg" />
+				<div> 南湖</div>
+			</div>
+			<div class="zone">
+				<image src="../../icon/rank.png" class="bottomimg" />
+				<div> 57% 胜率</div>
+			</div></div>
+  
+		</div>
+	</div>
+</view>

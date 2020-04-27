@@ -7,7 +7,7 @@
 
 
 .columndiv {
-  font-size:24rpx;
+  font-size:26rpx;
   display: flex;
   flex-direction: column;
 }
@@ -32,6 +32,6 @@
 }
 
 .fontbold{
-  font-size: 36rpx;
+  font-size: 30rpx;
   font-weight: bolder;
 }

@@ -4,8 +4,9 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
- height:360rpx;
+ height:200rpx;
  margin: 30rpx;
+
 }
 
 .item{
@@ -13,41 +14,48 @@
   flex-direction: column;
   align-items: flex-start;
   height: 100%;
-  width: 90%;
-  background-color:#fff
+  width: 100%;
+   /* border-radius: 20rpx; */
+   /* background: linear-gradient(50deg, #f78fad 20%,#fdeb82 10%); */
+   /* background: linear-gradient(50deg, #99e5a2 20%,#fdeb82 10%); */
+   /* background: linear-gradient(50deg, #99e5a2 20%,#fdeb82 10%); */
+   /* background: linear-gradient(50deg, #41d8dd 20%,#fafbf9 10%); */
+   /*  brass */
+   /*  silver */
+   /*  golden */
+  
 }
-
-.title{
- background-color:#f3f3f3;
- width:95%;
- padding-left: 5%;
- color: rgb(153, 153, 153);
-}
+.brass{background: linear-gradient(50deg, #da7518 20%,#fafbf9 10%);}
+.silver{background: linear-gradient(50deg, #41d8dd 20%,#fafbf9 10%);}
+.golden{background: linear-gradient(50deg, #e6e938 20%,#fafbf9 10%);}
+.diamond{ background: linear-gradient(50deg, #b738e9 20%,#fafbf9 10%);}
 .user{
   width:100%;
-  height:90%;
+  height:100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
 }
-.divid{
-  width:100%;
-  height:2rpx;
-  background-color: rgb(211, 211, 211);
-}
-.avator{
+.info{
   width:40%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
+
+.divid{
+  width:100%;
+  height:2rpx;
+  background-color: rgb(211, 211, 211);
+}
+
 .userinfo-avatar {
-  width: 98rpx;
-  height: 98rpx;
-  margin: 6rpx;
-  border-radius: 50%;
+  width:100rpx;
+height:100rpx;
+border-radius: 50%;
+  /* border-radius: 50%; */
 }
 
 .dividv{
@@ -60,13 +68,23 @@
  font-size: 24rpx;
  color: #fff;
 }
-
-.bottom{
-  height:40%;width:100%;
+.avator{
+  width:200rpx;
+height:200rpx;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-content: center;
+align-items: center;
+}
+.rest{
+  height:100%;
+  width:100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
 }
 
 .bottomimg{
@@ -75,7 +93,7 @@
   margin: 6rpx;
 }
 .zone{
-  width:45%;
+  width:40%;
   display: flex;
   flex-direction: row;
   align-items: center;

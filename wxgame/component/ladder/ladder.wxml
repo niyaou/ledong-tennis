@@ -1,7 +1,7 @@
 <!--component/analyze/analyze.wxml-->
 
 <view style="width:100%;height:100%">
-<view class="rowdiv" style="height:30%;width:100%;">
+<view class="rowdiv" style="height:15%;width:100%;">
 	<div class="analyzebanner">
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/dimand.png" style="width:64rpx;height:64rpx" />
@@ -17,5 +17,16 @@
 		</div>
 	</div>
 </view>
-<div>123</div>
+<scroll-view scroll-y style="width: 100%; height: 90%;" >
+ <view slot="refresher" class="refresh-container"
+    style="display: block; width: 100%; height: 80px; background: blue; display: flex; align-items: center;"
+  >
+    <view class="view1" style="position: absolute; text-align: center; width: 100%;">
+      下拉刷新
+    </view>
+      </view>
+			<view  wx:for="{{arrs}}">
+<player rankType="{{item}}" />
+</view>
+</scroll-view>
 </view>

@@ -11,7 +11,7 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     ratio: getApp().globalData.ratio,
-    tabBarStatus:1 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
+    tabBarStatus:0 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
   },
   //事件处理函数
   bindViewTap: function() {

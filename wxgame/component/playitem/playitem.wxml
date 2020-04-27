@@ -1,6 +1,6 @@
 <!--component/playitem/playitem.wxml-->
 
-<view class="rowdiv">
+<view class="rowdiv" bindtap="detail">
 	<div class="item">
 		<div class="title">寻找球友的比赛</div>
 		<div class="divid" />
@@ -35,6 +35,17 @@
 			</div>
 		</div>
 	</div>
+<!-- <map id="map" longitude="{{gps.ln}}" latitude="{{gps.lat}}" scale="14" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="regionchange" show-location style="position:absolute;top:0;width: 100%; height: 150%;z-index:50">
+ <cover-view class="cover-view">
+          <cover-view class="container">
+            <cover-view class="flex-wrp" style="flex-direction:row;">
+              <cover-view class="flex-item demo-text-1" bindtap="switch1">111</cover-view>
+              <cover-view class="flex-item demo-text-2">222</cover-view>
+              <cover-view class="flex-item demo-text-3">333</cover-view>
+            </cover-view>
+          </cover-view>
+        </cover-view>
 
+</map> -->
 
 </view>
