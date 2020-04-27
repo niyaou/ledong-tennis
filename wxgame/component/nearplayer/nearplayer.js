@@ -10,7 +10,7 @@ Component({
     },
     holderName: {
       type: String,
-      value: '守护者'
+      value: '范大将军'
     },
     challengerAvator: {
       type: String,

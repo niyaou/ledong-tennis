@@ -10,7 +10,7 @@ Component({
     },
     holderName: {
       type: String,
-      value: '守护者'
+      value: '南湖球场'
     },
     challengerAvator: {
       type: String,

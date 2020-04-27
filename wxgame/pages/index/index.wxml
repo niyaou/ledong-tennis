@@ -1,9 +1,15 @@
 <!--index.wxml-->
 <view class="container">
-	<!-- <div style='height:{{totalBarHeight}}rpx;color:#fff;padding-top:{{statusBarHeight}}rpx;'>乐动网球天梯</div> -->
+<block wx:if="{{!hasUserInfo && canIUse}}" >
+<view class="register" >
+<image src="../../icon/ledong.png" style="height:284rpx;width:284rpx;margin-bottom:30%"/>
+	<button class="btn1" open-type="getUserInfo" bindgetuserinfo="getUserInfo" bindtap="gps" style="width:70%"> 微信登录 </button>
+	</view>
+	</block>
+			<block wx:else>
 	<view class="banner">
-		<button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" bindtap="gps"> 微信登录 </button>
-		<block wx:else>
+	
+
 			<div class="detail" style='padding-top:{{totalBarHeight}}rpx;'>
 				<!-- <image src="../../assets/banner.png" class="banner-image" /> -->
 				<div class="avitorleft">
@@ -20,7 +26,7 @@
 
 
 
-		</block>
+	
 	</view>
 	<view class="functionbarTotal {{tabBarStatus==0?'start':tabBarStatus==1?'center':'end'}}">
 		<view class="functionbar">
@@ -38,4 +44,5 @@
 		<ladder wx:else isPicked="{{tabBarStatus==2}}"/>
 	</view>
 	<!-- <button bindtap="login">login</button> -->
+		</block>
 </view>
