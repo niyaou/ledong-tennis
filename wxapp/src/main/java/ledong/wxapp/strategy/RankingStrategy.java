@@ -42,11 +42,11 @@ public abstract class RankingStrategy {
     }
 
     public static String updateRankInfo(RankInfoVo vo) {
-        return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getId());
+        return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
     }
 
     public static String createRankInfo(RankInfoVo vo) {
-        return SearchApi.insertDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getId());
+        return SearchApi.insertDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
     }
 
 }

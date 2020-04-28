@@ -1,7 +1,7 @@
 //index.js
 //获取应用实例
 const app = getApp()
-
+var http = require('../../utils/http.js')
 Page({
   data: {
     motto: 'Hello World',
@@ -20,53 +20,72 @@ Page({
     })
   },
   onLoad: function () {
-    this.login()
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      })
-      console.info( app.globalData.userInfo.avatarUrl)
-    } else if (this.data.canIUse){
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
-      }
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
-        }
-      })
-    }
-    console.info( this.data.userInfo.userInfo)
+    let that=this
+    if (app.globalData.jwt) {
+  
+      // app.userInfoReadyCallback = res => {
+      //   this.setData({
+      //     userInfo:  app.globalData.userInfo ,
+      //     hasUserInfo: true
+      //   })
+      // }
+this.getUserInfoByJwt(app.globalData.jwt)
+
+
+    } 
+
+    
+
   },
   getUserInfo: function(e) {
-    console.log(e)
     app.globalData.userInfo = e.detail.userInfo
     this.setData({
       userInfo: e.detail.userInfo,
-      hasUserInfo: true
+     
     })
+    this.login(e.detail.userInfo)
   },
-  login(){
+  login( userInfo){
+    let that = this
     wx.login({
       success (res) {
-          console.log('登录失败！' + JSON.stringify(res))
-    
+          console.log('登录成功！' + JSON.stringify(res))
+          console.log('登录成功！' + res.code)
+          console.log('登录成功！' + JSON.stringify(userInfo))
+          wx.request({
+            url: `http://192.168.1.101:8081/user/login`,
+            method:'POST',
+            data: {
+              token: res.code,
+              nickName:userInfo.nickName,
+              avator:userInfo.avatarUrl
+            },
+            header: {
+              'content-type': 'application/x-www-form-urlencoded'
+            },
+            success:function(e){
+              wx.setStorageSync('jwt', e.data.data)
+              console.log('注册成功',e);
+             that. getUserInfoByJwt(e.data.data)
+            },
+            fail:function(e){
+              console.info('failed',e)
+            },
+            timeout:6000000
+          })
       }
     })
-
   },
+getUserInfoByJwt(jwt){
+  http.getReq('user/userinfo',jwt,(e)=>{
+    console.info(e)
+      this.setData({
+      userInfo:  {avatarUrl: e.data.avator,   nickName:e.data.nickName},
+      hasUserInfo: true
+    })
+  })
+},
+
   gps(){
     wx.getLocation({
       type: 'wgs84',

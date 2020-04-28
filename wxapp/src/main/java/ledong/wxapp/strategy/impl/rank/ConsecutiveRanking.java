@@ -34,8 +34,8 @@ public class ConsecutiveRanking extends RankingStrategy {
         RankInfoVo holder = getUserRank(vo.getHolder());
         RankInfoVo challenger = getUserRank(vo.getChallenger());
 
-        scores[0] = consectiveVerified(holder.getId()) && holderScore > challengerScor ? scoreChanged * 3 : 0;
-        scores[1] = consectiveVerified(challenger.getId()) && holderScore < challengerScor ? scoreChanged * 3 : 0;
+        scores[0] = consectiveVerified(holder.getOpenId()) && holderScore > challengerScor ? scoreChanged * 3 : 0;
+        scores[1] = consectiveVerified(challenger.getOpenId()) && holderScore < challengerScor ? scoreChanged * 3 : 0;
         return scores;
     }
 

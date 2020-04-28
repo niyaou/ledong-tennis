@@ -2,14 +2,22 @@ package ledong.wxapp.service.impl;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Optional;
 
+import org.apache.http.util.TextUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import VO.UserVo;
+
 import ledong.wxapp.auth.JwtToken;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.search.SearchApi;
@@ -19,6 +27,13 @@ import ledong.wxapp.utils.DateUtil;
 
 @Service
 public class UserServiceImpl implements IUserService {
+    private static Logger logger = Logger.getLogger(UserServiceImpl.class);
+
+    @Value("${wxapp.appid}")
+    private String appId;
+
+    @Value("${wxapp.secret}")
+    private String appSecret;
 
     @Autowired
     private JwtToken jwtToken;
@@ -30,27 +45,70 @@ public class UserServiceImpl implements IUserService {
     public String addUser(UserVo user) {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
-        String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),user.getUserName());
-        Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getUserName()));
+        String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),
+                user.getOpenId());
+        Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getOpenId()));
         return userId;
     }
 
     @Override
-    public String login(String user, String password) {
-
+    public String login(String openId) {
         HashMap<String, String> vo = new HashMap<String, String>();
-        vo.put(UserVo.USERNAME, user);
-        vo.put(UserVo.PASSWORD, password);
+        vo.put(UserVo.OPENID, openId);
         LinkedList<HashMap<String, Object>> loginUser = SearchApi.searchByField(DataSetConstant.USER_INFORMATION,
-                UserVo.USERNAME, user, null, null);
+                UserVo.OPENID, openId, null, null);
         if (loginUser != null) {
-            String passwordStore = (String) loginUser.get(0).get(UserVo.PASSWORD);
-            if (passwordStore.equals(password)) {
-
-                return jwtToken.generateToken(user);
-            }
+            return jwtToken.generateToken(openId);
         }
         return null;
     }
 
+    @Override
+    public String[] getOpenId(String token) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = String.format(
+                "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
+                appId, appSecret, token);
+        logger.error(url);
+        try {
+            // OpenId openId = restTemplate.getForObject(url, OpenId.class);
+            String json = restTemplate.getForObject(url, String.class);
+            logger.info(json);
+
+            JSONObject openId = (JSONObject) JSONObject.parse(json);
+
+            return new String[] { openId.getString("openid"), openId.getString("session_key") };
+        } catch (RestClientException e) {
+            logger.error(e.getMessage());
+            return null;
+        }
+
+    }
+
+    @Override
+    public String accessByWxToken(String token, String nickName, String avator) {
+        String[] userInfo = getOpenId(token);
+        userInfo = Optional.ofNullable(userInfo).orElse(new String[] { "" });
+        String jwtString = login(userInfo[0]);
+        if (TextUtils.isEmpty(jwtString)) {
+            UserVo user = new UserVo();
+            user.setOpenId(userInfo[0]);
+            user.setNickName(nickName);
+            user.setAvator(avator);
+            jwtString = jwtToken.generateToken(addUser(user));
+        }
+        return jwtString;
+    }
+
+    @Override
+    public HashMap<String, Object> getUserInfo(String openId) {
+        HashMap<String, String> vo = new HashMap<String, String>();
+        vo.put(UserVo.OPENID, openId);
+        LinkedList<HashMap<String, Object>> loginUser = SearchApi.searchByField(DataSetConstant.USER_INFORMATION,
+                UserVo.OPENID, openId, null, null);
+        if (loginUser != null) {
+            return loginUser.get(0);
+        }
+        return null;
+    }
 }

@@ -44,21 +44,12 @@ public class UserController {
     @Autowired
     private JwtToken tokenService;
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    @ApiOperation(value = "authority -- user register", notes = "")
-    public ResponseEntity<?> register(@RequestBody @Validated UserVo user) {
-        String info = userService.addUser(user);
-        if (info == null) {
-            return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
-        }
-    }
 
-    @RequestMapping(value = "/validate", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/userinfo", method = RequestMethod.GET)
     @ApiOperation(value = "认证管理-token有效认证", notes = "")
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> validate(@RequestHeader("Authorization") String authHeader)
+    public ResponseEntity<?> getuserInfo(@RequestHeader("Authorization") String authHeader)
             throws AuthenticationException {
 
         Claims claims = tokenService.getClaimByToken(authHeader);
@@ -67,17 +58,22 @@ public class UserController {
         }
         String userId = claims.getSubject();
         // 根据用户id获取接口数据返回接口
-        return new ResponseEntity<Object>(CommonResponse.success(userId), HttpStatus.OK);
+        return new ResponseEntity<Object>(CommonResponse.success(userService.getUserInfo(userId)), HttpStatus.OK);
     }
+
+
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value = "认证管理-用户登录", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户账号", required = true, dataType = "string", paramType = "form"),
-            @ApiImplicitParam(name = "password", value = "用户密码", required = true, dataType = "string", paramType = "form") })
-    public ResponseEntity<?> register(@RequestParam(value = "userId", required = true) String userId,
-            @RequestParam(value = "password", required = true) String password) {
-        String info = userService.login(userId, password);
+            @ApiImplicitParam(name = "token", value = "token", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "nickName", value = "nickName", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "avator", value = "avator", required = true, dataType = "string", paramType = "form")
+           })
+    public ResponseEntity<?> register(@RequestParam(value = "token", required = true) String token,
+    @RequestParam(value = "nickName", required = true) String nickName,
+    @RequestParam(value = "avator", required = true) String avator) {
+        String info = userService.accessByWxToken(token,nickName,avator);
         if (null == info) {
             return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
         } else {

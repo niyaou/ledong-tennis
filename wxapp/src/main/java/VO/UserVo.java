@@ -15,14 +15,9 @@ public class UserVo implements Serializable {
     public static final String PHONE = "phone";
 
     @NotEmpty
-    @ApiModelProperty(value = "userName")
-    private String userName;
-    public static final String USERNAME = "userName";
-
-    @NotEmpty
-    @ApiModelProperty(value = "password")
-    private String password;
-    public static final String PASSWORD = "password";
+    @ApiModelProperty(value = "openId")
+    private String openId;
+    public static final String OPENID = "openId";
 
     @ApiModelProperty(value = "avator")
     private String avator;
@@ -34,13 +29,18 @@ public class UserVo implements Serializable {
     public static final String NICKNAME = "nickName";
 
     @NotEmpty
-    @ApiModelProperty(value = "clubMember: 1 is member , 0 no member")
-    private String clubMember;
-    public static final String CLUBMEMBER = "clubMember";
+    @ApiModelProperty(value = "club : member of club ,it is blank when user is not the member of any club ")
+    private String clubId;
+    public static final String CLUBID = "clubId";
 
     @ApiModelProperty(value = "account charge remained quantities;rate 1:10")
     private Integer accountRemained;
     public static final String ACCOUNTREMAINED = "accountRemained";
+
+    @ApiModelProperty(value = "coach signal ,0: no coach user, 1: coach user ")
+    private Integer coach;
+    public static final String COACH = "coach";
+
 
     @ApiModelProperty(value = "createTime format : yyyy-MM-dd HH:mm:ss")
     private String createTime;
@@ -66,22 +66,6 @@ public class UserVo implements Serializable {
         this.phone = phone;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getAvator() {
         return avator;
     }
@@ -96,14 +80,6 @@ public class UserVo implements Serializable {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
-    }
-
-    public String getClubMember() {
-        return clubMember;
-    }
-
-    public void setClubMember(String clubMember) {
-        this.clubMember = clubMember;
     }
 
     public Integer getAccountRemained() {
@@ -144,6 +120,30 @@ public class UserVo implements Serializable {
 
     public void setLastPlayingTime(String lastPlayingTime) {
         this.lastPlayingTime = lastPlayingTime;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
+    public String getClubId() {
+        return clubId;
+    }
+
+    public void setClubId(String clubId) {
+        this.clubId = clubId;
+    }
+
+    public Integer getCoach() {
+        return coach;
+    }
+
+    public void setCoach(Integer coach) {
+        this.coach = coach;
     }
 
 }

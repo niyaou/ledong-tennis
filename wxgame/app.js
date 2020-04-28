@@ -3,15 +3,20 @@ App({
   onLaunch: function () {
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
+    this.globalData.jwt= wx.getStorageSync('jwt') || ''
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
+     console.info('jwt',this.globalData.jwt)
 
-    // 登录
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
-    })
+     
+    // // 登录
+    // wx.login({
+    //   success: res => {
+    //     // 发送 res.code 到后台换取 openId, sessionKey, unionId
+    //   }
+    // })
+
+
     // 获取用户信息
     wx.getSetting({
       success: res => {
@@ -38,34 +43,7 @@ App({
     totalBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight'] +44 )/wx.getSystemInfoSync()['windowWidth'],
     statusBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight']  )/wx.getSystemInfoSync()['windowWidth'],
     ratio: 750 /wx.getSystemInfoSync()['windowWidth'],
-    avator:''
+    avator:'',
+    jwt:''
   }
 })
-
-
-
-// tabbar
-// "tabBar": {
-  //   "color":"#8a8a8a",
-  //   "selectedColor":"#a5d116",
-  //   "list": [
-  //     {
-  //       "pagePath": "pages/index/index",
-  //       "text": "首页",
-  //       "iconPath":"icon/user3.png",
-  //       "selectedIconPath":"icon/user-s.png"
-  //     },
-  //     {
-  //       "pagePath": "pages/match/match",
-  //       "text": "比赛",
-  //       "iconPath":"icon/match.png",
-  //       "selectedIconPath":"icon/match-s.png"
-  //     },
-  //     {
-  //       "pagePath": "pages/ladder/ladder",
-  //       "text": "排行",
-  //       "iconPath":"icon/ladder.png",
-  //       "selectedIconPath":"icon/ladder-s.png"
-  //     }
-  //   ]
-  // },

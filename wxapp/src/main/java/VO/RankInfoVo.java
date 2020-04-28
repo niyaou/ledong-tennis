@@ -16,9 +16,9 @@ public class RankInfoVo implements Serializable {
     private static final long serialVersionUID = -821211115352857928L;
 
     @NotEmpty
-    @ApiModelProperty(value = "user id , identical to user information id")
-    private String id;
-    public static final String ID = "id";
+    @ApiModelProperty(value = "user openId , identical to user information openId")
+    private String openId;
+    public static final String OPENID = "openId";
 
     @NotEmpty
     @ApiModelProperty(value = "season  ")
@@ -27,7 +27,7 @@ public class RankInfoVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "score  ")
-    private Integer score = 4000;
+    private Integer score = 2000;
     public static final String SCORE = "score";
 
     @NotEmpty
@@ -49,10 +49,6 @@ public class RankInfoVo implements Serializable {
     @ApiModelProperty(value = "poolRemain  ")
     private Integer poolRemain = 0;
     public static final String POOLREMAIN = "poolRemain";
-
-    public String getId() {
-        return id;
-    }
 
     public Integer getSeason() {
         return season;
@@ -78,10 +74,6 @@ public class RankInfoVo implements Serializable {
         return poolRemain;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public void setSeason(Integer season) {
         this.season = season;
     }
@@ -104,6 +96,14 @@ public class RankInfoVo implements Serializable {
 
     public void setPoolRemain(Integer poolRemain) {
         this.poolRemain = poolRemain;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 
 }

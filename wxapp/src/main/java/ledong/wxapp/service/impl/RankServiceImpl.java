@@ -60,8 +60,8 @@ public class RankServiceImpl implements IRankService {
         challenger.setScore(challenger.getScore()+ scores[1]);
         updateRankInfo(holder);
         updateRankInfo(challenger);
-        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getId(), "ranked"), matchId, 60 * 60 * 24 * 7);
-        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
     }
 
@@ -86,7 +86,7 @@ public class RankServiceImpl implements IRankService {
     @Override
     public String createRankInfo(String userId) {
         RankInfoVo vo = new RankInfoVo();
-        vo.setId(userId);
+        vo.setOpenId(userId);
         return RankingStrategy.createRankInfo(vo);
     }
 
