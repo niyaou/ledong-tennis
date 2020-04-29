@@ -1,6 +1,7 @@
 package ledong.wxapp.service;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import VO.UserVo;
@@ -20,7 +21,7 @@ public interface IUserService {
      * @param openId
      * @return
      */
-    public String login(String openId);
+    public String login(String openId,String nickName, String avator,String gps);
 
 
     /**
@@ -39,7 +40,7 @@ public interface IUserService {
      * @param token
      * @return
      */
-    public String accessByWxToken(String token,String nickName,String avator);
+    public String accessByWxToken(String token,String nickName,String avator,String gps);
 
 
     /**
@@ -48,6 +49,17 @@ public interface IUserService {
      * @return
      */
     public HashMap<String, Object> getUserInfo(String openId);
+
+
+
+    /**
+     * 
+     * find nearby player 
+     * 
+     * @param gps
+     * @return
+     */
+    public LinkedList<HashMap<String, Object>> getNearyByUser(String gps);
 
 
    

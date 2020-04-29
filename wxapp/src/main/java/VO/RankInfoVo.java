@@ -36,6 +36,15 @@ public class RankInfoVo implements Serializable {
     public static final String CLUBSCORE = "clubScore";
 
     @NotEmpty
+    @ApiModelProperty(value = "rank type 0 ,means game grade  ")
+    private String rankType0;
+    public static final String RANKTYPE0 = "rankType0";
+    @NotEmpty
+    @ApiModelProperty(value = "rank type 0 ,means tennis technical grade   ")
+    private String rankType1;
+    public static final String RANKTYPE1 = "rankType1";
+
+    @NotEmpty
     @ApiModelProperty(value = "bardge  ")
     private Integer bardge;
     public static final String BARDGE = "bardge";
@@ -104,6 +113,22 @@ public class RankInfoVo implements Serializable {
 
     public void setOpenId(String openId) {
         this.openId = openId;
+    }
+
+    public String getRankType0() {
+        return rankType0;
+    }
+
+    public void setRankType0(String rankType0) {
+        this.rankType0 = rankType0;
+    }
+
+    public String getRankType1() {
+        return rankType1;
+    }
+
+    public void setRankType1(String rankType1) {
+        this.rankType1 = rankType1;
     }
 
 }

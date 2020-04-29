@@ -41,6 +41,10 @@ public class UserVo implements Serializable {
     private Integer coach;
     public static final String COACH = "coach";
 
+    @NotEmpty
+    @ApiModelProperty(value = "player's gps ,format 'Latitude,longitude' ")
+    private String gps;
+    public static final String GPS = "gps";
 
     @ApiModelProperty(value = "createTime format : yyyy-MM-dd HH:mm:ss")
     private String createTime;
@@ -144,6 +148,14 @@ public class UserVo implements Serializable {
 
     public void setCoach(Integer coach) {
         this.coach = coach;
+    }
+
+    public String getGps() {
+        return gps;
+    }
+
+    public void setGps(String gps) {
+        this.gps = gps;
     }
 
 }

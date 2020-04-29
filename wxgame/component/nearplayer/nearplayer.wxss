@@ -54,6 +54,9 @@
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
+  border-color: #b5babd;
+  border-style: solid;
+  border-width:2rpx;
   /* border-radius: 50%; */
 }
 

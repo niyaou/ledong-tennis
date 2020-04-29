@@ -69,7 +69,7 @@ public class MatchPostVo implements Serializable {
     public static final String COURTNAME = "courtName";
 
     @NotEmpty
-    @ApiModelProperty(value = "courtGPS ,format 'longitude,Latitude' ")
+    @ApiModelProperty(value = "courtGPS ,format 'Latitude,longitude' ")
     private String courtGPS;
     public static final String COURTGPS = "courtGPS";
 

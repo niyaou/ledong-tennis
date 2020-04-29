@@ -68,16 +68,30 @@ public class UserController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "token", required = true, dataType = "string", paramType = "form"),
             @ApiImplicitParam(name = "nickName", value = "nickName", required = true, dataType = "string", paramType = "form"),
-            @ApiImplicitParam(name = "avator", value = "avator", required = true, dataType = "string", paramType = "form")
+            @ApiImplicitParam(name = "avator", value = "avator", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form")
            })
     public ResponseEntity<?> register(@RequestParam(value = "token", required = true) String token,
     @RequestParam(value = "nickName", required = true) String nickName,
-    @RequestParam(value = "avator", required = true) String avator) {
-        String info = userService.accessByWxToken(token,nickName,avator);
+    @RequestParam(value = "avator", required = true) String avator,
+     @RequestParam(value = "gps", required = true) String gps) {
+        String info = userService.accessByWxToken(token,nickName,avator,gps);
         if (null == info) {
             return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
         } else {
             return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
         }
+    }
+
+
+    @RequestMapping(value = "/nearby", method = RequestMethod.GET)
+    @ApiOperation(value = "用户管理-附近用户", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form")
+           })
+    public ResponseEntity<?> nearby(
+     @RequestParam(value = "gps", required = true) String gps) {
+            return new ResponseEntity<Object>(CommonResponse.success(userService.getNearyByUser(gps)), HttpStatus.OK);
+      
     }
 }

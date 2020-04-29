@@ -26,7 +26,7 @@ public class MatchRequestVo implements Serializable {
     private String createTime;
     public static final String CREATETIME = "createTime";
 
-    @ApiModelProperty(value = "LOCATION")
+    @ApiModelProperty(value = "LOCATION Latitude,longitude")
     private String location;
     public static final String LOCATION = "courtGPS";
 

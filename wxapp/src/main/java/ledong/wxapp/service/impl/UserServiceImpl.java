@@ -52,12 +52,16 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String login(String openId) {
+    public String login(String openId,String nickName, String avator,String gps) {
         HashMap<String, String> vo = new HashMap<String, String>();
         vo.put(UserVo.OPENID, openId);
         LinkedList<HashMap<String, Object>> loginUser = SearchApi.searchByField(DataSetConstant.USER_INFORMATION,
                 UserVo.OPENID, openId, null, null);
         if (loginUser != null) {
+            loginUser.getFirst().put(UserVo.NICKNAME, nickName);
+            loginUser.getFirst().put(UserVo.AVATOR, avator);
+            loginUser.getFirst().put(UserVo.GPS, gps);
+            SearchApi.updateDocument(DataSetConstant.USER_INFORMATION,JSON.toJSONString(loginUser.getFirst()),openId);
             return jwtToken.generateToken(openId);
         }
         return null;
@@ -86,15 +90,16 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String accessByWxToken(String token, String nickName, String avator) {
+    public String accessByWxToken(String token, String nickName, String avator,String gps) {
         String[] userInfo = getOpenId(token);
         userInfo = Optional.ofNullable(userInfo).orElse(new String[] { "" });
-        String jwtString = login(userInfo[0]);
+        String jwtString = login(userInfo[0],nickName,avator,gps);
         if (TextUtils.isEmpty(jwtString)) {
             UserVo user = new UserVo();
             user.setOpenId(userInfo[0]);
             user.setNickName(nickName);
             user.setAvator(avator);
+            user.setGps(gps);
             jwtString = jwtToken.generateToken(addUser(user));
         }
         return jwtString;
@@ -110,5 +115,12 @@ public class UserServiceImpl implements IUserService {
             return loginUser.get(0);
         }
         return null;
+    }
+
+    @Override
+    public LinkedList<HashMap<String, Object>> getNearyByUser(String gps) {
+
+        return  SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps);
+       
     }
 }

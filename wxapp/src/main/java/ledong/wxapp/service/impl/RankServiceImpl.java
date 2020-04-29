@@ -15,8 +15,10 @@ import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.strategy.RankingStrategy;
+import ledong.wxapp.strategy.context.GradingContext;
 import ledong.wxapp.strategy.context.RankingContext;
 import ledong.wxapp.strategy.impl.rank.ConsecutiveRanking;
+import ledong.wxapp.strategy.impl.rank.GradeRanking;
 import ledong.wxapp.strategy.impl.rank.PondRanking;
 import ledong.wxapp.strategy.impl.rank.VictoryRanking;
 import ledong.wxapp.utils.StringUtil;
@@ -31,7 +33,7 @@ public class RankServiceImpl implements IRankService {
     public String matchRank(String matchId, int holderScore, int challengerScor) {
         int[] scores = new int[2];
         int[] tempScore = new int[2];
-        System.out.println("-----ranking match :"+matchId);
+        System.out.println("-----ranking match :" + matchId);
         Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
 
@@ -56,8 +58,13 @@ public class RankServiceImpl implements IRankService {
 
         holder.setPoolRemain(holder.getPoolRemain() + scores[0]);
         challenger.setPoolRemain(challenger.getPoolRemain() + scores[1]);
-        holder.setScore(holder.getScore()+  scores[0]);
-        challenger.setScore(challenger.getScore()+ scores[1]);
+        holder.setScore(holder.getScore() + scores[0]);
+        challenger.setScore(challenger.getScore() + scores[1]);
+
+        GradingContext gContext = new GradingContext(new GradeRanking());
+
+        holder = gContext.rankMatch(holder);
+        challenger = gContext.rankMatch(challenger);
         updateRankInfo(holder);
         updateRankInfo(challenger);
         redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
@@ -67,8 +74,10 @@ public class RankServiceImpl implements IRankService {
 
     @Override
     public RankInfoVo getUserRank(String userId) {
-//        Map<String, Object> match = SearchApi.searchById(DataSetConstant.USER_RANK_INFORMATION, userId);
-//        RankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), RankInfoVo.class);
+        // Map<String, Object> match =
+        // SearchApi.searchById(DataSetConstant.USER_RANK_INFORMATION, userId);
+        // RankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(match),
+        // RankInfoVo.class);
         return RankingStrategy.getUserRank(userId);
     }
 
@@ -87,6 +96,8 @@ public class RankServiceImpl implements IRankService {
     public String createRankInfo(String userId) {
         RankInfoVo vo = new RankInfoVo();
         vo.setOpenId(userId);
+        GradingContext gContext = new GradingContext(new GradeRanking());
+        vo = gContext.rankMatch(vo);
         return RankingStrategy.createRankInfo(vo);
     }
 

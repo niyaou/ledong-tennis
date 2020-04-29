@@ -21,6 +21,6 @@
 	</div>
 <div class="rest">
 <nearcourt />
-<nearplayer style="padding-top:5%" />
+<nearplayer style="padding-top:5%"  nearBy='{{nearBy}}'/>
 </div>
 </view>

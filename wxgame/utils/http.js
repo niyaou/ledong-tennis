@@ -10,8 +10,8 @@ function getReq(url, jwt,cb) {
     title: '加载中',
   })
   header.Authorization='Bearer '+jwt
-  console.log("header==")
-    console.log(header)
+  // console.log("header==")
+  //   console.log(header)
   wx.request({
     url: rootDocment + url,
     method: 'get',
@@ -32,12 +32,13 @@ function getReq(url, jwt,cb) {
   })
 }
  
-function postReq(url, data, cb) {
+function postReq(url,jwt, data, cb) {
   wx.showLoading({
     title: '加载中',
   })
-    console.log("header=="),
-    console.log(header),
+  header.Authorization='Bearer '+jwt
+    // console.log("header=="),
+    // console.log(header),
     wx.request({
       url: rootDocment + url,
       header: header,

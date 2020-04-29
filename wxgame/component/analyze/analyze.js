@@ -4,9 +4,14 @@ Component({
    * 组件的属性列表
    */
   properties: {
-    isPicked:{
+    isPicked: {
       type: Boolean,
       value: false
+    },
+    nearBy: {
+      type: Array,
+      value: []
+
     }
   },
 

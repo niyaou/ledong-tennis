@@ -18,7 +18,7 @@
 				</div>
 				<div class="avitorright">
 					<div class="nickname">{{userInfo.nickName}} </div>
-					<div class="rank">3.5 <span style="background:#0a90dd;padding-left: 10rpx;padding-right: 10rpx">钻石</span></div>
+					<div class="rank">{{userRankInfo.rankType1}} <span style="background:#0a90dd;padding-left: 10rpx;padding-right: 10rpx">{{userRankInfo.rankType0}}</span></div>
 				</div>
 			</div>
 			<view class="content">
@@ -40,7 +40,7 @@
 		<div class="indicator" />
 	</view>
 	<view class="componentview">
-		<analyze  wx:if="{{tabBarStatus==0}}" isPicked="{{tabBarStatus==0}}"/>
+		<analyze  wx:if="{{tabBarStatus==0}}" isPicked="{{tabBarStatus==0}}" nearBy='{{nearBy}}'/>
 		<match   wx:elif="{{tabBarStatus==1}}" isPicked="{{tabBarStatus==1}}"/>
 		<ladder wx:else isPicked="{{tabBarStatus==2}}"/>
 	</view>

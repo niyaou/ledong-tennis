@@ -4,8 +4,8 @@
 	
 	<div class="title">附近的球场</div>
 	<div class="divid" >1</div>
-	<scroll-view scroll-x style="width: 90%; height: 100%;white-space: nowrap;" >
-		<view wx:for="{{arrs}}" style="display:inline-block;background:#fafbf9">
+	<scroll-view scroll-x style="width: 90%; height: 100%;white-space: nowrap;background:#fafbf9" >
+		<view wx:for="{{arrs}}" style="display:inline-block;background:#fafbf9" wx:key="open">
 					<div class="avator">
 						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
 						<div>{{holderName}}</div>

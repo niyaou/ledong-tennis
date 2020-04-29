@@ -1,5 +1,6 @@
 package ledong.wxapp.rest;
 
+import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,18 +43,6 @@ public class RankController {
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.matchRank(matchId, 1, 1)), HttpStatus.OK);
     }
-
-    @RequestMapping(value = "/rankInfo/{userId}", method = RequestMethod.GET)
-    @ApiOperation(value = "explore a user rank information", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "userId", required = true, dataType = "string", paramType = "path") })
-    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> userRankIformationExplore(@PathVariable(value = "userId", required = true) String userId) {
-        MatchRequestVo vo = new MatchRequestVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserRank(userId)), HttpStatus.OK);
-    }
-
 
     @RequestMapping(value = "/rankInfo", method = RequestMethod.GET)
     @ApiOperation(value = "explore current rank information", notes = "")

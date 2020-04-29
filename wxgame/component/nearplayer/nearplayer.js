@@ -23,6 +23,11 @@ Component({
     rankType:{
       type:Number,
       value:1
+    },
+    nearBy: {
+      type: Array,
+      value: []
+
     }
   },
 

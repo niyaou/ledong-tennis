@@ -26,11 +26,13 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.GeoDistanceQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -128,25 +130,6 @@ public class SearchApi {
         searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(id));
         searchRequest.source(searchSourceBuilder);
         return parseSingleResponse(searchRequest);
-    }
-
-    /**
-     * 根据ID查询
-     * 
-     * @param indexName
-     * @param type
-     * @param id
-     * @param idType
-     * @return
-     */
-    public static LinkedList<HashMap<String, Object>> searchById(String indexName, String type, String id,
-            String idType) {
-        SearchRequest searchRequest = new SearchRequest(indexName);
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.idsQuery(type).addIds(id));
-        searchSourceBuilder.version(true);
-        searchRequest.source(searchSourceBuilder);
-        return parseResponseWithId(searchRequest, idType);
     }
 
     /**
@@ -259,6 +242,19 @@ public class SearchApi {
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }
+
+    public static LinkedList<HashMap<String, Object>> searchByLocation(String indexName, String key, String value
+           ) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        GeoDistanceQueryBuilder qb = QueryBuilders.geoDistanceQuery(key);
+        qb.point(Double.parseDouble(value.split(",")[0]), Double.parseDouble(value.split(",")[1]));
+        qb.distance("20km");
+        searchSourceBuilder.query(QueryBuilders.boolQuery().must(qb));
+        searchRequest.source(searchSourceBuilder);
+        return parseResponse(searchRequest);
+    }
+
 
     /**
      * 
@@ -458,7 +454,7 @@ public class SearchApi {
             // 表示如果该doc不包含该字段，在该doc新建字段并赋值value，
             // 如果存在该字段,会比较传入的对象是否存在于list中存在的对象相等，如果不相等就添加，相等就更新
             script_str = "if(!ctx._source.containsKey('" + field + "'))" + "{ctx._source." + field + "=[params." + field
-                    + "]} " + "else { ctx._source." + field + ".add(params." + field + ")}";
+                    + "]} " + "else { ctx._source." + field + "=[params." + field + "]}";
 
             script = new Script(ScriptType.INLINE, Script.DEFAULT_SCRIPT_LANG, script_str, params);
 
@@ -927,9 +923,6 @@ public class SearchApi {
      */
     public static String updateFieldValueById(String indexName, String field, String value, String id) {
 
-        // updateRequest.script(new Script(String.format("ctx._source.%s=%s", field,
-        // value)));
-        // updateRequest.upsertRequest();
         try {
             XContentBuilder builder = XContentFactory.jsonBuilder();
             builder.startObject();

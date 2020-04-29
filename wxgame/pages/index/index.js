@@ -6,101 +6,122 @@ Page({
   data: {
     motto: 'Hello World',
     userInfo: {},
+    userLocation: {},
+    userRankInfo: {},
+    nearBy: [],
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     ratio: getApp().globalData.ratio,
-    tabBarStatus:0 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
+    tabBarStatus: 0 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
   },
   //事件处理函数
-  bindViewTap: function() {
+  bindViewTap: function () {
     wx.navigateTo({
       url: '../logs/logs'
     })
   },
   onLoad: function () {
-    let that=this
+    let that = this
     if (app.globalData.jwt) {
-  
-      // app.userInfoReadyCallback = res => {
-      //   this.setData({
-      //     userInfo:  app.globalData.userInfo ,
-      //     hasUserInfo: true
-      //   })
-      // }
-this.getUserInfoByJwt(app.globalData.jwt)
+      this.getUserInfoByJwt(app.globalData.jwt)
+      this.getUserRankInfo(app.globalData.jwt)
+      this.gps()
+    }
 
 
-    } 
-
-    
 
   },
-  getUserInfo: function(e) {
+  getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo
     this.setData({
       userInfo: e.detail.userInfo,
-     
     })
-    this.login(e.detail.userInfo)
+    if (Object.keys(this.data.userLocation).length !== 0) {
+      this.login()
+    }
+
   },
-  login( userInfo){
+  login() {
     let that = this
     wx.login({
-      success (res) {
-          console.log('登录成功！' + JSON.stringify(res))
-          console.log('登录成功！' + res.code)
-          console.log('登录成功！' + JSON.stringify(userInfo))
-          wx.request({
-            url: `http://192.168.1.101:8081/user/login`,
-            method:'POST',
-            data: {
-              token: res.code,
-              nickName:userInfo.nickName,
-              avator:userInfo.avatarUrl
-            },
-            header: {
-              'content-type': 'application/x-www-form-urlencoded'
-            },
-            success:function(e){
-              wx.setStorageSync('jwt', e.data.data)
-              console.log('注册成功',e);
-             that. getUserInfoByJwt(e.data.data)
-            },
-            fail:function(e){
-              console.info('failed',e)
-            },
-            timeout:6000000
+      success(res) {
+        let jwt =
+          http.postReq('user/login', '', {
+            token: res.code,
+            nickName: that.data.userInfo.nickName,
+            avator: that.data.userInfo.avatarUrl,
+            gps: `${that.data.userLocation.latitude},${that.data.userLocation.longitude}`
+          }, function (e) {
+            wx.setStorageSync('jwt', e.data)
+            setTimeout(function () {
+              that.getUserInfoByJwt(e.data)
+              that.getUserRankInfo(e.data)
+            }, 1500)
           })
       }
     })
   },
-getUserInfoByJwt(jwt){
-  http.getReq('user/userinfo',jwt,(e)=>{
-    console.info(e)
+  getUserInfoByJwt(jwt) {
+    http.getReq('user/userinfo', jwt, (e) => {
       this.setData({
-      userInfo:  {avatarUrl: e.data.avator,   nickName:e.data.nickName},
-      hasUserInfo: true
+        userInfo: {
+          avatarUrl: e.data.avator,
+          nickName: e.data.nickName
+        },
+        hasUserInfo: true
+      })
     })
-  })
-},
+  },
+  getUserRankInfo(jwt) {
+    http.getReq('rank/rankInfo', jwt, (e) => {
+      this.setData({
+        userRankInfo: {
+          rankType1: e.data.rankType1,
+          rankType0: e.data.rankType0
+        }
+      })
+    })
+  },
+  getNearByUser(jwt) {
+    let that = this
+    http.getReq(`user/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
+      console.info(e)
+      that.setData({
+        nearBy: e.data
+      })
 
-  gps(){
+    })
+  },
+  gps() {
+    let that = this
     wx.getLocation({
       type: 'wgs84',
-      success (res) {
+      success(res) {
         const latitude = res.latitude
         const longitude = res.longitude
         const speed = res.speed
         const accuracy = res.accuracy
+        that.setData({
+          userLocation: {
+            latitude: res.latitude,
+            longitude: res.longitude
+          }
+        })
+        console.info(that.data.userLocation)
+        console.info(that.data.userInfo)
+        if (Object.keys(that.data.userInfo).length !== 0) {
+          that.login(that.data.userInfo)
+          that.getNearByUser(app.globalData.jwt)
+        }
       }
-     })
-    console.info('----gps----')
+    })
+
   },
-  tabStatus(event){
+  tabStatus(event) {
     this.setData({
-      tabBarStatus:event.currentTarget.dataset.gid
+      tabBarStatus: event.currentTarget.dataset.gid
     })
     console.log(event.currentTarget.dataset.gid)
   }
