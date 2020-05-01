@@ -72,6 +72,7 @@ Component({
       })
     },
     detail(){
+      let that = this
       wx.navigateTo({
         url: '../../pages/dealing/dealing',
         events: {
@@ -86,7 +87,7 @@ Component({
         },
         success: function(res) {
           // 通过eventChannel向被打开页面传送数据
-          res.eventChannel.emit('acceptDataFromOpenerPage', { data: 'test' })
+          res.eventChannel.emit('acceptDataFromOpenerPage', { data: that.data.matches })
         }
       })
       console.info('navigateTo')

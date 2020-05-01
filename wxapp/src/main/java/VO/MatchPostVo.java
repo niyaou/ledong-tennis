@@ -30,12 +30,14 @@ public class MatchPostVo implements Serializable {
     public static final String HOLDER = "holder";
     public static final String HOLDERNAME = "holderName";
     public static final String HOLDERAVATOR = "holderAvator";
+    public static final String HOLDERRANKTYPE0 = "holderrankType0";
     @NotEmpty
     @ApiModelProperty(value = "challenger id")
     private String challenger;
     public static final String CHALLENGER = "challenger";
     public static final String CHALLENGERNAME = "challengerName";
     public static final String CHALLENGERAVATOR = "challengerAvator";
+    public static final String CHALLENGERRANKTYPE0 = "challengerrankType0";
 
     @NotEmpty
     @ApiModelProperty(value = "holderAcknowaged , 1000 un-Acknowledged,  1001 Acknowledged ")

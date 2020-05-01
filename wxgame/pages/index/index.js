@@ -15,7 +15,7 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     ratio: getApp().globalData.ratio,
-    tabBarStatus: 0 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
+    tabBarStatus: 1 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
   },
   //事件处理函数
   bindViewTap: function () {
@@ -79,12 +79,15 @@ Page({
   },
   getUserRankInfo(jwt) {
     http.getReq('rank/rankInfo', jwt, (e) => {
+      console.info(e.data)
       this.setData({
         userRankInfo: {
           rankType1: e.data.rankType1,
           rankType0: e.data.rankType0
         }
       })
+      app.globalData.openId=e.data.openId
+      console.info('-------set global openid',e.data.openId)
     })
   },
   getNearByUser(jwt) {

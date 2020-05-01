@@ -260,8 +260,6 @@ public class MatchController {
             @PathVariable(value = "sessionId", required = true) String sessionId,
             @RequestParam(value = "holderCount", required = true) Integer holderCount,
             @RequestParam(value = "challengerCount", required = true) Integer challengerCount) {
-        MatchRequestVo vo = new MatchRequestVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(
                 CommonResponse
                         .success(matchService.getSessionContextWithQuantity(sessionId, holderCount, challengerCount)),

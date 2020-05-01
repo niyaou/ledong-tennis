@@ -40,6 +40,7 @@ App({
   },
   globalData: {
     userInfo: null,
+    openId:'',
     totalBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight'] +44 )/wx.getSystemInfoSync()['windowWidth'],
     statusBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight']  )/wx.getSystemInfoSync()['windowWidth'],
     ratio: 750 /wx.getSystemInfoSync()['windowWidth'],

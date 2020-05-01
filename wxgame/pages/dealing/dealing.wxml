@@ -1,14 +1,14 @@
 <view class="contain">
 	<view class="cl">
-  <div class="head" style='padding-top:{{totalBarHeight}}rpx;'>
-  <div style='top:{{totalBarHeight-70}}rpx;'> <text decode="true">&nbsp;&nbsp; &lt;</text></div>
+		<div class="head" style='padding-top:{{totalBarHeight}}rpx;'>
+			<div style='top:{{totalBarHeight-70}}rpx;' bindtap='backtoIndex'> <text decode="true">&nbsp;&nbsp; &lt;</text></div>
 
-  </div>
+		</div>
 		<div class="user">
 			<div class="avator">
-				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
-				<div class="nickname">{{holderName}}
-					<div class="rank">青铜</div>
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{matches.holderName}}
+					<div class="rank">{{matches.holderrankType0}}</div>
 				</div>
 			</div>
 
@@ -16,9 +16,9 @@
 			<div class="dividv" />
 			<div class="score lose">7</div>
 			<div class="avator">
-				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{challengerAvator}}" mode="cover" style="z-index:30"></image>
-				<div class="nickname">{{challengerName}}
-					<div class="rank">钻石</div>
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{matches.challengerName}}
+					<div class="rank">{{matches.challengerrankType0}}</div>
 				</div>
 			</div>
 		</div>
@@ -34,24 +34,27 @@
 			<!-- <div class="dividv" /> -->
 			<div class="zone">
 				<image src="../../icon/cald.png" class="bottomimg" />
-         <picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{startDate}}
+				<picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{matches.playingTime||'请选择日期'}}
 
-    
-        </picker>
-		
+
+				</picker>
+
 			</div>
 		</div>
 		<div class="divid" />
 		<!-- <text class='dialog-close' decode='true'>&lt;</text> -->
 
 	</view>
-	<scroll-view scroll-y class="swiper" >
-		<view wx:for="{{arrs}}">
-			<dialog  isSelf="{{item %2 == 0}}"/>
+	<scroll-view scroll-y class="swiper">
+		<view wx:for="{{sessionContext}}" wx:key="openId">
+			<dialog isSelf="{{item.openId !== openId}}" dialog="{{item}}"/>
 		</view>
 	</scroll-view>
 	<div class="message">
-		<input class="context" placeholder="告诉球友你的想法。。。"></input>
-		<image src="../../icon/send.png" class="send" />
+		<input class="context" placeholder="告诉球友你的想法。。。"  bindinput="bindInput" ></input>
+		<div class="button" bindtap="postMessage">
+				<image src="../../icon/send.png" class="send" />
+				</div>
+
 	</div>
 </view>

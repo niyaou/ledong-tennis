@@ -2,11 +2,11 @@
 
 <view  class="{{isSelf?'h userdialog':'c userdialog'}}">
 	<block wx:if="{{isSelf}}">
-		<image bindtap="bindViewTap" class="userinfo-avatar" src="{{avator}}" mode="cover" ></image>
-		<view class="pp1"><span class="{{isSelf?'hdialog':'cdialog'}}">{{content}}</span></view>
+		<image bindtap="bindViewTap" class="userinfo-avatar" src="{{dialog.avator}}" mode="cover" ></image>
+		<view class="pp1"><span class="{{isSelf?'hdialog':'cdialog'}}">{{dialog.context}}</span></view>
 	</block>
 	<block wx:else>
-		<view class="pp1"><span class="{{isSelf?'hdialog':'cdialog'}}">{{content}}</span></view>
-  <div>  	<image bindtap="bindViewTap" class="userinfo-avatar" src="{{avator}}" mode="cover" ></image></div>
+		<view class="pp1"><span class="{{isSelf?'hdialog':'cdialog'}}">{{dialog.context}}</span></view>
+  <div>  	<image bindtap="bindViewTap" class="userinfo-avatar" src="{{dialog.avator}}" mode="cover" ></image></div>
 	</block>
 </view>

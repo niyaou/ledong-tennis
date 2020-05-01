@@ -12,6 +12,8 @@ function getReq(url, jwt,cb) {
   header.Authorization='Bearer '+jwt
   // console.log("header==")
   //   console.log(header)
+  console.log(header),
+  console.log('url',rootDocment + url),
   wx.request({
     url: rootDocment + url,
     method: 'get',
@@ -38,7 +40,8 @@ function postReq(url,jwt, data, cb) {
   })
   header.Authorization='Bearer '+jwt
     // console.log("header=="),
-    // console.log(header),
+    console.log(header),
+    console.log('url',rootDocment + url),
     wx.request({
       url: rootDocment + url,
       header: header,

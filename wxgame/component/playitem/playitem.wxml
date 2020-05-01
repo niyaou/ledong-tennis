@@ -8,7 +8,7 @@
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
 				<div class="nickname">{{matches.holderName}}
-					<div class="rank">青铜</div>
+					<div class="rank">{{matches.holderrankType0}}</div>
 				</div>
 
 			</div>
@@ -18,7 +18,7 @@
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
 				<div class="nickname">{{matches.challengerName}}
-					<div class="rank">钻石</div>
+					<div class="rank">{{matches.challengerrankType0}}</div>
 				</div>
 			</div>
 		</div>

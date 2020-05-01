@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSONObject;
 import VO.CourtVo;
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
+import VO.RankInfoVo;
 import VO.SessionVo;
 import VO.UserVo;
 import ledong.wxapp.constant.DataSetConstant;
@@ -293,15 +294,19 @@ public class MatchServiceImpl implements IMatchService {
         sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
         QueryBuilder[] values = new QueryBuilder[8];
         List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
-                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));   
-          if(searchResponse!=null){
-            searchResponse =    (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
-                HashMap<String, Object>   holder=   iUserService.getUserInfo((String) match.get(MatchPostVo.HOLDER));
+                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
+        if (searchResponse != null) {
+            searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(MatchPostVo.HOLDER));
+                RankInfoVo holderRank = iRankService.getUserRank((String) match.get(MatchPostVo.HOLDER));
                 match.put(MatchPostVo.HOLDERAVATOR,holder.get(UserVo.AVATOR));
                 match.put(MatchPostVo.HOLDERNAME,holder.get(UserVo.NICKNAME));
+                match.put(MatchPostVo.HOLDERRANKTYPE0,holderRank.getRankType0());
                 HashMap<String, Object>   challenger=   iUserService.getUserInfo((String) match.get(MatchPostVo.CHALLENGER));
+                RankInfoVo challengerRank = iRankService.getUserRank((String) match.get(MatchPostVo.CHALLENGER));
                 match.put(MatchPostVo.CHALLENGERAVATOR,challenger.get(UserVo.AVATOR));
                 match.put(MatchPostVo.CHALLENGERNAME,challenger.get(UserVo.NICKNAME));
+                match.put(MatchPostVo.CHALLENGERRANKTYPE0,challengerRank.getRankType0());
                 return match;
             })
             .collect(Collectors.toList());

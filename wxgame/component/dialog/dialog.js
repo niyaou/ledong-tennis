@@ -15,8 +15,11 @@ Component({
     content: {
       type: String,
       value: "......."
+    },
+    dialog:{
+      type: Object,
+      value:{}
     }
-
   },
 
   /**
