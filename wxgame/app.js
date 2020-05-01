@@ -4,8 +4,8 @@ App({
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
     this.globalData.jwt= wx.getStorageSync('jwt') || ''
+    this.globalData.gps= wx.getStorageSync('gps') || ''
     logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
      console.info('jwt',this.globalData.jwt)
 
      
@@ -44,6 +44,7 @@ App({
     statusBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight']  )/wx.getSystemInfoSync()['windowWidth'],
     ratio: 750 /wx.getSystemInfoSync()['windowWidth'],
     avator:'',
-    jwt:''
+    jwt:'',
+    gps:''
   }
 })

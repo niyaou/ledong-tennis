@@ -8,7 +8,8 @@ Page({
     userInfo: {},
     userLocation: {},
     userRankInfo: {},
-    nearBy: [],
+    nearByUser: [],
+    nearByCourt: [],
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     statusBarHeight: getApp().globalData.statusBarHeight,
@@ -55,6 +56,8 @@ Page({
             gps: `${that.data.userLocation.latitude},${that.data.userLocation.longitude}`
           }, function (e) {
             wx.setStorageSync('jwt', e.data)
+            app.globalData.jwt=e.data
+            console.info('----------set jwt',e.data)
             setTimeout(function () {
               that.getUserInfoByJwt(e.data)
               that.getUserRankInfo(e.data)
@@ -89,9 +92,17 @@ Page({
     http.getReq(`user/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
       console.info(e)
       that.setData({
-        nearBy: e.data
+        nearByUser: e.data
       })
-
+    })
+  },
+  getNearByCourt(jwt) {
+    let that = this
+    http.getReq(`match/court/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
+      console.info(e)
+      that.setData({
+        nearByCourt: e.data
+      })
     })
   },
   gps() {
@@ -109,11 +120,14 @@ Page({
             longitude: res.longitude
           }
         })
-        console.info(that.data.userLocation)
-        console.info(that.data.userInfo)
+        wx.setStorageSync('gps', `${res.latitude},${res.longitude}`)
+        app.globalData.gps=`${res.latitude},${res.longitude}`
+        // console.info(that.data.userLocation)
+        // console.info(that.data.userInfo)
         if (Object.keys(that.data.userInfo).length !== 0) {
           that.login(that.data.userInfo)
           that.getNearByUser(app.globalData.jwt)
+          that.getNearByCourt(app.globalData.jwt)
         }
       }
     })

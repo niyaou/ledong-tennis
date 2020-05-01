@@ -45,10 +45,10 @@ public interface IUserService {
 
     /**
      * 
-     * @param openId
+     * @param object
      * @return
      */
-    public HashMap<String, Object> getUserInfo(String openId);
+    public HashMap<String, Object> getUserInfo(String object);
 
 
 

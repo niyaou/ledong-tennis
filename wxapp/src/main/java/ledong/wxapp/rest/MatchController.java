@@ -35,16 +35,14 @@ public class MatchController {
     @RequestMapping(value = "/randomMatch", method = RequestMethod.POST)
     @ApiOperation(value = "request a random match", notes = "")
     @ApiImplicitParams({
-
-            @ApiImplicitParam(name = "courtGPS", value = "random request user's location \"latitude,longitude\"", required = true, dataType = "string", paramType = "query") })
+            @ApiImplicitParam(name = "gps", value = "random request user's location \"latitude,longitude\"", required = true, dataType = "string", paramType = "query") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> randomMatch(@RequestHeader("Authorization") String authHeader,
-            @RequestParam(value = "courtGPS", required = true) String courtGPS) {
+            @RequestParam(value = "gps", required = true) String gps) {
         Claims claims = tokenService.getClaimByToken(authHeader);
         String userId = claims.getSubject();
-        MatchRequestVo vo = new MatchRequestVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        return new ResponseEntity<Object>(CommonResponse.success(matchService.requestMatching(userId, courtGPS)),
+        System.out.println(userId);
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.requestMatching(userId, gps)),
                 HttpStatus.OK);
     }
 
@@ -90,13 +88,12 @@ public class MatchController {
         MatchRequestVo vo = new MatchRequestVo();
         Claims claims = tokenService.getClaimByToken(authHeader);
         String userId = claims.getSubject();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         return new ResponseEntity<Object>(CommonResponse.success(matchService.getMatchedList(userId, count)),
                 HttpStatus.OK);
     }
 
     @RequestMapping(value = "/rankedMatch", method = RequestMethod.GET)
-    @ApiOperation(value = "get current randed match", notes = "")
+    @ApiOperation(value = "get current ranked match", notes = "")
     public ResponseEntity<?> exploreRankedGame(@RequestHeader("Authorization") String authHeader) {
         Claims claims = tokenService.getClaimByToken(authHeader);
         String userId = claims.getSubject();
@@ -270,5 +267,18 @@ public class MatchController {
                         .success(matchService.getSessionContextWithQuantity(sessionId, holderCount, challengerCount)),
                 HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/court/nearby", method = RequestMethod.GET)
+    @ApiOperation(value = "nearby court", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form")
+           })
+    public ResponseEntity<?> nearby(
+     @RequestParam(value = "gps", required = true) String gps) {
+            return new ResponseEntity<Object>(CommonResponse.success(matchService.nearByCourt(gps)), HttpStatus.OK);
+      
+    }
+
 
 }

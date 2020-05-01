@@ -237,4 +237,15 @@ public interface IMatchService {
      * @return
      */
     public Object lastMatchResult(String user);
+
+
+
+    /**
+     * 
+     * get near by court
+     * 
+     * @param gps
+     * @return
+     */
+    public LinkedList<HashMap<String, Object>> nearByCourt(String gps);
 }

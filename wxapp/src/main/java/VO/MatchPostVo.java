@@ -28,11 +28,14 @@ public class MatchPostVo implements Serializable {
     @ApiModelProperty(value = "holder id")
     private String holder;
     public static final String HOLDER = "holder";
-
+    public static final String HOLDERNAME = "holderName";
+    public static final String HOLDERAVATOR = "holderAvator";
     @NotEmpty
     @ApiModelProperty(value = "challenger id")
     private String challenger;
     public static final String CHALLENGER = "challenger";
+    public static final String CHALLENGERNAME = "challengerName";
+    public static final String CHALLENGERAVATOR = "challengerAvator";
 
     @NotEmpty
     @ApiModelProperty(value = "holderAcknowaged , 1000 un-Acknowledged,  1001 Acknowledged ")

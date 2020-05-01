@@ -21,6 +21,10 @@ Component({
       type: String,
       value: '挑战者'
     },
+    matches:{
+      type:Object,
+      value:{}
+    }
   },
 
   /**
@@ -48,6 +52,7 @@ Component({
     }
   },
   ready() {
+    console.info('matches',this.data.matches)
     // this.setData({
     //   holderAvator: app.globalData.userInfo.avatarUrl,
     //   holderName: app.globalData.userInfo.avatarUrl,

@@ -6,8 +6,8 @@
 		<div class="divid" />
 		<div class="user">
 			<div class="avator">
-				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
-				<div class="nickname">{{holderName}}
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{matches.holderName}}
 					<div class="rank">青铜</div>
 				</div>
 
@@ -16,8 +16,8 @@
 			<div class="dividv" />
          <div class="score lose">0</div>
 			<div class="avator">
-				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{challengerAvator}}" mode="cover" style="z-index:30"></image>
-				<div class="nickname">{{challengerName}}
+				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="nickname">{{matches.challengerName}}
 					<div class="rank">钻石</div>
 				</div>
 			</div>

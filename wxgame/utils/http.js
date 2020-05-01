@@ -34,7 +34,7 @@ function getReq(url, jwt,cb) {
  
 function postReq(url,jwt, data, cb) {
   wx.showLoading({
-    title: '加载中',
+    title: jwt,
   })
   header.Authorization='Bearer '+jwt
     // console.log("header=="),

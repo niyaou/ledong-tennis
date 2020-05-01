@@ -20,7 +20,7 @@
 		</div>
 	</div>
 <div class="rest">
-<nearcourt />
-<nearplayer style="padding-top:5%"  nearBy='{{nearBy}}'/>
+<nearcourt nearBy='{{nearByCourt}}'/>
+<nearplayer style="padding-top:5%"  nearBy='{{nearByUser}}'/>
 </div>
 </view>

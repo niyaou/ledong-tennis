@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.join.ScoreMode;
+import org.apache.lucene.spatial3d.geom.GeoPoint;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
@@ -45,6 +46,9 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortMode;
 import org.elasticsearch.search.sort.SortOrder;
 
 import ledong.wxapp.config.EsClientFactory;
@@ -243,14 +247,16 @@ public class SearchApi {
         return parseResponse(searchRequest);
     }
 
-    public static LinkedList<HashMap<String, Object>> searchByLocation(String indexName, String key, String value
-           ) {
+    public static LinkedList<HashMap<String, Object>> searchByLocation(String indexName, String key, String value,
+            String distance) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         GeoDistanceQueryBuilder qb = QueryBuilders.geoDistanceQuery(key);
+        GeoDistanceSortBuilder sort =  SortBuilders.geoDistanceSort(key,Double.parseDouble(value.split(",")[0]), Double.parseDouble(value.split(",")[1])); 
+        sort.unit(DistanceUnit.KILOMETERS).order(SortOrder.ASC);
         qb.point(Double.parseDouble(value.split(",")[0]), Double.parseDouble(value.split(",")[1]));
-        qb.distance("20km");
-        searchSourceBuilder.query(QueryBuilders.boolQuery().must(qb));
+        qb.distance(String.format("%skm", distance));
+        searchSourceBuilder.query(QueryBuilders.boolQuery().must(qb)).sort(sort);
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }

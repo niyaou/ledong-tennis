@@ -120,7 +120,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public LinkedList<HashMap<String, Object>> getNearyByUser(String gps) {
 
-        return  SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps);
+        return  SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps,"10");
        
     }
 }

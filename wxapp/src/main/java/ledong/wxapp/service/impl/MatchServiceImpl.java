@@ -20,15 +20,18 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import VO.CourtVo;
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
 import VO.SessionVo;
+import VO.UserVo;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IRankService;
+import ledong.wxapp.service.IUserService;
 import ledong.wxapp.strategy.MatchStrategy;
 import ledong.wxapp.strategy.context.MatchContext;
 import ledong.wxapp.strategy.impl.match.PickIntentionalMatch;
@@ -47,6 +50,9 @@ public class MatchServiceImpl implements IMatchService {
     @Autowired
     private IRankService iRankService;
 
+    @Autowired
+    private IUserService iUserService;
+
     @Override
     public String requestMatching(String user, String courtGps) {
 
@@ -56,9 +62,11 @@ public class MatchServiceImpl implements IMatchService {
         vo.setUserName(user);
         MatchContext strategy = null;
         String matchId = null;
-
+        log.info(user);
+        log.info(courtGps);
         strategy = new MatchContext(new PickRandomMatch(redis, iRankService));
         matchId = strategy.getMatchId(vo);
+        log.info(matchId);
         if (!TextUtils.isEmpty(matchId)) {
             return matchId;
         }
@@ -284,8 +292,22 @@ public class MatchServiceImpl implements IMatchService {
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
         sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
         QueryBuilder[] values = new QueryBuilder[8];
-        LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
-                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
+        List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
+                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));   
+          if(searchResponse!=null){
+            searchResponse =    (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                HashMap<String, Object>   holder=   iUserService.getUserInfo((String) match.get(MatchPostVo.HOLDER));
+                match.put(MatchPostVo.HOLDERAVATOR,holder.get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME,holder.get(UserVo.NICKNAME));
+                HashMap<String, Object>   challenger=   iUserService.getUserInfo((String) match.get(MatchPostVo.CHALLENGER));
+                match.put(MatchPostVo.CHALLENGERAVATOR,challenger.get(UserVo.AVATOR));
+                match.put(MatchPostVo.CHALLENGERNAME,challenger.get(UserVo.NICKNAME));
+                return match;
+            })
+            .collect(Collectors.toList());
+          }
+               
+                // iUserService.getUserInfo(openId);
         return searchResponse;
 
     }
@@ -414,5 +436,13 @@ public class MatchServiceImpl implements IMatchService {
       redis.del(key);
         return getMatchInfos(matchId);
     }
+
+    @Override
+    public LinkedList<HashMap<String, Object>> nearByCourt(String gps) {
+        return  SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps,"10");
+    }
+
+
+
 
 }

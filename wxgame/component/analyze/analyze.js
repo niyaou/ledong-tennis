@@ -8,10 +8,13 @@ Component({
       type: Boolean,
       value: false
     },
-    nearBy: {
+    nearByCourt: {
       type: Array,
       value: []
-
+    },
+    nearByUser: {
+      type: Array,
+      value: []
     }
   },
 
