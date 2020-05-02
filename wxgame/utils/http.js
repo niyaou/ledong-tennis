@@ -5,15 +5,17 @@ var header = {
   'content-type': 'application/x-www-form-urlencoded',
   'Authorization': 'Bearer '+app.globalData.jwt,
 }
-function getReq(url, jwt,cb) {
+function getReq(url, jwt,cb,toast = true) {
+ if(toast){
   wx.showLoading({
     title: '加载中',
   })
+ }
   header.Authorization='Bearer '+jwt
   // console.log("header==")
   //   console.log(header)
-  console.log(header),
-  console.log('url',rootDocment + url),
+  // console.log(header),
+  // console.log('url',rootDocment + url),
   wx.request({
     url: rootDocment + url,
     method: 'get',

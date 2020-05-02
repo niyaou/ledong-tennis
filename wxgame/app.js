@@ -1,4 +1,6 @@
 //app.js
+const SHORTINTERVAL=2000
+const SLOWINTERVAL=4000
 App({
   onLaunch: function () {
     // 展示本地存储能力
@@ -39,6 +41,8 @@ App({
     })
   },
   globalData: {
+    shortInterval:SHORTINTERVAL,
+    slowInterval:SLOWINTERVAL,
     userInfo: null,
     openId:'',
     totalBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight'] +44 )/wx.getSystemInfoSync()['windowWidth'],

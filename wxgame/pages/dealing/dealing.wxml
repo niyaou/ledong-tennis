@@ -34,7 +34,7 @@
 			<!-- <div class="dividv" /> -->
 			<div class="zone">
 				<image src="../../icon/cald.png" class="bottomimg" />
-				<picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{matches.playingTime||'请选择日期'}}
+				<picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{matches.orderTime||'请选择日期'}}
 
 
 				</picker>
@@ -46,7 +46,7 @@
 
 	</view>
 	<scroll-view scroll-y class="swiper">
-		<view wx:for="{{sessionContext}}" wx:key="openId">
+		<view wx:for="{{sessionContext}}" wx:key="postTime">
 			<dialog isSelf="{{item.openId !== openId}}" dialog="{{item}}"/>
 		</view>
 	</scroll-view>

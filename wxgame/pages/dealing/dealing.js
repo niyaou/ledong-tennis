@@ -10,6 +10,8 @@ Page({
    * 页面的初始数据
    */
   data: {
+    interval: -1,
+    intervalM: -1,
     matches: {},
     openId: getApp().globalData.openId,
     totalBarHeight: getApp().globalData.totalBarHeight,
@@ -57,6 +59,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+
     const eventChannel = this.getOpenerEventChannel()
     let that = this
     eventChannel.on('acceptDataFromOpenerPage', function (data) {
@@ -64,8 +67,6 @@ Page({
         matches: data.data,
         openId: app.globalData.openId
       })
-      console.info('app.globalData.openId',app.globalData.openId)
-      console.info('data.data', data.data)
       that.reloadContext()
     })
 
@@ -75,14 +76,16 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
+    console.info('xxxxxxxxxx onHide xxxxxxxxxx')
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
+    console.info('xxxxxxxxxx unload xxxxxxxxxx',this.data.interval)
+    clearInterval(this.data.interval)
+    clearInterval(this.data.intervalM)
   },
 
   /**
@@ -107,62 +110,69 @@ Page({
   },
   reloadContext() {
     let that = this
-    http.getReq(`match/sessionContext/${that.data.matches.sessionId}?holderCount=0&challengerCount=0`, app.globalData.jwt, (res) => {
-      console.info(res)
-      let arrs=that.data.sessionContext
+    let holderCount, challengerCount = 0
+    holderCount = this.data.sessionContext.filter(i => {
+      return i.openId === that.data.matches.holder
+    }).length
+    challengerCount = this.data.sessionContext.filter(i => {
+      return i.openId === that.data.matches.challenger
+    }).length
+    http.getReq(`match/sessionContext/${that.data.matches.sessionId}?holderCount=${holderCount}&challengerCount=${challengerCount}`, app.globalData.jwt, (res) => {
+
+      let arrs = that.data.sessionContext
       if (res.data.challengerContext != null) {
-        // that.setData({
-          // sessionContext: 
-          arrs=arrs.concat(   
-            res.data.challengerContext.map(i => {
-              return Object.assign(i, {
-                openId: that.data.matches.challenger,
-                avator: that.data.matches.challengerAvator
-              })
+        arrs = arrs.concat(
+          res.data.challengerContext.map(i => {
+            return Object.assign(i, {
+              openId: that.data.matches.challenger,
+              avator: that.data.matches.challengerAvator
             })
-            )
-            // console.info('challengerContext',arrs)
-        // })
+          })
+        )
       }
       if (res.data.holderContext != null) {
-        // that.setData({
-        //   sessionContext: that.data.sessionContext.concat(
-        //     res.data.holderContext.map(i => {
-        //       return Object.assign(i, {
-        //         openId: that.data.matches.holder,
-        //         avator: that.data.matches.holderAvator
-        //       })
-        //     })
-        //   )
-        // })
-        arrs=arrs.concat(   
+        arrs = arrs.concat(
           res.data.holderContext.map(i => {
             return Object.assign(i, {
               openId: that.data.matches.holder,
               avator: that.data.matches.holderAvator
             })
           })
-          )
-          // console.info('holderContext',arrs)
-
-
-
-
+        )
       }
+      if(that.data.interval==-1){
+        let interval = setInterval(() => {
+          that.reloadContext()
+        }, 2000)
 
- that.setData({
-          sessionContext:arrs.sort((o1,o2)=>{
-            return (new Date(o1.postTime)).getTime()<(new Date(o2.postTime))?1:-1
-          
+      let intervalM =  
+      setInterval(() => {
+        that.refreshMatches()
+      }, 5000)
+  
+        that.setData({
+          interval:interval,
+          intervalM:intervalM
         })
-    })
+        console.info('----------i set interval ',interval)
+      } 
 
+      arrs = arrs.sort((o1, o2) => {
+        // return (new Date(o1.postTime)).getTime() < (new Date(o2.postTime)) ? 1 : -1
+        return o1.postTime < o2.postTime ? 1 : -1
+      })
 
-    })
+      that.setData({
+        sessionContext: arrs
+      })
+    },false)
+    console.info('sorted arrs',that.data.sessionContext[0])
   },
   postMessage() {
-    console.info(this.data.inputValue)
+
     let type = app.globalData.openId === this.data.matches.holder ? 0 : 1
+
+    let that = this
     http.postReq(`match/sessionContext/${this.data.matches.sessionId}/${type}`, app.globalData.jwt, {
       context: this.data.inputValue
     }, (res) => {
@@ -178,6 +188,13 @@ Page({
     wx.navigateBack({
       complete: (res) => {},
     })
+  },
+  refreshMatches(){
+    let that  =  this
+    http.getReq(`match/matchInfo/${this.data.matches.id}`,   app.globalData.jwt,(res)=>{
+      // console.info(res.data)
+      // matches: res.data
+    },false)
   },
   pickerTap: function () {
     date = new Date();
@@ -342,7 +359,9 @@ Page({
 
   loadMinute: function (hours, minute) {
     var minuteIndex;
-    if (currentMinute > 0 && currentMinute <= 10) {
+    if (currentMinute == 0 ){
+      minuteIndex = 0;
+    }else    if (currentMinute > 0 && currentMinute <= 10) {
       minuteIndex = 10;
     } else if (currentMinute > 10 && currentMinute <= 20) {
       minuteIndex = 20;
@@ -396,9 +415,12 @@ Page({
 
     var startDate = monthDay + " " + hours + ":" + minute;
     that.setData({
-      matches: Object.assign(that.data.matches, {
-        playingTime: startDate
+        matches: Object.assign(that.data.matches, {
+        orderTime: startDate
       })
+   
+    })
+    http.postReq(`match/matchInfo/${this.data.matches.id}`,app.globalData.jwt,{orderTime:startDate},(res)=>{
 
     })
   },

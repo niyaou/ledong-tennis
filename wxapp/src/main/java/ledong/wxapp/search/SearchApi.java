@@ -23,6 +23,7 @@ import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -475,6 +476,7 @@ public class SearchApi {
 
             updateRequest.script(script);
             updateRequest.upsertRequest();
+            updateRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
             updateResponse = client.update(updateRequest, RequestOptions.DEFAULT);
 
         } catch (IOException e) {
