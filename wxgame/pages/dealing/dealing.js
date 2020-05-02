@@ -166,7 +166,7 @@ Page({
         sessionContext: arrs
       })
     },false)
-    console.info('sorted arrs',that.data.sessionContext[0])
+    // console.info('sorted arrs',that.data.sessionContext[0])
   },
   postMessage() {
 
@@ -244,7 +244,7 @@ Page({
 
     var that = this;
 
-    var monthDay = ['今天', '明天'];
+    var monthDay = ['今天', '明天','后天'];
     var hours = [];
     var minute = [];
 
@@ -397,30 +397,40 @@ Page({
     var monthDay = that.data.multiArray[0][e.detail.value[0]];
     var hours = that.data.multiArray[1][e.detail.value[1]];
     var minute = that.data.multiArray[2][e.detail.value[2]];
-
+    var parseTime=date.getFullYear()+'-'
     if (monthDay === "今天") {
       var month = date.getMonth() + 1;
       var day = date.getDate();
       monthDay = month + "月" + day + "日";
+      parseTime+=month.toString().padStart(2,"0") +'-'+day.toString().padStart(2,"0") 
     } else if (monthDay === "明天") {
       var date1 = new Date(date);
       date1.setDate(date.getDate() + 1);
       monthDay = (date1.getMonth() + 1) + "月" + date1.getDate() + "日";
-
-    } else {
+      parseTime+= (date1.getMonth() + 1).toString().padStart(2,"0")  +'-'+ date1.getDate().toString().padStart(2,"0") 
+    } else if (monthDay === "后天") {
+      var date1 = new Date(date);
+      date1.setDate(date.getDate() + 2);
+      monthDay = (date1.getMonth() + 2) + "月" + date1.getDate() + "日";
+      parseTime+= (date1.getMonth() + 2).toString().padStart(2,"0")  +'-'+ date1.getDate().toString().padStart(2,"0") 
+    }
+     else {
       var month = monthDay.split("-")[0]; // 返回月
       var day = monthDay.split("-")[1]; // 返回日
       monthDay = month + "月" + day + "日";
+      parseTime+= month.toString().padStart(2,"0") +'-'+ day.toString().padStart(2,"0") 
     }
 
     var startDate = monthDay + " " + hours + ":" + minute;
+    parseTime+=" " + hours.toString().padStart(2,"0") + ":" + minute.toString().padStart(2,"0")+":00";
+    date.getFullYear()+(date.getMonth() + 1)
     that.setData({
         matches: Object.assign(that.data.matches, {
         orderTime: startDate
       })
    
     })
-    http.postReq(`match/matchInfo/${this.data.matches.id}`,app.globalData.jwt,{orderTime:startDate},(res)=>{
+    http.postReq(`match/matchInfo/${this.data.matches.id}`,app.globalData.jwt,{orderTime:parseTime},(res)=>{
 
     })
   },
