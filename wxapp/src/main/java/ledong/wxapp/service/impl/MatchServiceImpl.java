@@ -323,7 +323,7 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     @Override
-    public Object updateMatchInfos(String matchId, String orderTime, String courtName) {
+    public Object updateMatchInfos(String matchId, String orderTime, String courtName,String courtGPS) {
 
         HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
         if (match == null) {
@@ -339,6 +339,9 @@ public class MatchServiceImpl implements IMatchService {
         }
         if (!TextUtils.isEmpty(courtName)) {
             vo.setCourtName(courtName);
+        }
+        if (!TextUtils.isEmpty(courtGPS)) {
+            vo.setCourtGPS(courtGPS);
         }
         vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
         vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());

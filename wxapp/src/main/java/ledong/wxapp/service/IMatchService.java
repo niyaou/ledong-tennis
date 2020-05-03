@@ -163,9 +163,10 @@ public interface IMatchService {
      * @param matchId
      * @param orderTime
      * @param courtName
+     * @param courtGPS
      * @return
      */
-    public Object updateMatchInfos(String matchId, String orderTime, String courtName);
+    public Object updateMatchInfos(String matchId, String orderTime, String courtName,String courtGPS);
 
 
 

@@ -1,3 +1,4 @@
+  <wxs module="dateFilter" src="../../filter/dateFilter.wxs"></wxs>
 <view class="contain">
 	<view class="cl">
 		<div class="head" style='padding-top:{{totalBarHeight}}rpx;'>
@@ -29,12 +30,12 @@
 		<div class="bottom">
 			<div class="zone">
 				<image src="../../icon/positiond.png" class="bottomimg" />
-				<div> 南湖</div>
+				<div bindtap="pluginsTap"> {{matches.courtName||'请选择球场'}}</div>
 			</div>
 			<!-- <div class="dividv" /> -->
 			<div class="zone">
 				<image src="../../icon/cald.png" class="bottomimg" />
-				<picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{matches.orderTime||'请选择日期'}}
+				<picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{dateFilter.getDate(matches.orderTime,'-')||'请选择日期'}}
 
 
 				</picker>
@@ -47,14 +48,27 @@
 	</view>
 	<scroll-view scroll-y class="swiper">
 		<view wx:for="{{sessionContext}}" wx:key="postTime">
-			<dialog isSelf="{{item.openId !== openId}}" dialog="{{item}}"/>
+			<dialog isSelf="{{item.openId !== openId}}" dialog="{{item}}" />
 		</view>
 	</scroll-view>
 	<div class="message">
-		<input class="context" placeholder="告诉球友你的想法。。。"  bindinput="bindInput" ></input>
+		<input class="context" placeholder="告诉球友你的想法。。。" bindinput="bindInput"></input>
 		<div class="button" bindtap="postMessage">
-				<image src="../../icon/send.png" class="send" />
-				</div>
+			<image src="../../icon/send.png" class="send" />
+		</div>
 
 	</div>
+
+ <!-- <map id="map" longitude="{{gps.ln}}" latitude="{{gps.lat}}" scale="14" controls="{{controls}}" bindcontroltap="controltap" markers="{{markers}}" bindmarkertap="markertap" polyline="{{polyline}}" bindregionchange="regionchange" show-location style="position:absolute;top:0;width: 100%; height: 150%;z-index:50">
+ <cover-view class="cover-view">
+          <cover-view class="container">
+            <cover-view class="flex-wrp" style="flex-direction:row;">
+              <cover-view class="flex-item demo-text-1" bindtap="switch1">111</cover-view>
+              <cover-view class="flex-item demo-text-2">222</cover-view>
+              <cover-view class="flex-item demo-text-3">333</cover-view>
+            </cover-view>
+          </cover-view>
+        </cover-view>
+
+</map>  -->
 </view>

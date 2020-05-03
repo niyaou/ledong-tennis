@@ -4,6 +4,8 @@ var date = new Date();
 var currentHours = date.getHours();
 var currentMinute = date.getMinutes();
 var http = require('../../utils/http.js')
+var utils = require('../../utils/util.js')
+const chooseLocation = requirePlugin('chooseLocation');
 Page({
 
   /**
@@ -59,7 +61,23 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    const location = chooseLocation.getLocation();
+    console.info(location)
 
+    if (location) {
+      this.setData({
+        matches: Object.assign(this.data.matches, {
+          courtName: location.name,
+          courtGPS: `${location.latitude},${location.longitude}`
+        })
+      })
+      http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
+        courtName: location.name,
+        courtGPS: `${location.latitude},${location.longitude}`
+      }, (res) => {
+  
+      })
+    }
     const eventChannel = this.getOpenerEventChannel()
     let that = this
     eventChannel.on('acceptDataFromOpenerPage', function (data) {
@@ -83,7 +101,7 @@ Page({
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-    console.info('xxxxxxxxxx unload xxxxxxxxxx',this.data.interval)
+    console.info('xxxxxxxxxx unload xxxxxxxxxx', this.data.interval)
     clearInterval(this.data.interval)
     clearInterval(this.data.intervalM)
   },
@@ -107,6 +125,19 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  pluginsTap() {
+    const key = '64TBZ-IOJWF-4X4JT-JG3BI-WKSEK-QEB7E'; //使用在腾讯位置服务申请的key
+    const referer = 'dd'; //调用插件的app的名称
+
+    const location = JSON.stringify({
+      latitude: app.globalData.gps.split(',')[0],
+      longitude: app.globalData.gps.split(',')[1]
+    });
+    const category = '综合体育场馆,体育户外,其它运动健身';
+    wx.navigateTo({
+      url: `plugin://chooseLocation/index?key=${key}&referer=${referer}&location=${location}&category=${category}`
+    });
   },
   reloadContext() {
     let that = this
@@ -140,22 +171,22 @@ Page({
           })
         )
       }
-      if(that.data.interval==-1){
+      if (that.data.interval == -1) {
         let interval = setInterval(() => {
           that.reloadContext()
         }, 2000)
 
-      let intervalM =  
-      setInterval(() => {
-        that.refreshMatches()
-      }, 5000)
-  
+        let intervalM =
+          setInterval(() => {
+            that.refreshMatches()
+          }, 5000)
+
         that.setData({
-          interval:interval,
-          intervalM:intervalM
+          interval: interval,
+          intervalM: intervalM
         })
-        console.info('----------i set interval ',interval)
-      } 
+        console.info('----------i set interval ', interval)
+      }
 
       arrs = arrs.sort((o1, o2) => {
         // return (new Date(o1.postTime)).getTime() < (new Date(o2.postTime)) ? 1 : -1
@@ -165,7 +196,7 @@ Page({
       that.setData({
         sessionContext: arrs
       })
-    },false)
+    }, false)
     // console.info('sorted arrs',that.data.sessionContext[0])
   },
   postMessage() {
@@ -189,12 +220,12 @@ Page({
       complete: (res) => {},
     })
   },
-  refreshMatches(){
-    let that  =  this
-    http.getReq(`match/matchInfo/${this.data.matches.id}`,   app.globalData.jwt,(res)=>{
+  refreshMatches() {
+    let that = this
+    http.getReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, (res) => {
       // console.info(res.data)
       // matches: res.data
-    },false)
+    }, false)
   },
   pickerTap: function () {
     date = new Date();
@@ -244,7 +275,7 @@ Page({
 
     var that = this;
 
-    var monthDay = ['今天', '明天','后天'];
+    var monthDay = ['今天', '明天', '后天'];
     var hours = [];
     var minute = [];
 
@@ -359,9 +390,9 @@ Page({
 
   loadMinute: function (hours, minute) {
     var minuteIndex;
-    if (currentMinute == 0 ){
+    if (currentMinute == 0) {
       minuteIndex = 0;
-    }else    if (currentMinute > 0 && currentMinute <= 10) {
+    } else if (currentMinute > 0 && currentMinute <= 10) {
       minuteIndex = 10;
     } else if (currentMinute > 10 && currentMinute <= 20) {
       minuteIndex = 20;
@@ -397,40 +428,41 @@ Page({
     var monthDay = that.data.multiArray[0][e.detail.value[0]];
     var hours = that.data.multiArray[1][e.detail.value[1]];
     var minute = that.data.multiArray[2][e.detail.value[2]];
-    var parseTime=date.getFullYear()+'-'
+    var parseTime = date.getFullYear() + '-'
     if (monthDay === "今天") {
       var month = date.getMonth() + 1;
       var day = date.getDate();
       monthDay = month + "月" + day + "日";
-      parseTime+=month.toString().padStart(2,"0") +'-'+day.toString().padStart(2,"0") 
+      parseTime += month.toString().padStart(2, "0") + '-' + day.toString().padStart(2, "0")
     } else if (monthDay === "明天") {
       var date1 = new Date(date);
       date1.setDate(date.getDate() + 1);
       monthDay = (date1.getMonth() + 1) + "月" + date1.getDate() + "日";
-      parseTime+= (date1.getMonth() + 1).toString().padStart(2,"0")  +'-'+ date1.getDate().toString().padStart(2,"0") 
+      parseTime += (date1.getMonth() + 1).toString().padStart(2, "0") + '-' + date1.getDate().toString().padStart(2, "0")
     } else if (monthDay === "后天") {
       var date1 = new Date(date);
       date1.setDate(date.getDate() + 2);
       monthDay = (date1.getMonth() + 2) + "月" + date1.getDate() + "日";
-      parseTime+= (date1.getMonth() + 2).toString().padStart(2,"0")  +'-'+ date1.getDate().toString().padStart(2,"0") 
-    }
-     else {
+      parseTime += (date1.getMonth() + 2).toString().padStart(2, "0") + '-' + date1.getDate().toString().padStart(2, "0")
+    } else {
       var month = monthDay.split("-")[0]; // 返回月
       var day = monthDay.split("-")[1]; // 返回日
       monthDay = month + "月" + day + "日";
-      parseTime+= month.toString().padStart(2,"0") +'-'+ day.toString().padStart(2,"0") 
+      parseTime += month.toString().padStart(2, "0") + '-' + day.toString().padStart(2, "0")
     }
 
     var startDate = monthDay + " " + hours + ":" + minute;
-    parseTime+=" " + hours.toString().padStart(2,"0") + ":" + minute.toString().padStart(2,"0")+":00";
-    date.getFullYear()+(date.getMonth() + 1)
+    parseTime += " " + hours.toString().padStart(2, "0") + ":" + minute.toString().padStart(2, "0") + ":00";
+    date.getFullYear() + (date.getMonth() + 1)
     that.setData({
-        matches: Object.assign(that.data.matches, {
+      matches: Object.assign(that.data.matches, {
         orderTime: startDate
       })
-   
+
     })
-    http.postReq(`match/matchInfo/${this.data.matches.id}`,app.globalData.jwt,{orderTime:parseTime},(res)=>{
+    http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
+      orderTime: parseTime
+    }, (res) => {
 
     })
   },

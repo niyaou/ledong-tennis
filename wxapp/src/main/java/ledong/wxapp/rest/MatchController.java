@@ -135,13 +135,15 @@ public class MatchController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "matchId", value = "matched id", required = true, dataType = "string", paramType = "path"),
             @ApiImplicitParam(name = "courtName", value = "intentional request court name", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "courtGPS", value = "intentional request court gps", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "orderTime", value = "intentional request time", required = false, dataType = "string", paramType = "query") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> updateMatchInfos(@PathVariable(value = "matchId", required = true) String matchId,
             @RequestParam(value = "courtName", required = false) String courtName,
+            @RequestParam(value = "courtGPS", required = false) String courtGPS,
             @RequestParam(value = "orderTime", required = false) String orderTime) {
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.updateMatchInfos(matchId, orderTime, courtName)), HttpStatus.OK);
+                CommonResponse.success(matchService.updateMatchInfos(matchId, orderTime, courtName,courtGPS)), HttpStatus.OK);
     }
 
 
