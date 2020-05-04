@@ -85,6 +85,7 @@ Page({
         matches: data.data,
         openId: app.globalData.openId
       })
+      console.info('matches',that.data.matches)
       that.reloadContext()
     })
 
@@ -131,10 +132,10 @@ Page({
     const referer = 'dd'; //调用插件的app的名称
 
     const location = JSON.stringify({
-      latitude: app.globalData.gps.split(',')[0],
-      longitude: app.globalData.gps.split(',')[1]
+      latitude: this.data.matches.courtGPS? this.data.matches.courtGPS.split(',')[0]:app.globalData.gps.split(',')[0],
+      longitude: this.data.matches.courtGPS? this.data.matches.courtGPS.split(',')[1]:app.globalData.gps.split(',')[1],
     });
-    const category = '综合体育场馆,体育户外,其它运动健身';
+    const category = '体育户外,体育场馆,';
     wx.navigateTo({
       url: `plugin://chooseLocation/index?key=${key}&referer=${referer}&location=${location}&category=${category}`
     });
@@ -224,7 +225,10 @@ Page({
     let that = this
     http.getReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, (res) => {
       // console.info(res.data)
-      // matches: res.data
+      that.setData({
+        matches: res.data
+      })
+   
     }, false)
   },
   pickerTap: function () {

@@ -63,6 +63,12 @@ Component({
    * 组件的方法列表
    */
   methods: {
+    
+    tapCourtLocation(){
+      console.info('tapCourtLocation')
+      this.triggerEvent('locationTapped',this.data.matches);
+    },
+    
     switch1() {
       this.setData({
         gps: {

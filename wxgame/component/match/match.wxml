@@ -39,9 +39,19 @@
 			</view>
 		</view>
 		<view wx:for="{{matches}}" wx:key="id">
-			<playitem matches="{{item}}" />
+			<playitem matches="{{item}}"  bind:locationTapped="onLocationTapped"/>
 		</view>
 	</scroll-view>
 
+  <map  
+	  latitude="{{latitude}}"
+      longitude="{{longitude}}"
+			 bindtap="closeMap" wx:if="{{showMap}}" id="map"  scale="14" controls="{{controls}}"
+			  bindcontroltap="controltap" 
+				markers="{{markers}}" 
+				bindmarkertap="markertap"
+				  show-location style="position:absolute;top:0;width: 100%; height: 150%;z-index:50">
+
+</map>  
 
 </view>

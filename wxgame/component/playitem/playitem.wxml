@@ -24,7 +24,7 @@
 		</div>
 		<div class="divid" />
 		<div class="bottom">
-			<div class="zone">
+			<div class="zone" catchtap="tapCourtLocation">
 				<image src="../../icon/position.png" class="bottomimg" />
 				<div> {{matches.courtName}}</div>
 			</div>
