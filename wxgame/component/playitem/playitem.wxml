@@ -12,9 +12,9 @@
 				</div>
 
 			</div>
-      <div class="score win">6</div>
+      <div class="score win">{{matches.holderScore}}</div>
 			<div class="dividv" />
-         <div class="score lose">0</div>
+         <div class="score lose">{{matches.challengerScore}}</div>
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
 				<div class="nickname">{{matches.challengerName}}

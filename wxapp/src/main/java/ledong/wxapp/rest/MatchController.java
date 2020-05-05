@@ -167,7 +167,7 @@ public class MatchController {
     @ApiOperation(value = "confirm   match ", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "matchId", value = "matched id ", required = true, dataType = "string", paramType = "path"),
-            @ApiImplicitParam(name = "type", value = "user type , 0 : holder , 1 : challenger", required = true, dataType = "string", paramType = "query")
+            @ApiImplicitParam(name = "type", value = "user type , 0 : holder , 1 : challenger", required = true, dataType = "string", paramType = "path")
 
     })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")

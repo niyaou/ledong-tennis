@@ -18,7 +18,7 @@
 
 
 .pp1{  width:65%;}
-.pp1 span{
+.pp1 >span{
   padding: 5px 8px;
   display: inline-block;
   border-radius: 4px;

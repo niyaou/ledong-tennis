@@ -410,30 +410,19 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
-
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         if (!MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode().equals(vo.getStatus())) {
             return null;
         }
-
-        // vo.setHolderScore(holderScore);
-        // Optional.ofNullable(holderScore).ifPresent(i -> {
         if (holderScore != null) {
             vo.setHolderScore(holderScore);
         }
-        // vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-        // });
-        ;
-        // Optional.ofNullable(challengerScore).ifPresent(i -> {
         if (challengerScore != null) {
             vo.setChallengerScore(challengerScore);
         }
-        // vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-        // });
-        // ;
         vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
         vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-       
+        log.info(JSON.toJSONString(vo));
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
     }
 

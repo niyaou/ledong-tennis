@@ -12,6 +12,9 @@ Page({
    * 页面的初始数据
    */
   data: {
+    short: 2000,
+    long: 5000,
+    confirmed: false,
     interval: -1,
     intervalM: -1,
     matches: {},
@@ -75,7 +78,7 @@ Page({
         courtName: location.name,
         courtGPS: `${location.latitude},${location.longitude}`
       }, (res) => {
-  
+
       })
     }
     const eventChannel = this.getOpenerEventChannel()
@@ -85,7 +88,7 @@ Page({
         matches: data.data,
         openId: app.globalData.openId
       })
-      console.info('matches',that.data.matches)
+      console.info('matches', that.data.matches)
       that.reloadContext()
     })
 
@@ -127,13 +130,51 @@ Page({
   onShareAppMessage: function () {
 
   },
+  confirm() {
+    const type = this.data.openId == this.data.matches.holder ? 0 : 1
+    let that = this
+    http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
+      console.info(res)
+      if (res.code == 0) {
+        that.setData({
+          confirmed: true
+        })
+      }
+
+    })
+
+  },
+
+  bindManual(e, type) {
+    // e.detail.value
+    let score = 0;
+    // e.detail.keyCode
+    if (e.detail.keyCode > 48 && e.detail.keyCode < 56) {
+      score = parseInt(e.detail.value)
+    }
+    console.info(e.detail, e.currentTarget.dataset.type)
+    let data = {}
+    if (e.currentTarget.dataset.type == "0") {
+      data = Object.assign({
+        holderScore: score
+      })
+    } else {
+      data = Object.assign({
+        challengerScore: score
+      })
+    }
+    http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => {
+      console.info(res)
+    })
+
+  },
   pluginsTap() {
     const key = '64TBZ-IOJWF-4X4JT-JG3BI-WKSEK-QEB7E'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
 
     const location = JSON.stringify({
-      latitude: this.data.matches.courtGPS? this.data.matches.courtGPS.split(',')[0]:app.globalData.gps.split(',')[0],
-      longitude: this.data.matches.courtGPS? this.data.matches.courtGPS.split(',')[1]:app.globalData.gps.split(',')[1],
+      latitude: this.data.matches.courtGPS ? this.data.matches.courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
+      longitude: this.data.matches.courtGPS ? this.data.matches.courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
     });
     const category = '体育户外,体育场馆,';
     wx.navigateTo({
@@ -175,12 +216,12 @@ Page({
       if (that.data.interval == -1) {
         let interval = setInterval(() => {
           that.reloadContext()
-        }, 2000)
+        }, that.data.short)
 
         let intervalM =
           setInterval(() => {
             that.refreshMatches()
-          }, 5000)
+          }, that.data.long)
 
         that.setData({
           interval: interval,
@@ -225,10 +266,27 @@ Page({
     let that = this
     http.getReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, (res) => {
       // console.info(res.data)
-      that.setData({
-        matches: res.data
+      res.data = Object.assign(res.data, {
+        challengerName: that.data.matches.challengerName,
+        challengerAvator: that.data.matches.challengerAvator,
+        holderAvator: that.data.matches.holderAvator,
+        holderName: that.data.matches.holderName,
       })
-   
+      let confirm = false
+      if(that.data.openId == res.data.holder){
+         confirm = res.data.holderAcknowledged ==1001
+      }else{
+        confirm = res.data.challengerAcknowledged ==1001
+      }
+      that.setData({
+        matches: res.data,
+        confirmed:confirm
+        // Object.assign(that.data.matches, {
+        //   courtGPS:res.data.courtGPS,courtName:res.data.courtName, orderTime:res.data.orderTime,
+        //   status:res.data.status
+        // })
+      })
+
     }, false)
   },
   pickerTap: function () {

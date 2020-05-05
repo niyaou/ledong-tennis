@@ -3,6 +3,7 @@
 	<view class="cl">
 		<div class="head" style='padding-top:{{totalBarHeight}}rpx;'>
 			<div style='top:{{totalBarHeight-70}}rpx;' bindtap='backtoIndex'> <text decode="true">&nbsp;&nbsp; &lt;</text></div>
+			<div  style='top:{{totalBarHeight-70}}rpx; left:40%' >{{matches.status ==2001 ? '比赛协商':matches.status ==2002?'正在比赛':'比赛结束'}}</div>
 
 		</div>
 		<div class="user">
@@ -13,9 +14,17 @@
 				</div>
 			</div>
 
-			<div class="score win">6</div>
+			<div class="score win">
+	 
+
+    <input type="number" bindinput="bindManual" data-type="0" maxlength="1" value="{{matches.holderScore}}" type="number" />  
+
+
+			</div>
 			<div class="dividv" />
-			<div class="score lose">7</div>
+			<div class="score lose">
+		 <input type="number" bindinput="bindManual" data-type="1" maxlength="1" value="{{matches.challengerScore}}" type="number" />  
+			 </div>
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
 				<div class="nickname">{{matches.challengerName}}
@@ -52,6 +61,9 @@
 		</view>
 	</scroll-view>
 	<div class="message">
+	<div class="button" bindtap="confirm"> 
+	<image src="{{confirmed?'../../icon/confirmed.png':'../../icon/tobeconfirm.png'}}"  class="send" />
+	</div>
 		<input class="context" placeholder="告诉球友你的想法。。。" bindinput="bindInput"></input>
 		<div class="button" bindtap="postMessage">
 			<image src="../../icon/send.png" class="send" />

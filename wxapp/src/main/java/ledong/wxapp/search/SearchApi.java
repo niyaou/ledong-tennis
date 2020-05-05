@@ -914,6 +914,7 @@ public class SearchApi {
      */
     public static String updateDocument(String indexName, String doc, String id) {
         UpdateRequest updateRequest = new UpdateRequest(indexName, id);
+        updateRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         updateRequest.doc(doc, XContentType.JSON);
         updateRequest.upsertRequest();
         return parseUpdateResponse(updateRequest);
@@ -1074,7 +1075,8 @@ public class SearchApi {
     private static String parseUpdateResponse(UpdateRequest searchRequest) {
         try {
             DocWriteResponse updateResponse = client.update(searchRequest, RequestOptions.DEFAULT);
-            if (updateResponse.getResult().equals(Result.UPDATED)) {
+            log.info(updateResponse.getResult());
+            if (updateResponse.getResult().toString().equals(Result.UPDATED.toString())) {
                 return updateResponse.getId();
             }
         } catch (IOException e) {
