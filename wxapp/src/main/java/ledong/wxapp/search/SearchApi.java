@@ -386,7 +386,7 @@ public class SearchApi {
      * @param value
      * @return
      */
-    public static QueryBuilder createNotSearchSource(String key, String value) {
+    public static QueryBuilder createNotSearchSource(String key, Object value) {
         QueryBuilder matchQueryBuilder = QueryBuilders.boolQuery().mustNot(QueryBuilders.termQuery(key, value));
         return matchQueryBuilder;
     }

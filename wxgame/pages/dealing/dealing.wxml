@@ -3,7 +3,7 @@
 	<view class="cl">
 		<div class="head" style='padding-top:{{totalBarHeight}}rpx;'>
 			<div style='top:{{totalBarHeight-70}}rpx;' bindtap='backtoIndex'> <text decode="true">&nbsp;&nbsp; &lt;</text></div>
-			<div  style='top:{{totalBarHeight-70}}rpx; left:40%' >{{matches.status ==2001 ? '比赛协商':matches.status ==2002?'正在比赛':'比赛结束'}}</div>
+			<div  style='top:{{totalBarHeight-70}}rpx; left:40%' >{{isPlus ?matches.status ==2001 ? '比赛协商':matches.status ==2002?'正在比赛':'比赛结束':'发布比赛'}}</div>
 
 		</div>
 		<div class="user">
@@ -28,7 +28,7 @@
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
 				<div class="nickname">{{matches.challengerName}}
-					<div class="rank">{{matches.challengerrankType0}}</div>
+					<div class="rank" wx:if="{{isPlus}}">{{matches.challengerrankType0}}</div>
 				</div>
 			</div>
 		</div>

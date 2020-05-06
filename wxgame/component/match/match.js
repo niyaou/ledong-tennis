@@ -26,8 +26,8 @@ Component({
       longitude: 113.324520,
       name: 'T.I.T 创意园'
     }],
-    longitude:'',
-    latitude:'',
+    longitude: '',
+    latitude: '',
     tabStatus: 0 //栏目选择状态
   },
 
@@ -35,7 +35,7 @@ Component({
    * 组件的方法列表
    */
   methods: {
-    closeMap(){
+    closeMap() {
 
       this.setData({
         showMap: false
@@ -44,11 +44,14 @@ Component({
     onLocationTapped(e) {
       console.info(e)
       this.setData({
-        latitude: e.detail.courtGPS? e.detail.courtGPS.split(',')[0]:app.globalData.gps.split(',')[0],
-        longitude:e.detail.courtGPS? e.detail.courtGPS.split(',')[1]:app.globalData.gps.split(',')[1],
-        markers:e.detail.courtGPS?[{id:1,  latitude: e.detail.courtGPS.split(',')[0],
-          longitude:e.detail.courtGPS.split(',')[1],
-          name: e.detail.courtName}]:[]
+        latitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
+        longitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
+        markers: e.detail.courtGPS ? [{
+          id: 1,
+          latitude: e.detail.courtGPS.split(',')[0],
+          longitude: e.detail.courtGPS.split(',')[1],
+          name: e.detail.courtName
+        }] : []
       });
 
       this.setData({
@@ -56,13 +59,18 @@ Component({
       })
     },
     tapTabStatus(event) {
+  
       this.setData({
         tabStatus: event.currentTarget.dataset.gid
       })
-      console.info(typeof event.currentTarget.dataset.gid, event.currentTarget.dataset.gid)
+   
       if (parseInt(event.currentTarget.dataset.gid) === 2) {
         console.log(event.currentTarget.dataset.gid)
         this.matchedGame()
+      } else if (parseInt(event.currentTarget.dataset.gid) === 1) {
+        this.matching()
+      } else {
+        this.matcheExplore()
       }
 
     },
@@ -83,8 +91,45 @@ Component({
             matches: res.data
           })
         }
-
       })
+    },
+
+    matcheExplore() {
+      let that = this
+      http.getReq('match/intentionalMatch/10', app.globalData.jwt, (res) => {
+        console.info(res)
+        if (res.code === 0) {
+          that.setData({
+            matches: res.data
+          })
+        }
+      })
+    },
+    createIntentional(){
+      let that = this
+      wx.navigateTo({
+        url: '../../pages/dealing/dealing',
+        events: {
+          // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
+          acceptDataFromOpenedPage: function(data) {
+            console.log(data)
+          },
+          someEvent: function(data) {
+            console.log(data)
+          }
+      
+        },
+        success: function(res) {
+          // 通过eventChannel向被打开页面传送数据
+          res.eventChannel.emit('acceptDataFromOpenerPage', { data:{holderAvator:app.globalData.userInfo.avatarUrl,
+            holderName:app.globalData.userInfo.nickName,
+            holderrankType0:app.globalData.userRankInfo.holderrankType0,
+            isPlus:false
+          } })
+        }
+      })
+      console.info('navigateTo')
     }
+
   }
 })

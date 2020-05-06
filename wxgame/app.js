@@ -44,6 +44,7 @@ App({
     shortInterval:SHORTINTERVAL,
     slowInterval:SLOWINTERVAL,
     userInfo: null,
+    userRankInfo:null,
     openId:'',
     totalBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight'] +44 )/wx.getSystemInfoSync()['windowWidth'],
     statusBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight']  )/wx.getSystemInfoSync()['windowWidth'],

@@ -12,6 +12,8 @@ Page({
    * 页面的初始数据
    */
   data: {
+    isPlus: true,
+    parseTime: '',
     short: 2000,
     long: 5000,
     confirmed: false,
@@ -77,9 +79,7 @@ Page({
       http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
         courtName: location.name,
         courtGPS: `${location.latitude},${location.longitude}`
-      }, (res) => {
-
-      })
+      }, (res) => {})
     }
     const eventChannel = this.getOpenerEventChannel()
     let that = this
@@ -89,6 +89,12 @@ Page({
         openId: app.globalData.openId
       })
       console.info('matches', that.data.matches)
+      if (that.data.matches.isPlus != undefined) {
+        console.info('isPlus', that.data.matches.isPlus)
+        that.setData({
+          isPlus: data.data.isPlus
+        })
+      }
       that.reloadContext()
     })
 
@@ -133,15 +139,41 @@ Page({
   confirm() {
     const type = this.data.openId == this.data.matches.holder ? 0 : 1
     let that = this
-    http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
-      console.info(res)
-      if (res.code == 0) {
-        that.setData({
-          confirmed: true
+    if (this.data.isPlus) {
+      http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
+        console.info(res)
+        if (res.code == 0) {
+          that.setData({
+            confirmed: true
+          })
+        }
+
+      })
+    } else {
+      let data = {}
+      if (that.data.matches.orderTime) {
+        data = Object.assign(data, {
+          orderTime: that.data.parseTime
         })
       }
+      if (that.data.matches.courtName) {
+        data = Object.assign(data, {
+          courtName: that.data.matches.courtName
+        })
+      }
+      if (that.data.matches.courtGPS) {
+        data = Object.assign(data, {
+          courtGPS: that.data.matches.courtGPS
+        })
+      }
+      http.postReq(`match/intentionalMatch/`, app.globalData.jwt, data, (res) => {
+        if (res.code == 0) {
+          that.backtoIndex()
+        }
 
-    })
+      })
+    }
+
 
   },
 
@@ -191,7 +223,6 @@ Page({
       return i.openId === that.data.matches.challenger
     }).length
     http.getReq(`match/sessionContext/${that.data.matches.sessionId}?holderCount=${holderCount}&challengerCount=${challengerCount}`, app.globalData.jwt, (res) => {
-
       let arrs = that.data.sessionContext
       if (res.data.challengerContext != null) {
         arrs = arrs.concat(
@@ -213,7 +244,7 @@ Page({
           })
         )
       }
-      if (that.data.interval == -1) {
+      if (that.data.interval == -1 && that.data.isPlus) {
         let interval = setInterval(() => {
           that.reloadContext()
         }, that.data.short)
@@ -227,11 +258,10 @@ Page({
           interval: interval,
           intervalM: intervalM
         })
-        console.info('----------i set interval ', interval)
       }
 
       arrs = arrs.sort((o1, o2) => {
-        // return (new Date(o1.postTime)).getTime() < (new Date(o2.postTime)) ? 1 : -1
+
         return o1.postTime < o2.postTime ? 1 : -1
       })
 
@@ -239,7 +269,7 @@ Page({
         sessionContext: arrs
       })
     }, false)
-    // console.info('sorted arrs',that.data.sessionContext[0])
+
   },
   postMessage() {
 
@@ -273,14 +303,14 @@ Page({
         holderName: that.data.matches.holderName,
       })
       let confirm = false
-      if(that.data.openId == res.data.holder){
-         confirm = res.data.holderAcknowledged ==1001
-      }else{
-        confirm = res.data.challengerAcknowledged ==1001
+      if (that.data.openId == res.data.holder) {
+        confirm = res.data.holderAcknowledged == 1001
+      } else {
+        confirm = res.data.challengerAcknowledged == 1001
       }
       that.setData({
         matches: res.data,
-        confirmed:confirm
+        confirmed: confirm
         // Object.assign(that.data.matches, {
         //   courtGPS:res.data.courtGPS,courtName:res.data.courtName, orderTime:res.data.orderTime,
         //   status:res.data.status
@@ -518,7 +548,8 @@ Page({
     date.getFullYear() + (date.getMonth() + 1)
     that.setData({
       matches: Object.assign(that.data.matches, {
-        orderTime: startDate
+        orderTime: startDate,
+        parseTime: parseTime
       })
 
     })

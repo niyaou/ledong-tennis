@@ -86,6 +86,7 @@ Page({
           rankType0: e.data.rankType0
         }
       })
+      app.globalData. userRankInfo=this.data.userRankInfo
       app.globalData.openId=e.data.openId
       console.info('-------set global openid',e.data.openId)
     })

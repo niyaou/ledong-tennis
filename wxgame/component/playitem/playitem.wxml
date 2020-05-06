@@ -2,7 +2,7 @@
   <wxs module="dateFilter" src="../../filter/dateFilter.wxs"></wxs>
 <view class="rowdiv" bindtap="detail">
 	<div class="item">
-		<div class="title">寻找球友的比赛</div>
+		<div class="{{matches.status ==2001 ? 'title demo-text-2':matches.status ==2002?'title demo-text-1':'title demo-text-3'}}">{{matches.status ==2001 ? '寻找球友的比赛':matches.status ==2002?'等待开始的比赛':'比赛结束'}}</div>
 		<div class="divid" />
 		<div class="user">
 			<div class="avator">

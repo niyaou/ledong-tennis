@@ -12,6 +12,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
 import ledong.wxapp.constant.DataSetConstant;
+import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.strategy.MatchStrategy;
 import ledong.wxapp.utils.DateUtil;
@@ -36,6 +37,7 @@ public class PickIntentionalMatch extends MatchStrategy {
 
             String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
             params.add(SearchApi.createSearchByFieldRangeSource(MatchPostVo.ORDERTIME, startTime, endTime));
+            params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()) );
             Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
             sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
             QueryBuilder[] values = new QueryBuilder[8];

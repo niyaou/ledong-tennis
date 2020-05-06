@@ -63,23 +63,24 @@ public class MatchServiceImpl implements IMatchService {
         vo.setUserName(user);
         MatchContext strategy = null;
         String matchId = null;
-        log.info(user);
-        log.info(courtGps);
         strategy = new MatchContext(new PickRandomMatch(redis, iRankService));
         matchId = strategy.getMatchId(vo);
-        log.info(matchId);
+        log.info("---1"+matchId);
+ 
         if (!TextUtils.isEmpty(matchId)) {
             return matchId;
         }
 
         strategy = new MatchContext(new PickIntentionalMatch());
         matchId = strategy.getMatchId(vo);
+        log.info("---2"+matchId);
         if (!TextUtils.isEmpty(matchId)) {
             return acceptIntentionalMatch(matchId, user);
         }
 
         strategy = new MatchContext(new PostRandomMatch(redis));
         matchId = strategy.getMatchId(vo);
+        log.info("---3"+matchId);
         if (!TextUtils.isEmpty(matchId)) {
             return matchId;
         }
@@ -288,8 +289,9 @@ public class MatchServiceImpl implements IMatchService {
         if (!StringUtil.isEmpty(user)) {
             params.add(SearchApi.createMultiFieldsWithSingleValue(user, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
         }
-        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
-                MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()));
+     
+        params.add(   SearchApi.createNotSearchSource(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
+
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
         sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
         QueryBuilder[] values = new QueryBuilder[8];
