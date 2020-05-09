@@ -123,12 +123,12 @@ Component({
           // 通过eventChannel向被打开页面传送数据
           res.eventChannel.emit('acceptDataFromOpenerPage', { data:{holderAvator:app.globalData.userInfo.avatarUrl,
             holderName:app.globalData.userInfo.nickName,
-            holderrankType0:app.globalData.userRankInfo.holderrankType0,
-            isPlus:false
+            holderrankType0:app.globalData.userRankInfo.rankType0,
+            isPlus:true
           } })
         }
       })
-      console.info('navigateTo')
+      console.info('navigateTo',app.globalData.userRankInfo)
     }
 
   }

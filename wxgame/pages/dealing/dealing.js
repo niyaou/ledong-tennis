@@ -12,7 +12,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    isPlus: true,
+    isPlus: false,
     parseTime: '',
     short: 2000,
     long: 5000,
@@ -88,15 +88,24 @@ Page({
         matches: data.data,
         openId: app.globalData.openId
       })
-      console.info('matches', that.data.matches)
-      if (that.data.matches.isPlus != undefined) {
-        console.info('isPlus', that.data.matches.isPlus)
+      console.info('matches', that.data.matches.status)
+      console.info('isPlus', that.data.matches.isPlus)
+      if (data.data.isPlus != undefined || that.data.matches != undefined ) {
+
         that.setData({
-          isPlus: data.data.isPlus
+          isPlus: data.data.isPlus || that.data.matches.status == 2000
         })
       }
-      that.reloadContext()
+
+
+
+      if(!that.data.isPlus){
+        that.reloadContext()
+      }else{
+        console.info('!that.data.isPlus', !that.data.isPlus)
+      }
     })
+
 
   },
 
@@ -136,10 +145,11 @@ Page({
   onShareAppMessage: function () {
 
   },
+  createInentional(){},
   confirm() {
     const type = this.data.openId == this.data.matches.holder ? 0 : 1
     let that = this
-    if (this.data.isPlus) {
+    if (!this.data.isPlus) {
       http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
         console.info(res)
         if (res.code == 0) {
@@ -151,7 +161,7 @@ Page({
       })
     } else {
       let data = {}
-      if (that.data.matches.orderTime) {
+      if (that.data.parseTime) {
         data = Object.assign(data, {
           orderTime: that.data.parseTime
         })
@@ -170,7 +180,6 @@ Page({
         if (res.code == 0) {
           that.backtoIndex()
         }
-
       })
     }
 
@@ -224,7 +233,7 @@ Page({
     }).length
     http.getReq(`match/sessionContext/${that.data.matches.sessionId}?holderCount=${holderCount}&challengerCount=${challengerCount}`, app.globalData.jwt, (res) => {
       let arrs = that.data.sessionContext
-      if (res.data.challengerContext != null) {
+      if ( res.data && res.data.challengerContext != null) {
         arrs = arrs.concat(
           res.data.challengerContext.map(i => {
             return Object.assign(i, {
@@ -234,7 +243,7 @@ Page({
           })
         )
       }
-      if (res.data.holderContext != null) {
+      if (res.data && res.data.holderContext != null) {
         arrs = arrs.concat(
           res.data.holderContext.map(i => {
             return Object.assign(i, {
@@ -244,7 +253,7 @@ Page({
           })
         )
       }
-      if (that.data.interval == -1 && that.data.isPlus) {
+      if (that.data.interval == -1 && !that.data.isPlus) {
         let interval = setInterval(() => {
           that.reloadContext()
         }, that.data.short)
@@ -294,13 +303,17 @@ Page({
   },
   refreshMatches() {
     let that = this
+    console.info('-----request info-------',this.data.matches.id)
     http.getReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, (res) => {
-      // console.info(res.data)
+      console.info("info response",res.data)
       res.data = Object.assign(res.data, {
         challengerName: that.data.matches.challengerName,
         challengerAvator: that.data.matches.challengerAvator,
         holderAvator: that.data.matches.holderAvator,
         holderName: that.data.matches.holderName,
+        challengerrankType0:that.data.matches.challengerrankType0,
+        holderrankType0:that.data.matches.holderrankType0
+
       })
       let confirm = false
       if (that.data.openId == res.data.holder) {
@@ -547,17 +560,18 @@ Page({
     parseTime += " " + hours.toString().padStart(2, "0") + ":" + minute.toString().padStart(2, "0") + ":00";
     date.getFullYear() + (date.getMonth() + 1)
     that.setData({
+      parseTime: parseTime,
       matches: Object.assign(that.data.matches, {
         orderTime: startDate,
         parseTime: parseTime
       })
-
     })
-    http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
-      orderTime: parseTime
-    }, (res) => {
-
-    })
+    if(!that.data.isPlus){
+      http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
+        orderTime: parseTime
+      }, (res) => {
+      })   
+    }
   },
 
 })

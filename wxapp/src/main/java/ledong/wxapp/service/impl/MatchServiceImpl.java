@@ -277,9 +277,22 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public Object getIntentionalMatch(Integer count) {
-        return SearchApi.searchByFieldSorted(DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.STATUS,
-                String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()), MatchPostVo.CREATETIME,
-                SortOrder.DESC, 1, count);
+        List<HashMap<String, Object>> searchResponse =SearchApi.searchByFieldSorted(DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.STATUS,
+        String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()), MatchPostVo.CREATETIME,
+        SortOrder.DESC, 1, count);
+        if (searchResponse != null) {
+            searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(MatchPostVo.HOLDER));
+                RankInfoVo holderRank = iRankService.getUserRank((String) match.get(MatchPostVo.HOLDER));
+                match.put(MatchPostVo.HOLDERAVATOR,holder.get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME,holder.get(UserVo.NICKNAME));
+                match.put(MatchPostVo.HOLDERRANKTYPE0,holderRank.getRankType0());
+              
+                return match;
+            })
+            .collect(Collectors.toList());
+          }
+        return searchResponse;
     }
 
     @Override
