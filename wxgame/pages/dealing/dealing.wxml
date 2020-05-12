@@ -70,7 +70,7 @@
 			<image src="../../icon/send.png" class="send" />
 		</div>
 </block>
-<div wx:else bindtap="confirm" style="color:#666;font-size:28rpx">点击图标发布比赛</div>
+<div wx:else bindtap="confirm" style="color:#666;font-size:28rpx">点击图标{{openId==matches.holder?"更新":"接受"}}比赛</div>
 	</div>
 
 

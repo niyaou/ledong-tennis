@@ -35,12 +35,13 @@ public interface IRankService {
      */
     public String updateRankInfo(RankInfoVo vo);
 
+
     /**
      * get ranking list
-     * 
+     * @param grade
      * @return
      */
-    public Object getRankingList();
+    public Object getRankingList(String grade);
 
     /**
      * create user rank info

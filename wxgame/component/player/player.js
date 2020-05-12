@@ -12,17 +12,10 @@ Component({
       type: String,
       value: '守护者'
     },
-    challengerAvator: {
-      type: String,
-      value: '../../icon/quest.png'
-    },
-    challengerName: {
-      type: String,
-      value: '挑战者'
-    },
-    rankType:{
-      type:Number,
-      value:1
+
+    rankType0:{
+      type:String,
+      value:''
     }
 
   },

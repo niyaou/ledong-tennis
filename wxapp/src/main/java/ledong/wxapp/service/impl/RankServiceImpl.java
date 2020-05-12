@@ -1,19 +1,25 @@
 package ledong.wxapp.service.impl;
 
-import java.util.Map;
-
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.HashMap;
 import com.alibaba.fastjson.JSONObject;
 
 import VO.MatchPostVo;
 import VO.RankInfoVo;
+import VO.UserVo;
 import ledong.wxapp.constant.DataSetConstant;
+import ledong.wxapp.constant.enums.GradeCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
+import ledong.wxapp.service.IUserService;
 import ledong.wxapp.strategy.RankingStrategy;
 import ledong.wxapp.strategy.context.GradingContext;
 import ledong.wxapp.strategy.context.RankingContext;
@@ -28,7 +34,8 @@ public class RankServiceImpl implements IRankService {
 
     @Autowired
     private RedisUtil redis;
-
+    @Autowired
+    private IUserService iUserService;
     @Override
     public String matchRank(String matchId, int holderScore, int challengerScor) {
         int[] scores = new int[2];
@@ -87,9 +94,21 @@ public class RankServiceImpl implements IRankService {
     }
 
     @Override
-    public Object getRankingList() {
-        return SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION, RankInfoVo.SCORE, SortOrder.DESC,
-                500);
+    public Object getRankingList(String grade) {
+
+        List<HashMap<String, Object>> users= SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,RankInfoVo.RANKTYPE0, grade, RankInfoVo.SCORE, SortOrder.DESC,
+        0,50);
+        if(users !=null){
+            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+                HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(RankInfoVo.OPENID));
+                match.put(MatchPostVo.HOLDERAVATOR,holder.get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME,holder.get(UserVo.NICKNAME));
+                return match;
+            })
+            .collect(Collectors.toList());
+        }
+
+        return users;
     }
 
     @Override

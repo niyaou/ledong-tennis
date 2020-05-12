@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import VO.MatchRequestVo;
@@ -58,9 +59,10 @@ public class RankController {
 
     @RequestMapping(value = "/rankList", method = RequestMethod.GET)
     @ApiOperation(value = "explore  ranking list ", notes = "")
-    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> userRankingList(@RequestHeader("Authorization") String authHeader) {
-        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getRankingList()), HttpStatus.OK);
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "grade", value = "grade name", required = false, dataType = "string", paramType = "query") })
+    public ResponseEntity<?> userRankingList(   @RequestParam(value = "grade", required = false) String grade) {
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getRankingList(grade)), HttpStatus.OK);
     }
 
 }

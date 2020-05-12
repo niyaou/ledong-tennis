@@ -44,6 +44,7 @@ public class RankInfoVo implements Serializable {
     private String rankType1;
     public static final String RANKTYPE1 = "rankType1";
 
+    
     @NotEmpty
     @ApiModelProperty(value = "bardge  ")
     private Integer bardge;

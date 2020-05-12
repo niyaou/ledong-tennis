@@ -242,7 +242,11 @@ public class SearchApi {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.sort(sortField, order);
         searchSourceBuilder.version(true);
-        searchSourceBuilder.query(QueryBuilders.termQuery(key, value));
+        if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+            searchSourceBuilder.query(QueryBuilders.termQuery(key, value));
+        } else {
+            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        }
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
@@ -253,7 +257,8 @@ public class SearchApi {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         GeoDistanceQueryBuilder qb = QueryBuilders.geoDistanceQuery(key);
-        GeoDistanceSortBuilder sort =  SortBuilders.geoDistanceSort(key,Double.parseDouble(value.split(",")[0]), Double.parseDouble(value.split(",")[1])); 
+        GeoDistanceSortBuilder sort = SortBuilders.geoDistanceSort(key, Double.parseDouble(value.split(",")[0]),
+                Double.parseDouble(value.split(",")[1]));
         sort.unit(DistanceUnit.KILOMETERS).order(SortOrder.ASC);
         qb.point(Double.parseDouble(value.split(",")[0]), Double.parseDouble(value.split(",")[1]));
         qb.distance(String.format("%skm", distance));
@@ -261,7 +266,6 @@ public class SearchApi {
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }
-
 
     /**
      * 
@@ -437,10 +441,10 @@ public class SearchApi {
      * @param index
      * @param type
      * @param id
-     * @param field 需更新的字段
+     * @param field  需更新的字段
      * @param value
      * @param delete : (default false) -----> true delete an element from array
-     * -----> false add an element to array
+     *               -----> false add an element to array
      *
      */
     public static String updateExistListObject(String indexName, String id, Map<String, String> o, String field,
@@ -538,7 +542,7 @@ public class SearchApi {
      * @param indexName
      * @param key
      * @param value
-     * @param type 0.早于某个时间范围，1.晚于某个时间范围
+     * @param type      0.早于某个时间范围，1.晚于某个时间范围
      * @param pageNo
      * @param size
      * @return

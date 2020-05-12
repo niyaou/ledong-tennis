@@ -1,7 +1,7 @@
 <!--component/playitem/playitem.wxml-->
 
 <view class="rowdiv" bindtap="detail">
-	<div class="{{rankType==1?'brass item':rankType==2?'silver item':rankType==3?'golden item':'diamond item'}}">
+	<div class="{{rankType0=='青铜'?'brass item':rankType0=='白银'?'silver item':rankType0=='黄金'?'golden item':'diamond item'}}">
 		<div class="user">
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
@@ -9,8 +9,7 @@
       <div class="rest">  
       <div class="info" >
             <div class="nickname">{{holderName}}		</div>
-					<div class="rank">青铜</div>
-		
+					<div class="rank">{{rankType0}}</div>
       </div>
   
 			<div class="zone">

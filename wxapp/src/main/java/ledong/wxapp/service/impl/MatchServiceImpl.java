@@ -346,7 +346,8 @@ public class MatchServiceImpl implements IMatchService {
         }
 
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
-        if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING .getCode().equals(vo.getStatus())) {
+        if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING .getCode().equals(vo.getStatus())&&
+        !MatchStatusCodeEnum.MATCH_MATCHING_STATUS .getCode().equals(vo.getStatus())) {
             return null;
         }
         if (!TextUtils.isEmpty(orderTime)) {

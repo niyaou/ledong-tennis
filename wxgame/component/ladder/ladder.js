@@ -1,4 +1,5 @@
-// component/ladder/ladder.js
+var http = require('../../utils/http.js')
+const app = getApp()
 Component({
   /**
    * 组件的属性列表
@@ -15,18 +16,34 @@ Component({
    */
   data: {
     arrs:[1,2,3,4,1,2,1,1,1,1,1,1,1,1,11,1,1,1,11,1,1,1,1,1,1,1,1,11,],
-    tabStatus:0 //栏目选择状态
+    tabStatus:'', //栏目选择状态,
+    players:[]
   },
-
+lifetimes:{
+  attached(){
+    let that = this
+    http.getReq(`rank/rankList`,app.globalData.jwt, (res)=>{
+      console.info(res)
+      that.setData({
+        players:res.data}
+      )
+    })
+  }
+},
   /**
    * 组件的方法列表
    */
   methods: {
     tapTabStatus(event){
-      this.setData({
-        tabStatus:event.currentTarget.dataset.gid
+      let that = this
+      http.getReq(`rank/rankList?grade=${event.currentTarget.dataset.gid}`,app.globalData.jwt, (res)=>{
+        console.info(res)
+        that.setData({
+          players:res.data,
+          tabStatus:event.currentTarget.dataset.gid
+        }
+        )
       })
-      console.log(event.currentTarget.dataset.gid)
     }
   
   }

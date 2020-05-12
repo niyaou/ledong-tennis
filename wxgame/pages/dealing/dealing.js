@@ -68,7 +68,7 @@ Page({
   onShow: function () {
     const location = chooseLocation.getLocation();
     console.info(location)
-
+    console.info(chooseLocation)
     if (location) {
       this.setData({
         matches: Object.assign(this.data.matches, {
@@ -76,10 +76,15 @@ Page({
           courtGPS: `${location.latitude},${location.longitude}`
         })
       })
-      http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
-        courtName: location.name,
-        courtGPS: `${location.latitude},${location.longitude}`
-      }, (res) => {})
+      console.info('this.data.isPlus',this.data.isPlus)
+      if(!this.data.isPlus){
+        http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
+          courtName: location.name,
+          courtGPS: `${location.latitude},${location.longitude}`
+        }, (res) => {})
+      }
+      chooseLocation.setLocation();
+      
     }
     const eventChannel = this.getOpenerEventChannel()
     let that = this
@@ -88,20 +93,16 @@ Page({
         matches: data.data,
         openId: app.globalData.openId
       })
-      console.info('matches', that.data.matches.status)
+      console.info('matches', that.data.matches)
       console.info('isPlus', that.data.matches.isPlus)
-      if (data.data.isPlus != undefined || that.data.matches != undefined ) {
-
+      if (data.data.isPlus != undefined || that.data.matches != undefined) {
         that.setData({
           isPlus: data.data.isPlus || that.data.matches.status == 2000
         })
       }
-
-
-
-      if(!that.data.isPlus){
+      if (!that.data.isPlus) {
         that.reloadContext()
-      }else{
+      } else {
         console.info('!that.data.isPlus', !that.data.isPlus)
       }
     })
@@ -145,21 +146,14 @@ Page({
   onShareAppMessage: function () {
 
   },
-  createInentional(){},
+  createInentional() {},
   confirm() {
     const type = this.data.openId == this.data.matches.holder ? 0 : 1
     let that = this
-    if (!this.data.isPlus) {
-      http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
-        console.info(res)
-        if (res.code == 0) {
-          that.setData({
-            confirmed: true
-          })
-        }
 
-      })
-    } else {
+    console.info('this.data.isPlus',this.data.isPlus)
+    console.info('this.data.status',this.data.matches.status)
+    if (this.data.isPlus || this.data.matches.status == 2000) {
       let data = {}
       if (that.data.parseTime) {
         data = Object.assign(data, {
@@ -176,11 +170,26 @@ Page({
           courtGPS: that.data.matches.courtGPS
         })
       }
-      http.postReq(`match/intentionalMatch/`, app.globalData.jwt, data, (res) => {
+      let url = 'match/intentionalMatch/'
+      if (that.data.matches.id) {
+        url = `match/matchInfo/${that.data.matches.id}`
+      }
+      http.postReq(url, app.globalData.jwt, data, (res) => {
         if (res.code == 0) {
           that.backtoIndex()
         }
       })
+    } else if (!this.data.isPlus) {
+      http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
+        console.info(res)
+        if (res.code == 0) {
+          that.setData({
+            confirmed: true
+          })
+        }
+      })
+    } else {
+
     }
 
 
@@ -233,7 +242,7 @@ Page({
     }).length
     http.getReq(`match/sessionContext/${that.data.matches.sessionId}?holderCount=${holderCount}&challengerCount=${challengerCount}`, app.globalData.jwt, (res) => {
       let arrs = that.data.sessionContext
-      if ( res.data && res.data.challengerContext != null) {
+      if (res.data && res.data.challengerContext != null) {
         arrs = arrs.concat(
           res.data.challengerContext.map(i => {
             return Object.assign(i, {
@@ -303,16 +312,16 @@ Page({
   },
   refreshMatches() {
     let that = this
-    console.info('-----request info-------',this.data.matches.id)
+    console.info('-----request info-------', this.data.matches.id)
     http.getReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, (res) => {
-      console.info("info response",res.data)
+      console.info("info response", res.data)
       res.data = Object.assign(res.data, {
         challengerName: that.data.matches.challengerName,
         challengerAvator: that.data.matches.challengerAvator,
         holderAvator: that.data.matches.holderAvator,
         holderName: that.data.matches.holderName,
-        challengerrankType0:that.data.matches.challengerrankType0,
-        holderrankType0:that.data.matches.holderrankType0
+        challengerrankType0: that.data.matches.challengerrankType0,
+        holderrankType0: that.data.matches.holderrankType0
 
       })
       let confirm = false
@@ -566,11 +575,10 @@ Page({
         parseTime: parseTime
       })
     })
-    if(!that.data.isPlus){
+    if (!that.data.isPlus) {
       http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
         orderTime: parseTime
-      }, (res) => {
-      })   
+      }, (res) => {})
     }
   },
 

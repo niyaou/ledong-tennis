@@ -2,11 +2,6 @@
   "pages": [
     "pages/index/index",
     "pages/dealing/dealing"
-  
-   
-
-   
-
   ],
   "window": {
     "backgroundTextStyle": "light",
