@@ -1,6 +1,13 @@
 package ledong.wxapp.service.impl;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +24,7 @@ import VO.RankInfoVo;
 import VO.UserVo;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.GradeCodeEnum;
+import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
@@ -37,6 +45,7 @@ public class RankServiceImpl implements IRankService {
     private RedisUtil redis;
     @Autowired
     private IUserService iUserService;
+
     @Override
     public String matchRank(String matchId, int holderScore, int challengerScor) {
         int[] scores = new int[2];
@@ -73,8 +82,14 @@ public class RankServiceImpl implements IRankService {
 
         holder = gContext.rankMatch(holder);
         challenger = gContext.rankMatch(challenger);
+        
+       updateRankInfo(holder);
+       updateRankInfo(challenger);
+       holder.setWinRate( updateWinRate(holder.getOpenId()));
+       challenger.setWinRate( updateWinRate(challenger.getOpenId()));
         updateRankInfo(holder);
         updateRankInfo(challenger);
+        // updateWinRate(challenger.getOpenId());
         redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
@@ -97,25 +112,27 @@ public class RankServiceImpl implements IRankService {
     @Override
     public Object getRankingList(String grade) {
 
-        List<HashMap<String, Object>> users= SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,RankInfoVo.RANKTYPE0, grade, RankInfoVo.SCORE, SortOrder.DESC,
-        0,50);
-        if(users !=null){
-            String[] idsArr=new String[users.size()];
-            List<String> ids=new ArrayList<String>();
+        List<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,
+                RankInfoVo.RANKTYPE0, grade, RankInfoVo.SCORE, SortOrder.DESC, 0, 50);
+        if (users != null) {
+            String[] idsArr = new String[users.size()];
+            List<String> ids = new ArrayList<String>();
             users = (List<HashMap<String, Object>>) users.stream().map(match -> {
                 ids.add((String) match.get(RankInfoVo.OPENID));
                 return match;
             }).collect(Collectors.toList());
-     
-            LinkedList<Map<String, Object>> userInfos=SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,ids.toArray(idsArr));
+
+            LinkedList<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
+                    ids.toArray(idsArr));
 
             users = (List<HashMap<String, Object>>) users.stream().map(match -> {
                 List<Map<String, Object>> holder = userInfos.stream()
                         .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
                         .collect(Collectors.toList());
-                // HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(RankInfoVo.OPENID));
-                match.put(MatchPostVo.HOLDERAVATOR,holder.get(0).get(UserVo.AVATOR));
-                match.put(MatchPostVo.HOLDERNAME,holder.get(0).get(UserVo.NICKNAME));
+                // HashMap<String, Object> holder = iUserService.getUserInfo((String)
+                // match.get(RankInfoVo.OPENID));
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
                 return match;
             }).collect(Collectors.toList());
 
@@ -131,6 +148,32 @@ public class RankServiceImpl implements IRankService {
         GradingContext gContext = new GradingContext(new GradeRanking());
         vo = gContext.rankMatch(vo);
         return RankingStrategy.createRankInfo(vo);
+    }
+
+    @Override
+    public Double updateWinRate(String userId) {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder user = new BoolQueryBuilder();
+        user.should(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId))
+                .should(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId));
+        BoolQueryBuilder match = new BoolQueryBuilder();
+        match.must(QueryBuilders.termQuery(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()))
+                .must(user);
+
+        BoolQueryBuilder win = new BoolQueryBuilder();
+
+        win.should(new BoolQueryBuilder()
+                .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
+                .must(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId)))
+                .should(new BoolQueryBuilder()
+                        .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
+                        .must(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId)));
+        AggregationBuilder b = AggregationBuilders.filter("winrate", win);
+        searchSourceBuilder.query(match);
+        searchSourceBuilder.aggregation(b);
+        System.out.println(searchSourceBuilder.toString());
+
+        return SearchApi.winRateAggregate(DataSetConstant.GAME_MATCH_INFORMATION, searchSourceBuilder);
     }
 
 }

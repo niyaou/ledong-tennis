@@ -18,7 +18,7 @@
 			</div>
 			<div class="zone">
 				<image src="../../icon/rank.png" class="bottomimg" />
-				<div> 57% 胜率</div>
+				<div> {{winRate}}% 胜率</div>
 			</div></div>
   
 		</div>

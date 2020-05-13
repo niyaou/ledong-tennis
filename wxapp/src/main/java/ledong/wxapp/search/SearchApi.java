@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
+import org.apache.lucene.queryparser.xml.builders.TermQueryBuilder;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.spatial3d.geom.GeoPoint;
 import org.elasticsearch.ElasticsearchException;
@@ -50,6 +52,7 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
@@ -1036,21 +1039,42 @@ public class SearchApi {
         }
     }
 
-    /**
-     * 基础查询方法
-     * 
-     * @param indexRequest
-     * @return
-     */
-    private static DocWriteResponse insertDocumentBase(IndexRequest indexRequest) {
-        try {
 
-            return client.index(indexRequest, RequestOptions.DEFAULT);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new ErrorResponse();
-        }
+    
+public static Double winRateAggregate(String indexName,SearchSourceBuilder searchSourceBuilder){
+
+    SearchRequest searchRequest = new SearchRequest(indexName);
+   
+
+
+   
+    searchRequest.source(searchSourceBuilder);
+    HashMap<String, Object> list = new HashMap<String, Object>();
+    try {
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+
+        long a=searchResponse.getHits().getHits().length;
+        list.put("total",a);
+      Filter f=  searchResponse.getAggregations().get("winrate");
+      list.put("date", f.getDocCount());
+    
+      System.out.println(list.toString());
+        return Double.parseDouble(String.valueOf(f.getDocCount()*100/a));
+    } catch (IOException e) {
+        log.error(e.getMessage());
     }
+    return null;
+
+
+}
+
+
+
+
+
+
+
+
 
     /**
      * 创建搜索页码

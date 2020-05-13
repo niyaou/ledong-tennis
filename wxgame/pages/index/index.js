@@ -83,7 +83,8 @@ Page({
       this.setData({
         userRankInfo: {
           rankType1: e.data.rankType1,
-          rankType0: e.data.rankType0
+          rankType0: e.data.rankType0,
+          winRate: e.data.winRate
         }
       })
       app.globalData. userRankInfo=this.data.userRankInfo

@@ -1,4 +1,5 @@
-// component/player/player.js
+
+const app = getApp()
 Component({
   /**
    * 组件的属性列表
@@ -12,7 +13,10 @@ Component({
       type: String,
       value: '守护者'
     },
-
+    winRate:{
+      type:Number,
+      value:0
+    },
     rankType0:{
       type:String,
       value:''
@@ -24,7 +28,7 @@ Component({
    * 组件的初始数据
    */
   data: {
-
+    //  winrate:app.globalData.userRankInfo.winRate
   },
 
   /**

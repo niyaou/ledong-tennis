@@ -6,7 +6,7 @@
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/rank.png" style="width:80rpx;height:80rpx" />
 			<div class="columndiv">
-				<div style="font-size:36rpx;color:#000;"> 35%</div>
+				<div style="font-size:36rpx;color:#000;"> {{winRate}}%</div>
 				<div style="font-size:24rpx;"> 胜率</div>
 			</div>
 		</div>

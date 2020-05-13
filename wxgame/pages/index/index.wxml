@@ -40,7 +40,7 @@
 		<div class="indicator" />
 	</view>
 	<view class="componentview">
-		<analyze  wx:if="{{tabBarStatus==0}}" isPicked="{{tabBarStatus==0}}" nearByUser='{{nearByUser}}' nearByCourt='{{nearByCourt}}'/>
+		<analyze  wx:if="{{tabBarStatus==0}}" isPicked="{{tabBarStatus==0}}"   winRate="{{userRankInfo.winRate}}" nearByUser='{{nearByUser}}' nearByCourt='{{nearByCourt}}'/>
 		<match   wx:elif="{{tabBarStatus==1}}" isPicked="{{tabBarStatus==1}}"  />
 		<ladder wx:else isPicked="{{tabBarStatus==2}}"/>
 	</view>

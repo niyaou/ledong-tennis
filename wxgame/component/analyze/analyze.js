@@ -15,6 +15,10 @@ Component({
     nearByUser: {
       type: Array,
       value: []
+    },
+    winRate:{
+      type:Number,
+      value:0
     }
   },
 

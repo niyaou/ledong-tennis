@@ -1,5 +1,7 @@
 package ledong.wxapp.service;
 
+import java.util.HashMap;
+
 import VO.RankInfoVo;
 
 public interface IRankService {
@@ -51,4 +53,13 @@ public interface IRankService {
      */
     public String createRankInfo(String userId);
 
+
+
+    /**
+     * update user win rate
+     * 
+     * @param userId
+     * @return
+     */
+    public Double  updateWinRate(String userId);
 }
