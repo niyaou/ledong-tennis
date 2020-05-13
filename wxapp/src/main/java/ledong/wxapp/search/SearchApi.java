@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.http.util.TextUtils;
@@ -17,6 +18,10 @@ import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.get.MultiGetItemResponse;
+import org.elasticsearch.action.get.MultiGetRequest;
+import org.elasticsearch.action.get.MultiGetRequestBuilder;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.ClearScrollRequest;
@@ -135,6 +140,35 @@ public class SearchApi {
         searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(id));
         searchRequest.source(searchSourceBuilder);
         return parseSingleResponse(searchRequest);
+    }
+
+
+
+
+    /**
+     * 
+     * 根据ID批量获取文档
+     * 
+     */
+    public static LinkedList<Map<String, Object>> getDocsByMultiIds(String indexName, String... ids) {
+         MultiGetRequest request = new MultiGetRequest();
+         Optional.ofNullable(ids).ifPresent( o -> {
+            for (String id : o) {
+                request.add(new MultiGetRequest.Item(indexName,id));
+            }
+            });
+
+            MultiGetResponse response;
+            LinkedList<Map<String, Object>> list = new LinkedList<Map<String, Object>>();
+            try {
+                response = client.mget(request, RequestOptions.DEFAULT);
+                for (MultiGetItemResponse item : response.getResponses()) {
+                    list.add(item.getResponse().getSourceAsMap());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        return list;
     }
 
     /**

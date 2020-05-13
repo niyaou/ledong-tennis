@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 import java.util.HashMap;
 import com.alibaba.fastjson.JSONObject;
 
@@ -99,13 +100,25 @@ public class RankServiceImpl implements IRankService {
         List<HashMap<String, Object>> users= SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,RankInfoVo.RANKTYPE0, grade, RankInfoVo.SCORE, SortOrder.DESC,
         0,50);
         if(users !=null){
+            String[] idsArr=new String[users.size()];
+            List<String> ids=new ArrayList<String>();
             users = (List<HashMap<String, Object>>) users.stream().map(match -> {
-                HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(RankInfoVo.OPENID));
-                match.put(MatchPostVo.HOLDERAVATOR,holder.get(UserVo.AVATOR));
-                match.put(MatchPostVo.HOLDERNAME,holder.get(UserVo.NICKNAME));
+                ids.add((String) match.get(RankInfoVo.OPENID));
                 return match;
-            })
-            .collect(Collectors.toList());
+            }).collect(Collectors.toList());
+     
+            LinkedList<Map<String, Object>> userInfos=SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,ids.toArray(idsArr));
+
+            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+                List<Map<String, Object>> holder = userInfos.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
+                        .collect(Collectors.toList());
+                // HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(RankInfoVo.OPENID));
+                match.put(MatchPostVo.HOLDERAVATOR,holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME,holder.get(0).get(UserVo.NICKNAME));
+                return match;
+            }).collect(Collectors.toList());
+
         }
 
         return users;
