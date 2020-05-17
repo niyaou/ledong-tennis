@@ -62,4 +62,14 @@ public interface IRankService {
      * @return
      */
     public Double  updateWinRate(String userId);
+
+
+
+    /**
+     * 
+     * 
+     * @param userId
+     * @return
+     */
+    public Integer getUserPositionInRankList(String userId);
 }

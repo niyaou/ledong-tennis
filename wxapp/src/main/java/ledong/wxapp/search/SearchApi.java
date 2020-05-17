@@ -377,9 +377,10 @@ public class SearchApi {
      * @param start
      * @return
      */
-    public static QueryBuilder createSearchByFieldRangeGteSource(String key, String start) {
+    public static QueryBuilder createSearchByFieldRangeGtSource(String key, Object start) {
+
         RangeQueryBuilder range = new RangeQueryBuilder(key);
-        range.gte(start);
+        range.gt(start);
         return range;
     }
 
@@ -1042,14 +1043,10 @@ public class SearchApi {
 
     
 public static Double winRateAggregate(String indexName,SearchSourceBuilder searchSourceBuilder){
-
     SearchRequest searchRequest = new SearchRequest(indexName);
-   
-
-
-   
     searchRequest.source(searchSourceBuilder);
     HashMap<String, Object> list = new HashMap<String, Object>();
+    System.out.println(searchSourceBuilder.toString());
     try {
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
@@ -1059,11 +1056,12 @@ public static Double winRateAggregate(String indexName,SearchSourceBuilder searc
       list.put("date", f.getDocCount());
     
       System.out.println(list.toString());
-        return Double.parseDouble(String.valueOf(f.getDocCount()*100/a));
-    } catch (IOException e) {
+        return  Double.parseDouble(String.valueOf(f.getDocCount()*100/a));
+    } catch (IOException | ArithmeticException e) {
         log.error(e.getMessage());
+        return 0.0;
     }
-    return null;
+   
 
 
 }
@@ -1172,23 +1170,19 @@ public static Double winRateAggregate(String indexName,SearchSourceBuilder searc
     }
 
     /**
-     * 搜索数据，生成结果
+     * 
      * 
      * @param searchRequest
+     * @param indexName
      * @return
      */
-    private static LinkedList<HashMap<String, Object>> parseResponseWithId(SearchRequest searchRequest, String idType) {
-        LinkedList<HashMap<String, Object>> list = new LinkedList<HashMap<String, Object>>();
+    public static Integer totalRawResponse(SearchSourceBuilder query,String indexName ) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.source(query);
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             SearchHit[] searchHits = searchResponse.getHits().getHits();
-            for (SearchHit hit : searchHits) {
-                HashMap<String, Object> m = (HashMap<String, Object>) hit.getSourceAsMap();
-                m.put(idType, hit.getId());
-                m.put(VERSION, hit.getVersion());
-                list.add(m);
-            }
-            return list.size() != 0 ? list : null;
+            return searchHits.length;
         } catch (IOException e) {
             log.error(e.getMessage());
         }

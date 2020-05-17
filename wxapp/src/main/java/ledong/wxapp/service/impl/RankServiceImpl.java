@@ -9,12 +9,19 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ApplicationContextEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import com.alibaba.fastjson.JSONObject;
@@ -22,6 +29,7 @@ import com.alibaba.fastjson.JSONObject;
 import VO.MatchPostVo;
 import VO.RankInfoVo;
 import VO.UserVo;
+import VO.WinRateEvent;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.GradeCodeEnum;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
@@ -45,6 +53,8 @@ public class RankServiceImpl implements IRankService {
     private RedisUtil redis;
     @Autowired
     private IUserService iUserService;
+    @Resource
+    private ApplicationContext ctx;
 
     @Override
     public String matchRank(String matchId, int holderScore, int challengerScor) {
@@ -82,25 +92,24 @@ public class RankServiceImpl implements IRankService {
 
         holder = gContext.rankMatch(holder);
         challenger = gContext.rankMatch(challenger);
-        
-       updateRankInfo(holder);
-       updateRankInfo(challenger);
-       holder.setWinRate( updateWinRate(holder.getOpenId()));
-       challenger.setWinRate( updateWinRate(challenger.getOpenId()));
+
         updateRankInfo(holder);
         updateRankInfo(challenger);
-        // updateWinRate(challenger.getOpenId());
+
+        ctx.publishEvent(new WinRateEvent(ctx, holder));
+        ctx.publishEvent(new WinRateEvent(ctx, challenger));
+
         redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
     }
 
+
+
+
+
     @Override
     public RankInfoVo getUserRank(String userId) {
-        // Map<String, Object> match =
-        // SearchApi.searchById(DataSetConstant.USER_RANK_INFORMATION, userId);
-        // RankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(match),
-        // RankInfoVo.class);
         return RankingStrategy.getUserRank(userId);
     }
 
@@ -166,14 +175,32 @@ public class RankServiceImpl implements IRankService {
                 .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
                 .must(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId)))
                 .should(new BoolQueryBuilder()
-                        .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
+                        .must(QueryBuilders.termQuery(MatchPostVo.WINNER,
+                                MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
                         .must(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId)));
         AggregationBuilder b = AggregationBuilders.filter("winrate", win);
         searchSourceBuilder.query(match);
         searchSourceBuilder.aggregation(b);
-        System.out.println(searchSourceBuilder.toString());
-
         return SearchApi.winRateAggregate(DataSetConstant.GAME_MATCH_INFORMATION, searchSourceBuilder);
     }
+
+    @Override
+    public Integer getUserPositionInRankList(String userId) {
+        Integer rankPosition = 0;
+        List<HashMap<String, Object>> users = SearchApi.searchByField(DataSetConstant.USER_RANK_INFORMATION,
+                RankInfoVo.OPENID, userId, null, null);
+        System.out.print(users);
+        if (users != null) {
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            QueryBuilder range = SearchApi.createSearchByFieldRangeGtSource(RankInfoVo.SCORE,
+                    String.valueOf(users.get(0).get(RankInfoVo.SCORE)));
+            searchSourceBuilder.query(range);
+            System.out.print(searchSourceBuilder.toString());
+            rankPosition = SearchApi.totalRawResponse(searchSourceBuilder, DataSetConstant.USER_RANK_INFORMATION);
+        }
+        System.out.print(rankPosition);
+        return rankPosition == null ? 1 : (rankPosition + 1);
+    }
+
 
 }

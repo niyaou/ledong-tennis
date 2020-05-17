@@ -65,4 +65,17 @@ public class RankController {
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.getRankingList(grade)), HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = "/rankPosition", method = RequestMethod.GET)
+    @ApiOperation(value = "get user position in  ranking list ", notes = "")
+    public ResponseEntity<?> userRankingListPosition(  @RequestHeader("Authorization") String authHeader)
+            throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserPositionInRankList(userId)), HttpStatus.OK);
+    }
+
 }

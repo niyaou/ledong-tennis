@@ -19,6 +19,10 @@ Component({
     winRate:{
       type:Number,
       value:0
+    },
+    rankPosition:{
+      type:Number,
+      value:0
     }
   },
 

@@ -27,7 +27,6 @@ Component({
     nearBy: {
       type: Array,
       value: []
-
     }
   },
 

@@ -14,7 +14,7 @@
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/ranklist.png" style="width:80rpx;height:80rpx" />
 			<div class="columndiv">
-				<div  style="font-size:24rpx;color:#000;"> 第32名</div>
+				<div  style="font-size:24rpx;color:#000;"> 第{{rankPosition}}名</div>
 				<div style="font-size:24rpx;"> 全服</div>
 			</div>
 		</div>

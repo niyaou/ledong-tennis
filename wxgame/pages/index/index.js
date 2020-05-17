@@ -9,6 +9,7 @@ Page({
     userLocation: {},
     userRankInfo: {},
     nearByUser: [],
+    rankPosition:0,
     nearByCourt: [],
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
@@ -28,11 +29,9 @@ Page({
     if (app.globalData.jwt) {
       this.getUserInfoByJwt(app.globalData.jwt)
       this.getUserRankInfo(app.globalData.jwt)
+      this.getRankPosition(app.globalData.jwt)
       this.gps()
     }
-
-
-
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo
@@ -75,6 +74,16 @@ Page({
         },
         hasUserInfo: true
       })
+    })
+  },
+  getRankPosition(jwt){
+    console.info('rankPosition---',jwt)
+    http.getReq('rank/rankPosition', jwt, (e) => {
+      console.info('rankPosition',e.data)
+      this.setData({
+        rankPosition:e.data
+      })
+
     })
   },
   getUserRankInfo(jwt) {
@@ -139,9 +148,14 @@ Page({
 
   },
   tabStatus(event) {
+    console.info('event.currentTarget.dataset.gid',event.currentTarget.dataset.gid)
     this.setData({
       tabBarStatus: event.currentTarget.dataset.gid
     })
+    if(event.currentTarget.dataset.gid==0){
+      this.getUserRankInfo(app.globalData.jwt)
+      this.getRankPosition(app.globalData.jwt)
+    }
     console.log(event.currentTarget.dataset.gid)
   }
 })
