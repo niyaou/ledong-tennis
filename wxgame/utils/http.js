@@ -1,13 +1,14 @@
 const app = getApp()
-var rootDocment = 'http://192.168.1.101:8081/';
+var rootDocment = 'https://192.168.1.101:8081/';
 var header = {
   'Accept': 'application/json',
   'content-type': 'application/x-www-form-urlencoded',
-  'Authorization': 'Bearer '+app.globalData.jwt,
+  'Authorization': 'Bearer '+app.globalData.jwt
 }
 function getReq(url, jwt,cb,toast = true) {
  if(toast){
   wx.showLoading({
+    mask:true,
     title: '加载中',
   })
  }
@@ -27,6 +28,7 @@ function getReq(url, jwt,cb,toast = true) {
     fail: function () {
       wx.hideLoading();
       wx.showModal({
+        mask:true,
         title: '网络错误',
         content: '网络出错，请刷新重试',
         showCancel: false
@@ -38,7 +40,8 @@ function getReq(url, jwt,cb,toast = true) {
  
 function postReq(url,jwt, data, cb) {
   wx.showLoading({
-    title: jwt,
+    mask:true,
+    title: 'loading',
   })
   header.Authorization='Bearer '+jwt
     // console.log("header=="),
@@ -56,6 +59,7 @@ function postReq(url,jwt, data, cb) {
       fail: function () {
         wx.hideLoading();
         wx.showModal({
+          mask:true,
           title: '网络错误',
           content: '网络出错，请刷新重试',
           showCancel: false

@@ -1,4 +1,6 @@
 // component/nearplayer/nearplayer.js
+var http = require('../../utils/http.js')
+const app = getApp()
 Component({
   /**
    * 组件的属性列表
@@ -20,9 +22,9 @@ Component({
       type: String,
       value: '挑战者'
     },
-    rankType:{
-      type:Number,
-      value:1
+    rankType: {
+      type: Number,
+      value: 1
     },
     nearBy: {
       type: Array,
@@ -35,13 +37,22 @@ Component({
    * 组件的初始数据
    */
   data: {
-arrs:[1,2,34,5,6,1]
+    arrs: [1, 2, 34, 5, 6, 1]
   },
 
   /**
    * 组件的方法列表
    */
   methods: {
+    userTap(event) {
+      console.info(event)
+      let that = this
+      http.getReq(`rank/rankInfo/${event.currentTarget.dataset.item.openId}`, app.globalData.jwt, (res) => {
+        console.info(res)
+        that.triggerEvent('nearPlayer', Object.assign(res.data,{avator:event.currentTarget.dataset.item.avator,nickName:event.currentTarget.dataset.item.nickName}))
+      })
+
+    }
 
   }
 })

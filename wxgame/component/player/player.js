@@ -1,4 +1,4 @@
-
+var http = require('../../utils/http.js')
 const app = getApp()
 Component({
   /**
@@ -8,6 +8,10 @@ Component({
     holderAvator: {
       type: String,
       value: 'https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83epUY765qAmPLVQAyMV2bicsbDQTQD12gm3qa5cuVzdcO4GkHXZuJLBYExoaEHpHBFwTDiauuY9NicpwQ/132'
+    },
+    holder:{
+      type: String,
+      value:''
     },
     holderName: {
       type: String,
@@ -35,6 +39,23 @@ Component({
    * 组件的方法列表
    */
   methods: {
+    detail(e){
+      let that = this
+      console.info(app.globalData.openId ,this.data.holder)
+      if(app.globalData.openId !== this.data.holder){
+      wx.showModal({
+        content:'是否发起挑战',
+        cancelColor: 'cancelColor',
+        success:()=>{
+          console.info('yes',that.data.holder)
 
+          http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {} ,(res)=>{
+
+            console.info(res)
+          })
+        }
+      })
+    }
+    }
   }
 })

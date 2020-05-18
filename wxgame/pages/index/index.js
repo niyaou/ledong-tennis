@@ -104,9 +104,12 @@ Page({
   getNearByUser(jwt) {
     let that = this
     http.getReq(`user/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
-      console.info(e)
+  
       that.setData({
-        nearByUser: e.data
+        nearByUser: e.data.filter( u => {
+          console.info(u,app.globalData.openId)
+          return  u.id !== app.globalData.openId
+        })
       })
     })
   },
@@ -136,8 +139,6 @@ Page({
         })
         wx.setStorageSync('gps', `${res.latitude},${res.longitude}`)
         app.globalData.gps=`${res.latitude},${res.longitude}`
-        // console.info(that.data.userLocation)
-        // console.info(that.data.userInfo)
         if (Object.keys(that.data.userInfo).length !== 0) {
           that.login(that.data.userInfo)
           that.getNearByUser(app.globalData.jwt)

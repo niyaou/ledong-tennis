@@ -5,7 +5,7 @@
 	<div class="title">附近的球友</div>
 	<div class="divid" >1</div>
 	<scroll-view scroll-x style="width: 90%; height: 100%;white-space: nowrap;background:#fafbf9" >
-		<view wx:for="{{nearBy}}" style="display:inline-block;background:#fafbf9" wx:key="openId">
+		<view wx:for="{{nearBy}}" style="display:inline-block;background:#fafbf9" wx:key="openId" bindtap="userTap" data-item="{{item}}">
 					<div class="avator">
 						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{item.avator}}" mode="cover" style="z-index:30"></image>
 							<div>{{item.nickName}}</div>

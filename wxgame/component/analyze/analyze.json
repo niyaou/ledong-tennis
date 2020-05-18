@@ -2,6 +2,7 @@
   "component": true,
   "usingComponents": {
     "nearplayer":"../nearplayer/nearplayer",
-    "nearcourt":"../nearcourt/nearplayer"
+    "nearcourt":"../nearcourt/nearplayer",
+    "player":"../player/player"
   }
 }

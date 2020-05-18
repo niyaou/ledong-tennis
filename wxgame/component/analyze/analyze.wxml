@@ -21,6 +21,10 @@
 	</div>
 <div class="rest">
 <nearcourt nearBy='{{nearByCourt}}'/>
-<nearplayer style="padding-top:5%"  nearBy='{{nearByUser}}'/>
+<nearplayer style="padding-top:5%"  nearBy='{{nearByUser}}'  bind:nearPlayer="onPlayerTap"/>
+<player style="padding:2% 1% 0% 1%"  
+ rankType0="{{currentUserInfo.rankType0}}"  holderAvator="{{currentUserInfo.avator}}" holderName="{{currentUserInfo.nickName}}" winRate="{{currentUserInfo.winRate}}"
+ holder="{{currentUserInfo.openId}}"
+  wx:if="{{currentUserInfo}}"/>
 </div>
 </view>

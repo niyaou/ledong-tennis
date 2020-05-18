@@ -57,6 +57,16 @@ public class RankController {
     }
 
 
+    @RequestMapping(value = "/rankInfo/{openId}", method = RequestMethod.GET)
+    @ApiOperation(value = "explore current rank information", notes = "")
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> userRankIformationById(@PathVariable(value = "openId", required = true) String openId) {
+        System.out.println(openId);
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserRank(openId)), HttpStatus.OK);
+    }
+
+
+
     @RequestMapping(value = "/rankList", method = RequestMethod.GET)
     @ApiOperation(value = "explore  ranking list ", notes = "")
     @ApiImplicitParams({

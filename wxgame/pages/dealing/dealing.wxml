@@ -17,13 +17,17 @@
 			<div class="score win">
 	 
 
-    <input type="number" bindinput="bindManual" data-type="0" maxlength="1" value="{{matches.holderScore}}" type="number" />  
+    <input type="number" bindinput="bindManual" data-type="0" maxlength="1" value="{{matches.holderScore}}" 
+		placeholder="-" placeholder-style="color:#ffffcc"
+		type="number" style="text-align:center" />  
 
 
 			</div>
 			<div class="dividv" />
 			<div class="score lose">
-		 <input type="number" bindinput="bindManual" data-type="1" maxlength="1" value="{{matches.challengerScore}}" type="number" />  
+		 <input type="number" bindinput="bindManual"
+		 	placeholder="-" placeholder-style="color:#ffffcc"
+			  data-type="1" maxlength="1" value="{{matches.challengerScore}}" type="number" style="text-align:center" />  
 			 </div>
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>

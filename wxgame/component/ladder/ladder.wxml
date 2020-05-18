@@ -24,7 +24,9 @@
 			</view>
 		</view>
 		<view wx:for="{{players}}">
-			<player rankType0="{{item.rankType0}}"  holderAvator="{{item.holderAvator}}" holderName="{{item.holderName}}" winRate="{{item.winRate}}"/>
+			<player rankType0="{{item.rankType0}}"  
+			holder="{{item.openId}}"
+			holderAvator="{{item.holderAvator}}" holderName="{{item.holderName}}" winRate="{{item.winRate}}"/>
 		</view>
 	</scroll-view>
 </view>
