@@ -1,5 +1,7 @@
 package ledong.wxapp.strategy;
 
+import java.util.HashMap;
+
 import com.alibaba.fastjson.JSON;
 
 import VO.MatchPostVo;
@@ -25,6 +27,17 @@ public abstract class MatchStrategy {
             String orderTime, String courtName, String courtGps) {
         MatchPostVo vo = new MatchPostVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+ 
+        if(MatchStatusCodeEnum.MATCH_TYPE_INTENTIONAL.getCode().equals(matchType)){
+            HashMap<String,Object> queries=new HashMap<String,Object>();
+            queries.put(MatchPostVo.HOLDER, holder);
+            queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode());
+          Object intentional =   SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null, null, null, null);
+          if(intentional!=null){
+              return null;
+          }
+        }
+ 
 
         if (!StringUtil.isEmpty(parendId)) {
             vo.setParendId(parendId);
@@ -59,7 +72,6 @@ public abstract class MatchStrategy {
         String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
         id = String.format("%s-%s-%s", id, holder, StringUtil.isEmpty(challenger) ? "" : challenger);
         id = SearchApi.insertDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), id);
-        System.out.println(JSON.toJSONString(vo));
         return id;
     }
 

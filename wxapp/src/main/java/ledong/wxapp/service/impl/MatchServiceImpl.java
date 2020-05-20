@@ -102,7 +102,7 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public String postIntentionalMatch(String user, String orderTime, String courtName, String courtGps) {
-        return postMatches(null, user, null, MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(),
+        return postMatches(null, user, null, MatchStatusCodeEnum.MATCH_TYPE_INTENTIONAL.getCode(),
                 MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), orderTime, courtName, courtGps);
     }
 
@@ -324,6 +324,7 @@ public class MatchServiceImpl implements IMatchService {
         }
      
         params.add(   SearchApi.createNotSearchSource(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
+        params.add(   SearchApi.createNotSearchSource(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
 
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
         sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
@@ -336,7 +337,7 @@ public class MatchServiceImpl implements IMatchService {
             List<String> idsChallenger=new ArrayList<String>();
 
             searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
-                HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(MatchPostVo.HOLDER));
+                // HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(MatchPostVo.HOLDER));
                 idsHolder.add((String) match.get(MatchPostVo.HOLDER));
                 idsChallenger.add((String) match.get(MatchPostVo.CHALLENGER));
                 return match;

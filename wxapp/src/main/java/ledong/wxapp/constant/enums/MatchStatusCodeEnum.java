@@ -13,7 +13,7 @@ public enum MatchStatusCodeEnum {
     MATCH_MATCHING_STATUS(2000, "比赛等待匹配"), MATCH_ACKNOWLEDGED_MATCHING(2001, "比赛匹配中，等待确认"),
     MATCH_PLAYING_MATCHING(2002, "比赛中"), MATCH_GAMED_MATCHING(2003, "比赛结束"),
     /**/
-    MATCH_TYPE_PICK(3000, "指定比赛"), MATCH_TYPE_RANDOM(3001, "随机匹配比赛"),
+    MATCH_TYPE_PICK(3000, "指定比赛"), MATCH_TYPE_RANDOM(3001, "随机匹配比赛"),MATCH_TYPE_INTENTIONAL(3002,"发起比赛"),
     /**/
     NON_CLUB_MATCH(4000, "非俱乐部比赛"), CLUB_MATCH(4001, "俱乐部比赛"),
     /* winner type */
