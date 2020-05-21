@@ -355,6 +355,10 @@ public enum ResultCodeEnum {
     /** 拥有标注任务未完成,不能删除! */
     TASK_NOT_FINISHED(82004, "拥有标注任务未完成,不能删除!"),
 
+
+
+    ONLY_ONE_INTENTIONAL_MATCH(91001,"只能发布一个比赛"),
+
     /** 未知错误 */
     UNKOWN_ERROR(90001, "未知错误");
 

@@ -18,4 +18,11 @@ public class CommonExceptionHandler {
         return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
     }
 
+
+
+    @ExceptionHandler(CustomException.class)
+    public Object handleCustomException(CustomException customException) {
+        return new ResponseEntity<Object>(CommonResponse.failure(customException.getResultStatusEnum()), HttpStatus.OK);
+    }
+
 }

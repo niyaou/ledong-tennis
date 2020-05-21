@@ -56,7 +56,6 @@ Page({
           }, function (e) {
             wx.setStorageSync('jwt', e.data)
             app.globalData.jwt=e.data
-            console.info('----------set jwt',e.data)
             setTimeout(function () {
               that.getUserInfoByJwt(e.data)
               that.getUserRankInfo(e.data)
@@ -77,9 +76,7 @@ Page({
     })
   },
   getRankPosition(jwt){
-    console.info('rankPosition---',jwt)
     http.getReq('rank/rankPosition', jwt, (e) => {
-      console.info('rankPosition',e.data)
       this.setData({
         rankPosition:e.data
       })
@@ -88,7 +85,6 @@ Page({
   },
   getUserRankInfo(jwt) {
     http.getReq('rank/rankInfo', jwt, (e) => {
-      console.info(e.data)
       this.setData({
         userRankInfo: {
           rankType1: e.data.rankType1,
@@ -98,7 +94,6 @@ Page({
       })
       app.globalData. userRankInfo=this.data.userRankInfo
       app.globalData.openId=e.data.openId
-      console.info('-------set global openid',e.data.openId)
     })
   },
   getNearByUser(jwt) {
@@ -107,7 +102,6 @@ Page({
   
       that.setData({
         nearByUser: e.data.filter( u => {
-          console.info(u,app.globalData.openId)
           return  u.id !== app.globalData.openId
         })
       })
@@ -116,7 +110,6 @@ Page({
   getNearByCourt(jwt) {
     let that = this
     http.getReq(`match/court/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
-      console.info(e)
       that.setData({
         nearByCourt: e.data
       })
@@ -149,7 +142,6 @@ Page({
 
   },
   tabStatus(event) {
-    console.info('event.currentTarget.dataset.gid',event.currentTarget.dataset.gid)
     this.setData({
       tabBarStatus: event.currentTarget.dataset.gid
     })
@@ -157,6 +149,5 @@ Page({
       this.getUserRankInfo(app.globalData.jwt)
       this.getRankPosition(app.globalData.jwt)
     }
-    console.log(event.currentTarget.dataset.gid)
   }
 })

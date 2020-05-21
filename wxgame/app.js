@@ -8,7 +8,7 @@ App({
     this.globalData.jwt= wx.getStorageSync('jwt') || ''
     this.globalData.gps= wx.getStorageSync('gps') || ''
     logs.unshift(Date.now())
-     console.info('jwt',this.globalData.jwt)
+
 
      
     // // 登录

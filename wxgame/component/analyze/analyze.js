@@ -38,7 +38,7 @@ currentUserInfo:null
    */
   methods: {
     onPlayerTap(e){
-      console.info('tap',e)
+
       this.setData({
         currentUserInfo:e.detail
       })

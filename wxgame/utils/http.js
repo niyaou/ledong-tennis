@@ -13,10 +13,6 @@ function getReq(url, jwt,cb,toast = true) {
   })
  }
   header.Authorization='Bearer '+jwt
-  // console.log("header==")
-  //   console.log(header)
-  // console.log(header),
-  // console.log('url',rootDocment + url),
   wx.request({
     url: rootDocment + url,
     method: 'get',
@@ -44,8 +40,6 @@ function postReq(url,jwt, data, cb) {
     title: 'loading',
   })
   header.Authorization='Bearer '+jwt
-    // console.log("header=="),
-    console.log(header),
     console.log('url',rootDocment + url),
     wx.request({
       url: rootDocment + url,
@@ -53,10 +47,12 @@ function postReq(url,jwt, data, cb) {
       data: data,
       method: 'post',
       success: function (res) {
+        console.info(res)
         wx.hideLoading();
         return typeof cb == "function" && cb(res.data)
       },
-      fail: function () {
+      fail: function (e) {
+        console.info(e)
         wx.hideLoading();
         wx.showModal({
           mask:true,

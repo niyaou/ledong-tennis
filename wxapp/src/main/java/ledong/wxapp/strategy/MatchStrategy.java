@@ -7,8 +7,10 @@ import com.alibaba.fastjson.JSON;
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
 import VO.SessionVo;
+import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
+import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.utils.DateUtil;
 import ledong.wxapp.utils.StringUtil;
@@ -34,7 +36,7 @@ public abstract class MatchStrategy {
             queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode());
           Object intentional =   SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null, null, null, null);
           if(intentional!=null){
-              return null;
+              throw new CustomException(ResultCodeEnum.ONLY_ONE_INTENTIONAL_MATCH);
           }
         }
  

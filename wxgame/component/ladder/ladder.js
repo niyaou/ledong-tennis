@@ -23,7 +23,7 @@ lifetimes:{
   attached(){
     let that = this
     http.getReq(`rank/rankList`,app.globalData.jwt, (res)=>{
-      console.info(res)
+
       that.setData({
         players:res.data}
       )
@@ -37,7 +37,7 @@ lifetimes:{
     tapTabStatus(event){
       let that = this
       http.getReq(`rank/rankList?grade=${event.currentTarget.dataset.gid}`,app.globalData.jwt, (res)=>{
-        console.info(res)
+  
         that.setData({
           players:res.data,
           tabStatus:event.currentTarget.dataset.gid

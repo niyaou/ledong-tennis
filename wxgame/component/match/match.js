@@ -32,7 +32,6 @@ Component({
   },
   lifetimes: {
     attached() {
-      console.info('=-------show====-')
       let event = {
         currentTarget: {
           dataset: {
@@ -56,7 +55,6 @@ Component({
       })
     },
     onLocationTapped(e) {
-      console.info(e)
       this.setData({
         latitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
         longitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
@@ -79,7 +77,6 @@ Component({
       })
 
       if (parseInt(event.currentTarget.dataset.gid) === 2) {
-        console.log(event.currentTarget.dataset.gid)
         this.matchedGame()
       } else if (parseInt(event.currentTarget.dataset.gid) === 1) {
         this.matching()
@@ -95,13 +92,11 @@ Component({
       http.postReq('match/randomMatch', app.globalData.jwt, {
         gps: app.globalData.gps
       }, (res) => {
-        console.info(res)
       })
     },
     matchedGame() {
       let that = this
       http.getReq('match/matchedGames/10', app.globalData.jwt, (res) => {
-        console.info(res)
         if (res.code === 0) {
           that.setData({
             matches: res.data
@@ -113,7 +108,6 @@ Component({
     matcheExplore() {
       let that = this
       http.getReq('match/intentionalMatch/10', app.globalData.jwt, (res) => {
-        console.info(res)
         if (res.code === 0) {
           that.setData({
             matches: res.data
@@ -128,10 +122,8 @@ Component({
         events: {
           // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
           acceptDataFromOpenedPage: function (data) {
-            console.log(data)
           },
           someEvent: function (data) {
-            console.log(data)
           }
 
         },
@@ -147,7 +139,6 @@ Component({
           })
         }
       })
-      console.info('navigateTo', app.globalData.userRankInfo)
     }
   }
 })

@@ -41,17 +41,15 @@ Component({
   methods: {
     detail(e){
       let that = this
-      console.info(app.globalData.openId ,this.data.holder)
       if(app.globalData.openId !== this.data.holder){
       wx.showModal({
         content:'是否发起挑战',
         cancelColor: 'cancelColor',
         success:()=>{
-          console.info('yes',that.data.holder)
+          ('yes',that.data.holder)
 
           http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {} ,(res)=>{
 
-            console.info(res)
           })
         }
       })

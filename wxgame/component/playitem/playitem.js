@@ -52,7 +52,7 @@ Component({
     }
   },
   ready() {
-    console.info('matches',this.data.matches)
+    ('matches',this.data.matches)
     // this.setData({
     //   holderAvator: app.globalData.userInfo.avatarUrl,
     //   holderName: app.globalData.userInfo.avatarUrl,
@@ -65,7 +65,6 @@ Component({
   methods: {
     
     tapCourtLocation(){
-      console.info('tapCourtLocation')
       this.triggerEvent('locationTapped',this.data.matches);
     },
     
@@ -84,10 +83,8 @@ Component({
         events: {
           // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
           acceptDataFromOpenedPage: function(data) {
-            console.log(data)
           },
           someEvent: function(data) {
-            console.log(data)
           }
       
         },
@@ -96,7 +93,7 @@ Component({
           res.eventChannel.emit('acceptDataFromOpenerPage', { data: that.data.matches })
         }
       })
-      console.info('navigateTo')
+      ('navigateTo')
     }
   }
 })

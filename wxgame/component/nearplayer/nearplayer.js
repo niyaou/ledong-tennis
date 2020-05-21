@@ -45,10 +45,8 @@ Component({
    */
   methods: {
     userTap(event) {
-      console.info(event)
       let that = this
       http.getReq(`rank/rankInfo/${event.currentTarget.dataset.item.openId}`, app.globalData.jwt, (res) => {
-        console.info(res)
         that.triggerEvent('nearPlayer', Object.assign(res.data,{avator:event.currentTarget.dataset.item.avator,nickName:event.currentTarget.dataset.item.nickName}))
       })
 

@@ -67,8 +67,6 @@ Page({
    */
   onShow: function () {
     const location = chooseLocation.getLocation();
-    console.info(location)
-    console.info(chooseLocation)
     if (location) {
       this.setData({
         matches: Object.assign(this.data.matches, {
@@ -76,7 +74,6 @@ Page({
           courtGPS: `${location.latitude},${location.longitude}`
         })
       })
-      console.info('this.data.isPlus',this.data.isPlus)
       if(!this.data.isPlus){
         http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
           courtName: location.name,
@@ -93,8 +90,6 @@ Page({
         matches: data.data,
         openId: app.globalData.openId
       })
-      console.info('matches', that.data.matches)
-      console.info('isPlus', that.data.matches.isPlus)
       if (data.data.isPlus != undefined || that.data.matches != undefined) {
         that.setData({
           isPlus: data.data.isPlus || that.data.matches.status == 2000
@@ -103,7 +98,6 @@ Page({
       if (!that.data.isPlus) {
         that.reloadContext()
       } else {
-        console.info('!that.data.isPlus', !that.data.isPlus)
       }
     })
 
@@ -114,14 +108,12 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-    console.info('xxxxxxxxxx onHide xxxxxxxxxx')
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-    console.info('xxxxxxxxxx unload xxxxxxxxxx', this.data.interval)
     clearInterval(this.data.interval)
     clearInterval(this.data.intervalM)
   },
@@ -151,8 +143,6 @@ Page({
     const type = this.data.openId == this.data.matches.holder ? 0 : 1
     let that = this
 
-    console.info('this.data.isPlus',this.data.isPlus)
-    console.info('this.data.status',this.data.matches.status)
     if (this.data.isPlus || this.data.matches.status == 2000) {
       let data = {}
       if (that.data.parseTime) {
@@ -174,17 +164,45 @@ Page({
       if (that.data.matches.id) {
         url = `match/matchInfo/${that.data.matches.id}`
       }
+      if(!data.courtGPS){
+        wx.showToast({
+          title: '请选择球场',
+          image:'../../icon/toast.png',
+          mask:true
+        })
+        return
+      }
+      if(!data.orderTime){
+        wx.showToast({
+          title: '请选择时间',
+          image:'../../icon/toast.png',
+          mask:true
+        })
+        return
+      }
       http.postReq(url, app.globalData.jwt, data, (res) => {
         if (res.code == 0) {
           that.backtoIndex()
+        }else{
+          wx.showToast({
+            icon:'none',
+            title: res.message,
+            // image:'../../icon/toast.png',
+            mask:true
+          })
         }
       })
     } else if (!this.data.isPlus) {
       http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
-        console.info(res)
         if (res.code == 0) {
           that.setData({
             confirmed: true
+          })
+        }else{
+          wx.showToast({
+            title: res.message,
+            // image:'../../icon/toast.png',
+            mask:true
           })
         }
       })
@@ -202,7 +220,6 @@ Page({
     if (e.detail.keyCode > 48 && e.detail.keyCode < 56) {
       score = parseInt(e.detail.value)
     }
-    console.info(e.detail, e.currentTarget.dataset.type)
     let data = {}
     if (e.currentTarget.dataset.type == "0") {
       data = Object.assign({
@@ -214,7 +231,6 @@ Page({
       })
     }
     http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => {
-      console.info(res)
     })
 
   },
@@ -297,7 +313,6 @@ Page({
     http.postReq(`match/sessionContext/${this.data.matches.sessionId}/${type}`, app.globalData.jwt, {
       context: this.data.inputValue
     }, (res) => {
-      console.info(res.data)
     })
   },
   bindInput(e) {
@@ -312,9 +327,7 @@ Page({
   },
   refreshMatches() {
     let that = this
-    console.info('-----request info-------', this.data.matches.id)
     http.getReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, (res) => {
-      console.info("info response", res.data)
       res.data = Object.assign(res.data, {
         challengerName: that.data.matches.challengerName,
         challengerAvator: that.data.matches.challengerAvator,
