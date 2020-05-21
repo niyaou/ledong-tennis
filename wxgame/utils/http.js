@@ -1,5 +1,5 @@
 const app = getApp()
-var rootDocment = 'https://192.168.1.101:8081/';
+var rootDocment = 'http://192.168.1.101:8081/';
 var header = {
   'Accept': 'application/json',
   'content-type': 'application/x-www-form-urlencoded',

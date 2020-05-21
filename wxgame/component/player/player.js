@@ -47,7 +47,6 @@ Component({
         cancelColor: 'cancelColor',
         success:()=>{
           ('yes',that.data.holder)
-
           http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {} ,(res)=>{
 
           })

@@ -29,6 +29,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             //如果有包含有Authorization头信息，就对其进行解析
             if(header.startsWith("Bearer ")){
                 //得到token
+                
                 String token =header.substring(7);//从第7位网后截
                 //对令牌进行验证
                 try {
@@ -39,15 +40,6 @@ public class JwtInterceptor implements HandlerInterceptor {
                     }
                     String userId = claims.getSubject();
 
-
-
-               
-                    // if(roles!=null&&roles.equals("admin")){//用户不存在或者角色不是admin
-                    //     request.setAttribute("claims_admin",token);
-                    // }
-                    // if(roles!=null&&roles.equals("user")){
-                    //     request.setAttribute("claims_user",token);
-                    // }
 
                     request.setAttribute("user",userId);
                 } catch (Exception e) {

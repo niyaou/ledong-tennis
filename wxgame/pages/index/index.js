@@ -47,6 +47,7 @@ Page({
     let that = this
     wx.login({
       success(res) {
+        console.info(res)
         let jwt =
           http.postReq('user/login', '', {
             token: res.code,

@@ -26,8 +26,10 @@ import VO.MatchRequestVo;
 import VO.RankInfoVo;
 import VO.SessionVo;
 import VO.UserVo;
+import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
+import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IMatchService;
@@ -65,22 +67,22 @@ public class MatchServiceImpl implements IMatchService {
         String matchId = null;
         strategy = new MatchContext(new PickRandomMatch(redis, iRankService));
         matchId = strategy.getMatchId(vo);
-        log.info("---1"+matchId);
- 
+        log.info("---1" + matchId);
+
         if (!TextUtils.isEmpty(matchId)) {
             return matchId;
         }
 
         strategy = new MatchContext(new PickIntentionalMatch());
         matchId = strategy.getMatchId(vo);
-        log.info("---2"+matchId);
+        log.info("---2" + matchId);
         if (!TextUtils.isEmpty(matchId)) {
             return acceptIntentionalMatch(matchId, user);
         }
 
         strategy = new MatchContext(new PostRandomMatch(redis));
         matchId = strategy.getMatchId(vo);
-        log.info("---3"+matchId);
+        log.info("---3" + matchId);
         if (!TextUtils.isEmpty(matchId)) {
             return matchId;
         }
@@ -121,6 +123,11 @@ public class MatchServiceImpl implements IMatchService {
             return null;
         }
         String holder = (String) match.get(MatchPostVo.HOLDER);
+        String id = String.format("%s%s", parentId,  StringUtil.isEmpty(challenger) ? "" : challenger);
+        if (SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, id) != null) {
+            log.error("        -------------  throw exception");
+            throw new CustomException(ResultCodeEnum.ALREADY_ACCEPTED_MATCH);
+        }
         String matchId = postMatches((String) match.get(MatchPostVo.ID), holder, challenger,
                 MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(), MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(),
                 (String) match.get(MatchPostVo.ORDERTIME), (String) match.get(MatchPostVo.COURTNAME),
@@ -277,41 +284,40 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public Object getIntentionalMatch(Integer count) {
-        List<HashMap<String, Object>> searchResponse =SearchApi.searchByFieldSorted(DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.STATUS,
-        String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()), MatchPostVo.CREATETIME,
-        SortOrder.DESC, 1, count);
+        List<HashMap<String, Object>> searchResponse = SearchApi.searchByFieldSorted(
+                DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.STATUS,
+                String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()), MatchPostVo.CREATETIME,
+                SortOrder.DESC, 1, count);
         if (searchResponse != null) {
-            String[] idsArr=new String[searchResponse.size()];
-            List<String> ids=new ArrayList<String>();
-           
+            String[] idsArr = new String[searchResponse.size()];
+            List<String> ids = new ArrayList<String>();
+
             searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
                 ids.add((String) match.get(MatchPostVo.HOLDER));
                 return match;
-            })
-            .collect(Collectors.toList());
+            }).collect(Collectors.toList());
 
-            LinkedList<Map<String, Object>> userInfos=SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,ids.toArray(idsArr));
-            LinkedList<Map<String, Object>> userRankInfos=SearchApi.getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION,ids.toArray(idsArr));
-
+            LinkedList<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
+                    ids.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfos = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, ids.toArray(idsArr));
 
             searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
                 List<Map<String, Object>> holder = userInfos.stream()
-                .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
-                .collect(Collectors.toList());
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
 
                 List<Map<String, Object>> holderRank = userRankInfos.stream()
-                .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
-                .collect(Collectors.toList());
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
 
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.HOLDERRANKTYPE0, holderRank.get(0).get(RankInfoVo.RANKTYPE0));
 
-                match.put(MatchPostVo.HOLDERAVATOR,holder.get(0).get(UserVo.AVATOR));
-                match.put(MatchPostVo.HOLDERNAME,holder.get(0).get(UserVo.NICKNAME));
-                match.put(MatchPostVo.HOLDERRANKTYPE0,holderRank.get(0).get(RankInfoVo.RANKTYPE0));
-              
                 return match;
-            })
-            .collect(Collectors.toList());
-          }
+            }).collect(Collectors.toList());
+        }
         return searchResponse;
     }
 
@@ -322,9 +328,11 @@ public class MatchServiceImpl implements IMatchService {
         if (!StringUtil.isEmpty(user)) {
             params.add(SearchApi.createMultiFieldsWithSingleValue(user, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
         }
-     
-        params.add(   SearchApi.createNotSearchSource(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
-        params.add(   SearchApi.createNotSearchSource(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
+
+        params.add(SearchApi.createNotSearchSource(MatchPostVo.STATUS,
+                MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
+        params.add(SearchApi.createNotSearchSource(MatchPostVo.STATUS,
+                MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
 
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
         sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
@@ -332,61 +340,59 @@ public class MatchServiceImpl implements IMatchService {
         List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
                 DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
         if (searchResponse != null) {
-            String[] idsArr=new String[searchResponse.size()];
-            List<String> idsHolder=new ArrayList<String>();
-            List<String> idsChallenger=new ArrayList<String>();
+            String[] idsArr = new String[searchResponse.size()];
+            List<String> idsHolder = new ArrayList<String>();
+            List<String> idsChallenger = new ArrayList<String>();
 
             searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
-                // HashMap<String, Object> holder = iUserService.getUserInfo((String) match.get(MatchPostVo.HOLDER));
+                // HashMap<String, Object> holder = iUserService.getUserInfo((String)
+                // match.get(MatchPostVo.HOLDER));
                 idsHolder.add((String) match.get(MatchPostVo.HOLDER));
                 idsChallenger.add((String) match.get(MatchPostVo.CHALLENGER));
                 return match;
-            })
-            .collect(Collectors.toList());
+            }).collect(Collectors.toList());
 
+            LinkedList<Map<String, Object>> userInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_INFORMATION, idsHolder.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, idsHolder.toArray(idsArr));
 
-            LinkedList<Map<String, Object>> userInfosHolder=SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,idsHolder.toArray(idsArr));
-            LinkedList<Map<String, Object>> userRankInfosHolder=SearchApi.getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION,idsHolder.toArray(idsArr));
-
-            LinkedList<Map<String, Object>> userInfosChallenger=SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,idsChallenger.toArray(idsArr));
-            LinkedList<Map<String, Object>> userRankInfosChallenger=SearchApi.getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION,idsChallenger.toArray(idsArr));
+            LinkedList<Map<String, Object>> userInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_INFORMATION, idsChallenger.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, idsChallenger.toArray(idsArr));
 
             searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
 
-
                 List<Map<String, Object>> holder = userInfosHolder.stream()
-                .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
-                .collect(Collectors.toList());
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
 
                 List<Map<String, Object>> holderRank = userRankInfosHolder.stream()
-                .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
-                .collect(Collectors.toList());
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
 
-                match.put(MatchPostVo.HOLDERAVATOR,holder.get(0).get(UserVo.AVATOR));
-                match.put(MatchPostVo.HOLDERNAME,holder.get(0).get(UserVo.NICKNAME));
-                match.put(MatchPostVo.HOLDERRANKTYPE0,holderRank.get(0).get(RankInfoVo.RANKTYPE0));
-
-
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.HOLDERRANKTYPE0, holderRank.get(0).get(RankInfoVo.RANKTYPE0));
 
                 List<Map<String, Object>> challenger = userInfosChallenger.stream()
-                .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
-                .collect(Collectors.toList());
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
 
                 List<Map<String, Object>> challengerRank = userRankInfosChallenger.stream()
-                .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
-                .collect(Collectors.toList());
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
 
-
-                match.put(MatchPostVo.CHALLENGERAVATOR,challenger.get(0).get(UserVo.AVATOR));
-                match.put(MatchPostVo.CHALLENGERNAME,challenger.get(0).get(UserVo.NICKNAME));
-                match.put(MatchPostVo.CHALLENGERRANKTYPE0,challengerRank.get(0).get(RankInfoVo.RANKTYPE0));
+                match.put(MatchPostVo.CHALLENGERAVATOR, challenger.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.CHALLENGERNAME, challenger.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.CHALLENGERRANKTYPE0, challengerRank.get(0).get(RankInfoVo.RANKTYPE0));
                 return match;
-            })
-            .collect(Collectors.toList());
+            }).collect(Collectors.toList());
 
-          }
-               
-                // iUserService.getUserInfo(openId);
+        }
+
+        // iUserService.getUserInfo(openId);
         return searchResponse;
 
     }
@@ -397,7 +403,7 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     @Override
-    public Object updateMatchInfos(String matchId, String orderTime, String courtName,String courtGPS) {
+    public Object updateMatchInfos(String matchId, String orderTime, String courtName, String courtGPS) {
 
         HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
         if (match == null) {
@@ -405,8 +411,8 @@ public class MatchServiceImpl implements IMatchService {
         }
 
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
-        if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING .getCode().equals(vo.getStatus())&&
-        !MatchStatusCodeEnum.MATCH_MATCHING_STATUS .getCode().equals(vo.getStatus())) {
+        if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode().equals(vo.getStatus())
+                && !MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode().equals(vo.getStatus())) {
             return null;
         }
         if (!TextUtils.isEmpty(orderTime)) {
@@ -439,16 +445,16 @@ public class MatchServiceImpl implements IMatchService {
         if (MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getChallengerAcknowledged())
                 && MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getHolderAcknowledged())) {
 
-           if(!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())){
-            vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
-            vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-            vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-            System.out.println("update acknowledged");
-           }else{
-               vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-               finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
-               System.out.println("finished game");
-           }     
+            if (!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())) {
+                vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
+                vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+                vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+                System.out.println("update acknowledged");
+            } else {
+                vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+                finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
+                System.out.println("finished game");
+            }
         }
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
     }
@@ -502,17 +508,14 @@ public class MatchServiceImpl implements IMatchService {
     @Override
     public Object lastMatchResult(String user) {
         String key = StringUtil.combiningSpecifiedUserKey(user, "ranked");
-      String matchId= (String) redis.get(key);
-      redis.del(key);
+        String matchId = (String) redis.get(key);
+        redis.del(key);
         return getMatchInfos(matchId);
     }
 
     @Override
     public LinkedList<HashMap<String, Object>> nearByCourt(String gps) {
-        return  SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps,"10");
+        return SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps, "10");
     }
-
-
-
 
 }

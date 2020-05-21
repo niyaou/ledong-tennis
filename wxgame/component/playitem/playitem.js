@@ -93,7 +93,6 @@ Component({
           res.eventChannel.emit('acceptDataFromOpenerPage', { data: that.data.matches })
         }
       })
-      ('navigateTo')
     }
   }
 })

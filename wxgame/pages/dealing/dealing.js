@@ -17,6 +17,7 @@ Page({
     short: 2000,
     long: 5000,
     confirmed: false,
+    isPickIntentional:false,
     interval: -1,
     intervalM: -1,
     matches: {},
@@ -147,7 +148,7 @@ Page({
       let data = {}
       if (that.data.parseTime) {
         data = Object.assign(data, {
-          orderTime: that.data.parseTime
+          orderTime: that.data.parseTime 
         })
       }
       if (that.data.matches.courtName) {
@@ -161,8 +162,24 @@ Page({
         })
       }
       let url = 'match/intentionalMatch/'
-      if (that.data.matches.id) {
-        url = `match/matchInfo/${that.data.matches.id}`
+      if (that.data.matches.id ) {
+        url =   that.data.matches.holder == that.data.openId ?`match/matchInfo/${that.data.matches.id}`:`match/intentionalMatch/${that.data.matches.id}`
+      }
+      if(!data.courtGPS){
+        wx.showToast({
+          title: '请选择球场',
+          image:'../../icon/toast.png',
+          mask:true
+        })
+        return
+      }
+      if(!data.orderTime && !that.data.matches.orderTime){
+        wx.showToast({
+          title: '请选择时间',
+          image:'../../icon/toast.png',
+          mask:true
+        })
+        return
       }
       if(!data.courtGPS){
         wx.showToast({

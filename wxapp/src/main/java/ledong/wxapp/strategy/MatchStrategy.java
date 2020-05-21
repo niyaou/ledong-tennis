@@ -54,9 +54,6 @@ public abstract class MatchStrategy {
         }else{
             status = MatchStatusCodeEnum.MATCH_MATCHING_STATUS;
         }
-        System.out.println(holder);
-        System.out.println(challenger);
-        System.out.println(status.getMessage());
         vo.setStatus(status.getCode());
         vo.setMatchType(matchType);
         vo.setClubMatch(clubMatch);
@@ -71,7 +68,7 @@ public abstract class MatchStrategy {
             vo.setCourtGPS(courtGps);
         }
 
-        String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
+        String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_NUM);
         id = String.format("%s-%s-%s", id, holder, StringUtil.isEmpty(challenger) ? "" : challenger);
         id = SearchApi.insertDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), id);
         return id;
@@ -92,6 +89,7 @@ public abstract class MatchStrategy {
             vo.setChallenger(challengerId);
         }
         String id = SearchApi.insertDocument(DataSetConstant.SESSION_INFORMATION, JSON.toJSONString(vo));
+        System.out.println(id+"          :        " + matchId);
         matchId = SearchApi.updateFieldValueById(DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.SESSIONID, id,
                 matchId);
         return id;
