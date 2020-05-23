@@ -17,7 +17,7 @@ Page({
     short: 2000,
     long: 5000,
     confirmed: false,
-    isPickIntentional:false,
+    isPickIntentional: false,
     interval: -1,
     intervalM: -1,
     matches: {},
@@ -75,14 +75,14 @@ Page({
           courtGPS: `${location.latitude},${location.longitude}`
         })
       })
-      if(!this.data.isPlus){
+      if (!this.data.isPlus) {
         http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
           courtName: location.name,
           courtGPS: `${location.latitude},${location.longitude}`
         }, (res) => {})
       }
       chooseLocation.setLocation();
-      
+
     }
     const eventChannel = this.getOpenerEventChannel()
     let that = this
@@ -98,8 +98,7 @@ Page({
       }
       if (!that.data.isPlus) {
         that.reloadContext()
-      } else {
-      }
+      } else {}
     })
 
 
@@ -108,8 +107,7 @@ Page({
   /**
    * 生命周期函数--监听页面隐藏
    */
-  onHide: function () {
-  },
+  onHide: function () {},
 
   /**
    * 生命周期函数--监听页面卸载
@@ -143,83 +141,90 @@ Page({
   confirm() {
     const type = this.data.openId == this.data.matches.holder ? 0 : 1
     let that = this
+    let data = {}
+    if (that.data.parseTime) {
+      data = Object.assign(data, {
+        orderTime: that.data.parseTime
+      })
+    }
+    if (that.data.matches.courtName) {
+      data = Object.assign(data, {
+        courtName: that.data.matches.courtName
+      })
+    }
+    if (that.data.matches.courtGPS) {
+      data = Object.assign(data, {
+        courtGPS: that.data.matches.courtGPS
+      })
+    }
+    console.info(data.courtGPS,!data.courtGPS)
+    if (!data.courtGPS) {
+      wx.showToast({
+        title: '请选择球场',
+        image: '../../icon/toast.png',
+        mask: true
+      })
+      return
+    }
+
+  
+    console.info(data.courtName,!data.courtName)
+    if (!data.courtName) {
+      wx.showToast({
+        title: '请选择球场',
+        image: '../../icon/toast.png',
+        mask: true
+      })
+      return
+    }
+    if ((data.orderTime == undefined) && (that.data.matches.orderTime == undefined)) {
+      wx.showToast({
+        title: '请选择时间',
+        image: '../../icon/toast.png',
+        mask: true
+      })
+      return
+    }
 
     if (this.data.isPlus || this.data.matches.status == 2000) {
-      let data = {}
-      if (that.data.parseTime) {
-        data = Object.assign(data, {
-          orderTime: that.data.parseTime 
-        })
-      }
-      if (that.data.matches.courtName) {
-        data = Object.assign(data, {
-          courtName: that.data.matches.courtName
-        })
-      }
-      if (that.data.matches.courtGPS) {
-        data = Object.assign(data, {
-          courtGPS: that.data.matches.courtGPS
-        })
-      }
+     
       let url = 'match/intentionalMatch/'
-      if (that.data.matches.id ) {
-        url =   that.data.matches.holder == that.data.openId ?`match/matchInfo/${that.data.matches.id}`:`match/intentionalMatch/${that.data.matches.id}`
+      if (that.data.matches.id) {
+        url = that.data.matches.holder == that.data.openId ? `match/matchInfo/${that.data.matches.id}` : `match/intentionalMatch/${that.data.matches.id}`
       }
-      if(!data.courtGPS){
-        wx.showToast({
-          title: '请选择球场',
-          image:'../../icon/toast.png',
-          mask:true
-        })
-        return
-      }
-      if(!data.orderTime && !that.data.matches.orderTime){
-        wx.showToast({
-          title: '请选择时间',
-          image:'../../icon/toast.png',
-          mask:true
-        })
-        return
-      }
-      if(!data.courtGPS){
-        wx.showToast({
-          title: '请选择球场',
-          image:'../../icon/toast.png',
-          mask:true
-        })
-        return
-      }
-      if(!data.orderTime){
-        wx.showToast({
-          title: '请选择时间',
-          image:'../../icon/toast.png',
-          mask:true
-        })
-        return
-      }
+
+
       http.postReq(url, app.globalData.jwt, data, (res) => {
         if (res.code == 0) {
           that.backtoIndex()
-        }else{
           wx.showToast({
-            icon:'none',
+            icon: 'none',
+            title: '请在赛列表中查看参与的比赛',
+            // image:'../../icon/toast.png',
+            mask: true,
+            duration: 2000
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
             title: res.message,
             // image:'../../icon/toast.png',
-            mask:true
+            mask: true
           })
         }
       })
     } else if (!this.data.isPlus) {
+
       http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
         if (res.code == 0) {
           that.setData({
             confirmed: true
           })
-        }else{
+        } else {
           wx.showToast({
             title: res.message,
             // image:'../../icon/toast.png',
-            mask:true
+            mask: true
           })
         }
       })
@@ -237,6 +242,7 @@ Page({
     if (e.detail.keyCode > 48 && e.detail.keyCode < 56) {
       score = parseInt(e.detail.value)
     }
+   
     let data = {}
     if (e.currentTarget.dataset.type == "0") {
       data = Object.assign({
@@ -247,8 +253,8 @@ Page({
         challengerScore: score
       })
     }
-    http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => {
-    })
+    console.info(e.detail.value,data)
+    http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => {})
 
   },
   pluginsTap() {
@@ -329,8 +335,7 @@ Page({
     let that = this
     http.postReq(`match/sessionContext/${this.data.matches.sessionId}/${type}`, app.globalData.jwt, {
       context: this.data.inputValue
-    }, (res) => {
-    })
+    }, (res) => {})
   },
   bindInput(e) {
     this.setData({
@@ -363,11 +368,11 @@ Page({
       that.setData({
         matches: res.data,
         confirmed: confirm
-        // Object.assign(that.data.matches, {
-        //   courtGPS:res.data.courtGPS,courtName:res.data.courtName, orderTime:res.data.orderTime,
-        //   status:res.data.status
-        // })
+
       })
+      if (res.data.status === 2003) {
+        that.backtoIndex()
+      }
 
     }, false)
   },

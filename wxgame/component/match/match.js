@@ -88,10 +88,40 @@ Component({
       }
     },
     matching() {
-
+      let that = this
       http.postReq('match/randomMatch', app.globalData.jwt, {
         gps: app.globalData.gps
       }, (res) => {
+        if (res.code == 0 && res.data != null) {
+          console.info(res)
+          wx.showLoading({
+            title: 'loading...',
+          })
+          setTimeout(function () {
+            http.getReq(`match/matchInfo/${res.data}`, app.globalData.jwt, (resMatch) => {
+              console.info(resMatch)
+              if (resMatch.code === 0) {
+                that.setData({
+                  matches: [resMatch.data]
+                })
+              }
+            })
+          }, 1000)
+
+        } else if (res.code == 91003) {
+          wx.showToast({
+            icon: 'none',
+            title: res.message,
+            duration: 3000
+          })
+
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '没找到对手，请发布比赛、参加其他选手比赛或者发起挑战',
+            duration: 3000
+          })
+        }
       })
     },
     matchedGame() {
@@ -121,10 +151,8 @@ Component({
         url: '../../pages/dealing/dealing',
         events: {
           // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
-          acceptDataFromOpenedPage: function (data) {
-          },
-          someEvent: function (data) {
-          }
+          acceptDataFromOpenedPage: function (data) {},
+          someEvent: function (data) {}
 
         },
         success: function (res) {

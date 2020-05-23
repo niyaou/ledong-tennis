@@ -35,6 +35,7 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.cluster.ClusterState.Custom;
 import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -60,7 +61,9 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortMode;
 import org.elasticsearch.search.sort.SortOrder;
 
+import ledong.wxapp.config.CustomException;
 import ledong.wxapp.config.EsClientFactory;
+import ledong.wxapp.constant.enums.ResultCodeEnum;
 import response.ErrorResponse;
 
 /**
@@ -810,6 +813,7 @@ public class SearchApi {
         searchSourceBuilder.query(queryBuilder);
         searchSourceBuilder.version(true);
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
+        log.error(searchSourceBuilder.toString());
         searchRequest.source(searchSourceBuilder);
 
         // try {
@@ -1221,14 +1225,15 @@ public static Double winRateAggregate(String indexName,SearchSourceBuilder searc
      * @param idName
      * @return
      */
-    private static String parseInsertResponse(IndexRequest searchRequest, String idName) {
+    private static String parseInsertResponse(IndexRequest searchRequest, String idName) throws CustomException {
         try {
             IndexResponse indexResponse = client.index(searchRequest, RequestOptions.DEFAULT);
             if (Result.CREATED.toString().equals(indexResponse.getResult().name())) {
                 return indexResponse.getId();
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("---------throw exception--------");
+        throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
         }
         return null;
     }

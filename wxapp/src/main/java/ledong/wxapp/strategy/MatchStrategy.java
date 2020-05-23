@@ -26,17 +26,33 @@ public abstract class MatchStrategy {
     public abstract String matchingGame(MatchRequestVo vo);
 
     public static String postMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
-            String orderTime, String courtName, String courtGps) {
+            String orderTime, String courtName, String courtGps) throws CustomException{
         MatchPostVo vo = new MatchPostVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
  
+        System.out.println(" 1  matchType :"+matchType);
         if(MatchStatusCodeEnum.MATCH_TYPE_INTENTIONAL.getCode().equals(matchType)){
             HashMap<String,Object> queries=new HashMap<String,Object>();
             queries.put(MatchPostVo.HOLDER, holder);
             queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode());
           Object intentional =   SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null, null, null, null);
+          System.out.println("1 intentional :"+intentional);
+
           if(intentional!=null){
               throw new CustomException(ResultCodeEnum.ONLY_ONE_INTENTIONAL_MATCH);
+          }
+        }
+
+        System.out.println("2   matchType :"+matchType);
+        if(MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType)){
+            HashMap<String,Object> queries=new HashMap<String,Object>();
+            queries.put(MatchPostVo.HOLDER, holder);
+            queries.put(MatchPostVo.CHALLENGER, challenger);
+            queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode());
+          Object intentional =   SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null, null, null, null);
+          System.out.println(" 2 intentional :"+intentional);
+          if(intentional!=null){
+              throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
           }
         }
  

@@ -52,11 +52,9 @@ Component({
     }
   },
   ready() {
-    ('matches',this.data.matches)
     // this.setData({
     //   holderAvator: app.globalData.userInfo.avatarUrl,
     //   holderName: app.globalData.userInfo.avatarUrl,
-
     // })
   },
   /**

@@ -45,11 +45,22 @@ Component({
       wx.showModal({
         content:'是否发起挑战',
         cancelColor: 'cancelColor',
-        success:()=>{
-          ('yes',that.data.holder)
-          http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {} ,(res)=>{
+        success:(res)=>{
+          if (res.confirm) {
+            console.log('用户点击确定')
+            http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {} ,(res)=>{
+              if(res.code!==0){
+                wx.showToast({
+                  title: res.message,
+                  icon:'none',
+                  duration:1500
+                })
+              }
+            })
+          } else if (res.cancel) {
+      
+          }
 
-          })
         }
       })
     }

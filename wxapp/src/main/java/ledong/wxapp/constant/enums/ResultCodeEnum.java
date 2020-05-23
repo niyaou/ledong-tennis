@@ -134,6 +134,7 @@ public enum ResultCodeEnum {
     ONLY_ONE_INTENTIONAL_MATCH(91001,"只能发布一个比赛"),
 
     ALREADY_ACCEPTED_MATCH(91002,"已经匹配过该场比赛"),
+    ALREADY_POSTED_CHALLENGE(91003,"正在挑战，请先完成比赛"),
 
     /** 未知错误 */
     UNKOWN_ERROR(90001, "未知错误");

@@ -37,7 +37,7 @@ function getReq(url, jwt,cb,toast = true) {
 function postReq(url,jwt, data, cb) {
   wx.showLoading({
     mask:true,
-    title: 'loading',
+    title: '处理中...',
   })
   header.Authorization='Bearer '+jwt
     console.log('url',rootDocment + url),
