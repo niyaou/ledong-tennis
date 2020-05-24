@@ -7,16 +7,16 @@
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{holderAvator}}" mode="cover" style="z-index:30"></image>
 			</div>
       <div class="rest">  
-      <div class="info" >
+      <div class="info"  style="width:30%">
             <div class="nickname">{{holderName}}		</div>
 					<div class="rank">{{rankType0}}</div>
       </div>
   
-			<div class="zone">
+			<div class="zone" style="width:35%">
 				<image src="../../icon/position.png" class="bottomimg" />
-				<div> 南湖</div>
+				<div> {{courtName}}</div>
 			</div>
-			<div class="zone">
+			<div class="zone"  style="width:35%">
 				<image src="../../icon/rank.png" class="bottomimg" />
 				<div> {{winRate}}% 胜率</div>
 			</div></div>

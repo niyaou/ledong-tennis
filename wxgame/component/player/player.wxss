@@ -88,9 +88,9 @@ align-items: center;
 }
 
 .bottomimg{
-  width: 48rpx;
-  height: 48rpx;
-  margin: 6rpx;
+  width: 36rpx;
+  height: 36rpx;
+  margin: 0rpx;
 }
 .zone{
   width:40%;

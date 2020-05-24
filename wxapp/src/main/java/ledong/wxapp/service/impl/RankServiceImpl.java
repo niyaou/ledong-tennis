@@ -35,6 +35,7 @@ import ledong.wxapp.constant.enums.GradeCodeEnum;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
+import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.service.IUserService;
 import ledong.wxapp.strategy.RankingStrategy;
@@ -53,6 +54,8 @@ public class RankServiceImpl implements IRankService {
     private RedisUtil redis;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private IMatchService iMatchService;
     @Resource
     private ApplicationContext ctx;
 
@@ -140,8 +143,12 @@ public class RankServiceImpl implements IRankService {
                         .collect(Collectors.toList());
                 // HashMap<String, Object> holder = iUserService.getUserInfo((String)
                 // match.get(RankInfoVo.OPENID));
+
+              
+
                 match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
                 match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.COURTNAME,  iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID)).get(MatchPostVo.COURTNAME));
                 return match;
             }).collect(Collectors.toList());
 

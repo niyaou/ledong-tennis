@@ -97,7 +97,7 @@ public class MatchPostVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "canceled , 7000: not-canceled , 7001: canceled")
-    private Integer canceled;
+    private Integer canceled = 7000;
     public static final String CANCELED = "canceled";
 
     @NotEmpty

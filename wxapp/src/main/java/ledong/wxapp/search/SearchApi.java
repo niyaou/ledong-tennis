@@ -54,6 +54,7 @@ import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
@@ -148,32 +149,29 @@ public class SearchApi {
         return parseSingleResponse(searchRequest);
     }
 
-
-
-
     /**
      * 
      * 根据ID批量获取文档
      * 
      */
     public static LinkedList<Map<String, Object>> getDocsByMultiIds(String indexName, String... ids) {
-         MultiGetRequest request = new MultiGetRequest();
-         Optional.ofNullable(ids).ifPresent( o -> {
+        MultiGetRequest request = new MultiGetRequest();
+        Optional.ofNullable(ids).ifPresent(o -> {
             for (String id : o) {
-                request.add(new MultiGetRequest.Item(indexName,id));
+                request.add(new MultiGetRequest.Item(indexName, id));
             }
-            });
+        });
 
-            MultiGetResponse response;
-            LinkedList<Map<String, Object>> list = new LinkedList<Map<String, Object>>();
-            try {
-                response = client.mget(request, RequestOptions.DEFAULT);
-                for (MultiGetItemResponse item : response.getResponses()) {
-                    list.add(item.getResponse().getSourceAsMap());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        MultiGetResponse response;
+        LinkedList<Map<String, Object>> list = new LinkedList<Map<String, Object>>();
+        try {
+            response = client.mget(request, RequestOptions.DEFAULT);
+            for (MultiGetItemResponse item : response.getResponses()) {
+                list.add(item.getResponse().getSourceAsMap());
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -1044,39 +1042,45 @@ public class SearchApi {
         }
     }
 
+    public static Double winRateAggregate(String indexName, SearchSourceBuilder searchSourceBuilder) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.source(searchSourceBuilder);
+        HashMap<String, Object> list = new HashMap<String, Object>();
+        System.out.println(searchSourceBuilder.toString());
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
-    
-public static Double winRateAggregate(String indexName,SearchSourceBuilder searchSourceBuilder){
-    SearchRequest searchRequest = new SearchRequest(indexName);
-    searchRequest.source(searchSourceBuilder);
-    HashMap<String, Object> list = new HashMap<String, Object>();
-    System.out.println(searchSourceBuilder.toString());
-    try {
-        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            long a = searchResponse.getHits().getHits().length;
+            list.put("total", a);
+            Filter f = searchResponse.getAggregations().get("winrate");
+            list.put("date", f.getDocCount());
 
-        long a=searchResponse.getHits().getHits().length;
-        list.put("total",a);
-      Filter f=  searchResponse.getAggregations().get("winrate");
-      list.put("date", f.getDocCount());
-    
-      System.out.println(list.toString());
-        return  Double.parseDouble(String.valueOf(f.getDocCount()*100/a));
-    } catch (IOException | ArithmeticException e) {
-        log.error(e.getMessage());
-        return 0.0;
+            System.out.println(list.toString());
+            return Double.parseDouble(String.valueOf(f.getDocCount() * 100 / a));
+        } catch (IOException | ArithmeticException e) {
+            log.error(e.getMessage());
+            return 0.0;
+        }
+
     }
-   
 
+    public static String mostPlayedCourt(String indexName, SearchSourceBuilder searchSourceBuilder) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.source(searchSourceBuilder);
+        System.out.println(searchSourceBuilder.toString());
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
-}
+            Terms t = searchResponse.getAggregations().get("court");
 
+            System.out.println(t.getBuckets().get(0));
+            return t.getBuckets().get(0).getKeyAsString();
+        } catch (IOException | ArithmeticException e) {
+            log.error(e.getMessage());
 
-
-
-
-
-
-
+        }
+        return null;
+    }
 
     /**
      * 创建搜索页码
@@ -1180,7 +1184,7 @@ public static Double winRateAggregate(String indexName,SearchSourceBuilder searc
      * @param indexName
      * @return
      */
-    public static Integer totalRawResponse(SearchSourceBuilder query,String indexName ) {
+    public static Integer totalRawResponse(SearchSourceBuilder query, String indexName) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(query);
         try {
@@ -1233,7 +1237,7 @@ public static Double winRateAggregate(String indexName,SearchSourceBuilder searc
             }
         } catch (IOException e) {
             log.error("---------throw exception--------");
-        throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
+            throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
         }
         return null;
     }

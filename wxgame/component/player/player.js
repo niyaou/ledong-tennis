@@ -24,6 +24,10 @@ Component({
     rankType0:{
       type:String,
       value:''
+    },
+    courtName:{
+      type:String,
+      value:''
     }
 
   },

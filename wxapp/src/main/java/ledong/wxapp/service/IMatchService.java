@@ -249,4 +249,14 @@ public interface IMatchService {
      * @return
      */
     public LinkedList<HashMap<String, Object>> nearByCourt(String gps);
+
+
+
+    /**
+     * get user most played court
+     * 
+     * @param user
+     * @return
+     */
+    public HashMap<String,Object> commonCourt(String user);
 }

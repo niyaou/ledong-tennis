@@ -12,7 +12,13 @@ import java.util.stream.Collectors;
 
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -121,6 +127,9 @@ public class MatchServiceImpl implements IMatchService {
                 MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()));
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
 
+        String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME, time));
+
         QueryBuilder[] values = new QueryBuilder[8];
         LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
                 DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
@@ -169,7 +178,12 @@ public class MatchServiceImpl implements IMatchService {
                 params.add(SearchApi.createSearchAll());
             }
             String endTime = DateUtil.getDate(DateUtil.getSundayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
-            String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(), DateUtil.FORMAT_DATE_TIME);
+            // String startTime = DateUtil.getDate(DateUtil.getMondayOfThisWeek(),
+            // DateUtil.FORMAT_DATE_TIME);
+            String startTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+            // params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME,
+            // time));
+
             params.add(SearchApi.createSearchByFieldRangeSource(MatchPostVo.ORDERTIME, startTime, endTime));
             params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
                     MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
@@ -303,10 +317,24 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public Object getIntentionalMatch(Integer count) {
-        List<HashMap<String, Object>> searchResponse = SearchApi.searchByFieldSorted(
-                DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.STATUS,
-                String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()), MatchPostVo.CREATETIME,
-                SortOrder.DESC, 1, count);
+        // List<HashMap<String, Object>> searchResponse = SearchApi.searchByFieldSorted(
+        // DataSetConstant.GAME_MATCH_INFORMATION, MatchPostVo.STATUS,
+        // String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()),
+        // MatchPostVo.CREATETIME,
+        // SortOrder.DESC, 1, count);
+
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+
+        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                String.valueOf(MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode())));
+        String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME, time));
+        Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
+
+        QueryBuilder[] values = new QueryBuilder[8];
+        List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
+                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, count, params.toArray(values));
+
         if (searchResponse != null) {
             String[] idsArr = new String[searchResponse.size()];
             List<String> ids = new ArrayList<String>();
@@ -419,6 +447,9 @@ public class MatchServiceImpl implements IMatchService {
     @Override
     public Object getMatchInfos(String matchId) {
 
+        if (TextUtils.isEmpty(matchId)) {
+            return null;
+        }
         HashMap<String, Object> searchResponse = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
 
         Optional.ofNullable(searchResponse).ifPresent(i -> {
@@ -576,6 +607,25 @@ public class MatchServiceImpl implements IMatchService {
     @Override
     public LinkedList<HashMap<String, Object>> nearByCourt(String gps) {
         return SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps, "10");
+    }
+
+    @Override
+    public HashMap<String, Object> commonCourt(String userId) {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder user = new BoolQueryBuilder();
+        user.should(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId))
+                .should(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId));
+        BoolQueryBuilder match = new BoolQueryBuilder();
+        match.must(QueryBuilders.termQuery(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()))
+                .must(user);
+        TermsAggregationBuilder b = AggregationBuilders.terms("court").field(MatchPostVo.COURTNAME);
+        searchSourceBuilder.query(match);
+        searchSourceBuilder.aggregation(b).size(0);
+        String court = SearchApi.mostPlayedCourt(DataSetConstant.GAME_MATCH_INFORMATION, searchSourceBuilder);
+        HashMap<String, Object> courtName = new HashMap<String, Object>();
+        courtName.put(MatchPostVo.COURTNAME, court);
+        return courtName;
+
     }
 
 }
