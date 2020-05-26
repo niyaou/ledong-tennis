@@ -3,6 +3,8 @@ package ledong.wxapp.queue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
+import VO.MatchPostVo;
+
 public class ConfirmedMatchTask implements Delayed {
 
     private final long delay; //延迟时间

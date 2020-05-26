@@ -18,7 +18,7 @@
 	 
 
     <input type="number" bindinput="bindManual" data-type="0" maxlength="1" value="{{matches.holderScore}}" 
-		placeholder="-" placeholder-style="color:#ffffcc"
+		placeholder="-" placeholder-style="color:#ffffcc" disabled="{{matches.status!==2002}}"
 		type="number" style="text-align:center" />  
 
 
@@ -27,7 +27,7 @@
 			<div class="score lose">
 		 <input type="number" bindinput="bindManual"
 		 	placeholder="-" placeholder-style="color:#ffffcc"
-			  data-type="1" maxlength="1" value="{{matches.challengerScore}}" type="number" style="text-align:center" />  
+			  data-type="1" maxlength="1" value="{{matches.challengerScore}}" type="number" style="text-align:center" disabled="{{matches.status!==2002}}" />  
 			 </div>
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
@@ -48,7 +48,7 @@
 			<!-- <div class="dividv" /> -->
 			<div class="zone">
 				<image src="../../icon/cald.png" class="bottomimg" />
-				<picker class='time-picker' mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{dateFilter.getDate(matches.orderTime,'-')||'请选择日期'}}
+				<picker class='time-picker' disabled="{{matches.status==2002}}" mode="multiSelector" bindchange="bindStartMultiPickerChange" bindtap='pickerTap' bindcolumnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{multiArray}}">{{dateFilter.getDate(matches.orderTime,'-')||'请选择日期'}}
 
 
 				</picker>

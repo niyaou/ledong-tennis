@@ -186,6 +186,7 @@ Page({
       return
     }
 
+
     if (this.data.isPlus || this.data.matches.status == 2000) {
      
       let url = 'match/intentionalMatch/'
@@ -214,6 +215,23 @@ Page({
         }
       })
     } else if (!this.data.isPlus) {
+console.info('this.data.matches.status',this.data.matches.status)
+console.info('status judgement ',parseInt(this.data.matches.status) == 2002)
+console.info('this.data.matches.holderScore',this.data.matches.holderScore)
+console.info('holderScore judgement ',(this.data.matches.holderScore == undefined))
+console.info('this.data.matches.challengerScore',this.data.matches.challengerScore)
+console.info('challengerScore judgement ',(this.data.matches.challengerScore == undefined))
+      if(parseInt(this.data.matches.status) == 2002){
+        if(this.data.matches.holderScore == undefined || this.data.matches.challengerScore == undefined ){
+         wx.showToast({
+           title: '请输入双方比分',
+           image: '../../icon/toast.png',
+           mask: true
+         })
+         return 
+        }
+      }
+
 
       http.postReq(`match/matchConfirm/${this.data.matches.id}/${type}`, app.globalData.jwt, {}, (res) => {
         if (res.code == 0) {
@@ -223,6 +241,7 @@ Page({
         } else {
           wx.showToast({
             title: res.message,
+            icon:'none',
             // image:'../../icon/toast.png',
             mask: true
           })
@@ -258,6 +277,9 @@ Page({
 
   },
   pluginsTap() {
+    if(parseInt(this.data.matches.status) == 2002){
+      return 
+    }
     const key = '64TBZ-IOJWF-4X4JT-JG3BI-WKSEK-QEB7E'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
 
@@ -377,6 +399,9 @@ Page({
     }, false)
   },
   pickerTap: function () {
+    if(parseInt(this.data.matches.status) == 2002){
+      return 
+    }
     date = new Date();
 
     var monthDay = ['今天', '明天', '后天'];

@@ -9,11 +9,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import VO.MatchConfirmEvent;
-import VO.MatchConfirmEvent1;
 import VO.RankInfoVo;
 import VO.WinRateEvent;
 import ledong.wxapp.queue.ConfirmedMatchTask;
 import ledong.wxapp.queue.MatchConfirmSchedule;
+import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IRankService;
 
 @Component
@@ -22,6 +22,9 @@ public class EventsListener {
 
     @Autowired
     private IRankService rankService;
+
+    @Autowired
+    private IMatchService matchService;
 
     @Autowired
     private MatchConfirmSchedule matchConfirmSchedule;
@@ -45,17 +48,16 @@ public class EventsListener {
     public void handleConfirmEvent(MatchConfirmEvent event) {
         log.info("---------start delay task :" + event.getMatchId());
         matchConfirmSchedule.put(event.getMatchId());
-        DelayQueue<ConfirmedMatchTask> que = matchConfirmSchedule.get(event.getMatchId());
+        DelayQueue<ConfirmedMatchTask> que = matchConfirmSchedule.get();
         try {
-            que.take();
-            log.info("---------get delay task expired :" + event.getMatchId());
-            if(que.isEmpty()){
-                matchConfirmSchedule.clear();
-            }
-            
+            String matchId = que.take().getMatchId();
+         Object m =   matchService.getMatchInfos(matchId);
+         if(m!=null){
+            matchService.confirmMatch(matchId, 2);
+            log.info("---------confirm :" + matchId + "    "+m) ;
+         }
+            log.info("---------get delay task expired :" + matchId + "    "+m) ;
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            log.info("---------exception delay task  :" + event.getMatchId());
             e.printStackTrace();
         }
 

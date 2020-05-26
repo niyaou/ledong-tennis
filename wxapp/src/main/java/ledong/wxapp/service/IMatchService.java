@@ -187,7 +187,7 @@ public interface IMatchService {
      * user confirm match
      * 
      * @param matchId
-     * @param type 0: holder, 1: challenger
+     * @param type 0: holder, 1: challenger,  2: both
      * @return
      */
     public Object confirmMatch(String matchId, Integer type);

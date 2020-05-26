@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -21,12 +23,14 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import VO.CourtVo;
+import VO.MatchConfirmEvent;
 import VO.MatchPostVo;
 import VO.MatchRequestVo;
 import VO.RankInfoVo;
@@ -61,6 +65,9 @@ public class MatchServiceImpl implements IMatchService {
 
     @Autowired
     private IUserService iUserService;
+
+    @Resource
+    private ApplicationContext ctx;
 
     @Override
     public String requestMatching(String user, String courtGps) {
@@ -526,10 +533,14 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
+        String finishId=null;
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         if (type == 0) {
             vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
-        } else {
+        } else if(type == 1) {
+            vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        } else{
+            vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
             vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
         }
 
@@ -543,11 +554,20 @@ public class MatchServiceImpl implements IMatchService {
                 System.out.println("update acknowledged");
             } else {
                 vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-                finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
+                finishId =  finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
                 System.out.println("finished game");
             }
         }
-        return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+
+
+        String id=SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+        if(TextUtils.isEmpty(id)){
+            throw new CustomException(ResultCodeEnum.CONFIRMED_MATCH_ERROR);
+        }
+        if (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode()) && TextUtils.isEmpty(finishId)){
+            ctx.publishEvent(new MatchConfirmEvent(ctx, id) );
+        }
+        return id;
     }
 
     @Override
