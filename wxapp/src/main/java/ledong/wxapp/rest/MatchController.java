@@ -1,6 +1,9 @@
 package ledong.wxapp.rest;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import VO.MatchConfirmEvent;
+import VO.MatchConfirmEvent1;
 import VO.MatchRequestVo;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
@@ -279,6 +284,26 @@ public class MatchController {
             return new ResponseEntity<Object>(CommonResponse.success(matchService.nearByCourt(gps)), HttpStatus.OK);
       
     }
+
+
+  
+    @Resource
+    private ApplicationContext ctx;
+
+    
+    @RequestMapping(value = "/test/put", method = RequestMethod.GET)
+    public ResponseEntity<?> test1( ){
+        ctx.publishEvent(new MatchConfirmEvent(ctx, "1"));
+
+            return new ResponseEntity<Object>(CommonResponse.success(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/test/remove", method = RequestMethod.GET)
+    public ResponseEntity<?> test2( ){
+        ctx.publishEvent(new MatchConfirmEvent1(ctx, "1"));
+        return new ResponseEntity<Object>(CommonResponse.success(), HttpStatus.OK);
+}
+
 
 
 }
