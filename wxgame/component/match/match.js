@@ -41,7 +41,6 @@ Component({
       }
       this.tapTabStatus(event)
     }
-
   },
 
 

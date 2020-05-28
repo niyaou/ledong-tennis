@@ -69,7 +69,7 @@
 	<image src="{{confirmed?'../../icon/confirmed.png':'../../icon/tobeconfirm.png'}}"  class="send" />
 	</div>
 	<block wx:if="{{!isPlus}}">
-		<input class="context" placeholder="告诉球友你的想法。。。" bindinput="bindInput"></input>
+		<input class="context" placeholder="告诉球友你的想法。。。"  value="{{inputValue}}" bindinput="bindInput"></input>
 		<div class="button" bindtap="postMessage">
 			<image src="../../icon/send.png" class="send" />
 		</div>

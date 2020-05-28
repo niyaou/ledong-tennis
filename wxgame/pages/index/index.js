@@ -39,18 +39,23 @@ Page({
     http.getReq(`match/matchResult`,app.globalData.jwt , (res)=>{
       console.info('1 ---- result',res)
      if(res.code==0 && res.data != null){
-       console.info('result',res)
-       let message = (that.data.userInfo.openId == res.data.holder)?(res.data.winner==5000?'比赛胜利':'比赛失败')
+       console.info('app.globalData',app.globalData)
+       let message = (app.globalData.openId == res.data.holder)?(res.data.winner==5000?'比赛胜利':'比赛失败')
        :(res.data.winner==5001?'比赛胜利':'比赛失败')
-       let other =  (that.data.userInfo.openId == res.data.holderName)?res.data.holder:res.data.challengerName
+       let other =  (app.globalData.openId !== res.data.holder)?res.data.holderName:res.data.challengerName
        let title = `你与${other}的${message}`
       wx.showModal({
         title: '比赛结果',
-        content:title,
-        cancelColor: 'cancelColor',
+        content:title
       })
      }
     })
+
+    var matchComp = this.selectComponent('#match');
+     if(matchComp!=null){
+      matchComp.tapTabStatus({currentTarget:{dataset:{gid:matchComp.data.tabStatus}}})
+     }
+
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo

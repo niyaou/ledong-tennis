@@ -84,7 +84,7 @@ public abstract class MatchStrategy {
             vo.setCourtGPS(courtGps);
         }
 
-        String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_NUM);
+        String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
         id = String.format("%s-%s-%s", id, holder, StringUtil.isEmpty(challenger) ? "" : challenger);
         id = SearchApi.insertDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), id);
         return id;

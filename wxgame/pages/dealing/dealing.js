@@ -79,7 +79,7 @@ Page({
         http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
           courtName: location.name,
           courtGPS: `${location.latitude},${location.longitude}`
-        }, (res) => {})
+        }, (res) => { })
       }
       chooseLocation.setLocation();
 
@@ -98,7 +98,7 @@ Page({
       }
       if (!that.data.isPlus) {
         that.reloadContext()
-      } else {}
+      } else { }
     })
 
 
@@ -107,7 +107,7 @@ Page({
   /**
    * 生命周期函数--监听页面隐藏
    */
-  onHide: function () {},
+  onHide: function () { },
 
   /**
    * 生命周期函数--监听页面卸载
@@ -137,7 +137,7 @@ Page({
   onShareAppMessage: function () {
 
   },
-  createInentional() {},
+  createInentional() { },
   confirm() {
     const type = this.data.openId == this.data.matches.holder ? 0 : 1
     let that = this
@@ -157,7 +157,7 @@ Page({
         courtGPS: that.data.matches.courtGPS
       })
     }
-    console.info(data.courtGPS,!data.courtGPS)
+    console.info(data.courtGPS, !data.courtGPS)
     if (!data.courtGPS) {
       wx.showToast({
         title: '请选择球场',
@@ -167,8 +167,8 @@ Page({
       return
     }
 
-  
-    console.info(data.courtName,!data.courtName)
+
+    console.info(data.courtName, !data.courtName)
     if (!data.courtName) {
       wx.showToast({
         title: '请选择球场',
@@ -188,7 +188,7 @@ Page({
 
 
     if (this.data.isPlus || this.data.matches.status == 2000) {
-     
+
       let url = 'match/intentionalMatch/'
       if (that.data.matches.id) {
         url = that.data.matches.holder == that.data.openId ? `match/matchInfo/${that.data.matches.id}` : `match/intentionalMatch/${that.data.matches.id}`
@@ -215,20 +215,20 @@ Page({
         }
       })
     } else if (!this.data.isPlus) {
-console.info('this.data.matches.status',this.data.matches.status)
-console.info('status judgement ',parseInt(this.data.matches.status) == 2002)
-console.info('this.data.matches.holderScore',this.data.matches.holderScore)
-console.info('holderScore judgement ',(this.data.matches.holderScore == undefined))
-console.info('this.data.matches.challengerScore',this.data.matches.challengerScore)
-console.info('challengerScore judgement ',(this.data.matches.challengerScore == undefined))
-      if(parseInt(this.data.matches.status) == 2002){
-        if(this.data.matches.holderScore == undefined || this.data.matches.challengerScore == undefined ){
-         wx.showToast({
-           title: '请输入双方比分',
-           image: '../../icon/toast.png',
-           mask: true
-         })
-         return 
+      console.info('this.data.matches.status', this.data.matches.status)
+      console.info('status judgement ', parseInt(this.data.matches.status) == 2002)
+      console.info('this.data.matches.holderScore', this.data.matches.holderScore)
+      console.info('holderScore judgement ', (this.data.matches.holderScore == undefined))
+      console.info('this.data.matches.challengerScore', this.data.matches.challengerScore)
+      console.info('challengerScore judgement ', (this.data.matches.challengerScore == undefined))
+      if (parseInt(this.data.matches.status) == 2002) {
+        if (this.data.matches.holderScore == undefined || this.data.matches.challengerScore == undefined) {
+          wx.showToast({
+            title: '请输入双方比分',
+            image: '../../icon/toast.png',
+            mask: true
+          })
+          return
         }
       }
 
@@ -241,7 +241,7 @@ console.info('challengerScore judgement ',(this.data.matches.challengerScore == 
         } else {
           wx.showToast({
             title: res.message,
-            icon:'none',
+            icon: 'none',
             // image:'../../icon/toast.png',
             mask: true
           })
@@ -261,7 +261,7 @@ console.info('challengerScore judgement ',(this.data.matches.challengerScore == 
     if (e.detail.keyCode > 48 && e.detail.keyCode < 56) {
       score = parseInt(e.detail.value)
     }
-   
+
     let data = {}
     if (e.currentTarget.dataset.type == "0") {
       data = Object.assign({
@@ -272,13 +272,13 @@ console.info('challengerScore judgement ',(this.data.matches.challengerScore == 
         challengerScore: score
       })
     }
-    console.info(e.detail.value,data)
-    http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => {})
+    console.info(e.detail.value, data)
+    http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => { })
 
   },
   pluginsTap() {
-    if(parseInt(this.data.matches.status) == 2002){
-      return 
+    if (parseInt(this.data.matches.status) == 2002) {
+      return
     }
     const key = '64TBZ-IOJWF-4X4JT-JG3BI-WKSEK-QEB7E'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
@@ -353,11 +353,24 @@ console.info('challengerScore judgement ',(this.data.matches.challengerScore == 
   postMessage() {
 
     let type = app.globalData.openId === this.data.matches.holder ? 0 : 1
-
+    console.info(this.data.inputValue)
+    console.info(typeof this.data.inputValue, this.data.inputValue == null)
+    console.info(this.data.inputValue.length, this.data.inputValue.lenght == 0)
+    if (this.data.inputValue == undefined || this.data.inputValue == null || this.data.inputValue.length == 0) {
+      wx.showToast({
+        title: '请不要发送空消息',
+        image: '../../icon/toast.png',
+        mask: true
+      })
+      return
+    }
     let that = this
     http.postReq(`match/sessionContext/${this.data.matches.sessionId}/${type}`, app.globalData.jwt, {
       context: this.data.inputValue
-    }, (res) => {})
+    }, (res) => { })
+    this.setData({
+      inputValue: ''
+    })
   },
   bindInput(e) {
     this.setData({
@@ -366,7 +379,7 @@ console.info('challengerScore judgement ',(this.data.matches.challengerScore == 
   },
   backtoIndex() {
     wx.navigateBack({
-      complete: (res) => {},
+      complete: (res) => { },
     })
   },
   refreshMatches() {
@@ -399,8 +412,8 @@ console.info('challengerScore judgement ',(this.data.matches.challengerScore == 
     }, false)
   },
   pickerTap: function () {
-    if(parseInt(this.data.matches.status) == 2002){
-      return 
+    if (parseInt(this.data.matches.status) == 2002) {
+      return
     }
     date = new Date();
 
@@ -638,7 +651,7 @@ console.info('challengerScore judgement ',(this.data.matches.challengerScore == 
     if (!that.data.isPlus) {
       http.postReq(`match/matchInfo/${this.data.matches.id}`, app.globalData.jwt, {
         orderTime: parseTime
-      }, (res) => {})
+      }, (res) => { })
     }
   },
 
