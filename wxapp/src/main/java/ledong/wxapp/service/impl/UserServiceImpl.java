@@ -1,12 +1,29 @@
 package ledong.wxapp.service.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,7 +45,8 @@ import ledong.wxapp.utils.DateUtil;
 @Service
 public class UserServiceImpl implements IUserService {
     private static Logger logger = Logger.getLogger(UserServiceImpl.class);
-
+    private static String KEY_NAME = "AES";
+    public static final String CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
     @Value("${wxapp.appid}")
     private String appId;
 
@@ -52,7 +70,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public String login(String openId,String nickName, String avator,String gps) {
+    public String login(String openId, String nickName, String avator, String gps) {
         HashMap<String, String> vo = new HashMap<String, String>();
         vo.put(UserVo.OPENID, openId);
         LinkedList<HashMap<String, Object>> loginUser = SearchApi.searchByField(DataSetConstant.USER_INFORMATION,
@@ -61,7 +79,7 @@ public class UserServiceImpl implements IUserService {
             loginUser.getFirst().put(UserVo.NICKNAME, nickName);
             loginUser.getFirst().put(UserVo.AVATOR, avator);
             loginUser.getFirst().put(UserVo.GPS, gps);
-            SearchApi.updateDocument(DataSetConstant.USER_INFORMATION,JSON.toJSONString(loginUser.getFirst()),openId);
+            SearchApi.updateDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()), openId);
             return jwtToken.generateToken(openId);
         }
         return null;
@@ -86,17 +104,16 @@ public class UserServiceImpl implements IUserService {
             logger.error(e.getMessage());
             return null;
         }
-
     }
 
     @Override
-    public String accessByWxToken(String token, String nickName, String avator,String gps) {
-        String[] userInfo = getOpenId(token);
-        userInfo = Optional.ofNullable(userInfo).orElse(new String[] { "" });
-        String jwtString = login(userInfo[0],nickName,avator,gps);
+    public String accessByWxToken(String token, String nickName, String avator, String gps) {
+        // String[] userInfo = getOpenId(token);
+        // userInfo = Optional.ofNullable(userInfo).orElse(new String[] { "" });
+        String jwtString = login(token, nickName, avator, gps);
         if (TextUtils.isEmpty(jwtString)) {
             UserVo user = new UserVo();
-            user.setOpenId(userInfo[0]);
+            user.setOpenId(token);
             user.setNickName(nickName);
             user.setAvator(avator);
             user.setGps(gps);
@@ -121,7 +138,83 @@ public class UserServiceImpl implements IUserService {
     @Override
     public LinkedList<HashMap<String, Object>> getNearyByUser(String gps) {
 
-        return  SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps,"50");
+        return SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps, "50");
+
+    }
+
+    @Override
+    public String verified(String token) {
+        String[] userInfo = getOpenId(token);
+        return userInfo == null ? null : userInfo[1];
+    }
+
+    @Override
+    public String getPhoneNumber(String sessionKey, String iv, String data) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
+            BadPaddingException, UnsupportedEncodingException {
+          
+                // String json = null;
+                // byte[] encrypted64 = Base64.decodeBase64(data);
+                // byte[] key64 = Base64.decodeBase64(sessionKey);
+                // byte[] iv64 = Base64.decodeBase64(iv);
+          
+                String json = null;
+                byte[] encrypted64 = Base64.decodeBase64(data);
+                byte[] key64 = Base64.decodeBase64(sessionKey);
+                byte[] iv64 = Base64.decodeBase64(iv);
+          
+                try {
+                    init();
+                    json = new String(decrypt(encrypted64, key64, generateIV(iv64)));
+                } catch (Exception e) {
+                    System.out.println("解密微信手机号失败:" + e.getMessage());
+                }
+                return json;
        
+    //     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); 
+    //     SecretKeySpec skeySpec = new SecretKeySpec(Base64.decodeBase64(sessionKey), "AES"); 
+    //     IvParameterSpec ivs = new IvParameterSpec(Base64.decodeBase64(sessionKey));  
+    //     cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivs);
+      
+    //     byte[] original = cipher.doFinal(Base64.decodeBase64(data)); 
+    //     logger.error(original.toString());
+    //     String originalString = new String(original,"UTF-8");  
+    //   logger.error(originalString);
+    //     return   originalString;
+    
+    }
+
+
+    
+    /**
+     * 初始化密钥
+     */
+    public  void init() throws Exception {
+     
+        Security.addProvider(new BouncyCastleProvider());
+        KeyGenerator.getInstance(KEY_NAME).init(128);
+    }
+
+    /**
+     * 生成iv
+     */
+    public  AlgorithmParameters generateIV(byte[] iv) throws Exception {
+        // iv 为一个 16 字节的数组，这里采用和 iOS 端一样的构造方法，数据全为0
+        // Arrays.fill(iv, (byte) 0x00);
+        AlgorithmParameters params = AlgorithmParameters.getInstance(KEY_NAME);
+        params.init(new IvParameterSpec(iv));
+        return params;
+    }
+
+    /**
+     * 生成解密
+     */
+    public  byte[] decrypt(byte[] encryptedData, byte[] keyBytes, AlgorithmParameters iv)
+            throws Exception {
+        Key key = new SecretKeySpec(keyBytes, KEY_NAME);
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        // 设置为解密模式
+        cipher.init(Cipher.DECRYPT_MODE, key, iv);
+        return cipher.doFinal(encryptedData);
     }
 }

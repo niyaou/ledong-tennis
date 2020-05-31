@@ -2,13 +2,18 @@
 <view class="container">
 <block wx:if="{{!hasUserInfo && canIUse}}" >
 <view class="register" >
-<image src="../../icon/ledong.png" style="height:284rpx;width:284rpx;margin-bottom:30%"/>
-	<button class="btn1" open-type="getUserInfo"   bindgetuserinfo="getUserInfo" bindtap="gps" style="width:70%"> 微信登录 </button>
+<text style='position:absolute;top:{{totalBarHeight/2}}rpx;color:#fff;font-weight:bold'>网者争霸</text>
+<!-- <image src="../../icon/159.png" style="height:320rpx;width:600rpx;margin-bottom:30%"/> -->
+	<button class="btn1" open-type="getUserInfo"   bindgetuserinfo="getUserInfo" bindtap="gps" 
+	style="margin-top:90%; width:70%;background-color:#66FF56;color:#100E37" wx:if="{{!userInfo}}"> 微信登录 </button>
+		<button class="btn1" open-type="getPhoneNumber"   bindgetphonenumber="getPhoneNumber" bindtap="gps" 
+	style="margin-top:90%; width:70%;background-color:#66FF56;color:#100E37" wx:else> 微信1212登录 </button>
 	<!-- bindgetuserinfo="getUserInfo" -->
 	</view>
 	</block>
 			<block wx:else>
 	<view class="banner">
+	<!-- getUserInfo -->
 	
 
 			<div class="detail" style='padding-top:{{totalBarHeight}}rpx;'>

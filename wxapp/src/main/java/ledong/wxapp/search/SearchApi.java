@@ -1073,8 +1073,8 @@ public class SearchApi {
 
             Terms t = searchResponse.getAggregations().get("court");
 
-            System.out.println(t.getBuckets().get(0));
-            return t.getBuckets().get(0).getKeyAsString();
+       
+            return t.getBuckets().size()==0?null:t.getBuckets().get(0).getKeyAsString();
         } catch (IOException | ArithmeticException e) {
             log.error(e.getMessage());
 

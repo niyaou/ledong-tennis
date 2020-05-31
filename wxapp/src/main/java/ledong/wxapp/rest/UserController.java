@@ -1,6 +1,5 @@
 package ledong.wxapp.rest;
 
-
 import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,8 +38,6 @@ public class UserController {
     @Autowired
     private JwtToken tokenService;
 
-
-
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET)
     @ApiOperation(value = "认证管理-token有效认证", notes = "")
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
@@ -56,21 +53,18 @@ public class UserController {
         return new ResponseEntity<Object>(CommonResponse.success(userService.getUserInfo(userId)), HttpStatus.OK);
     }
 
-
-
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value = "认证管理-用户登录", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", value = "token", required = true, dataType = "string", paramType = "form"),
             @ApiImplicitParam(name = "nickName", value = "nickName", required = true, dataType = "string", paramType = "form"),
             @ApiImplicitParam(name = "avator", value = "avator", required = true, dataType = "string", paramType = "form"),
-            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form")
-           })
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form") })
     public ResponseEntity<?> register(@RequestParam(value = "token", required = true) String token,
-    @RequestParam(value = "nickName", required = true) String nickName,
-    @RequestParam(value = "avator", required = true) String avator,
-     @RequestParam(value = "gps", required = true) String gps) {
-        String info = userService.accessByWxToken(token,nickName,avator,gps);
+            @RequestParam(value = "nickName", required = true) String nickName,
+            @RequestParam(value = "avator", required = true) String avator,
+            @RequestParam(value = "gps", required = true) String gps) {
+        String info = userService.accessByWxToken(token, nickName, avator, gps);
         if (null == info) {
             return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
         } else {
@@ -78,15 +72,45 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/phone", method = RequestMethod.POST)
+    @ApiOperation(value = "认证管理-用户登录", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "vscode", value = "vscode", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "iv", value = "iv", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "data", value = "data", required = true, dataType = "string", paramType = "form")
+
+    })
+    public ResponseEntity<?> phone(@RequestParam(value = "vscode", required = true) String vscode,
+            @RequestParam(value = "iv", required = true) String iv,
+            @RequestParam(value = "data", required = true) String data) {
+        try {
+            String info = userService.getPhoneNumber(vscode, iv, data);
+            return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
+        }
+
+    }
+
+    @RequestMapping(value = "/verified", method = RequestMethod.POST)
+    @ApiOperation(value = "认证管理-微信认证", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "token", required = true, dataType = "string", paramType = "form") })
+    public ResponseEntity<?> verified(@RequestParam(value = "token", required = true) String token) {
+        String info = userService.verified(token);
+        if (null == info) {
+            return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
+        }
+    }
 
     @RequestMapping(value = "/nearby", method = RequestMethod.GET)
     @ApiOperation(value = "用户管理-附近用户", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form")
-           })
-    public ResponseEntity<?> nearby(
-     @RequestParam(value = "gps", required = true) String gps) {
-            return new ResponseEntity<Object>(CommonResponse.success(userService.getNearyByUser(gps)), HttpStatus.OK);
-      
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form") })
+    public ResponseEntity<?> nearby(@RequestParam(value = "gps", required = true) String gps) {
+        return new ResponseEntity<Object>(CommonResponse.success(userService.getNearyByUser(gps)), HttpStatus.OK);
+
     }
 }

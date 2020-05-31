@@ -6,17 +6,14 @@
 	"setting": {
 		"urlCheck": false,
 		"es6": true,
-		"enhance": false,
-		"postcss": false,
+		"postcss": true,
 		"preloadBackgroundData": false,
-		"minified": false,
+		"minified": true,
 		"newFeature": true,
 		"coverView": true,
-		"nodeModules": false,
 		"autoAudits": false,
-		"showShadowRootInWxmlPanel": false,
+		"showShadowRootInWxmlPanel": true,
 		"scopeDataCheck": false,
-		"uglifyFileName": true,
 		"checkInvalidKey": true,
 		"checkSiteMap": true,
 		"uploadWithSourceMap": true,
@@ -25,14 +22,13 @@
 			"disablePlugins": [],
 			"outputPath": ""
 		},
-		"bundle": false,
 		"useCompilerModule": false,
 		"userConfirmedUseCompilerModuleSwitch": false
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.11.0",
-	"appid": "wx047616b67deaf552",
-	"projectname": "wxgame",
+	"libVersion": "2.11.1",
+	"appid": "wx08fefd101492cbd6",
+	"projectname": "tenniscraft",
 	"debugOptions": {
 		"hidedInDevtools": []
 	},

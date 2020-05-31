@@ -6,7 +6,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "乐动网球天梯",
+    "navigationBarTitleText": "网者争霸",
     "navigationBarTextStyle": "black",
     "navigationStyle": "custom"
   },
@@ -19,7 +19,7 @@
   },
   "plugins": {
     "chooseLocation": {
-      "version": "1.0.2",
+      "version": "1.0.3",
       "provider": "wx76a9a06e5b4e693e"
     }
   }

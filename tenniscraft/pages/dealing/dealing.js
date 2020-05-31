@@ -67,6 +67,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+   
     const location = chooseLocation.getLocation();
     if (location) {
       this.setData({
@@ -99,6 +100,7 @@ Page({
       if (!that.data.isPlus) {
         that.reloadContext()
       } else { }
+      console.info(that.data.openId,that.data.matches.holder)
     })
 
 
@@ -215,12 +217,7 @@ Page({
         }
       })
     } else if (!this.data.isPlus) {
-      console.info('this.data.matches.status', this.data.matches.status)
-      console.info('status judgement ', parseInt(this.data.matches.status) == 2002)
-      console.info('this.data.matches.holderScore', this.data.matches.holderScore)
-      console.info('holderScore judgement ', (this.data.matches.holderScore == undefined))
-      console.info('this.data.matches.challengerScore', this.data.matches.challengerScore)
-      console.info('challengerScore judgement ', (this.data.matches.challengerScore == undefined))
+
       if (parseInt(this.data.matches.status) == 2002) {
         if (this.data.matches.holderScore == undefined || this.data.matches.challengerScore == undefined) {
           wx.showToast({
@@ -280,7 +277,7 @@ Page({
     if (parseInt(this.data.matches.status) == 2002) {
       return
     }
-    const key = '64TBZ-IOJWF-4X4JT-JG3BI-WKSEK-QEB7E'; //使用在腾讯位置服务申请的key
+    const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
 
     const location = JSON.stringify({

@@ -141,11 +141,7 @@ public class RankServiceImpl implements IRankService {
                 List<Map<String, Object>> holder = userInfos.stream()
                         .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
                         .collect(Collectors.toList());
-                // HashMap<String, Object> holder = iUserService.getUserInfo((String)
-                // match.get(RankInfoVo.OPENID));
-
-              
-
+    
                 match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
                 match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
                 match.put(MatchPostVo.COURTNAME,  iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID)).get(MatchPostVo.COURTNAME));
