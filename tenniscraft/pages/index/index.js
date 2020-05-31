@@ -5,14 +5,14 @@ var http = require('../../utils/http.js')
 Page({
   data: {
     motto: 'Hello World',
-    userInfo: null,
+    userInfo: {nickName:"请登录",avatarUrl:"../../icon/user2.png"},
     userLocation: {},
-    userRankInfo: {},
+    userRankInfo: {rankType0:'暂无'},
     vsCode: '',
     nearByUser: [],
     rankPosition: 0,
     nearByCourt: [],
-    hasUserInfo: false,
+    hasUserInfo: true,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
@@ -21,9 +21,8 @@ Page({
   },
   //事件处理函数
   bindViewTap: function () {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
+    this.setData({hasUserInfo:false})
+    return 
   },
   onLoad: function () {
     let that = this
@@ -104,8 +103,8 @@ Page({
             that.gps()
             that.getUserInfoByJwt(e.data)
             that.getUserRankInfo(e.data)
-            this.getNearByCourt(app.globalData.jwt)
-        
+            that.getNearByCourt(app.globalData.jwt)
+            that. getNearByUser(app.globalData.jwt)
           }, 1500)
         }
 
@@ -218,6 +217,7 @@ Page({
       this.getUserRankInfo(app.globalData.jwt)
       this.getRankPosition(app.globalData.jwt)
       this.getNearByCourt(app.globalData.jwt)
+      this. getNearByUser(app.globalData.jwt)
     }
   }
 })
