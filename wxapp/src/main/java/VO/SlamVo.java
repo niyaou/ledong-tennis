@@ -1,11 +1,15 @@
 package VO;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModelProperty;
+import ledong.wxapp.utils.DateUtil;
 
 /**
  * slam data structure
@@ -14,7 +18,10 @@ import io.swagger.annotations.ApiModelProperty;
  *
  */
 public class SlamVo implements Serializable {
-    private static final long serialVersionUID = -824151313652857923L;
+    private static final long serialVersionUID = -624151313652857923L;
+
+    private static String SLAMKEY="slamKey";
+    public static final String SLAM_INFORMATION ="slam_information";
 
     @NotEmpty
     @ApiModelProperty(value = "slam id ")
@@ -44,6 +51,25 @@ public class SlamVo implements Serializable {
     @ApiModelProperty(value = "appendix game information  ")
     private List<RoundVo> appendix;
     public static final String APPENDIX = "appendix";
+
+    @ApiModelProperty(value = "participated user  ")
+    private LinkedList<HashMap<String,Object>> members;
+    public static final String MEMBERS = "members";
+
+
+     @ApiModelProperty(value = " group information  ")
+    private Set<GroupVo> groups;
+    public static final String GROUPS = "groups";
+
+
+
+    public static String getSlamKey(String id){
+        return String.format("%s-%s",SLAMKEY, id);
+    }
+
+    public static String getSlamId(String date){
+        return String.format("%s-%s", SLAMKEY, date);
+    }
 
     public String getId() {
         return id;
@@ -91,6 +117,22 @@ public class SlamVo implements Serializable {
 
     public void setAppendix(List<RoundVo> appendix) {
         this.appendix = appendix;
+    }
+
+    public LinkedList<HashMap<String,Object>> getMembers() {
+        return members;
+    }
+
+    public void setMembers(LinkedList<HashMap<String,Object>> members) {
+        this.members = members;
+    }
+
+    public Set<GroupVo> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<GroupVo> groups) {
+        this.groups = groups;
     }
 
 }

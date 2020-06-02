@@ -139,6 +139,20 @@ public final class DateUtil {
                         : new SimpleDateFormat(fomart).format(date));
     }
 
+
+    /**
+     * 日期格式转换
+     * @param date
+     * @param fomartIn
+     * @param formatOut
+     * @return
+     * @throws ParseException
+     */
+    public static String formatDate(String date, String fomartIn,String formatOut) throws ParseException {
+        return getDate( getDate(date,fomartIn),formatOut);
+    }
+
+
     /**
      * 字符串转换为日期
      * 

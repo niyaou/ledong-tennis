@@ -287,6 +287,7 @@ public class SearchApi {
         }
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
         searchRequest.source(searchSourceBuilder);
+        log.info(searchSourceBuilder.toString());
         return parseResponse(searchRequest);
     }
 

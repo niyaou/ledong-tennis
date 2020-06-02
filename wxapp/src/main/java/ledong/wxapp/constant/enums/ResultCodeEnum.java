@@ -30,11 +30,11 @@ public enum ResultCodeEnum {
 
 
 
-    /** 格式化参数解析错误 */
+  
     CONFIRMED_MATCH_ERROR(50356, "比赛确认失败"),
 
 
-
+    SLAM_DATE_ERROR(50100, "比赛日期格式错误"),
 
 
     /** 该接口禁止访问 */
@@ -51,6 +51,13 @@ public enum ResultCodeEnum {
 
     ALREADY_ACCEPTED_MATCH(91002,"已经匹配过该场比赛"),
     ALREADY_POSTED_CHALLENGE(91003,"正在挑战，请先完成比赛"),
+
+
+
+    /**  slam */
+    SLAM_NOT_EXISTED(32000,"比赛不存在"),
+    SLAM_ALREADY_EXISTED(32001,"比赛已存在"),
+    SLAM_MEMBER_READY(32002,"比赛已报满"),
 
     /** 未知错误 */
     UNKOWN_ERROR(90001, "未知错误");

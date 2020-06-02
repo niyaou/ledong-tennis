@@ -3,6 +3,8 @@ package ledong.wxapp.service;
 import java.util.List;
 import java.util.Map;
 
+import VO.SlamVo;
+
 /**
  * slam affairs
  * 
@@ -14,11 +16,11 @@ public interface ISlamService {
     /**
      * 
      * explore slam by time
-     * 
+     * if date is null,return recent slam
      * @param date
      * @return
      */
-    public List<String> exploreSlams(String date);
+    public SlamVo exploreSlams(String date);
 
     /**
      * create a slam with specification time;
