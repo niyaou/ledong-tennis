@@ -40,6 +40,11 @@ public class RankInfoVo implements Serializable {
     private Double winRate;
     public static final String WINRATE = "winRate";
 
+    
+    @ApiModelProperty(value = "slamScore  ")
+    private Double slamScore;
+    public static final String SLAMSCORE = "slamScore";
+
     @NotEmpty
     @ApiModelProperty(value = "rank type 0 ,means game grade  ")
     private String rankType0;
@@ -143,6 +148,14 @@ public class RankInfoVo implements Serializable {
 
     public void setWinRate(Double winRate) {
         this.winRate = winRate;
+    }
+
+    public Double getSlamScore() {
+        return slamScore;
+    }
+
+    public void setSlamScore(Double slamScore) {
+        this.slamScore = slamScore;
     }
 
 }

@@ -59,6 +59,8 @@ public enum ResultCodeEnum {
     SLAM_ALREADY_EXISTED(32001,"比赛已存在"),
     SLAM_MEMBER_READY(32002,"比赛已报满"),
 
+    SLAM_PARTICIPATE_ERROR(32003,"比赛报名失败"),
+
     /** 未知错误 */
     UNKOWN_ERROR(90001, "未知错误");
 

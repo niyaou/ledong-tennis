@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import VO.MatchRequestVo;
+import VO.UserVo;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -22,6 +23,7 @@ import ledong.wxapp.auth.JwtToken;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.service.ISlamService;
+import ledong.wxapp.service.impl.UserServiceImpl;
 import ledong.wxapp.utils.DateUtil;
 
 @RequestMapping(value = "/slam")
@@ -32,6 +34,9 @@ public class SlamController {
 
     @Autowired
     private IRankService iRankService;
+
+    @Autowired
+    private UserServiceImpl user;
 
     @Autowired
     private ISlamService iSlamService;
@@ -69,17 +74,38 @@ public class SlamController {
         return new ResponseEntity<Object>(CommonResponse.success(iSlamService.participateSlam(openId, matchId)), HttpStatus.OK);
     }
 
-    // @RequestMapping(value = "/rankList", method = RequestMethod.GET)
-    // @ApiOperation(value = "explore ranking list ", notes = "")
-    // @ApiImplicitParams({
-    // @ApiImplicitParam(name = "grade", value = "grade name", required = false,
-    // dataType = "string", paramType = "query") })
-    // public ResponseEntity<?> userRankingList( @RequestParam(value = "grade",
-    // required = false) String grade) {
-    // return new
-    // ResponseEntity<Object>(CommonResponse.success(iRankService.getRankingList(grade)),
-    // HttpStatus.OK);
-    // }
+
+    
+    @RequestMapping(value = "/{openId}", method = RequestMethod.POST)
+    @ApiOperation(value = "test create user ", notes = "")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "openId", value = "openId  ", required = true, dataType = "string", paramType = "path") })
+    public ResponseEntity<?> testcreate(
+    @PathVariable(value = "openId", required = true) String openId) throws InterruptedException {
+        // Claims claims = tokenService.getClaimByToken(authHeader);
+        // String userId = claims.getSubject();
+        UserVo u=new UserVo();
+        u.setOpenId(openId);
+        user. addUser(u);
+        Thread.sleep(2000);
+        return new ResponseEntity<Object>(CommonResponse.success(user.login(openId, "测试"+openId,
+         "https://wx.qlogo.cn/mmopen/vi_32/txBevTDopuse1ibs4BZfZyN6V9vTn0E6FBBqWibLG1m1mVibw8VEmNk0gn7JT0VGp8lD8xo5LiavwlyvAmKC14RDQA/132",
+         "30.509777069091797,104.06473541259766") ), HttpStatus.OK);
+    }
+
+
+
+    @RequestMapping(value = "/groups/{slamId}", method = RequestMethod.PUT)
+    @ApiOperation(value = "explore ranking list ", notes = "")
+    @ApiImplicitParams({
+    @ApiImplicitParam(name = "slamId", value = "slamId name", required = true,
+    dataType = "string", paramType = "path") })
+    public ResponseEntity<?> generateGroups( @PathVariable(value = "slamId",
+    required = true) String slamId) {
+    return new
+    ResponseEntity<Object>(CommonResponse.success(iSlamService.generateGroups(slamId)),
+    HttpStatus.OK);
+    }
 
     // @RequestMapping(value = "/rankPosition", method = RequestMethod.GET)
     // @ApiOperation(value = "get user position in ranking list ", notes = "")

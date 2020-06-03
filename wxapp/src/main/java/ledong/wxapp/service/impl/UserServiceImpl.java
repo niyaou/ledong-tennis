@@ -153,10 +153,6 @@ public class UserServiceImpl implements IUserService {
             NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
             BadPaddingException, UnsupportedEncodingException {
           
-                // String json = null;
-                // byte[] encrypted64 = Base64.decodeBase64(data);
-                // byte[] key64 = Base64.decodeBase64(sessionKey);
-                // byte[] iv64 = Base64.decodeBase64(iv);
           
                 String json = null;
                 byte[] encrypted64 = Base64.decodeBase64(data);
@@ -170,17 +166,6 @@ public class UserServiceImpl implements IUserService {
                     System.out.println("解密微信手机号失败:" + e.getMessage());
                 }
                 return json;
-       
-    //     Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); 
-    //     SecretKeySpec skeySpec = new SecretKeySpec(Base64.decodeBase64(sessionKey), "AES"); 
-    //     IvParameterSpec ivs = new IvParameterSpec(Base64.decodeBase64(sessionKey));  
-    //     cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivs);
-      
-    //     byte[] original = cipher.doFinal(Base64.decodeBase64(data)); 
-    //     logger.error(original.toString());
-    //     String originalString = new String(original,"UTF-8");  
-    //   logger.error(originalString);
-    //     return   originalString;
     
     }
 

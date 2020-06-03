@@ -31,7 +31,7 @@ public class GroupVo implements Serializable {
             + " 1 : 1 player take part in next round,and second players take part in appendix matches, "
             + " 2 : 1 player take part in next round, and second players take part in quarter finals whose score is higher in all the groups "
             + " 3 : 1 player take part in next round")
-    private String type;
+    private Integer type;
     public static final String TYPE = "type";
 
     @NotEmpty
@@ -47,7 +47,7 @@ public class GroupVo implements Serializable {
         return members;
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
@@ -63,7 +63,7 @@ public class GroupVo implements Serializable {
         this.members = members;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 

@@ -1,6 +1,7 @@
 package ledong.wxapp.service.impl;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,15 +21,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import VO.GroupVo;
+import VO.MemberVo;
 import VO.SlamVo;
 import VO.UserVo;
 import ledong.wxapp.config.CustomException;
+import ledong.wxapp.constant.CommonConstanst;
+import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.service.ISlamService;
 import ledong.wxapp.service.IUserService;
+import ledong.wxapp.strategy.impl.slam.Base32Generator;
 import ledong.wxapp.utils.DateUtil;
 
 @Service
@@ -93,7 +98,10 @@ public class SlamServiceImpl implements ISlamService {
     @Override
     public String participateSlam(String openId, String matchId) {
         SlamVo slam = null;
-        LinkedList<HashMap<String,Object>> members = null;
+        Set<String> members = null;
+        if (SearchApi.searchById(DataSetConstant.USER_INFORMATION, openId) == null) {
+            throw new CustomException(ResultCodeEnum.SLAM_PARTICIPATE_ERROR);
+        }
         try {
             logger.info("participateSlam slam to  " + SlamVo.getSlamKey(matchId));
             slam = (SlamVo) redis.get(matchId);
@@ -109,10 +117,9 @@ public class SlamServiceImpl implements ISlamService {
                 members = slam.getMembers();
             }
         }
-        members = members == null ? new LinkedList<HashMap<String,Object>>() : members;
-        HashMap<String,Object>  member=new HashMap<String,Object>();
-        member.put(openId, openId);
-        members.add(member);
+        members = members == null ? new HashSet<String>() : members;
+
+        members.add(openId);
         slam.setMembers(members);
         redis.set(matchId, slam);
         logger.info("redis slam to  " + JSON.toJSONString(slam));
@@ -127,7 +134,7 @@ public class SlamServiceImpl implements ISlamService {
             slam = (SlamVo) redis.get(slamId);
             logger.info("getSlamKey slam to redis  is " + slam.getId());
         } catch (Exception e) {
-            HashMap<String, Object> s = SearchApi.searchById(SlamVo.SLAM_INFORMATION, slamId) ;
+            HashMap<String, Object> s = SearchApi.searchById(SlamVo.SLAM_INFORMATION, slamId);
             if (s == null) {
                 throw new CustomException(ResultCodeEnum.SLAM_NOT_EXISTED);
             }
@@ -135,12 +142,34 @@ public class SlamServiceImpl implements ISlamService {
             redis.set(slam.getId(), slam);
         }
 
-      int groupSize=  (int) Math.ceil((double) slam.getMembers().size() / 4);
-      Set<GroupVo> groups=new HashSet<GroupVo>();
-      while(groups.size()<groupSize){
-        GroupVo group=new GroupVo();
+        int groupSize = (int) Math.ceil((double) slam.getMembers().size() / 4);
+        Set<GroupVo> groups = new HashSet<GroupVo>();
+        Set<String> members = slam.getMembers();
+        logger.info("group size :" + groupSize);
+        LinkedList<MemberVo> m = Base32Generator.createSeeds(members);
 
-      }
+        while (groups.size() < groupSize) {
+            GroupVo g = new GroupVo();
+            List<MemberVo> l = new ArrayList<>();
+            l.add(m.removeFirst());
+            try {
+                l.add(m.removeLast());
+                l.add(m.removeLast());
+                if (groupSize > 5) {
+                    l.add(m.removeLast());
+                }
+            } catch (Exception e) {
+            }
+            g.setMembers(l);
+            g.setId(String.valueOf(groups.size()+1));
+            g.setType(groupSize==4?0:groupSize<7?1:groupSize<8?2:3);
+            groups.add(g);
+            
+        }
+        slam.setGroups(groups);
+        redis.set(slam.getId(), slam);
+        SearchApi.updateDocument(SlamVo.SLAM_INFORMATION, JSON.toJSONString(slam), slam.getId());
+        logger.info("group size :" + JSON.toJSONString(groups));
         return groupSize;
     }
 

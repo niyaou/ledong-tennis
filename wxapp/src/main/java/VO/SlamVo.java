@@ -53,7 +53,7 @@ public class SlamVo implements Serializable {
     public static final String APPENDIX = "appendix";
 
     @ApiModelProperty(value = "participated user  ")
-    private LinkedList<HashMap<String,Object>> members;
+    private Set<String> members;
     public static final String MEMBERS = "members";
 
 
@@ -119,11 +119,11 @@ public class SlamVo implements Serializable {
         this.appendix = appendix;
     }
 
-    public LinkedList<HashMap<String,Object>> getMembers() {
+    public Set<String> getMembers() {
         return members;
     }
 
-    public void setMembers(LinkedList<HashMap<String,Object>> members) {
+    public void setMembers(Set<String> members) {
         this.members = members;
     }
 
