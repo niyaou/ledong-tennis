@@ -36,7 +36,7 @@ public class GroupVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "matches  of group")
-    private List<String> matches;
+    private List<MatchPostVo> matches;
     public static final String MATCHES = "matches";
 
     public String getId() {
@@ -51,7 +51,7 @@ public class GroupVo implements Serializable {
         return type;
     }
 
-    public List<String> getMatches() {
+    public List<MatchPostVo> getMatches() {
         return matches;
     }
 
@@ -67,7 +67,7 @@ public class GroupVo implements Serializable {
         this.type = type;
     }
 
-    public void setMatches(List<String> matches) {
+    public void setMatches(List<MatchPostVo> matches) {
         this.matches = matches;
     }
 

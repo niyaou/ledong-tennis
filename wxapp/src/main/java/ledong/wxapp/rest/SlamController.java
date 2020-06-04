@@ -96,7 +96,7 @@ public class SlamController {
 
 
     @RequestMapping(value = "/groups/{slamId}", method = RequestMethod.PUT)
-    @ApiOperation(value = "explore ranking list ", notes = "")
+    @ApiOperation(value = "generator slam group ", notes = "")
     @ApiImplicitParams({
     @ApiImplicitParam(name = "slamId", value = "slamId name", required = true,
     dataType = "string", paramType = "path") })

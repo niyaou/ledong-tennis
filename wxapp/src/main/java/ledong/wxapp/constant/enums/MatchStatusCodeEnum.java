@@ -15,15 +15,21 @@ public enum MatchStatusCodeEnum {
     /**/
     MATCH_TYPE_PICK(3000, "指定比赛"), MATCH_TYPE_RANDOM(3001, "随机匹配比赛"),MATCH_TYPE_INTENTIONAL(3002,"发起比赛"),
     /**/
-    NON_CLUB_MATCH(4000, "非俱乐部比赛"), CLUB_MATCH(4001, "俱乐部比赛"),
+    NON_CLUB_MATCH(4000, "天梯比赛"), CLUB_MATCH(4001, "俱乐部比赛"), SLAM_MATCH(4002, "挑战赛比赛"),
     /* winner type */
     HOLDER_WIN_MATCH(5000, "防守方赢得比赛"), CHALLENGER_WIN_MATCH(5001, "挑战者比赛"),
 
     /*  */
     MATCH_RANKED_STATUS(6001, "比赛已计分"), MATCH_UNRANKED_STATUS(6000, "比赛未计分"),
+    // 0 ： not initated , 1: grouped ,  2: final playing , 3: gamed
+
+    SLAM_RAW_STATUS(6500, "大奖赛未分组"), SLAM_GENERATED_STATUS(6501, "大奖赛已分组，正在小组赛"), 
+    SLAM_FINAL_PLAYING_STATUS(6503, "正在决赛阶段"), SLAM_GAMED_STATUS(6504, "大奖赛已结束"), 
+
+
 
     /*  */
-    MATCH_CANCELED_STATUS(7001, "比赛已取消"), MATCH_UNCANCELED_STATUS(7000, "比赛未计分"),
+    MATCH_CANCELED_STATUS(7001, "比赛已取消"), MATCH_UNCANCELED_STATUS(7000, "比赛未取消"),
 
     UNKOWN_ERROR(90001, "未知错误");
 

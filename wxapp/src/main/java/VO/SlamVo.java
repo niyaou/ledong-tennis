@@ -40,16 +40,16 @@ public class SlamVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "semi game information  ")
-    private List<RoundVo> semi;
+    private List<MatchPostVo> semi;
     public static final String SEMI = "semi";
 
     @NotEmpty
     @ApiModelProperty(value = "quarter game information  ")
-    private List<RoundVo> quarter;
+    private List<MatchPostVo> quarter;
     public static final String QUARTER = "quarter";
 
     @ApiModelProperty(value = "appendix game information  ")
-    private List<RoundVo> appendix;
+    private List<MatchPostVo> appendix;
     public static final String APPENDIX = "appendix";
 
     @ApiModelProperty(value = "participated user  ")
@@ -61,6 +61,10 @@ public class SlamVo implements Serializable {
     private Set<GroupVo> groups;
     public static final String GROUPS = "groups";
 
+
+    @ApiModelProperty(value = "status   6500 ： not initated ,6501: grouped ,  6502: final playing , 6503: gamed  ")
+    private Integer status=6500;
+    public static final String STATUS = "status";
 
 
     public static String getSlamKey(String id){
@@ -83,15 +87,15 @@ public class SlamVo implements Serializable {
         return finalGame;
     }
 
-    public List<RoundVo> getSemi() {
+    public List<MatchPostVo> getSemi() {
         return semi;
     }
 
-    public List<RoundVo> getQuarter() {
+    public List<MatchPostVo> getQuarter() {
         return quarter;
     }
 
-    public List<RoundVo> getAppendix() {
+    public List<MatchPostVo> getAppendix() {
         return appendix;
     }
 
@@ -107,15 +111,15 @@ public class SlamVo implements Serializable {
         this.finalGame = finalGame;
     }
 
-    public void setSemi(List<RoundVo> semi) {
+    public void setSemi(List<MatchPostVo> semi) {
         this.semi = semi;
     }
 
-    public void setQuarter(List<RoundVo> quarter) {
+    public void setQuarter(List<MatchPostVo> quarter) {
         this.quarter = quarter;
     }
 
-    public void setAppendix(List<RoundVo> appendix) {
+    public void setAppendix(List<MatchPostVo> appendix) {
         this.appendix = appendix;
     }
 
@@ -133,6 +137,14 @@ public class SlamVo implements Serializable {
 
     public void setGroups(Set<GroupVo> groups) {
         this.groups = groups;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
 }

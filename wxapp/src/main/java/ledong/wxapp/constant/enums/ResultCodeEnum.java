@@ -60,6 +60,8 @@ public enum ResultCodeEnum {
     SLAM_MEMBER_READY(32002,"比赛已报满"),
 
     SLAM_PARTICIPATE_ERROR(32003,"比赛报名失败"),
+    SLAM_GENERATED_GROUP_ERROR(32004,"比赛已分组"),
+    SLAM_MEMBER_NOT_ENOUGH_ERROR(32005,"比赛人数不足"),
 
     /** 未知错误 */
     UNKOWN_ERROR(90001, "未知错误");
