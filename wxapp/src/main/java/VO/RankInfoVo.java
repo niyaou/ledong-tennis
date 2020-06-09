@@ -37,7 +37,7 @@ public class RankInfoVo implements Serializable {
 
 
     @ApiModelProperty(value = "clubScore  ")
-    private Double winRate;
+    private Double winRate = 0.0;
     public static final String WINRATE = "winRate";
 
     
