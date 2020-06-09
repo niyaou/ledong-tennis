@@ -1,14 +1,10 @@
 package ledong.wxapp.strategy.impl.rank;
 
-
-
 import VO.RankInfoVo;
 import ledong.wxapp.constant.enums.GradeCodeEnum;
 import ledong.wxapp.strategy.GradingStrategy;
 
 public class GradeRanking extends GradingStrategy {
-
-
 
     @Override
     public RankInfoVo ranking(RankInfoVo user) {
@@ -22,12 +18,18 @@ public class GradeRanking extends GradingStrategy {
         } else {
             user.setRankType0(GradeCodeEnum.DIAMOND.getMessage());
         }
-        user .setRankType1(winRateFilter(user.getOpenId()));
+        user.setRankType1(winRateFilter(user));
         return user;
     }
 
-    private String winRateFilter(String userId) {
-        return GradeCodeEnum.TWOANDHALF.getMessage();
+    private String winRateFilter(RankInfoVo user) {
+        String grade = user.getWinRate() > 85 ? GradeCodeEnum.FOURPOINT.getMessage()
+                : user.getWinRate() > 65 ? GradeCodeEnum.THREEANDHALF.getMessage()
+                        : user.getWinRate() > 50 ? GradeCodeEnum.THREEPOINT.getMessage()
+                                : user.getWinRate() > 35 ? GradeCodeEnum.TWOANDHALF.getMessage()
+                                        : user.getWinRate() > 20 ? GradeCodeEnum.TWOPOINT.getMessage()
+                                                : GradeCodeEnum.TWOPOINT.getMessage();
+        return grade;
 
     }
 
