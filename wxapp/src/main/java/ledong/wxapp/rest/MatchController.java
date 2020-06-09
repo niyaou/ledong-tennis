@@ -276,7 +276,7 @@ public class MatchController {
     @RequestMapping(value = "/court/nearby", method = RequestMethod.GET)
     @ApiOperation(value = "nearby court", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form")
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "query")
            })
     public ResponseEntity<?> nearby(
      @RequestParam(value = "gps", required = true) String gps) {

@@ -48,7 +48,6 @@ Component({
       if(app.globalData.openId !== this.data.holder){
       wx.showModal({
         content:'是否发起挑战',
-        cancelColor: 'cancelColor',
         success:(res)=>{
           if (res.confirm) {
             console.log('用户点击确定')

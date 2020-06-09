@@ -86,8 +86,7 @@ public class RankServiceImpl implements IRankService {
         scores[0] += tempScore[0];
         scores[1] += tempScore[1];
 
-        holder.setPoolRemain(holder.getPoolRemain() + scores[0]);
-        challenger.setPoolRemain(challenger.getPoolRemain() + scores[1]);
+
         holder.setScore(holder.getScore() + scores[0]);
         challenger.setScore(challenger.getScore() + scores[1]);
 

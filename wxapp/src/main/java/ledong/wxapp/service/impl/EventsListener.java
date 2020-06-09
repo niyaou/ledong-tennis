@@ -47,10 +47,12 @@ public class EventsListener {
     @Async
     public void handleConfirmEvent(MatchConfirmEvent event) {
         log.info("---------start delay task :" + event.getMatchId());
-        matchConfirmSchedule.put(event.getMatchId());
-        DelayQueue<ConfirmedMatchTask> que = matchConfirmSchedule.get();
+        // matchConfirmSchedule.put(event.getMatchId());
+        // DelayQueue<ConfirmedMatchTask> que = matchConfirmSchedule.get();
         try {
-            String matchId = que.take().getMatchId();
+            Thread.sleep(1500);
+            // String matchId = que.take().getMatchId();
+            String matchId = event.getMatchId();
          Object m =   matchService.getMatchInfos(matchId);
          if(m!=null){
             matchService.confirmMatch(matchId, 2);

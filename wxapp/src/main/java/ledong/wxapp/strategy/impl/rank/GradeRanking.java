@@ -22,14 +22,12 @@ public class GradeRanking extends GradingStrategy {
         } else {
             user.setRankType0(GradeCodeEnum.DIAMOND.getMessage());
         }
-
         user .setRankType1(winRateFilter(user.getOpenId()));
         return user;
     }
 
     private String winRateFilter(String userId) {
-
-        return GradeCodeEnum.THREEPOINT.getMessage();
+        return GradeCodeEnum.TWOANDHALF.getMessage();
 
     }
 
