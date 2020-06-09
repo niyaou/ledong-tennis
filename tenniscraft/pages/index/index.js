@@ -12,15 +12,19 @@ Page({
     nearByUser: [],
     rankPosition: 0,
     nearByCourt: [],
+    hasInitial:false,
     hasUserInfo: true,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     ratio: getApp().globalData.ratio,
-    tabBarStatus: 1 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
+    tabBarStatus: 2 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
   },
   //事件处理函数
   bindViewTap: function () {
+    if(this.data.hasInitial){
+      return
+    }
     this.setData({hasUserInfo:false})
     return 
   },
@@ -36,7 +40,7 @@ Page({
   onShow: function () {
     let that = this
     console.info('---------onshow ---------')
-    if (!this.data.hasUserInfo) {
+    if (!this.data.hasInitial) {
       return
     }
     http.getReq(`match/matchResult`, app.globalData.jwt, (res) => {
@@ -142,7 +146,8 @@ Page({
           avatarUrl: e.data.avator,
           nickName: e.data.nickName
         },
-        hasUserInfo: true
+        hasUserInfo: true,
+        hasInitial:true
       })
     })
   },
@@ -164,13 +169,11 @@ Page({
       })
       app.globalData.userRankInfo = this.data.userRankInfo
       app.globalData.openId = e.data.openId
-      console.info('app.globalData.openId', app.globalData.openId)
     })
   },
   getNearByUser(jwt) {
     let that = this
     http.getReq(`user/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
-
       that.setData({
         nearByUser: e.data.filter(u => {
           return u.id !== app.globalData.openId
@@ -199,17 +202,18 @@ Page({
         })
         wx.setStorageSync('gps', `${res.latitude},${res.longitude}`)
         app.globalData.gps = `${res.latitude},${res.longitude}`
-   
-        // if (Object.keys(that.data.userInfo).length !== 0) {
-        //   // that.verified(that.data.userInfo)
-        //   that.getNearByUser(app.globalData.jwt)
-        //   that.getNearByCourt(app.globalData.jwt)
-        // }
       }
     })
 
   },
   tabStatus(event) {
+    if(!this.data.hasInitial && event.currentTarget.dataset.gid != 2 ){
+      this.setData({hasUserInfo:false})
+      return
+    }
+
+
+
     this.setData({
       tabBarStatus: event.currentTarget.dataset.gid
     })
