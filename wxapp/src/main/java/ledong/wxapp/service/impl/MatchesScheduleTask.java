@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Optional;
 
+import com.alibaba.fastjson.JSON;
+
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -95,5 +97,30 @@ public class MatchesScheduleTask {
         });
 
     }
+
+
+        // 3.每10分钟定时清理未开始任务
+        @Scheduled(cron = "8 */10 * * * ?")
+        private void matchesUnConfirmedClear() {
+    
+            String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+            ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+            params.add(SearchApi.createSearchByFieldRangeLteSource(MatchPostVo.ORDERTIME, time, true));
+            params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                    MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()));
+            QueryBuilder[] values = new QueryBuilder[8];
+            LinkedList<HashMap<String, Object>> matches = SearchApi.searchByMultiQueriesAndOrders(
+                    DataSetConstant.GAME_MATCH_INFORMATION, null, 0, 50, params.toArray(values));
+    
+            Optional.ofNullable(matches).ifPresent(us -> {
+                us.forEach(u -> {
+                    String id = (String) u.get(MatchPostVo.ID);
+                    u.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+                    u.put(MatchPostVo.RANKED, MatchStatusCodeEnum.MATCH_UNRANKED_STATUS.getCode());
+                    SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(u), id);
+                });
+            });
+    
+        }
 
 }
