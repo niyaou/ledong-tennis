@@ -393,9 +393,13 @@ public class SearchApi {
      * @param end
      * @return
      */
-    public static QueryBuilder createSearchByFieldRangeLteSource(String key, String end) {
+    public static QueryBuilder createSearchByFieldRangeLteSource(String key, String end, boolean isOnRim) {
         RangeQueryBuilder range = new RangeQueryBuilder(key);
-        range.lte(end);
+        if (isOnRim) {
+            range.lte(end);
+        } else {
+            range.lt(end);
+        }
         return range;
     }
 
@@ -917,8 +921,8 @@ public class SearchApi {
      * @param id
      * @return
      */
-    public static DocWriteResponse deleteDocument(String indexName, String type, String id) {
-        DeleteRequest deleteRequest = new DeleteRequest(indexName, type, id);
+    public static DocWriteResponse deleteDocument(String indexName, String id) {
+        DeleteRequest deleteRequest = new DeleteRequest(indexName,  id);
         try {
             return client.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -1074,8 +1078,7 @@ public class SearchApi {
 
             Terms t = searchResponse.getAggregations().get("court");
 
-       
-            return t.getBuckets().size()==0?null:t.getBuckets().get(0).getKeyAsString();
+            return t.getBuckets().size() == 0 ? null : t.getBuckets().get(0).getKeyAsString();
         } catch (IOException | ArithmeticException e) {
             log.error(e.getMessage());
 

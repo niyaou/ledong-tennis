@@ -1,7 +1,6 @@
-package ledong.wxapp.config;
+package ledong.wxapp.service.impl;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
-import ledong.wxapp.service.impl.MatchServiceImpl;
 import ledong.wxapp.utils.DateUtil;
 
 @Configuration
@@ -33,10 +31,9 @@ public class MatchesScheduleTask {
     @Autowired
     private MatchServiceImpl matchService;
 
-    // 3.添加定时任务
+    // 3.每天2点增加积分池
     @Scheduled(cron = "3 0 02 * * ?")
-    private void configureTasks2() {
-        System.err.println("每隔2分钟执行静态定时任务时间: " + LocalDateTime.now());
+    private void configureTasks() {
         LinkedList<HashMap<String, Object>> users;
         try {
             users = SearchApi.searchAll(DataSetConstant.USER_RANK_INFORMATION, 1, 5000);
@@ -56,15 +53,16 @@ public class MatchesScheduleTask {
                     try {
                         time = DateUtil.getDateTime(DateUtil.getBeforeDate(new Date(), 14));
                         params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME, time));
-            
+
                         QueryBuilder[] values = new QueryBuilder[8];
-                        if(    SearchApi.searchByMultiQueriesAndOrders(DataSetConstant.GAME_MATCH_INFORMATION,null,null,null,params.toArray(values))!=null){
-                            rank.setPoolRemain(rank.getPoolRemain() -20);
+                        if (SearchApi.searchByMultiQueriesAndOrders(DataSetConstant.GAME_MATCH_INFORMATION, null, null,
+                                null, params.toArray(values)) != null) {
+                            rank.setPoolRemain(rank.getPoolRemain() - 20);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-               
+
                     rank.setPoolRemain(rank.getPoolRemain() + 5);
                     rankservice.updateRankInfo(rank);
                 });
@@ -73,6 +71,28 @@ public class MatchesScheduleTask {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    // 3.每10分钟定时清理过期任务
+    @Scheduled(cron = "5 */10 * * * ?")
+    private void matchesClear() {
+
+        String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        params.add(SearchApi.createSearchByFieldRangeLteSource(MatchPostVo.ORDERTIME, time, true));
+        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
+        QueryBuilder[] values = new QueryBuilder[8];
+        LinkedList<HashMap<String, Object>> matches = SearchApi.searchByMultiQueriesAndOrders(
+                DataSetConstant.GAME_MATCH_INFORMATION, null, 0, 50, params.toArray(values));
+
+        Optional.ofNullable(matches).ifPresent(us -> {
+            us.forEach(u -> {
+                String id = (String) u.get(MatchPostVo.ID);
+                SearchApi.deleteDocument(DataSetConstant.GAME_MATCH_INFORMATION, id);
+            });
+        });
 
     }
 

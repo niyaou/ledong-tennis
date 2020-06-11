@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -134,8 +133,8 @@ public class MatchServiceImpl implements IMatchService {
                 MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()));
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
 
-        String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
-        params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME, time));
+        // String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        // params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME, time));
 
         QueryBuilder[] values = new QueryBuilder[8];
         LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
