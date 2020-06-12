@@ -57,13 +57,13 @@ public class RankController {
     }
 
 
-    @RequestMapping(value = "/rankInfo/", method = RequestMethod.GET)
+    @RequestMapping(value = "/rankInfo/{user}", method = RequestMethod.GET)
     @ApiOperation(value = "explore current rank information", notes = "")
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> userRankIformationById(@RequestHeader("Authorization") String authHeader) {
-        Claims claims = tokenService.getClaimByToken(authHeader);
-        String userId = claims.getSubject();
-        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserRank(userId)), HttpStatus.OK);
+    public ResponseEntity<?> userRankIformationById( @PathVariable(value = "user", required = true) String user) {
+        // Claims claims = tokenService.getClaimByToken(authHeader);
+        // String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserRank(user)), HttpStatus.OK);
     }
 
 
