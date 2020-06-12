@@ -50,7 +50,7 @@ public class EventsListener {
         // matchConfirmSchedule.put(event.getMatchId());
         // DelayQueue<ConfirmedMatchTask> que = matchConfirmSchedule.get();
         try {
-            Thread.sleep(1500);
+            Thread.sleep(60000);
             // String matchId = que.take().getMatchId();
             String matchId = event.getMatchId();
          Object m =   matchService.getMatchInfos(matchId);

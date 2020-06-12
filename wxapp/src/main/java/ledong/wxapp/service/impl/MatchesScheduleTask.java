@@ -100,7 +100,7 @@ public class MatchesScheduleTask {
 
 
         // 3.每10分钟定时清理未开始任务
-        @Scheduled(cron = "8 */10 * * * ?")
+        @Scheduled(cron = "8 00 02 * * ?")
         private void matchesUnConfirmedClear() {
     
             String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);

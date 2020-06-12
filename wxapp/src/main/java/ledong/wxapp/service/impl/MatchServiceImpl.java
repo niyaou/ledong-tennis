@@ -134,7 +134,8 @@ public class MatchServiceImpl implements IMatchService {
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
 
         // String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
-        // params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME, time));
+        // params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME,
+        // time));
 
         QueryBuilder[] values = new QueryBuilder[8];
         LinkedList<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
@@ -532,13 +533,13 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
-        String finishId=null;
+        String finishId = null;
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         if (type == 0) {
             vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
-        } else if(type == 1) {
+        } else if (type == 1) {
             vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
-        } else{
+        } else {
             vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
             vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
         }
@@ -553,18 +554,18 @@ public class MatchServiceImpl implements IMatchService {
                 System.out.println("update acknowledged");
             } else {
                 vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-                finishId =  finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
+                finishId = finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
                 System.out.println("finished game");
             }
         }
 
-
-        String id=SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
-        if(TextUtils.isEmpty(id)){
+        String id = SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+        if (TextUtils.isEmpty(id)) {
             throw new CustomException(ResultCodeEnum.CONFIRMED_MATCH_ERROR);
         }
-        if (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode()) && TextUtils.isEmpty(finishId)){
-            ctx.publishEvent(new MatchConfirmEvent(ctx, id) );
+        if (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())
+                && TextUtils.isEmpty(finishId)) {
+            ctx.publishEvent(new MatchConfirmEvent(ctx, id));
         }
         return id;
     }
@@ -645,6 +646,18 @@ public class MatchServiceImpl implements IMatchService {
         courtName.put(MatchPostVo.COURTNAME, court);
         return courtName;
 
+    }
+
+    @Override
+    public String deleteMatches(String id) {
+        LinkedList<HashMap<String, Object>> session = SearchApi.searchByField(DataSetConstant.SESSION_INFORMATION,
+                SessionVo.MATCHID, id, 1, 10);
+        Optional.ofNullable(session).ifPresent(s -> {
+            String sessionId = (String) s.getFirst().get(SessionVo.ID);
+            SearchApi.deleteDocument(DataSetConstant.SESSION_INFORMATION, sessionId);
+        });
+        SearchApi.deleteDocument(DataSetConstant.GAME_MATCH_INFORMATION, id);
+        return null;
     }
 
 }

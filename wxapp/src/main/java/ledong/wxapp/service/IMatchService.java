@@ -259,4 +259,12 @@ public interface IMatchService {
      * @return
      */
     public HashMap<String,Object> commonCourt(String user);
+
+
+    /**
+     * delete match and session
+     * @param id
+     * @return
+     */
+    public String deleteMatches(String id);
 }
