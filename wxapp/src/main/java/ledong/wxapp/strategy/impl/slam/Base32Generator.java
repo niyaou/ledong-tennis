@@ -77,7 +77,6 @@ public class Base32Generator  extends SlamGenerator{
         });
 
         result.sort(Comparator.comparingInt(MemberVo::getScore).reversed());
-        System.out.println( System.currentTimeMillis()-s);
         return result;
     }
     

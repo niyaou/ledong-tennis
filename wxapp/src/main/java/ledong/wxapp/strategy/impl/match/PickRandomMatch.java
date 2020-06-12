@@ -38,7 +38,6 @@ public class PickRandomMatch extends MatchStrategy {
         if (map.size() != 0) {
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
                 if (redis.lockKey((String) entry.getKey(), 30)) {
-                    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
 
                     MatchRequestVo otherRequest = (MatchRequestVo) entry.getValue();
 
@@ -57,14 +56,11 @@ public class PickRandomMatch extends MatchStrategy {
                     String matchId = postMatches(null, otherRequest.getUserName(), user,
                             MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode(),
                             MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null, courtGps);
-                    System.out.println(String.format(" create match post : %s", user));
                     redis.set(StringUtil.combiningSpecifiedUserKey(otherRequest.getUserName(), "receive"), matchId, 7);
                     redis = null;
                     attachedMatchSession(matchId, user, otherRequest.getUserName());
                     return matchId;
-                } else {
-                    System.out.println("the Key = " + entry.getKey() + " has been locked ");
-                }
+                } 
 
             }
         }

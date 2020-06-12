@@ -1042,7 +1042,6 @@ public class SearchApi {
             return new ErrorResponse();
         } catch (Exception x) {
             x.printStackTrace();
-            System.out.println(x.getClass());
             throw x;
         }
     }
@@ -1051,7 +1050,6 @@ public class SearchApi {
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(searchSourceBuilder);
         HashMap<String, Object> list = new HashMap<String, Object>();
-        System.out.println(searchSourceBuilder.toString());
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
@@ -1060,7 +1058,6 @@ public class SearchApi {
             Filter f = searchResponse.getAggregations().get("winrate");
             list.put("date", f.getDocCount());
 
-            System.out.println(list.toString());
             return Double.parseDouble(String.valueOf(f.getDocCount() * 100 / a));
         } catch (IOException | ArithmeticException e) {
             log.error(e.getMessage());
@@ -1072,7 +1069,6 @@ public class SearchApi {
     public static String mostPlayedCourt(String indexName, SearchSourceBuilder searchSourceBuilder) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(searchSourceBuilder);
-        System.out.println(searchSourceBuilder.toString());
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 

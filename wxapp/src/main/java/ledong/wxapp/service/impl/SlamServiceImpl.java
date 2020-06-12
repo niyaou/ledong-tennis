@@ -264,7 +264,6 @@ public class SlamServiceImpl implements ISlamService {
     private GroupVo createGroupMatches(String slamId,GroupVo group) {
         List<MemberVo> m = group.getMembers();
         List<MatchPostVo> matches= new ArrayList<MatchPostVo>();
-        System.out.println(JSON.toJSONString(m));
         if (m.size() == 3) {
             matches.add( createMatch(slamId, m,0,1));
             matches.add( createMatch(slamId, m,0,2));

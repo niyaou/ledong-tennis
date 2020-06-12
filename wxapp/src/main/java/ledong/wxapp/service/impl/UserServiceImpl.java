@@ -126,7 +126,6 @@ public class UserServiceImpl implements IUserService {
     public HashMap<String, Object> getUserInfo(String openId) {
         HashMap<String, String> vo = new HashMap<String, String>();
         vo.put(UserVo.OPENID, openId);
-        System.out.println(openId);
         LinkedList<HashMap<String, Object>> loginUser = SearchApi.searchByField(DataSetConstant.USER_INFORMATION,
                 UserVo.OPENID, openId, null, null);
         if (loginUser != null) {
@@ -163,7 +162,7 @@ public class UserServiceImpl implements IUserService {
                     init();
                     json = new String(decrypt(encrypted64, key64, generateIV(iv64)));
                 } catch (Exception e) {
-                    System.out.println("解密微信手机号失败:" + e.getMessage());
+                    logger.info("解密微信手机号失败:" + e.getMessage());
                 }
                 return json;
     

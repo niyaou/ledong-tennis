@@ -45,7 +45,6 @@ public class PickIntentionalMatch extends MatchStrategy {
                     DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
             if (matches != null) {
                 pickMatchId = (String) matches.get(0).get(SearchApi.ID);
-                System.out.println(String.format(" create pick match post : %s", exclusiveUser));
             }
             return pickMatchId;
         } catch (ParseException e) {

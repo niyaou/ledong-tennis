@@ -45,7 +45,6 @@ public class MatchController {
             @RequestParam(value = "gps", required = true) String gps) {
         Claims claims = tokenService.getClaimByToken(authHeader);
         String userId = claims.getSubject();
-        System.out.println(userId);
         return new ResponseEntity<Object>(CommonResponse.success(matchService.requestMatching(userId, gps)),
                 HttpStatus.OK);
     }

@@ -251,7 +251,6 @@ public class MatchServiceImpl implements IMatchService {
         HashMap<String, Object> session = SearchApi.searchById(DataSetConstant.SESSION_INFORMATION, sessionId);
         // SessionVo vo = null;
         if (session == null) {
-            System.out.println("session is not existed");
             return null;
         } else {
             Map<String, String> o = new HashMap<String, String>();
@@ -551,11 +550,9 @@ public class MatchServiceImpl implements IMatchService {
                 vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
                 vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
                 vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-                System.out.println("update acknowledged");
             } else {
                 vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
                 finishId = finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
-                System.out.println("finished game");
             }
         }
 

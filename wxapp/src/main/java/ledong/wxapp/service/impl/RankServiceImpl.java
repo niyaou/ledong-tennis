@@ -63,7 +63,6 @@ public class RankServiceImpl implements IRankService {
     public String matchRank(String matchId, int holderScore, int challengerScor) {
         int[] scores = new int[2];
         int[] tempScore = new int[2];
-        System.out.println("-----ranking match :" + matchId);
         Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
 
@@ -191,16 +190,13 @@ public class RankServiceImpl implements IRankService {
         Integer rankPosition = 0;
         List<HashMap<String, Object>> users = SearchApi.searchByField(DataSetConstant.USER_RANK_INFORMATION,
                 RankInfoVo.OPENID, userId, null, null);
-        System.out.print(users);
         if (users != null) {
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             QueryBuilder range = SearchApi.createSearchByFieldRangeGtSource(RankInfoVo.SCORE,
                     String.valueOf(users.get(0).get(RankInfoVo.SCORE)));
             searchSourceBuilder.query(range);
-            System.out.print(searchSourceBuilder.toString());
             rankPosition = SearchApi.totalRawResponse(searchSourceBuilder, DataSetConstant.USER_RANK_INFORMATION);
         }
-        System.out.print(rankPosition);
         return rankPosition == null ? 1 : (rankPosition + 1);
     }
 
