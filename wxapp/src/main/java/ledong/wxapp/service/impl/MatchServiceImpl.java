@@ -34,6 +34,7 @@ import VO.MatchPostVo;
 import VO.MatchRequestVo;
 import VO.RankInfoVo;
 import VO.SessionVo;
+import VO.SlamVo;
 import VO.UserVo;
 import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.DataSetConstant;
@@ -308,7 +309,7 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
-        String score = iRankService.matchRank(matchId, holderScore, challengerScore);
+        iRankService.matchRank(matchId, holderScore, challengerScore);
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
                 : MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode());
@@ -655,6 +656,29 @@ public class MatchServiceImpl implements IMatchService {
         });
         SearchApi.deleteDocument(DataSetConstant.GAME_MATCH_INFORMATION, id);
         return null;
+    }
+
+
+
+    @Override
+    public String finishSlamMatch(String slamId, String matchId, Integer holderScore, Integer challengerScore) {
+
+        SlamVo match = JSON.parseObject(JSON.toJSONString( SearchApi.searchById(SlamVo.SLAM_INFORMATION, slamId)),SlamVo.class);
+        if (match == null) {
+            return null;
+        }
+      
+        iRankService.rankingSlamMatches(slamId, matchId,holderScore,challengerScore);
+
+        MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
+        vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
+                : MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode());
+        vo.setHolderScore(holderScore);
+        vo.setChallengerScore(challengerScore);
+        vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
+        vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+        return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
     }
 
 }

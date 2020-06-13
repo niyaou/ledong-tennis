@@ -214,6 +214,17 @@ public interface IMatchService {
      */
     public String finishMatch(String matchId, int holderScore, int challengerScore);
 
+
+    /**
+     * finish slam match , set score and status
+     * @param slamId
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public String finishSlamMatch(String slamId,String matchId,Integer holderScore,Integer challengerScore);
+
     /**
      * get playing match
      * 

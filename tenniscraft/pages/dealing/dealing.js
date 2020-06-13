@@ -15,7 +15,7 @@ Page({
     isPlus: false,
     parseTime: '',
     short: 2000,
-    long: 5000,
+    long: 3500,
     confirmed: false,
     isPickIntentional: false,
     interval: -1,

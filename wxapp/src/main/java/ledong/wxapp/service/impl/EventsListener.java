@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import VO.MatchConfirmEvent;
 import VO.RankInfoVo;
+import VO.SlamWinRateEvent;
 import VO.WinRateEvent;
 import ledong.wxapp.queue.ConfirmedMatchTask;
 import ledong.wxapp.queue.MatchConfirmSchedule;
@@ -42,6 +43,24 @@ public class EventsListener {
         userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
         rankService.updateRankInfo(userVos);
     }
+
+
+    @EventListener
+    @Async
+    public void handleSlamWinRateEvent(SlamWinRateEvent event) {
+        RankInfoVo userVos = event.getUserVo();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
+        userVos.setSlamWinRate(rankService.updateSlamWinRate(userVos.getOpenId()));
+        rankService.updateRankInfo(userVos);
+    }
+
+
+
 
     @EventListener
     @Async

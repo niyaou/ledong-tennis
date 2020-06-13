@@ -28,6 +28,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import VO.MatchPostVo;
 import VO.RankInfoVo;
+import VO.SlamWinRateEvent;
 import VO.UserVo;
 import VO.WinRateEvent;
 import ledong.wxapp.constant.DataSetConstant;
@@ -85,7 +86,6 @@ public class RankServiceImpl implements IRankService {
         scores[0] += tempScore[0];
         scores[1] += tempScore[1];
 
-
         holder.setScore(holder.getScore() + scores[0]);
         challenger.setScore(challenger.getScore() + scores[1]);
 
@@ -104,10 +104,6 @@ public class RankServiceImpl implements IRankService {
         redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
     }
-
-
-
-
 
     @Override
     public RankInfoVo getUserRank(String userId) {
@@ -139,10 +135,11 @@ public class RankServiceImpl implements IRankService {
                 List<Map<String, Object>> holder = userInfos.stream()
                         .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
                         .collect(Collectors.toList());
-    
+
                 match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
                 match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
-                match.put(MatchPostVo.COURTNAME,  iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID)).get(MatchPostVo.COURTNAME));
+                match.put(MatchPostVo.COURTNAME, iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID))
+                        .get(MatchPostVo.COURTNAME));
                 return match;
             }).collect(Collectors.toList());
 
@@ -200,5 +197,71 @@ public class RankServiceImpl implements IRankService {
         return rankPosition == null ? 1 : (rankPosition + 1);
     }
 
+    @Override
+    public String rankingSlamMatches(String slamId, String matchId, Integer holderScore, Integer challengerScore) {
+
+        Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_MATCH_INFORMATION, matchId);
+        MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
+        RankInfoVo holder = getUserRank(vo.getHolder());
+        RankInfoVo challenger = getUserRank(vo.getChallenger());
+
+        matchRanked(holder, challenger, matchId, holderScore, challengerScore);
+        updateRankInfo(holder);
+        updateRankInfo(challenger);
+        ctx.publishEvent(new SlamWinRateEvent(ctx, holder));
+        ctx.publishEvent(new SlamWinRateEvent(ctx, challenger));
+        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        return null;
+    }
+
+    private void matchRanked(RankInfoVo holder, RankInfoVo challenger, String matchId, Integer holderScore,
+            Integer challengerScore) {
+        int[] scores = new int[2];
+        int[] tempScore = new int[2];
+        RankingContext context = new RankingContext(new VictoryRanking());
+        scores = context.rankMatch(matchId, holderScore, challengerScore);
+
+        context = new RankingContext(new ConsecutiveRanking());
+        tempScore = context.rankMatch(matchId, holderScore, challengerScore);
+
+        scores[0] += tempScore[0];
+        scores[1] += tempScore[1];
+        context = new RankingContext(new PondRanking());
+        tempScore = context.rankMatch(matchId, holderScore, challengerScore);
+        scores[0] += tempScore[0];
+        scores[1] += tempScore[1];
+
+        holder.setSlamScore(holder.getSlamScore() + scores[0]);
+        challenger.setSlamScore(challenger.getSlamScore() + scores[1]);
+        GradingContext gContext = new GradingContext(new GradeRanking());
+        holder = gContext.rankMatch(holder);
+        challenger = gContext.rankMatch(challenger);
+    }
+
+    @Override
+    public Double updateSlamWinRate(String userId) {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder user = new BoolQueryBuilder();
+        user.should(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId))
+                .should(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId));
+        BoolQueryBuilder match = new BoolQueryBuilder();
+        match.must(QueryBuilders.termQuery(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()))
+                .must(user).must(QueryBuilders.termQuery(MatchPostVo.CLUBMATCH, MatchStatusCodeEnum.SLAM_MATCH .getCode()));
+
+        BoolQueryBuilder win = new BoolQueryBuilder();
+
+        win.should(new BoolQueryBuilder()
+                .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
+                .must(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId)))
+                .should(new BoolQueryBuilder()
+                        .must(QueryBuilders.termQuery(MatchPostVo.WINNER,
+                                MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
+                        .must(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId)));
+        AggregationBuilder b = AggregationBuilders.filter("winrate", win);
+        searchSourceBuilder.query(match);
+        searchSourceBuilder.aggregation(b);
+        return SearchApi.winRateAggregate(DataSetConstant.GAME_MATCH_INFORMATION, searchSourceBuilder);
+    }
 
 }
