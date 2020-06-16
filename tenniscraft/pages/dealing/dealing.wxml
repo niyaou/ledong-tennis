@@ -2,7 +2,7 @@
 <view class="contain">
 	<view class="cl">
 		<div class="head" style='padding-top:{{totalBarHeight}}rpx;'>
-			<div style='top:{{totalBarHeight-70}}rpx;' bindtap='backtoIndex'> <text decode="true">&nbsp;&nbsp; &lt;</text></div>
+			<div style='top:{{totalBarHeight-70}}rpx;width:10%;height:5%' bindtap='backtoIndex'> <text decode="true">&nbsp;&nbsp; &lt;</text></div>
 			<div  style='top:{{totalBarHeight-70}}rpx; left:40%' >{{!isPlus ?matches.status ==2001 ? '比赛协商':matches.status ==2002?'正在比赛':matches.status ==2003?'比赛结束':'发布比赛':'发布比赛'}}</div>
 
 		</div>

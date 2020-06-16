@@ -2,6 +2,8 @@ package ledong.wxapp.service.impl;
 
 import java.util.concurrent.DelayQueue;
 
+import com.alibaba.fastjson.JSON;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -9,9 +11,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import VO.MatchConfirmEvent;
+import VO.MatchPostVo;
 import VO.RankInfoVo;
 import VO.SlamWinRateEvent;
 import VO.WinRateEvent;
+import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.queue.ConfirmedMatchTask;
 import ledong.wxapp.queue.MatchConfirmSchedule;
 import ledong.wxapp.service.IMatchService;
@@ -65,19 +69,13 @@ public class EventsListener {
     @EventListener
     @Async
     public void handleConfirmEvent(MatchConfirmEvent event) {
-        log.info("---------start delay task :" + event.getMatchId());
-        // matchConfirmSchedule.put(event.getMatchId());
-        // DelayQueue<ConfirmedMatchTask> que = matchConfirmSchedule.get();
         try {
             Thread.sleep(60000);
-            // String matchId = que.take().getMatchId();
             String matchId = event.getMatchId();
-         Object m =   matchService.getMatchInfos(matchId);
-         if(m!=null){
+         MatchPostVo m = JSON.parseObject(JSON.toJSONString( matchService.getMatchInfos(matchId)),MatchPostVo.class);
+         if(!m.getRanked().equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
             matchService.confirmMatch(matchId, 2);
-            log.info("---------confirm :" + matchId + "    "+m) ;
          }
-            log.info("---------get delay task expired :" + matchId + "    "+m) ;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

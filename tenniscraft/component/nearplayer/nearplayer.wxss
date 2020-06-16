@@ -1,20 +1,12 @@
 /* component/playitem/playitem.wxss */
-.rowdiv {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  height: 200rpx;
-  margin: 30rpx;
-
-}
 
 .columndiv {
   display: flex;
   flex-direction: column;
-  height: 200rpx;
+  height: 210rpx;
   width: 100%;
   margin-top:5%;
+  min-height:210rpx;
   justify-content: center;
   align-items: center;
   align-content: center;
@@ -35,7 +27,13 @@
   color: rgb(153, 153, 153);
  }
 
-
+.name{
+  width:90%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: center;
+}
 .info {
   width: 40%;
   display: flex;

@@ -58,7 +58,7 @@ Page({
       }
     })
     var matchComp = this.selectComponent('#match');
-    if (matchComp != null) {
+    if (matchComp != null && matchComp.data.tabStatus != 1) {
       matchComp.tapTabStatus({
         currentTarget: {
           dataset: {
@@ -67,7 +67,9 @@ Page({
         }
       })
     }
-
+    if (matchComp != null && matchComp.data.tabStatus == 1){
+      matchComp. clearMatches()
+    }
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo

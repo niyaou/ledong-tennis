@@ -287,7 +287,6 @@ public class SearchApi {
         }
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
         searchRequest.source(searchSourceBuilder);
-        log.info(searchSourceBuilder.toString());
         return parseResponse(searchRequest);
     }
 
@@ -816,7 +815,6 @@ public class SearchApi {
         searchSourceBuilder.query(queryBuilder);
         searchSourceBuilder.version(true);
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
-        log.error(searchSourceBuilder.toString());
         searchRequest.source(searchSourceBuilder);
 
         // try {
@@ -1143,7 +1141,7 @@ public class SearchApi {
     private static String parseUpdateResponse(UpdateRequest searchRequest) {
         try {
             DocWriteResponse updateResponse = client.update(searchRequest, RequestOptions.DEFAULT);
-            log.info(updateResponse.getResult());
+            log.info(updateResponse.getResult().toString());
             if (updateResponse.getResult().toString().equals(Result.UPDATED.toString())) {
                 return updateResponse.getId();
             }

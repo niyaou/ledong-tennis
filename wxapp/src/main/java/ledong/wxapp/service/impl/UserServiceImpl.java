@@ -91,17 +91,14 @@ public class UserServiceImpl implements IUserService {
         String url = String.format(
                 "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
                 appId, appSecret, token);
-        logger.error(url);
         try {
             // OpenId openId = restTemplate.getForObject(url, OpenId.class);
             String json = restTemplate.getForObject(url, String.class);
-            logger.info(json);
 
             JSONObject openId = (JSONObject) JSONObject.parse(json);
 
             return new String[] { openId.getString("openid"), openId.getString("session_key") };
         } catch (RestClientException e) {
-            logger.error(e.getMessage());
             return null;
         }
     }

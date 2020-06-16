@@ -48,6 +48,11 @@ Component({
    * 组件的方法列表
    */
   methods: {
+    clearMatches() {
+      this.setData({
+        matches: []
+      })
+    },
     closeMap() {
       this.setData({
         showMap: false
@@ -70,11 +75,9 @@ Component({
       })
     },
     tapTabStatus(event) {
-
       this.setData({
         tabStatus: event.currentTarget.dataset.gid
       })
-
       if (parseInt(event.currentTarget.dataset.gid) === 2) {
         this.matchedGame()
       } else if (parseInt(event.currentTarget.dataset.gid) === 1) {

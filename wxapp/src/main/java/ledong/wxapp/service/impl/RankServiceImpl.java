@@ -1,5 +1,6 @@
 package ledong.wxapp.service.impl;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -7,7 +8,6 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ApplicationContextEvent;
@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import com.alibaba.fastjson.JSONObject;
 
@@ -50,7 +51,7 @@ import ledong.wxapp.utils.StringUtil;
 
 @Service
 public class RankServiceImpl implements IRankService {
-
+    private static Logger logger = Logger.getLogger(RankServiceImpl.class);
     @Autowired
     private RedisUtil redis;
     @Autowired
@@ -70,22 +71,18 @@ public class RankServiceImpl implements IRankService {
         RankInfoVo holder = getUserRank(vo.getHolder());
         RankInfoVo challenger = getUserRank(vo.getChallenger());
         int scoreChanged = 0;
-
         RankingContext context = new RankingContext(new VictoryRanking());
         scores = context.rankMatch(matchId, holderScore, challengerScor);
-
         context = new RankingContext(new ConsecutiveRanking());
         tempScore = context.rankMatch(matchId, holderScore, challengerScor);
 
         scores[0] += tempScore[0];
         scores[1] += tempScore[1];
-
         context = new RankingContext(new PondRanking());
 
         tempScore = context.rankMatch(matchId, holderScore, challengerScor);
         scores[0] += tempScore[0];
         scores[1] += tempScore[1];
-
         holder.setScore(holder.getScore() + scores[0]);
         challenger.setScore(challenger.getScore() + scores[1]);
 
@@ -93,10 +90,22 @@ public class RankServiceImpl implements IRankService {
 
         holder = gContext.rankMatch(holder);
         challenger = gContext.rankMatch(challenger);
+     
+        if (holder.getPoolRemain() >= tempScore[0]) {
+            holder.setPoolRemain(holder.getPoolRemain() - tempScore[0]);
+        }else{
+            holder.setPoolRemain(0);
+        }
+       
+        if (challenger.getPoolRemain() >= tempScore[1]) {
+            challenger.setPoolRemain(challenger.getPoolRemain() - tempScore[1]);
+        }else{
+            challenger.setPoolRemain(0);
+        }
+
 
         updateRankInfo(holder);
         updateRankInfo(challenger);
-
         ctx.publishEvent(new WinRateEvent(ctx, holder));
         ctx.publishEvent(new WinRateEvent(ctx, challenger));
 

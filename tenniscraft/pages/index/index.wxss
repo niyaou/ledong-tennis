@@ -105,6 +105,15 @@ page {
   /* align-items: center; */
 
 }
+.functionbar > text{
+  height:100%;
+  width:90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
 .start{align-items: flex-start;}
 .center{align-items: center;}
 .end{align-items: flex-end;}

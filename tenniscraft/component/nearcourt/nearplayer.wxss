@@ -1,18 +1,10 @@
 /* component/playitem/playitem.wxss */
-.rowdiv {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  height: 200rpx;
-  margin: 30rpx;
-
-}
 
 .columndiv {
   display: flex;
   flex-direction: column;
-  height: 200rpx;
+  height: 230rpx;
+  min-height:230rpx;
   width: 100%;
   margin-top:5%;
   justify-content: center;

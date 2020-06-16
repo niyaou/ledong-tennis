@@ -7,9 +7,9 @@
 		<div class="user">
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
-				<div class="nickname">{{matches.holderName}}
+		<div  class="namecontent"><text class="nickname">{{matches.holderName}}</text>
 					<div class="rank">{{matches.holderrankType0}}</div>
-				</div>
+			</div>
 
 			</div>
       <div class="score win">{{matches.holderScore}}</div>
@@ -17,9 +17,9 @@
          <div class="score lose">{{matches.challengerScore}}</div>
 			<div class="avator">
 				<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
-				<div class="nickname">{{matches.challengerName}}
+				<div  class="namecontent">	<text class="nickname">{{matches.challengerName}}</text>
 					<div class="rank" wx:if="{{matches.challengerrankType0}}">{{matches.challengerrankType0}}</div>
-				</div>
+			</div>
 			</div>
 		</div>
 		<div class="divid" />

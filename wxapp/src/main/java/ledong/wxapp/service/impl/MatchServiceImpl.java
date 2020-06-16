@@ -80,7 +80,6 @@ public class MatchServiceImpl implements IMatchService {
         String matchId = null;
         strategy = new MatchContext(new PickRandomMatch(redis, iRankService));
         matchId = strategy.getMatchId(vo);
-        log.info("---1" + matchId);
 
         if (!TextUtils.isEmpty(matchId)) {
             return matchId;
@@ -95,7 +94,6 @@ public class MatchServiceImpl implements IMatchService {
 
         strategy = new MatchContext(new PostRandomMatch(redis));
         matchId = strategy.getMatchId(vo);
-        log.info("---3" + matchId);
         if (!TextUtils.isEmpty(matchId)) {
             return matchId;
         }
@@ -624,7 +622,7 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public LinkedList<HashMap<String, Object>> nearByCourt(String gps) {
-        return SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps, "8");
+        return SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps, "50");
     }
 
     @Override

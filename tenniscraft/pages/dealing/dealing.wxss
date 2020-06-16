@@ -169,11 +169,11 @@ page {
   align-items: center;
   align-self: center;
   align-content: center;
-  width: 15%;
+  width: 20%;
   height: 100%;
 }
 .message{
-  height:100rpx;
+  height:140rpx;
   width: 100%;
   position: absolute;
   bottom: 0;

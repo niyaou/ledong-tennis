@@ -8,7 +8,7 @@
 		<view wx:for="{{nearBy}}" style="display:inline-block;background:#fafbf9" wx:key="openId" bindtap="userTap" data-item="{{item}}">
 					<div class="avator">
 						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{item.avator}}" mode="cover" style="z-index:30"></image>
-							<div>{{item.nickName}}</div>
+							<div class="name">{{item.nickName}}</div>
 					</div>
 		</view>
 	</scroll-view>
