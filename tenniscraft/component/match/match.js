@@ -95,13 +95,13 @@ Component({
         gps: app.globalData.gps
       }, (res) => {
         if (res.code == 0 && res.data != null) {
-          console.info(res)
+          // console.info(res)
           wx.showLoading({
             title: 'loading...',
           })
           setTimeout(function () {
             http.getReq(`match/matchInfo/${res.data}`, app.globalData.jwt, (resMatch) => {
-              console.info(resMatch)
+              // console.info(resMatch)
               if (resMatch.code === 0) {
                 that.setData({
                   matches: [resMatch.data]

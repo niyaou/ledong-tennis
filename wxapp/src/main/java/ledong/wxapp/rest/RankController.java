@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import ledong.wxapp.auth.JwtToken;
+import ledong.wxapp.config.CustomException;
+import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.utils.DateUtil;
@@ -71,11 +73,22 @@ public class RankController {
     @RequestMapping(value = "/rankList", method = RequestMethod.GET)
     @ApiOperation(value = "explore  ranking list ", notes = "")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "grade", value = "grade name", required = false, dataType = "string", paramType = "query") })
-    public ResponseEntity<?> userRankingList(   @RequestParam(value = "grade", required = false) String grade) {
+        @ApiImplicitParam(name = "grade", value = "grade name", required = false, dataType = "string", paramType = "query"),
+        @ApiImplicitParam(name = "count", value = "list count ", required = false, dataType = "string", paramType = "query")  })
+    public ResponseEntity<?> userRankingList(   @RequestParam(value = "grade", required = false) String grade,
+    @RequestParam(value = "count", required = false) Integer count) {
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.getRankingList(grade)), HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = "/rankNewList", method = RequestMethod.GET)
+    @ApiOperation(value = "explore  ranking list ", notes = "")
+    @ApiImplicitParams({
+              @ApiImplicitParam(name = "count", value = "list count ", required = false, dataType = "string", paramType = "query")  })
+    public ResponseEntity<?> userRankingNewList(   
+    @RequestParam(value = "count", required = false) Integer count) {
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getRankingList(count)), HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/rankPosition", method = RequestMethod.GET)
     @ApiOperation(value = "get user position in  ranking list ", notes = "")
@@ -87,6 +100,45 @@ public class RankController {
         }
         String userId = claims.getSubject();
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserPositionInRankList(userId)), HttpStatus.OK);
+    }
+
+
+    
+    @RequestMapping(value = "/totalUser", method = RequestMethod.GET)
+    @ApiOperation(value = "get user count ", notes = "")
+    public ResponseEntity<?> getTotalUser(  @RequestHeader("Authorization") String authHeader)
+            throws AuthenticationException {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+                    throw new AuthenticationException("token 不可用");
+                }
+                String userId = claims.getSubject();
+                if(!"19960390361".equals(userId) && !"18602862619".equals(userId)){
+                   
+                    throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                }
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getTotalUser() ), HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/updateUserScore", method = RequestMethod.POST)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "openId", value = "openId", required = true, dataType = "string", paramType = "query"),
+        @ApiImplicitParam(name = "score", value = "score ", required = true, dataType = "int", paramType = "query")  })
+    public ResponseEntity<?> updateUserScore(  @RequestHeader("Authorization") String authHeader,
+    @RequestParam(value = "openId", required = true) String openId,
+    @RequestParam(value = "score", required = true) Integer score)
+            throws AuthenticationException {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+                    throw new AuthenticationException("token 不可用");
+                }
+                String userId = claims.getSubject();
+                if(!"19960390361".equals(userId) && !"18602862619".equals(userId)){
+                    throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                }
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.updateScoreByMaster(openId,score) ), HttpStatus.OK);
     }
 
 }

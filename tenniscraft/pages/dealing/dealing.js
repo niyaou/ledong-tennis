@@ -100,7 +100,7 @@ Page({
       if (!that.data.isPlus) {
         that.reloadContext()
       } else { }
-      console.info(that.data.openId,that.data.matches.holder)
+      // console.info(that.data.openId,that.data.matches.holder)
     })
 
 
@@ -159,7 +159,7 @@ Page({
         courtGPS: that.data.matches.courtGPS
       })
     }
-    console.info(data.courtGPS, !data.courtGPS)
+    // console.info(data.courtGPS, !data.courtGPS)
     if (!data.courtGPS) {
       wx.showToast({
         title: '请选择球场',
@@ -170,7 +170,7 @@ Page({
     }
 
 
-    console.info(data.courtName, !data.courtName)
+    // console.info(data.courtName, !data.courtName)
     if (!data.courtName) {
       wx.showToast({
         title: '请选择球场',
@@ -269,7 +269,7 @@ Page({
         challengerScore: score
       })
     }
-    console.info(e.detail.value, data)
+    // console.info(e.detail.value, data)
     http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => { })
 
   },
@@ -350,9 +350,9 @@ Page({
   postMessage() {
 
     let type = app.globalData.openId === this.data.matches.holder ? 0 : 1
-    console.info(this.data.inputValue)
-    console.info(typeof this.data.inputValue, this.data.inputValue == null)
-    console.info(this.data.inputValue.length, this.data.inputValue.lenght == 0)
+    // console.info(this.data.inputValue)
+    // console.info(typeof this.data.inputValue, this.data.inputValue == null)
+    // console.info(this.data.inputValue.length, this.data.inputValue.lenght == 0)
     if (this.data.inputValue == undefined || this.data.inputValue == null || this.data.inputValue.length == 0) {
       wx.showToast({
         title: '请不要发送空消息',

@@ -89,4 +89,5 @@ public interface IUserService {
      */
     public LinkedList<HashMap<String, Object>> getNearyByUser(String gps);
 
+
 }

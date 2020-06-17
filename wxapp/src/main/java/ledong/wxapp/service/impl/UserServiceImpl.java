@@ -198,4 +198,5 @@ public class UserServiceImpl implements IUserService {
         cipher.init(Cipher.DECRYPT_MODE, key, iv);
         return cipher.doFinal(encryptedData);
     }
+
 }

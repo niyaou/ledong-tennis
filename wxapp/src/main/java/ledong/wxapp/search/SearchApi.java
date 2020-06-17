@@ -857,6 +857,23 @@ public class SearchApi {
         return null;
     }
 
+    public static Long indexCount(String indexName) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchRequest.source(searchSourceBuilder);
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            Long hits=searchResponse.getHits().getTotalHits().value;
+            return hits;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return null;
+    }
+
+
+
     public static SearchResponse fileStatiscByParams(String indexName, QueryBuilder... queries) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().size(0);

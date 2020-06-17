@@ -1,7 +1,11 @@
 {
   "pages": [
+  
     "pages/index/index",
+    "pages/master/master",
     "pages/dealing/dealing"
+
+ 
   ],
   "window": {
     "backgroundTextStyle": "light",
