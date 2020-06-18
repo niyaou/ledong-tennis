@@ -110,6 +110,9 @@ public class UserController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form") })
     public ResponseEntity<?> nearby(@RequestParam(value = "gps", required = true) String gps) {
+        if (gps.contains("undefined")) {
+            gps = "30.653011,104.065735";
+        }
         return new ResponseEntity<Object>(CommonResponse.success(userService.getNearyByUser(gps)), HttpStatus.OK);
 
     }

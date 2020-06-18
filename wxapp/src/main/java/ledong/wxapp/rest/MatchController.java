@@ -111,7 +111,6 @@ public class MatchController {
         return new ResponseEntity<Object>(CommonResponse.success(matchService.playingMatchInfo(userId)), HttpStatus.OK);
     }
 
-
     @RequestMapping(value = "/matchResult", method = RequestMethod.GET)
     @ApiOperation(value = "get last match result", notes = "")
     public ResponseEntity<?> exploreLastResult(@RequestHeader("Authorization") String authHeader) {
@@ -119,10 +118,6 @@ public class MatchController {
         String userId = claims.getSubject();
         return new ResponseEntity<Object>(CommonResponse.success(matchService.lastMatchResult(userId)), HttpStatus.OK);
     }
-
-
-
-
 
     @RequestMapping(value = "/matchInfo/{matchId}", method = RequestMethod.GET)
     @ApiOperation(value = "get  match infos", notes = "")
@@ -146,9 +141,9 @@ public class MatchController {
             @RequestParam(value = "courtGPS", required = false) String courtGPS,
             @RequestParam(value = "orderTime", required = false) String orderTime) {
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.updateMatchInfos(matchId, orderTime, courtName,courtGPS)), HttpStatus.OK);
+                CommonResponse.success(matchService.updateMatchInfos(matchId, orderTime, courtName, courtGPS)),
+                HttpStatus.OK);
     }
-
 
     @RequestMapping(value = "/matchScore/{matchId}", method = RequestMethod.POST)
     @ApiOperation(value = "update  match score", notes = "")
@@ -161,10 +156,9 @@ public class MatchController {
             @RequestParam(value = "holderScore", required = false) Integer holderScore,
             @RequestParam(value = "challengerScore", required = false) Integer challengerScore) {
         return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.updateMatchScore(matchId, holderScore, challengerScore)), HttpStatus.OK);
+                CommonResponse.success(matchService.updateMatchScore(matchId, holderScore, challengerScore)),
+                HttpStatus.OK);
     }
-
-
 
     @RequestMapping(value = "/matchConfirm/{matchId}/{type}", method = RequestMethod.POST)
     @ApiOperation(value = "confirm   match ", notes = "")
@@ -182,15 +176,15 @@ public class MatchController {
 
     @RequestMapping(value = "/intentionalMatch/{matchId}", method = RequestMethod.POST)
     @ApiOperation(value = "pick a intentional request  match", notes = "")
-    @ApiImplicitParams({        
+    @ApiImplicitParams({
             @ApiImplicitParam(name = "matchId", value = "intentional  request id", required = true, dataType = "string", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> pickIntentionalMatch(@RequestHeader("Authorization") String authHeader,
             @PathVariable(value = "matchId", required = true) String matchId) {
         Claims claims = tokenService.getClaimByToken(authHeader);
         String userId = claims.getSubject();
-        return new ResponseEntity<Object>(
-                CommonResponse.success(matchService.acceptIntentionalMatch(matchId, userId)), HttpStatus.OK);
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.acceptIntentionalMatch(matchId, userId)),
+                HttpStatus.OK);
     }
 
     @RequestMapping(value = "/matchResult/${matchId}", method = RequestMethod.POST)
@@ -211,13 +205,13 @@ public class MatchController {
 
     @RequestMapping(value = "/challengeMatch/{holder}", method = RequestMethod.POST)
     @ApiOperation(value = "challenge a player", notes = "")
-    @ApiImplicitParams({         
+    @ApiImplicitParams({
             @ApiImplicitParam(name = "holder", value = "holder who been challenged user  id", required = true, dataType = "string", paramType = "path") })
     // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
     public ResponseEntity<?> challengeMatch(@RequestHeader("Authorization") String authHeader,
             @PathVariable(value = "holder", required = true) String holder) {
-                Claims claims = tokenService.getClaimByToken(authHeader);
-                String challenger = claims.getSubject();
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String challenger = claims.getSubject();
         return new ResponseEntity<Object>(CommonResponse.success(matchService.postChallengeMatch(holder, challenger)),
                 HttpStatus.OK);
     }
@@ -271,29 +265,26 @@ public class MatchController {
                 HttpStatus.OK);
     }
 
-
     @RequestMapping(value = "/court/nearby", method = RequestMethod.GET)
     @ApiOperation(value = "nearby court", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "query")
-           })
-    public ResponseEntity<?> nearby(
-     @RequestParam(value = "gps", required = true) String gps) {
-            return new ResponseEntity<Object>(CommonResponse.success(matchService.nearByCourt(gps)), HttpStatus.OK);
-      
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "query") })
+    public ResponseEntity<?> nearby(@RequestParam(value = "gps", required = true) String gps) {
+        if (gps.contains("undefined")) {
+            gps = "30.653011,104.065735";
+        }
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.nearByCourt(gps)), HttpStatus.OK);
+
     }
 
-
-  
     @Resource
     private ApplicationContext ctx;
 
-    
     @RequestMapping(value = "/test/put", method = RequestMethod.GET)
-    public ResponseEntity<?> test1( ){
+    public ResponseEntity<?> test1() {
         ctx.publishEvent(new MatchConfirmEvent(ctx, "1"));
 
-            return new ResponseEntity<Object>(CommonResponse.success(), HttpStatus.OK);
+        return new ResponseEntity<Object>(CommonResponse.success(), HttpStatus.OK);
     }
 
 }
