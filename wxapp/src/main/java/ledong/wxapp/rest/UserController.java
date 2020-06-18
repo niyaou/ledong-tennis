@@ -64,6 +64,9 @@ public class UserController {
             @RequestParam(value = "nickName", required = true) String nickName,
             @RequestParam(value = "avator", required = true) String avator,
             @RequestParam(value = "gps", required = true) String gps) {
+        if (gps.contains("undefined")) {
+            gps = "30.653011,104.065735";
+        }
         String info = userService.accessByWxToken(token, nickName, avator, gps);
         if (null == info) {
             return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);

@@ -85,7 +85,7 @@ public class UserServiceImpl implements IUserService {
         if (loginUser != null) {
             loginUser.getFirst().put(UserVo.NICKNAME, nickName);
             loginUser.getFirst().put(UserVo.AVATOR, avator);
-            loginUser.getFirst().put(UserVo.GPS, gps);
+//            loginUser.getFirst().put(UserVo.GPS, gps);
             SearchApi.updateDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()), openId);
             return jwtToken.generateToken(openId);
         }
