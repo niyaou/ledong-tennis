@@ -64,6 +64,14 @@ public class UserServiceImpl implements IUserService {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
         logger.info(JSON.toJSONString(user));
+        try{
+ if(user.getString("gps").equals("undefined,undefined")){
+    user.put("gps","30.653011,104.065735");
+ }
+        }catch(Exception e){
+
+        }
+       
         String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),
                 user.getOpenId());
         Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getOpenId()));
