@@ -20,6 +20,10 @@ Component({
       type:Number,
       value:0
     },
+    score:{
+      type:Number,
+      value:0
+    },
     rankPosition:{
       type:Number,
       value:0

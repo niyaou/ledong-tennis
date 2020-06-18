@@ -156,7 +156,8 @@ Page({
         userRankInfo: {
           rankType1: e.data.rankType1,
           rankType0: e.data.rankType0,
-          winRate: e.data.winRate
+          winRate: e.data.winRate,
+          score:e.data.score
         }
       })
       app.globalData.userRankInfo = this.data.userRankInfo
