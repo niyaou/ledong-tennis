@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "player":"../../component/player/player"
+  }
+
+}

@@ -50,7 +50,7 @@ Component({
         content:'是否发起挑战',
         success:(res)=>{
           if (res.confirm) {
-            console.log('用户点击确定')
+            // console.log('用户点击确定')
             http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {} ,(res)=>{
               if(res.code!==0){
                 wx.showToast({

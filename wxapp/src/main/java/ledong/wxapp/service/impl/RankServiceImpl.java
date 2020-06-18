@@ -24,7 +24,10 @@ import javax.annotation.Resource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import VO.MatchPostVo;
@@ -90,19 +93,18 @@ public class RankServiceImpl implements IRankService {
 
         holder = gContext.rankMatch(holder);
         challenger = gContext.rankMatch(challenger);
-     
+
         if (holder.getPoolRemain() >= tempScore[0]) {
             holder.setPoolRemain(holder.getPoolRemain() - tempScore[0]);
-        }else{
+        } else {
             holder.setPoolRemain(0);
         }
-       
+
         if (challenger.getPoolRemain() >= tempScore[1]) {
             challenger.setPoolRemain(challenger.getPoolRemain() - tempScore[1]);
-        }else{
+        } else {
             challenger.setPoolRemain(0);
         }
-
 
         updateRankInfo(holder);
         updateRankInfo(challenger);
@@ -137,7 +139,7 @@ public class RankServiceImpl implements IRankService {
                 return match;
             }).collect(Collectors.toList());
 
-            LinkedList<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
+           List<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
                     ids.toArray(idsArr));
 
             users = (List<HashMap<String, Object>>) users.stream().map(match -> {
@@ -256,7 +258,8 @@ public class RankServiceImpl implements IRankService {
                 .should(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId));
         BoolQueryBuilder match = new BoolQueryBuilder();
         match.must(QueryBuilders.termQuery(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()))
-                .must(user).must(QueryBuilders.termQuery(MatchPostVo.CLUBMATCH, MatchStatusCodeEnum.SLAM_MATCH .getCode()));
+                .must(user)
+                .must(QueryBuilders.termQuery(MatchPostVo.CLUBMATCH, MatchStatusCodeEnum.SLAM_MATCH.getCode()));
 
         BoolQueryBuilder win = new BoolQueryBuilder();
 
@@ -273,4 +276,51 @@ public class RankServiceImpl implements IRankService {
         return SearchApi.winRateAggregate(DataSetConstant.GAME_MATCH_INFORMATION, searchSourceBuilder);
     }
 
+    @Override
+    public Object getRankingList(Integer count) {
+        List<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION, null,
+                null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
+        if (users != null) {
+            String[] idsArr = new String[users.size()];
+            List<String> ids = new ArrayList<String>();
+            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+                ids.add((String) match.get(RankInfoVo.OPENID));
+                return match;
+            }).collect(Collectors.toList());
+
+            LinkedList<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
+                    ids.toArray(idsArr));
+
+            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+                List<Map<String, Object>> holder = userInfos.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
+                        .collect(Collectors.toList());
+
+                match.put(UserVo.CREATETIME, holder.get(0).get(UserVo.CREATETIME));
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.COURTNAME, iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID))
+                        .get(MatchPostVo.COURTNAME));
+                return match;
+            }).sorted(Comparator.comparing(UserVo::comparingByTime).reversed()).collect(Collectors.toList());
+
+        }
+        return users;
+    }
+
+    @Override
+    public Long getTotalUser() {
+        return SearchApi.indexCount(DataSetConstant.USER_INFORMATION);
+    }
+
+    @Override
+    public String updateScoreByMaster(String openId, Integer score) {
+        RankInfoVo holder = getUserRank(openId);
+        holder.setScore(score);
+        logger.info(JSON.toJSONString(holder));
+        GradingContext gContext = new GradingContext(new GradeRanking());
+        holder = gContext.rankMatch(holder);
+        updateRankInfo(holder);
+        return holder.getOpenId();
+    }
 }

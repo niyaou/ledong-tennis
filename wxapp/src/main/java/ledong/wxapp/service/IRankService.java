@@ -21,16 +21,17 @@ public interface IRankService {
     public String matchRank(String matchId, int holderScore, int challengerScore);
 
     /**
-     * ranking slam matches,which stored in slam index
-     * 1.get holder and challenger by matchid 2.get both players' current rank 3.use
-     * strategy to rank 4.update players' rank 5.return both current rank
+     * ranking slam matches,which stored in slam index 1.get holder and challenger
+     * by matchid 2.get both players' current rank 3.use strategy to rank 4.update
+     * players' rank 5.return both current rank
+     * 
      * @param slamId
      * @param matchId
      * @param holderScore
      * @param challengerScore
      * @return
      */
-    public String rankingSlamMatches(String slamId,String matchId, Integer holderScore, Integer challengerScore);
+    public String rankingSlamMatches(String slamId, String matchId, Integer holderScore, Integer challengerScore);
 
     /**
      * get user rank information by id
@@ -49,13 +50,21 @@ public interface IRankService {
      */
     public String updateRankInfo(RankInfoVo vo);
 
-
     /**
      * get ranking list
+     * 
      * @param grade
      * @return
      */
     public Object getRankingList(String grade);
+
+    /**
+     * get ranking list by count
+     * 
+     * @param count
+     * @return
+     */
+    public Object getRankingList(Integer count);
 
     /**
      * create user rank info
@@ -65,16 +74,13 @@ public interface IRankService {
      */
     public String createRankInfo(String userId);
 
-
-
     /**
      * update user win rate
      * 
      * @param userId
      * @return
      */
-    public Double  updateWinRate(String userId);
-
+    public Double updateWinRate(String userId);
 
     /**
      * update user slam win rate
@@ -82,7 +88,7 @@ public interface IRankService {
      * @param userId
      * @return
      */
-    public Double  updateSlamWinRate(String userId);
+    public Double updateSlamWinRate(String userId);
 
     /**
      * 
@@ -91,4 +97,21 @@ public interface IRankService {
      * @return
      */
     public Integer getUserPositionInRankList(String userId);
+
+    
+
+    /**
+     * get system user
+     * @return
+     */
+    public Long getTotalUser();
+
+
+    /**
+     *  update score  only operated by master
+     * @param openId
+     * @param score
+     * @return
+     */
+    public String updateScoreByMaster(String openId,Integer score);
 }

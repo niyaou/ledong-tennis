@@ -52,7 +52,7 @@ public enum ResultCodeEnum {
     ALREADY_ACCEPTED_MATCH(91002,"已经匹配过该场比赛"),
     ALREADY_POSTED_CHALLENGE(91003,"正在挑战，请先完成比赛"),
 
-
+   
 
     /**  slam */
     SLAM_NOT_EXISTED(32000,"比赛不存在"),
@@ -62,7 +62,7 @@ public enum ResultCodeEnum {
     SLAM_PARTICIPATE_ERROR(32003,"比赛报名失败"),
     SLAM_GENERATED_GROUP_ERROR(32004,"比赛已分组"),
     SLAM_MEMBER_NOT_ENOUGH_ERROR(32005,"比赛人数不足"),
-
+    MASTER_ALLOWED_ONLY(63503,"只允许管理员修改"),
     /** 未知错误 */
     UNKOWN_ERROR(90001, "未知错误");
 

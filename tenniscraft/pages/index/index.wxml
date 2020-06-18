@@ -26,6 +26,7 @@
 					<div class="nickname">{{userInfo.nickName}} </div>
 					<div class="rank">{{userRankInfo.rankType1}} <span style="background:#0a90dd;padding-left: 10rpx;padding-right: 10rpx">{{userRankInfo.rankType0}}</span></div>
 				</div>
+				<div class="master" bindtap="masterTap"></div>
 			</div>
 			<view class="content">
 		

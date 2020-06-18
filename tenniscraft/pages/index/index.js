@@ -39,14 +39,11 @@ Page({
   },
   onShow: function () {
     let that = this
-    console.info('---------onshow ---------')
     if (!this.data.hasInitial) {
       return
     }
     http.getReq(`match/matchResult`, app.globalData.jwt, (res) => {
-      console.info('1 ---- result', res)
       if (res.code == 0 && res.data != null) {
-        console.info('app.globalData', app.globalData)
         let message = (app.globalData.openId == res.data.holder) ? (res.data.winner == 5000 ? '比赛胜利' : '比赛失败') :
           (res.data.winner == 5001 ? '比赛胜利' : '比赛失败')
         let other = (app.globalData.openId !== res.data.holder) ? res.data.holderName : res.data.challengerName
@@ -73,7 +70,6 @@ Page({
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo
-    console.info('------getUserInfo', e)
     this.setData({
       userInfo: e.detail.userInfo,
     })
@@ -83,7 +79,6 @@ Page({
     let that = this
     wx.login({
       success(res) {
-        console.info('wxlogin   ', res)
         http.postReq('user/verified', '', {
           token: res.code,
         }, function (e) {
@@ -120,22 +115,17 @@ Page({
   },
   getPhoneNumber(e) {
     let that = this
-    console.log(e.detail.errMsg)
-    console.log(e.detail.iv)
-    console.log(e.detail.encryptedData)
     http.postReq('user/phone', '', {
       vscode: this.data.vsCode,
       iv: e.detail.iv,
       data: e.detail.encryptedData,
 
     }, function (e) {
-      console.log('getPhoneNumber',e)
       let jsonData=JSON.parse(e.data)
       if (e.code == 0) {
         that.setData({
           openId:jsonData.purePhoneNumber,
         })
-        console.log('purePhoneNumber id',that.data.openId)
         that.login()
       }
     })
@@ -224,6 +214,15 @@ Page({
       this.getRankPosition(app.globalData.jwt)
       this.getNearByCourt(app.globalData.jwt)
       this. getNearByUser(app.globalData.jwt)
+    }
+  },
+  masterTap(){
+    if(app.globalData.openId == '19960390361' || app.globalData.openId == '18602862619' ){
+    
+      wx.navigateTo({
+        url: '../master/master' 
+      })
+    }else{
     }
   }
 })

@@ -139,7 +139,11 @@ page {
   height:70%;
   width:100%;
 }
-
+.master{
+  width:200rpx;
+  height:150rpx;
+  /* background-color:#cd1; */
+}
 
 
 

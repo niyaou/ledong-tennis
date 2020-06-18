@@ -1,6 +1,7 @@
 package VO;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -61,6 +62,10 @@ public class UserVo implements Serializable {
     @ApiModelProperty(value = "lastPlayingTime format : yyyy-MM-dd HH:mm:ss")
     private String lastPlayingTime;
     public static final String LASTPLAYINGTIME = "lastPlayingTime";
+
+    public static String comparingByTime(Map<String, Object> map){
+        return (String) map.get(CREATETIME);
+    }
 
     public String getPhone() {
         return phone;
