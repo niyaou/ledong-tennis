@@ -63,6 +63,7 @@ public class UserServiceImpl implements IUserService {
     public String addUser(UserVo user) {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
+        logger.info(JSON.toJSONString(user));
         String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),
                 user.getOpenId());
         Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getOpenId()));
