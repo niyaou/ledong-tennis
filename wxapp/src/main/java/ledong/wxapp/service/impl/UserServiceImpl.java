@@ -34,6 +34,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import VO.UserVo;
 import ledong.wxapp.auth.JwtToken;
+import ledong.wxapp.constant.CommonConstanst;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
@@ -61,10 +62,10 @@ public class UserServiceImpl implements IUserService {
     public String addUser(UserVo user) {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
-        logger.info(JSON.toJSONString(user));
+        logger.info(JSON.toJSONString(user)); 
         try {
-            if (user.getGps().equals("undefined,undefined")) {
-                user.setGps("30.653011,104.065735");
+            if (user.getGps().contains("undefined")) {
+                user.setGps( CommonConstanst.GPS);
             }
         } catch (Exception e) {
 
@@ -85,7 +86,9 @@ public class UserServiceImpl implements IUserService {
         if (loginUser != null) {
             loginUser.getFirst().put(UserVo.NICKNAME, nickName);
             loginUser.getFirst().put(UserVo.AVATOR, avator);
-//            loginUser.getFirst().put(UserVo.GPS, gps);
+            if(!gps.contains("undefined")){
+                loginUser.getFirst().put(UserVo.GPS, gps);
+            }
             SearchApi.updateDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()), openId);
             return jwtToken.generateToken(openId);
         }

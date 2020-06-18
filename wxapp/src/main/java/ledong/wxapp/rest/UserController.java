@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import ledong.wxapp.auth.JwtToken;
+import ledong.wxapp.constant.CommonConstanst;
 import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.redis.RedisUtil;
@@ -64,9 +65,9 @@ public class UserController {
             @RequestParam(value = "nickName", required = true) String nickName,
             @RequestParam(value = "avator", required = true) String avator,
             @RequestParam(value = "gps", required = true) String gps) {
-        if (gps.contains("undefined")) {
-            gps = "30.653011,104.065735";
-        }
+                if (gps.contains("undefined")) {
+                    gps = CommonConstanst.GPS;
+            }
         String info = userService.accessByWxToken(token, nickName, avator, gps);
         if (null == info) {
             return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
@@ -114,8 +115,8 @@ public class UserController {
             @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form") })
     public ResponseEntity<?> nearby(@RequestParam(value = "gps", required = true) String gps) {
         if (gps.contains("undefined")) {
-            gps = "30.653011,104.065735";
-        }
+            gps = CommonConstanst.GPS;
+    }
         return new ResponseEntity<Object>(CommonResponse.success(userService.getNearyByUser(gps)), HttpStatus.OK);
 
     }

@@ -279,7 +279,7 @@ public class RankServiceImpl implements IRankService {
     @Override
     public Object getRankingList(Integer count) {
         List<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION, null,
-                null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
+                null, RankInfoVo.SCORE, SortOrder.DESC, 0, 200);
         if (users != null) {
             String[] idsArr = new String[users.size()];
             List<String> ids = new ArrayList<String>();
