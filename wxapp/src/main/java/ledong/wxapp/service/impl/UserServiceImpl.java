@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
@@ -34,7 +33,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import VO.UserVo;
-
 import ledong.wxapp.auth.JwtToken;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.search.SearchApi;
@@ -64,14 +62,14 @@ public class UserServiceImpl implements IUserService {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
         logger.info(JSON.toJSONString(user));
-        try{
- if(user.getString("gps").equals("undefined,undefined")){
-    user.put("gps","30.653011,104.065735");
- }
-        }catch(Exception e){
+        try {
+            if (user.getGps().equals("undefined,undefined")) {
+                user.setGps("30.653011,104.065735");
+            }
+        } catch (Exception e) {
 
         }
-       
+
         String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),
                 user.getOpenId());
         Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getOpenId()));
@@ -157,30 +155,27 @@ public class UserServiceImpl implements IUserService {
     public String getPhoneNumber(String sessionKey, String iv, String data) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
             BadPaddingException, UnsupportedEncodingException {
-          
-          
-                String json = null;
-                byte[] encrypted64 = Base64.decodeBase64(data);
-                byte[] key64 = Base64.decodeBase64(sessionKey);
-                byte[] iv64 = Base64.decodeBase64(iv);
-          
-                try {
-                    init();
-                    json = new String(decrypt(encrypted64, key64, generateIV(iv64)));
-                } catch (Exception e) {
-                    logger.info("解密微信手机号失败:" + e.getMessage());
-                }
-                return json;
-    
+
+        String json = null;
+        byte[] encrypted64 = Base64.decodeBase64(data);
+        byte[] key64 = Base64.decodeBase64(sessionKey);
+        byte[] iv64 = Base64.decodeBase64(iv);
+
+        try {
+            init();
+            json = new String(decrypt(encrypted64, key64, generateIV(iv64)));
+        } catch (Exception e) {
+            logger.info("解密微信手机号失败:" + e.getMessage());
+        }
+        return json;
+
     }
 
-
-    
     /**
      * 初始化密钥
      */
-    public  void init() throws Exception {
-     
+    public void init() throws Exception {
+
         Security.addProvider(new BouncyCastleProvider());
         KeyGenerator.getInstance(KEY_NAME).init(128);
     }
@@ -188,7 +183,7 @@ public class UserServiceImpl implements IUserService {
     /**
      * 生成iv
      */
-    public  AlgorithmParameters generateIV(byte[] iv) throws Exception {
+    public AlgorithmParameters generateIV(byte[] iv) throws Exception {
         // iv 为一个 16 字节的数组，这里采用和 iOS 端一样的构造方法，数据全为0
         // Arrays.fill(iv, (byte) 0x00);
         AlgorithmParameters params = AlgorithmParameters.getInstance(KEY_NAME);
@@ -199,8 +194,7 @@ public class UserServiceImpl implements IUserService {
     /**
      * 生成解密
      */
-    public  byte[] decrypt(byte[] encryptedData, byte[] keyBytes, AlgorithmParameters iv)
-            throws Exception {
+    public byte[] decrypt(byte[] encryptedData, byte[] keyBytes, AlgorithmParameters iv) throws Exception {
         Key key = new SecretKeySpec(keyBytes, KEY_NAME);
         Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         // 设置为解密模式
