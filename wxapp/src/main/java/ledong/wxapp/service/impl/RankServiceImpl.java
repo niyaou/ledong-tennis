@@ -1,5 +1,15 @@
 package ledong.wxapp.service.impl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
 import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -10,22 +20,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ApplicationContextEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -36,7 +31,6 @@ import VO.SlamWinRateEvent;
 import VO.UserVo;
 import VO.WinRateEvent;
 import ledong.wxapp.constant.DataSetConstant;
-import ledong.wxapp.constant.enums.GradeCodeEnum;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
@@ -134,15 +128,15 @@ public class RankServiceImpl implements IRankService {
         if (users != null) {
             String[] idsArr = new String[users.size()];
             List<String> ids = new ArrayList<String>();
-            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+            users = users.stream().map(match -> {
                 ids.add((String) match.get(RankInfoVo.OPENID));
                 return match;
             }).collect(Collectors.toList());
 
-           List<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
+            List<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
                     ids.toArray(idsArr));
 
-            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+            users = users.stream().map(match -> {
                 List<Map<String, Object>> holder = userInfos.stream()
                         .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
                         .collect(Collectors.toList());
@@ -203,6 +197,7 @@ public class RankServiceImpl implements IRankService {
             QueryBuilder range = SearchApi.createSearchByFieldRangeGtSource(RankInfoVo.SCORE,
                     String.valueOf(users.get(0).get(RankInfoVo.SCORE)));
             searchSourceBuilder.query(range);
+            searchSourceBuilder.size(500);
             rankPosition = SearchApi.totalRawResponse(searchSourceBuilder, DataSetConstant.USER_RANK_INFORMATION);
         }
         return rankPosition == null ? 1 : (rankPosition + 1);
@@ -283,7 +278,7 @@ public class RankServiceImpl implements IRankService {
         if (users != null) {
             String[] idsArr = new String[users.size()];
             List<String> ids = new ArrayList<String>();
-            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+            users = users.stream().map(match -> {
                 ids.add((String) match.get(RankInfoVo.OPENID));
                 return match;
             }).collect(Collectors.toList());
@@ -291,7 +286,7 @@ public class RankServiceImpl implements IRankService {
             LinkedList<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
                     ids.toArray(idsArr));
 
-            users = (List<HashMap<String, Object>>) users.stream().map(match -> {
+            users = users.stream().map(match -> {
                 List<Map<String, Object>> holder = userInfos.stream()
                         .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
                         .collect(Collectors.toList());
