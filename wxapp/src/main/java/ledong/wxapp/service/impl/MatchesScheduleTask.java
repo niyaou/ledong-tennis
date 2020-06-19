@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import com.alibaba.fastjson.JSON;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,7 @@ import ledong.wxapp.utils.DateUtil;
 @Configuration
 @EnableScheduling
 public class MatchesScheduleTask {
-
+    private static Logger logger = Logger.getLogger(MatchesScheduleTask.class);
     @Autowired
     private IRankService rankservice;
 
@@ -36,6 +37,7 @@ public class MatchesScheduleTask {
     // 3.每天2点增加积分池
     @Scheduled(cron = "3 0 02 * * ?")
     private void configureTasks() {
+        logger.info("每天2点增加积分池");
         LinkedList<HashMap<String, Object>> users;
         try {
             users = SearchApi.searchAll(DataSetConstant.USER_RANK_INFORMATION, 1, 5000);
@@ -79,12 +81,15 @@ public class MatchesScheduleTask {
     // 3.每10分钟定时清理过期任务
     @Scheduled(cron = "5 */10 * * * ?")
     private void matchesClear() {
-
+        logger.info("每10分钟定时清理过期任务");
         String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
         params.add(SearchApi.createSearchByFieldRangeLteSource(MatchPostVo.ORDERTIME, time, true));
-        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
-                MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
+        params.add(SearchApi.createSearchByMultiSource(MatchPostVo.STATUS, String.valueOf( MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()),
+                String.valueOf( MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode())
+        ))  ; 
+           
+
         QueryBuilder[] values = new QueryBuilder[8];
         LinkedList<HashMap<String, Object>> matches = SearchApi.searchByMultiQueriesAndOrders(
                 DataSetConstant.GAME_MATCH_INFORMATION, null, 0, 50, params.toArray(values));
@@ -92,35 +97,38 @@ public class MatchesScheduleTask {
         Optional.ofNullable(matches).ifPresent(us -> {
             us.forEach(u -> {
                 String id = (String) u.get(MatchPostVo.ID);
+                String session = (String) u.get(MatchPostVo.SESSIONID);
+                logger.info("expired match: "+id+"   session:"+session);
                 SearchApi.deleteDocument(DataSetConstant.GAME_MATCH_INFORMATION, id);
+                SearchApi.deleteDocument(DataSetConstant.SESSION_INFORMATION, session);
             });
         });
 
     }
 
 
-        // 3.每10分钟定时清理未开始任务
-        @Scheduled(cron = "8 00 02 * * ?")
-        private void matchesUnConfirmedClear() {
+        // // 3.每天2点开始清理
+        // @Scheduled(cron = "8 00 02 * * ?")
+        // private void matchesUnConfirmedClear() {
     
-            String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
-            ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
-            params.add(SearchApi.createSearchByFieldRangeLteSource(MatchPostVo.ORDERTIME, time, true));
-            params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
-                    MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()));
-            QueryBuilder[] values = new QueryBuilder[8];
-            LinkedList<HashMap<String, Object>> matches = SearchApi.searchByMultiQueriesAndOrders(
-                    DataSetConstant.GAME_MATCH_INFORMATION, null, 0, 50, params.toArray(values));
+        //     String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        //     ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        //     params.add(SearchApi.createSearchByFieldRangeLteSource(MatchPostVo.ORDERTIME, time, true));
+        //     params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+        //             MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()));
+        //     QueryBuilder[] values = new QueryBuilder[8];
+        //     LinkedList<HashMap<String, Object>> matches = SearchApi.searchByMultiQueriesAndOrders(
+        //             DataSetConstant.GAME_MATCH_INFORMATION, null, 0, 50, params.toArray(values));
     
-            Optional.ofNullable(matches).ifPresent(us -> {
-                us.forEach(u -> {
-                    String id = (String) u.get(MatchPostVo.ID);
-                    u.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-                    u.put(MatchPostVo.RANKED, MatchStatusCodeEnum.MATCH_UNRANKED_STATUS.getCode());
-                    SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(u), id);
-                });
-            });
+        //     Optional.ofNullable(matches).ifPresent(us -> {
+        //         us.forEach(u -> {
+        //             String id = (String) u.get(MatchPostVo.ID);
+        //             u.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+        //             u.put(MatchPostVo.RANKED, MatchStatusCodeEnum.MATCH_UNRANKED_STATUS.getCode());
+        //             SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(u), id);
+        //         });
+        //     });
     
-        }
+        // }
 
 }

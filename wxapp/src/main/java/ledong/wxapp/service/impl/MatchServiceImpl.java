@@ -508,7 +508,8 @@ public class MatchServiceImpl implements IMatchService {
 
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode().equals(vo.getStatus())
-                && !MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode().equals(vo.getStatus())) {
+                && !MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode().equals(vo.getStatus())
+                && !MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(vo.getMatchType())) {
             return null;
         }
         if (!TextUtils.isEmpty(orderTime)) {
@@ -656,17 +657,16 @@ public class MatchServiceImpl implements IMatchService {
         return null;
     }
 
-
-
     @Override
     public String finishSlamMatch(String slamId, String matchId, Integer holderScore, Integer challengerScore) {
 
-        SlamVo match = JSON.parseObject(JSON.toJSONString( SearchApi.searchById(SlamVo.SLAM_INFORMATION, slamId)),SlamVo.class);
+        SlamVo match = JSON.parseObject(JSON.toJSONString(SearchApi.searchById(SlamVo.SLAM_INFORMATION, slamId)),
+                SlamVo.class);
         if (match == null) {
             return null;
         }
-      
-        iRankService.rankingSlamMatches(slamId, matchId,holderScore,challengerScore);
+
+        iRankService.rankingSlamMatches(slamId, matchId, holderScore, challengerScore);
 
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()

@@ -1,5 +1,6 @@
 package ledong.wxapp.service.impl;
 
+import java.util.Map;
 import java.util.concurrent.DelayQueue;
 
 import com.alibaba.fastjson.JSON;
@@ -70,11 +71,12 @@ public class EventsListener {
     @Async
     public void handleConfirmEvent(MatchConfirmEvent event) {
         try {
-            Thread.sleep(60000);
             String matchId = event.getMatchId();
-         MatchPostVo m = JSON.parseObject(JSON.toJSONString( matchService.getMatchInfos(matchId)),MatchPostVo.class);
-         if(!m.getRanked().equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
-            matchService.confirmMatch(matchId, 2);
+            log.info("输入比分后自动确认:"+matchId);
+            Thread.sleep(120000);
+          Map<String,Object> vo=  (Map<String, Object>) matchService.getMatchInfos(matchId);
+         if(vo.get(MatchPostVo.RANKED)==null||!vo.get(MatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
+            matchService.confirmMatch(matchId, vo.get(MatchPostVo.HOLDERACKNOWLEDGED).equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode())?2:1);
          }
         } catch (InterruptedException e) {
             e.printStackTrace();

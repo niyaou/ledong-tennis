@@ -85,7 +85,11 @@ public abstract class MatchStrategy {
         }
         MatchStatusCodeEnum status = null;
         if (!StringUtil.isEmpty(challenger) && !StringUtil.isEmpty(holder)) {
-            status = MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING;
+            status = MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType) ? 
+            MatchStatusCodeEnum.MATCH_PLAYING_MATCHING: MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING;
+            if(MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType)){
+                vo.setOrderTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+            }
         } else {
             status = MatchStatusCodeEnum.MATCH_MATCHING_STATUS;
         }

@@ -21,6 +21,7 @@ Page({
     interval: -1,
     intervalM: -1,
     matches: {},
+    matchType:3000,
     openId: getApp().globalData.openId,
     totalBarHeight: getApp().globalData.totalBarHeight,
     holderAvator: 'https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83epUY765qAmPLVQAyMV2bicsbDQTQD12gm3qa5cuVzdcO4GkHXZuJLBYExoaEHpHBFwTDiauuY9NicpwQ/132',
@@ -218,7 +219,7 @@ Page({
       })
     } else if (!this.data.isPlus) {
 
-      if (parseInt(this.data.matches.status) == 2002) {
+      if (parseInt(this.data.matches.status) == 2002 ) {
         if (this.data.matches.holderScore == undefined || this.data.matches.challengerScore == undefined) {
           wx.showToast({
             title: '请输入双方比分',
@@ -274,9 +275,13 @@ Page({
 
   },
   pluginsTap() {
-    if (parseInt(this.data.matches.status) == 2002) {
+    // console.info('pluginsTap',this.data.matches.matchType)
+    // console.info('pluginsTap',parseInt(this.data.matches.matchType) !==3001)
+    if (parseInt(this.data.matches.status) == 2002 && this.data.matches.matchType !=3001) {
+      // console.info('pluginsTap   interupt')
       return
     }
+    // console.info('pluginsTap   passed')
     const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
 
@@ -388,8 +393,8 @@ Page({
         holderAvator: that.data.matches.holderAvator,
         holderName: that.data.matches.holderName,
         challengerrankType0: that.data.matches.challengerrankType0,
-        holderrankType0: that.data.matches.holderrankType0
-
+        holderrankType0: that.data.matches.holderrankType0,
+        matchType:that.data.matches.matchType
       })
       let confirm = false
       if (that.data.openId == res.data.holder) {
@@ -408,12 +413,15 @@ Page({
 
     }, false)
   },
-  pickerTap: function () {
-    if (parseInt(this.data.matches.status) == 2002) {
+  pickerTap() {
+    // console.info('pickerTap',this.data.matches.matchType)
+    // console.info('pickerTap',parseInt(this.data.matches.matchType) !==3001)
+    if (parseInt(this.data.matches.status) == 2002 && this.data.matches.matchType !=3001) {
+      // console.info('pickerTap   interupt')
       return
     }
     date = new Date();
-
+    // console.info('pickerTap   passed')
     var monthDay = ['今天', '明天', '后天'];
     var hours = [];
     var minute = [];

@@ -143,9 +143,11 @@ public class SearchApi {
     public static HashMap<String, Object> searchById(String indexName, String id) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    
         // searchSourceBuilder.version(true);
         searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(id));
         searchRequest.source(searchSourceBuilder);
+   
         return parseSingleResponse(searchRequest);
     }
 
@@ -816,7 +818,7 @@ public class SearchApi {
         searchSourceBuilder.version(true);
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
         searchRequest.source(searchSourceBuilder);
-
+     log.info(searchSourceBuilder.toString());
         // try {
         // SearchResponse searchResponse = client.search(searchRequest,
         // RequestOptions.DEFAULT);
