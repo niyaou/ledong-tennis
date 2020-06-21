@@ -183,6 +183,7 @@ public class RankServiceImpl implements IRankService {
                         .must(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId)));
         AggregationBuilder b = AggregationBuilders.filter("winrate", win);
         searchSourceBuilder.query(match);
+        searchSourceBuilder.size(5000);
         searchSourceBuilder.aggregation(b);
         return SearchApi.winRateAggregate(DataSetConstant.GAME_MATCH_INFORMATION, searchSourceBuilder);
     }

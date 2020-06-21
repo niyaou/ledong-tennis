@@ -84,7 +84,7 @@ public class MatchPostVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "ranked status , 6001 : ranked , 6000 : un-ranked ")
-    private Integer ranked;
+    private Integer ranked=6000;
     public static final String RANKED = "ranked";
 
     @ApiModelProperty(value = "holderScore ")
