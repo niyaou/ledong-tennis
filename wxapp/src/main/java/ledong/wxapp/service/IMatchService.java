@@ -278,4 +278,16 @@ public interface IMatchService {
      * @return
      */
     public String deleteMatches(String id);
+
+
+
+     /**
+      * create match by master
+      * @param holder
+      * @param holderName
+      * @param challenger
+      * @param challengerName
+      * @return
+      */
+    public String postSlamMatch(String holder, String holderName,String challenger,String challengerName);
 }

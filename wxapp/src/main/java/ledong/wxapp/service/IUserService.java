@@ -90,4 +90,11 @@ public interface IUserService {
     public LinkedList<HashMap<String, Object>> getNearyByUser(String gps);
 
 
+    /**
+     * get user information by master
+     * @return
+     */
+    public LinkedList<HashMap<String, Object>> getUserList();
+
+
 }

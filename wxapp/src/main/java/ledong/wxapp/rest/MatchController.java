@@ -2,6 +2,7 @@ package ledong.wxapp.rest;
 
 import javax.annotation.Resource;
 
+import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import ledong.wxapp.auth.JwtToken;
+import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.CommonConstanst;
+import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.utils.DateUtil;
@@ -175,9 +178,7 @@ public class MatchController {
         @ApiOperation(value = "confirm   match ", notes = "")
         @ApiImplicitParams({
                         @ApiImplicitParam(name = "matchId", value = "matched id ", required = true, dataType = "string", paramType = "path"),
-                        @ApiImplicitParam(name = "type", value = "user type , 0 : holder , 1 : challenger", required = true, dataType = "string", paramType = "path")
-
-        })
+                        @ApiImplicitParam(name = "type", value = "user type , 0 : holder , 1 : challenger", required = true, dataType = "string", paramType = "path") })
         // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
         public ResponseEntity<?> confirmMatch(@PathVariable(value = "matchId", required = true) String matchId,
                         @PathVariable(value = "type", required = true) Integer type) {
@@ -206,11 +207,19 @@ public class MatchController {
                         @ApiImplicitParam(name = "challengerScore", value = "challengerScore", required = true, dataType = "int", paramType = "query"),
                         @ApiImplicitParam(name = "matchId", value = "  match id", required = true, dataType = "string", paramType = "path") })
         // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-        public ResponseEntity<?> finishMatch(@RequestParam(value = "holderScore", required = true) Integer holderScore,
+        public ResponseEntity<?> finishMatch(@RequestHeader("Authorization") String authHeader,
+                        @RequestParam(value = "holderScore", required = true) Integer holderScore,
                         @RequestParam(value = "challengerScore", required = true) Integer challengerScore,
-                        @PathVariable(value = "matchId", required = true) String matchId) {
-                MatchRequestVo vo = new MatchRequestVo();
-                vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+                        @PathVariable(value = "matchId", required = true) String matchId)
+                        throws AuthenticationException {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+                        throw new AuthenticationException("token 不可用");
+                }
+                String userId = claims.getSubject();
+                if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+                        throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                }
                 return new ResponseEntity<Object>(
                                 CommonResponse.success(matchService.finishMatch(matchId, holderScore, challengerScore)),
                                 HttpStatus.OK);
@@ -293,14 +302,37 @@ public class MatchController {
 
         }
 
-        @Resource
-        private ApplicationContext ctx;
+        @RequestMapping(value = "/postSlamMatchByMaster", method = RequestMethod.GET)
+        @ApiOperation(value = "post Slam Match By  Master", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "holder", value = "holder  id", required = true, dataType = "string", paramType = "path"),
+                        @ApiImplicitParam(name = "challenger", value = "challenger id", required = true, dataType = "string", paramType = "query") })
 
-        @RequestMapping(value = "/test/put", method = RequestMethod.GET)
-        public ResponseEntity<?> test1() {
-                ctx.publishEvent(new MatchConfirmEvent(ctx, "1"));
-
-                return new ResponseEntity<Object>(CommonResponse.success(), HttpStatus.OK);
+        public ResponseEntity<?> postSlamMatchByMaster(@RequestHeader("Authorization") String authHeader,
+                        @RequestParam(value = "holder", required = true) String holder,
+                        @RequestParam(value = "challenger", required = true) String challenger)
+                        throws AuthenticationException {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+                        throw new AuthenticationException("token 不可用");
+                }
+                String userId = claims.getSubject();
+                if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+                        throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                }
+                return new ResponseEntity<Object>(
+                                CommonResponse.success(matchService.postSlamMatch(holder, null, challenger, null)),
+                                HttpStatus.OK);
         }
+
+        // @Resource
+        // private ApplicationContext ctx;
+
+        // @RequestMapping(value = "/test/put", method = RequestMethod.GET)
+        // public ResponseEntity<?> test1() {
+        // ctx.publishEvent(new MatchConfirmEvent(ctx, "1"));
+
+        // return new ResponseEntity<Object>(CommonResponse.success(), HttpStatus.OK);
+        // }
 
 }

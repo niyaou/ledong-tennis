@@ -679,4 +679,13 @@ public class MatchServiceImpl implements IMatchService {
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
     }
 
+    @Override
+    public String postSlamMatch(String holder, String holderName,String challenger,String challengerName) {
+        String matchId = postMatches(null, holder, challenger,
+        MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode(),
+        MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null, null);
+        attachedMatchSession(matchId, holder, challenger);
+          return matchId;
+    }
+
 }

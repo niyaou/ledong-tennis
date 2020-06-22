@@ -1,5 +1,6 @@
 package ledong.wxapp.service.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
@@ -62,10 +63,10 @@ public class UserServiceImpl implements IUserService {
     public String addUser(UserVo user) {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
-        logger.info(JSON.toJSONString(user)); 
+        logger.info(JSON.toJSONString(user));
         try {
             if (user.getGps().contains("undefined")) {
-                user.setGps( CommonConstanst.GPS);
+                user.setGps(CommonConstanst.GPS);
             }
         } catch (Exception e) {
 
@@ -86,7 +87,7 @@ public class UserServiceImpl implements IUserService {
         if (loginUser != null) {
             loginUser.getFirst().put(UserVo.NICKNAME, nickName);
             loginUser.getFirst().put(UserVo.AVATOR, avator);
-            if(!gps.contains("undefined")){
+            if (!gps.contains("undefined")) {
                 loginUser.getFirst().put(UserVo.GPS, gps);
             }
             SearchApi.updateDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()), openId);
@@ -203,6 +204,17 @@ public class UserServiceImpl implements IUserService {
         // 设置为解密模式
         cipher.init(Cipher.DECRYPT_MODE, key, iv);
         return cipher.doFinal(encryptedData);
+    }
+
+    @Override
+    public LinkedList<HashMap<String, Object>> getUserList() {
+        try {
+          return   SearchApi.searchAll(DataSetConstant.USER_INFORMATION, 0, 200);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

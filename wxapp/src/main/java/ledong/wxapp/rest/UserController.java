@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import ledong.wxapp.auth.JwtToken;
+import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.CommonConstanst;
 import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
@@ -119,5 +120,22 @@ public class UserController {
     }
         return new ResponseEntity<Object>(CommonResponse.success(userService.getNearyByUser(gps)), HttpStatus.OK);
 
+    }
+
+
+    @RequestMapping(value = "/userList", method = RequestMethod.GET)
+    @ApiOperation(value = "获取所有用户列表", notes = "")
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> getuserList(@RequestHeader("Authorization") String authHeader)
+            throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        if(!"19960390361".equals(userId) && !"18602862619".equals(userId)){
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+        return new ResponseEntity<Object>(CommonResponse.success(userService.getUserList()), HttpStatus.OK);
     }
 }

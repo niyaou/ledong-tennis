@@ -39,6 +39,7 @@ public class EventsListener {
     @Async
     public void handleWinRateEvent(WinRateEvent event) {
         RankInfoVo userVos = event.getUserVo();
+        log.info(JSON.toJSONString( userVos));
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -47,6 +48,7 @@ public class EventsListener {
         }
         userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
         rankService.updateRankInfo(userVos);
+        log.info(JSON.toJSONString( userVos));
     }
 
 
@@ -54,14 +56,16 @@ public class EventsListener {
     @Async
     public void handleSlamWinRateEvent(SlamWinRateEvent event) {
         RankInfoVo userVos = event.getUserVo();
+        log.info(JSON.toJSONString( userVos));
         try {
-            Thread.sleep(500);
+            Thread.sleep(800);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
         // userVos.setSlamWinRate(rankService.updateSlamWinRate(userVos.getOpenId()));
         rankService.updateRankInfo(userVos);
+        log.info(JSON.toJSONString( userVos));
     }
 
 
