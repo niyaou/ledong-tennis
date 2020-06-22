@@ -688,4 +688,64 @@ public class MatchServiceImpl implements IMatchService {
           return matchId;
     }
 
+    @Override
+    public  LinkedList<HashMap<String, Object>>  getStartMatch() {
+        LinkedList<HashMap<String, Object>>  searchResponse= SearchApi.searchByField(DataSetConstant.GAME_MATCH_INFORMATION,
+        MatchPostVo.STATUS,String.valueOf( MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode()), 0, 50);
+
+
+        if (searchResponse != null) {
+            String[] idsArr = new String[searchResponse.size()];
+            List<String> idsHolder = new ArrayList<String>();
+            List<String> idsChallenger = new ArrayList<String>();
+
+            searchResponse = (LinkedList<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                // HashMap<String, Object> holder = iUserService.getUserInfo((String)
+                // match.get(MatchPostVo.HOLDER));
+                idsHolder.add((String) match.get(MatchPostVo.HOLDER));
+                idsChallenger.add((String) match.get(MatchPostVo.CHALLENGER));
+                return match;
+            }).collect(Collectors.toCollection(LinkedList::new));
+
+            LinkedList<Map<String, Object>> userInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_INFORMATION, idsHolder.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, idsHolder.toArray(idsArr));
+
+            LinkedList<Map<String, Object>> userInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_INFORMATION, idsChallenger.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, idsChallenger.toArray(idsArr));
+
+            searchResponse = (LinkedList<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+
+                List<Map<String, Object>> holder = userInfosHolder.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
+
+                List<Map<String, Object>> holderRank = userRankInfosHolder.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
+
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.HOLDERRANKTYPE0, holderRank.get(0).get(RankInfoVo.RANKTYPE0));
+
+                List<Map<String, Object>> challenger = userInfosChallenger.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
+
+                List<Map<String, Object>> challengerRank = userRankInfosChallenger.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
+
+                match.put(MatchPostVo.CHALLENGERAVATOR, challenger.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.CHALLENGERNAME, challenger.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.CHALLENGERRANKTYPE0, challengerRank.get(0).get(RankInfoVo.RANKTYPE0));
+                return match;
+            }).collect(Collectors.toCollection(LinkedList::new));
+        }
+     return searchResponse;
+    }
+
 }

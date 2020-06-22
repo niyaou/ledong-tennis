@@ -1,6 +1,7 @@
 {
   "usingComponents": {
     "player":"../../component/player/player"
-  }
+  },
+  "disableScroll": true
 
 }

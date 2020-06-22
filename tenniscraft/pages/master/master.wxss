@@ -19,3 +19,8 @@ page {
  height:800rpx;
  width:100%
 }
+.column{
+  width:80%;
+  display: flex;
+  flex-direction: row;
+}

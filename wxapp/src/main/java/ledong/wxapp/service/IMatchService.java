@@ -290,4 +290,13 @@ public interface IMatchService {
       * @return
       */
     public String postSlamMatch(String holder, String holderName,String challenger,String challengerName);
+
+
+
+    /**
+     * get started match by master
+     * 
+     * @return
+     */
+    public  LinkedList<HashMap<String, Object>>  getStartMatch();
 }

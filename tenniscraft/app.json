@@ -1,8 +1,8 @@
 {
   "pages": [
-  
-    "pages/index/index",
     "pages/master/master",
+    "pages/index/index",
+ 
     "pages/dealing/dealing"
 
  

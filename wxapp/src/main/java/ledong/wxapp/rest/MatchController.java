@@ -325,6 +325,28 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
+
+        @RequestMapping(value = "/getStartMatch", method = RequestMethod.GET)
+        @ApiOperation(value = "get Slam Match By  Master", notes = "")
+        // @ApiImplicitParams({
+        //                 @ApiImplicitParam(name = "holder", value = "holder  id", required = true, dataType = "string", paramType = "path"),
+        //                 @ApiImplicitParam(name = "challenger", value = "challenger id", required = true, dataType = "string", paramType = "query") })
+
+        public ResponseEntity<?> getStartMatch(@RequestHeader("Authorization") String authHeader)
+                        throws AuthenticationException {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+                        throw new AuthenticationException("token 不可用");
+                }
+                String userId = claims.getSubject();
+                if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+                        throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                }
+                return new ResponseEntity<Object>(
+                                CommonResponse.success(matchService.getStartMatch()),
+                                HttpStatus.OK);
+        }
+
         // @Resource
         // private ApplicationContext ctx;
 
