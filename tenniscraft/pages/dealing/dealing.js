@@ -30,6 +30,7 @@ Page({
     challengerName: 'Jerry',
     inputValue: '',
     arrs: [1],
+    scoreList: [0, 1, 2, 3, 4, 5, 6, 7],
     sessionContext: [],
 
     startDate: "请选择日期",
@@ -270,18 +271,52 @@ Page({
         challengerScore: score
       })
     }
-    // console.info(e.detail.value, data)
     http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, data, (res) => { })
-
   },
+
+
+  bindScoreChange1: function (e) {
+    console.info(e)
+    let that = this
+    let pickerValue = e.detail.value
+  
+
+
+    http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, {
+      holderScore: pickerValue,
+    }, (res) => {
+      if (res.code !== 0) {
+        wx.showToast({
+          title: res.message,
+          icon: 'none',
+          duration: 1500
+        })
+      } else {
+      }
+    })
+  },
+bindScoreChange2: function (e) {
+    console.info(e)
+    let that = this
+    let pickerValue = e.detail.value
+    http.postReq(`match/matchScore/${this.data.matches.id}`, app.globalData.jwt, {
+      challengerScore: pickerValue,
+    }, (res) => {
+      if (res.code !== 0) {
+        wx.showToast({
+          title: res.message,
+          icon: 'none',
+          duration: 1500
+        })
+      } else {
+      }
+    })
+  },
+
   pluginsTap() {
-    // console.info('pluginsTap',this.data.matches.matchType)
-    // console.info('pluginsTap',parseInt(this.data.matches.matchType) !==3001)
     if (parseInt(this.data.matches.status) == 2002 && this.data.matches.matchType !=3001) {
-      // console.info('pluginsTap   interupt')
       return
     }
-    // console.info('pluginsTap   passed')
     const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
 
@@ -353,11 +388,7 @@ Page({
 
   },
   postMessage() {
-
     let type = app.globalData.openId === this.data.matches.holder ? 0 : 1
-    // console.info(this.data.inputValue)
-    // console.info(typeof this.data.inputValue, this.data.inputValue == null)
-    // console.info(this.data.inputValue.length, this.data.inputValue.lenght == 0)
     if (this.data.inputValue == undefined || this.data.inputValue == null || this.data.inputValue.length == 0) {
       wx.showToast({
         title: '请不要发送空消息',
@@ -414,14 +445,10 @@ Page({
     }, false)
   },
   pickerTap() {
-    // console.info('pickerTap',this.data.matches.matchType)
-    // console.info('pickerTap',parseInt(this.data.matches.matchType) !==3001)
     if (parseInt(this.data.matches.status) == 2002 && this.data.matches.matchType !=3001) {
-      // console.info('pickerTap   interupt')
       return
     }
     date = new Date();
-    // console.info('pickerTap   passed')
     var monthDay = ['今天', '明天', '后天'];
     var hours = [];
     var minute = [];

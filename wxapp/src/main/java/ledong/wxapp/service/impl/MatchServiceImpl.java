@@ -680,10 +680,10 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     @Override
-    public String postSlamMatch(String holder, String holderName,String challenger,String challengerName) {
+    public String postSlamMatch(String holder, String courtName,String challenger,String courtGPS) {
         String matchId = postMatches(null, holder, challenger,
         MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode(),
-        MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null, null);
+        MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME), courtName, courtGPS);
         attachedMatchSession(matchId, holder, challenger);
           return matchId;
     }

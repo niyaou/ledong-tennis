@@ -131,7 +131,12 @@ page {
   color:#e4e4e4;
 }
 
-
+.picker{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
 .cover-view {
   position: absolute;

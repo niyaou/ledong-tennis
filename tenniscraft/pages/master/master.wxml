@@ -2,7 +2,10 @@
 	<div style="font-size:80rpx" bindtap="backtoIndex"> 返回首页</div>
 	<!-- <div class="detail" style='padding-top:{{totalBarHeight}}rpx;'></div> -->
 	<div>总用户：{{total}}</div>
-	<div class="column">	 <div style="width:150rpx" bindtap="rank">调分</div><div style="width:150rpx" bindtap="match">比赛</div></div>
+	<div class="column">
+		<div style="width:150rpx" bindtap="rank">调分</div>
+		<div style="width:150rpx" bindtap="match">比赛</div>
+	</div>
 
 	<div class="option" wx:if="{{isUserList}}">
 		<scroll-view scroll-y style="width: 100%; height: 90%;display:flex;flex-direction:row;">
@@ -38,17 +41,102 @@
 					</div>
 				</view>
 
-
-
-
-
-
-
 			</view>
 		</scroll-view>
 	</div>
 
 	<div class="option" wx:else>
+		<scroll-view scroll-y style="width: 100%; height: 90%;display:flex;flex-direction:row;">
+			<view class="rowdiv1" style="width:100%" wx:for="{{matchList}}" wx:for-index="matchIndex">
+				<div class="item" bindtap="confirmMatch" data-index="{{matchIndex}}">
+					<div class=" demo-text-3">添加比赛</div>
+					<div class="divid" />
+					<div class="user">
+						<div class="avator" catchtap="catch1">
+							<picker catchchange="bindScoreChange1" value="{{index}}" range="{{scoreList}}" data-index="{{matchIndex}}">
+								<image class="userinfo-avatar" src="{{item.holderAvator}}" mode="cover" style="z-index:30"></image>
+							</picker>
+							<div class="namecontent"><text class="nickname">{{item.holderName}}</text>
+								<div class="rank" wx:if="{{item.holderrankType0}}">{{item.holderrankType0}}</div>
+							</div>
+						</div>
+
+						<div class="score win">{{item.holderScore}}</div>
+
+						<div class="dividv" />
+
+						<div class="score lose">{{item.challengerScore}}</div>
+
+						<div class="avator" catchtap="catch1">
+							<picker catchchange="bindScoreChange2" value="{{index}}" range="{{scoreList}}" data-index="{{matchIndex}}">
+								<image bindtap="bindViewTap" class="userinfo-avatar" src="{{item.challengerAvator}}" mode="cover" style="z-index:30"></image>
+							</picker>
+							<div class="namecontent"> <text class="nickname">{{item.challengerName}}</text>
+								<div class="rank" wx:if="{{item.challengerrankType0}}">{{item.challengerrankType0}}</div>
+							</div>
+						</div>
+					</div>
+					<div class="divid" />
+					<div class="bottom">
+						<div class="zone">
+							<image src="../../icon/position.png" class="bottomimg" />
+							<div> {{item.courtName}}</div>
+						</div>
+						<!-- <div class="dividv" /> -->
+						<div class="zone">
+							<image src="../../icon/cal.png" class="bottomimg" />
+							<div> {{dateFilter.getDate(matches.orderTime,'-') || '时间待定'}}</div>
+						</div>
+					</div>
+				</div>
+			</view>
+		</scroll-view>
 	</div>
 	<div class="option">其他</div>
+	<view class="rowdiv1" bindtap="addMatches" style="width:100%">
+		<div class="item">
+			<div class=" demo-text-3">添加比赛</div>
+			<div class="divid" />
+			<div class="user">
+				<div class="avator" catchtap="catch1">
+					<picker catchchange="bindPickerChange" value="{{index}}" range="{{userList}}" range-key="nickName">
+						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
+						<view class="picker">
+							{{userList[index].nickName}}
+						</view>
+					</picker>
+					<div class="namecontent"><text class="nickname">{{matches.holderName}}</text>
+						<div class="rank" wx:if="{{matches.holderrankType0}}">{{matches.holderrankType0}}</div>
+					</div>
+
+				</div>
+				<div class="score win">{{matches.holderScore}}</div>
+				<div class="dividv" />
+				<div class="score lose">{{matches.challengerScore}}</div>
+				<div class="avator" catchtap="catch1">
+					<picker catchchange="bindPickerChange2" value="{{index}}" range="{{userList}}" range-key="nickName">
+						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
+						<view class="picker">
+							{{userList[index].nickName}}
+						</view>
+					</picker>
+					<div class="namecontent"> <text class="nickname">{{matches.challengerName}}</text>
+						<div class="rank" wx:if="{{matches.challengerrankType0}}">{{matches.challengerrankType0}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="divid" />
+			<div class="bottom">
+				<div class="zone" catchtap="tapCourtLocation">
+					<image src="../../icon/position.png" class="bottomimg" />
+					<div> {{matches.courtName}}</div>
+				</div>
+				<!-- <div class="dividv" /> -->
+				<div class="zone">
+					<image src="../../icon/cal.png" class="bottomimg" />
+					<div> {{dateFilter.getDate(matches.orderTime,'-') || '时间待定'}}</div>
+				</div>
+			</div>
+		</div>
+	</view>
 </view>

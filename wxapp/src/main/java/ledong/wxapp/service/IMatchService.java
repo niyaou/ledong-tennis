@@ -284,12 +284,12 @@ public interface IMatchService {
      /**
       * create match by master
       * @param holder
-      * @param holderName
+      * @param courtName
       * @param challenger
-      * @param challengerName
+      * @param courtGPS
       * @return
       */
-    public String postSlamMatch(String holder, String holderName,String challenger,String challengerName);
+    public String postSlamMatch(String holder, String courtName,String challenger,String courtGPS);
 
 
 

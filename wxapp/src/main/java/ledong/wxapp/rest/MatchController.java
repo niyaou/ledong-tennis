@@ -200,7 +200,7 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
-        @RequestMapping(value = "/matchResult/${matchId}", method = RequestMethod.POST)
+        @RequestMapping(value = "/matchResult/{matchId}", method = RequestMethod.POST)
         @ApiOperation(value = "finish match ,upload score result", notes = "")
         @ApiImplicitParams({
                         @ApiImplicitParam(name = "holderScore", value = "holderScore", required = true, dataType = "int", paramType = "query"),
@@ -302,15 +302,20 @@ public class MatchController {
 
         }
 
-        @RequestMapping(value = "/postSlamMatchByMaster", method = RequestMethod.GET)
+        @RequestMapping(value = "/postSlamMatchByMaster", method = RequestMethod.POST)
         @ApiOperation(value = "post Slam Match By  Master", notes = "")
         @ApiImplicitParams({
                         @ApiImplicitParam(name = "holder", value = "holder  id", required = true, dataType = "string", paramType = "path"),
-                        @ApiImplicitParam(name = "challenger", value = "challenger id", required = true, dataType = "string", paramType = "query") })
+                        @ApiImplicitParam(name = "challenger", value = "challenger id", required = true, dataType = "string", paramType = "query") ,
+                        @ApiImplicitParam(name = "courtName", value = "courtName", required = true, dataType = "string", paramType = "query") ,
+                        @ApiImplicitParam(name = "courtGPS", value = "courtGPS", required = true, dataType = "string", paramType = "query") 
+                })
 
         public ResponseEntity<?> postSlamMatchByMaster(@RequestHeader("Authorization") String authHeader,
                         @RequestParam(value = "holder", required = true) String holder,
-                        @RequestParam(value = "challenger", required = true) String challenger)
+                        @RequestParam(value = "challenger", required = true) String challenger,
+                        @RequestParam(value = "courtName", required = true) String courtName,
+                        @RequestParam(value = "courtGPS", required = true) String courtGPS)
                         throws AuthenticationException {
                 Claims claims = tokenService.getClaimByToken(authHeader);
                 if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
@@ -321,7 +326,7 @@ public class MatchController {
                         throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
                 }
                 return new ResponseEntity<Object>(
-                                CommonResponse.success(matchService.postSlamMatch(holder, null, challenger, null)),
+                                CommonResponse.success(matchService.postSlamMatch(holder, courtName, challenger, courtGPS)),
                                 HttpStatus.OK);
         }
 
