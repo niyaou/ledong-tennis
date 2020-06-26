@@ -270,6 +270,10 @@ Page({
                   challengerAvator: '../../icon/quest.png'
                 }
               })
+             setTimeout(() => {
+              that.getMatchList()
+             }, 1500);
+         
             }
           })
         }
