@@ -49,14 +49,14 @@ public class MatchesScheduleTask {
                     params.add(SearchApi.createMultiFieldsWithSingleValue((String) u.get(RankInfoVo.OPENID),
                             MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
 
-                    params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                    params.add(SearchApi.createSearchByFieldSource(MatchPostVo.RANKED,
                             MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode()));
 
                     String time;
 
                     try {
-                        time = DateUtil.getDateTime(DateUtil.getBeforeDate(new Date(), 14));
-                        params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.ORDERTIME, time));
+                        time = DateUtil.getDateTime(DateUtil.getBeforeDate(new Date(), -14));
+                        params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.GAMEDTIME, time));
 
                         QueryBuilder[] values = new QueryBuilder[8];
                         if (SearchApi.searchByMultiQueriesAndOrders(DataSetConstant.GAME_MATCH_INFORMATION, null, null,
