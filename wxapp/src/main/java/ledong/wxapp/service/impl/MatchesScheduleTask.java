@@ -60,8 +60,8 @@ public class MatchesScheduleTask {
 
                         QueryBuilder[] values = new QueryBuilder[8];
                         if (SearchApi.searchByMultiQueriesAndOrders(DataSetConstant.GAME_MATCH_INFORMATION, null, null,
-                                null, params.toArray(values)) != null) {
-                            rank.setPoolRemain(rank.getPoolRemain() - 20);
+                                null, params.toArray(values)) == null) {
+                            rank.setScore(rank.getScore() - 5);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
