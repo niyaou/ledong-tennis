@@ -61,6 +61,13 @@ public class SlamController {
         return new ResponseEntity<Object>(CommonResponse.success(iSlamService.exploreSlams(null)), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/updatePosition", method = RequestMethod.GET)
+    @ApiOperation(value = "explore current slam information", notes = "")
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> updatePosition() {
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.updateUserPosition() ), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/{matchId}/{openId}", method = RequestMethod.POST)
     @ApiOperation(value = "participate match ", notes = "")
     @ApiImplicitParams({

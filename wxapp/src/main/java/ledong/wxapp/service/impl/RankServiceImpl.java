@@ -104,7 +104,7 @@ public class RankServiceImpl implements IRankService {
         updateRankInfo(challenger);
         ctx.publishEvent(new WinRateEvent(ctx, holder));
         ctx.publishEvent(new WinRateEvent(ctx, challenger));
-
+        updateUserPosition();
         redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
@@ -318,5 +318,22 @@ public class RankServiceImpl implements IRankService {
         holder = gContext.rankMatch(holder);
         updateRankInfo(holder);
         return holder.getOpenId();
+    }
+
+    @Override
+    public String updateUserPosition() {
+
+        LinkedList<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,
+                null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, 200);
+        int[] position = { 0 };
+        LinkedList<RankInfoVo> vos=new LinkedList<RankInfoVo> ();
+        users.forEach(u -> {
+            position[0] = position[0]+1;
+            u.put(RankInfoVo.POSITION, position[0]);
+            RankInfoVo rank=JSON.parseObject(      JSON.toJSONString(u),RankInfoVo.class);
+            vos.add(rank);
+        });
+        RankingStrategy.bulkUpdateRankInfo(vos);
+        return null;
     }
 }

@@ -1,10 +1,14 @@
 <view class="container">
-	<div style="font-size:80rpx" bindtap="backtoIndex"> 返回首页</div>
+<div  style='margin-top:{{totalBarHeight}}rpx;'></div>
+	<!-- <button style='margin-top:{{totalBarHeight}}rpx;padding-left:0;' bindtap="backtoIndex"> 返回首页</button>  -->
+	<div >		<button bindtap="backtoIndex"> 返回首页</button> </div>
+
+	<!-- style="font-size:80rpx" ></div> -->
 	<!-- <div class="detail" style='padding-top:{{totalBarHeight}}rpx;'></div> -->
 	<div>总用户：{{total}}</div>
 	<div class="column">
-		<div style="width:150rpx" bindtap="rank">调分</div>
-		<div style="width:150rpx" bindtap="match">比赛</div>
+		<button style="width:150rpx" bindtap="rank">调分</button>
+		<button style="width:150rpx" bindtap="match">比赛</button>
 	</div>
 
 	<div class="option" wx:if="{{isUserList}}">

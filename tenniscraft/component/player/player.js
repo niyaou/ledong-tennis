@@ -9,25 +9,29 @@ Component({
       type: String,
       value: 'https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83epUY765qAmPLVQAyMV2bicsbDQTQD12gm3qa5cuVzdcO4GkHXZuJLBYExoaEHpHBFwTDiauuY9NicpwQ/132'
     },
-    holder:{
+    holder: {
       type: String,
-      value:''
+      value: ''
     },
     holderName: {
       type: String,
       value: '守护者'
     },
-    winRate:{
-      type:Number,
-      value:0
+    position: {
+      type: Number,
+      value: 0
     },
-    rankType0:{
-      type:String,
-      value:''
+    winRate: {
+      type: Number,
+      value: 0
     },
-    courtName:{
-      type:String,
-      value:''
+    rankType0: {
+      type: String,
+      value: ''
+    },
+    courtName: {
+      type: String,
+      value: ''
     }
 
   },
@@ -43,30 +47,30 @@ Component({
    * 组件的方法列表
    */
   methods: {
-    detail(e){
+    detail(e) {
       let that = this
-      if(app.globalData.openId !== this.data.holder){
-      wx.showModal({
-        content:'是否发起挑战',
-        success:(res)=>{
-          if (res.confirm) {
-            // console.log('用户点击确定')
-            http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {} ,(res)=>{
-              if(res.code!==0){
-                wx.showToast({
-                  title: res.message,
-                  icon:'none',
-                  duration:1500
-                })
-              }
-            })
-          } else if (res.cancel) {
-      
-          }
+      if (app.globalData.openId !== this.data.holder) {
+        wx.showModal({
+          content: '是否发起挑战',
+          success: (res) => {
+            if (res.confirm) {
+              // console.log('用户点击确定')
+              http.postReq(`match/challengeMatch/${that.data.holder}`, app.globalData.jwt, {}, (res) => {
+                if (res.code !== 0) {
+                  wx.showToast({
+                    title: res.message,
+                    icon: 'none',
+                    duration: 1500
+                  })
+                }
+              })
+            } else if (res.cancel) {
 
-        }
-      })
-    }
+            }
+
+          }
+        })
+      }
     }
   }
 })

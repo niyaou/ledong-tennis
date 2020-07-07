@@ -17,8 +17,11 @@ import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.spatial3d.geom.GeoPoint;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.MultiGetItemResponse;
 import org.elasticsearch.action.get.MultiGetRequest;
@@ -87,6 +90,7 @@ public class SearchApi {
     static {
         client = EsClientFactory.getInstance().getClient();
     }
+
 
     /**
      * 查询所有
@@ -1100,6 +1104,14 @@ public class SearchApi {
         }
         return null;
     }
+
+
+    public static void bulkUpsert( BulkRequest request) throws IOException {
+        // BulkRequest request = new BulkRequest(); 
+      
+        client.bulk(request, RequestOptions.DEFAULT);
+    }
+
 
     /**
      * 创建搜索页码

@@ -114,4 +114,11 @@ public interface IRankService {
      * @return
      */
     public String updateScoreByMaster(String openId,Integer score);
+
+
+    /**
+     * 
+     * @return
+     */
+    public String updateUserPosition();
 }

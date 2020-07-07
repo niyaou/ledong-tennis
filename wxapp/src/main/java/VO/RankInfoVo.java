@@ -58,7 +58,12 @@ public class RankInfoVo implements Serializable {
     private String rankType1;
     public static final String RANKTYPE1 = "rankType1";
 
-    
+    @NotEmpty
+    @ApiModelProperty(value = "bardge  ")
+    private Integer position=0;
+    public static final String POSITION = "position";
+
+
     @NotEmpty
     @ApiModelProperty(value = "bardge  ")
     private Integer bardge;
@@ -168,6 +173,14 @@ public class RankInfoVo implements Serializable {
 
     public void setSlamWinRate(Double slamWinRate) {
         this.slamWinRate = slamWinRate;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 
 }

@@ -1,9 +1,17 @@
 package ledong.wxapp.strategy;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+
+import org.elasticsearch.action.DocWriteRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import VO.RankInfoVo;
 import ledong.wxapp.constant.DataSetConstant;
@@ -44,6 +52,22 @@ public abstract class RankingStrategy {
     public static String updateRankInfo(RankInfoVo vo) {
         return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
     }
+
+    public static void bulkUpdateRankInfo(List<RankInfoVo> vos) {
+        BulkRequest request = new BulkRequest();
+     
+        vos.forEach(vo -> {
+            // Map<String,Object>  mapTypes = JSON.parseObject(JSON.toJSONString(vo)); 
+            request.add(new IndexRequest(DataSetConstant.USER_RANK_INFORMATION).id(vo.getOpenId())
+                    .source( JSON.parseObject(JSON.toJSONString(vo)),XContentType.JSON).opType(DocWriteRequest.OpType.INDEX));
+        });
+        try {
+            SearchApi.bulkUpsert(request);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static String createRankInfo(RankInfoVo vo) {
         return SearchApi.insertDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
