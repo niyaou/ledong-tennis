@@ -330,7 +330,7 @@ public class RankServiceImpl implements IRankService {
         users.forEach(u -> {
             position[0] = position[0]+1;
             u.put(RankInfoVo.POSITION, position[0]);
-            RankInfoVo rank=JSON.parseObject(      JSON.toJSONString(u),RankInfoVo.class);
+            RankInfoVo rank=JSON.parseObject(JSON.toJSONString(u),RankInfoVo.class);
             vos.add(rank);
         });
         RankingStrategy.bulkUpdateRankInfo(vos);

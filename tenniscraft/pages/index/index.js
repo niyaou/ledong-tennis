@@ -144,11 +144,11 @@ Page({
     })
   },
   getRankPosition(jwt) {
-    http.getReq('rank/rankPosition', jwt, (e) => {
-      this.setData({
-        rankPosition: e.data
-      })
-    })
+    // http.getReq('rank/rankPosition', jwt, (e) => {
+    //   this.setData({
+    //     rankPosition: e.data
+    //   })
+    // })
   },
   getUserRankInfo(jwt) {
     http.getReq('rank/rankInfo', jwt, (e) => {
@@ -158,7 +158,9 @@ Page({
           rankType0: e.data.rankType0,
           winRate: e.data.winRate,
           score:e.data.score
-        }
+        },
+        rankPosition:e.data.position
+
       })
       app.globalData.userRankInfo = this.data.userRankInfo
       app.globalData.openId = e.data.openId

@@ -79,7 +79,7 @@ public class EventsListener {
             log.info("输入比分后自动确认:"+matchId);
             Thread.sleep(120000);
           Map<String,Object> vo=  (Map<String, Object>) matchService.getMatchInfos(matchId);
-
+          rankService.updateUserPosition()
          if(vo.get(MatchPostVo.RANKED)==null||!vo.get(MatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
             matchService.confirmMatch(matchId, vo.get(MatchPostVo.HOLDERACKNOWLEDGED).equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode())?2:1);
          }
