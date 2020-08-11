@@ -307,6 +307,7 @@ public class SearchApi {
         qb.point(Double.parseDouble(value.split(",")[0]), Double.parseDouble(value.split(",")[1]));
         qb.distance(String.format("%skm", distance));
         searchSourceBuilder.query(QueryBuilders.boolQuery().must(qb)).sort(sort);
+        searchSourceBuilder.size(2);
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }

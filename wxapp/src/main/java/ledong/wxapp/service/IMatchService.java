@@ -259,7 +259,7 @@ public interface IMatchService {
      * @param gps
      * @return
      */
-    public LinkedList<HashMap<String, Object>> nearByCourt(String gps);
+    public LinkedList<HashMap<String, Object>> nearByCourt(String gps,Integer size);
 
 
 

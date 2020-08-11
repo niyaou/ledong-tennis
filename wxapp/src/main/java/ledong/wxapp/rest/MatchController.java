@@ -293,12 +293,14 @@ public class MatchController {
         @RequestMapping(value = "/court/nearby", method = RequestMethod.GET)
         @ApiOperation(value = "nearby court", notes = "")
         @ApiImplicitParams({
-                        @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "query") })
-        public ResponseEntity<?> nearby(@RequestParam(value = "gps", required = true) String gps) {
+                        @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "query"),
+                        @ApiImplicitParam(name = "size", value = "size", required = true, dataType = "int", paramType = "query") })
+        public ResponseEntity<?> nearby(@RequestParam(value = "gps", required = true) String gps,
+        @RequestParam(value = "size", required = true) Integer size) {
                 if (gps.contains("undefined")) {
                         gps = CommonConstanst.GPS;
                 }
-                return new ResponseEntity<Object>(CommonResponse.success(matchService.nearByCourt(gps)), HttpStatus.OK);
+                return new ResponseEntity<Object>(CommonResponse.success(matchService.nearByCourt(gps,size)), HttpStatus.OK);
 
         }
 
