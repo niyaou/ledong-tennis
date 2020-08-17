@@ -13,7 +13,7 @@
 	</view>
 	</block>
 			<block wx:else>
-	<view class="banner">
+	<view class="{{isSingal?'banner':'banner2'}}">
 	<!-- getUserInfo -->
 	
 
@@ -26,6 +26,8 @@
 					<div class="nickname">{{userInfo.nickName}} </div>
 					<div class="rank">{{userRankInfo.rankType1}} <span style="background:#0a90dd;padding-left: 10rpx;padding-right: 10rpx">{{userRankInfo.rankType0}}</span></div>
 				</div>
+				<image src="{{isSingal?'../../icon/single.png':'../../icon/double.png'}}" bindtap="switchMode" style='width:50px;height:50px'/>
+				<!-- <image src='../../icon/double.png' style='width:50px;height:50px'/> -->
 				<div class="master" bindtap="masterTap"></div>
 			</div>
 			<view class="content">

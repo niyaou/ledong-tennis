@@ -1,25 +1,14 @@
 <view class="container">
-<!-- <div  style='margin-top:{{totalBarHeight}}rpx;width:100%;height:100rpx'></div> -->
-	<!-- <button style='margin-top:{{totalBarHeight}}rpx;padding-left:0;' bindtap="backtoIndex"> 返回首页</button>  -->
-	<div style="margin-top:{{totalBarHeight}}rpx;width:100%;height:160rpx;display: flex;flex-direction: row;	justify-content:space-start;">
-	<!-- <button style="width:40%" bindtap="backtoIndex"> -->
-	<div style="width:40%;font-weight:bold" bindtap="backtoIndex">
-	 返回首页
-	 </div>
-	<!-- </button>  -->
-		<div style="width:100%;height:60rpx;text-align: center;"> 总用户：{{total}}</div>
-		</div>
-
-	<!-- style="font-size:80rpx" ></div> -->
+	<div style="font-size:80rpx" bindtap="backtoIndex"> 返回首页</div>
 	<!-- <div class="detail" style='padding-top:{{totalBarHeight}}rpx;'></div> -->
-
-	<div class="column" style="width:100%;height:80rpx">
-		<button style="width:150rpx;height:80rpx" bindtap="rank">调分</button>
-		<button style="width:150rpx;height:80rpx" bindtap="match">比赛</button>
+	<div>总用户：{{total}}</div>
+	<div class="column">
+		<div style="width:150rpx" bindtap="rank">调分</div>
+		<div style="width:150rpx" bindtap="match">比赛</div>
 	</div>
 
 	<div class="option" wx:if="{{isUserList}}">
-		<scroll-view scroll-y style="width: 100%; height: 90%;display:flex;flex-direction:row;">
+		<scroll-view scroll-y style="width: 100%; height: 150%;display:flex;flex-direction:row;">
 			<view wx:for="{{players}}" wx:for-index="userIndex">
 
 				<!-- <player rankType0="{{item.rankType0}}"  
@@ -57,7 +46,7 @@
 	</div>
 
 	<div class="option" wx:else>
-		<scroll-view scroll-y style="width: 100%; height: 90%;display:flex;flex-direction:row;">
+		<scroll-view scroll-y style="width: 100%; height: 150%;display:flex;flex-direction:row;">
 			<view class="rowdiv1" style="width:100%" wx:for="{{matchList}}" wx:for-index="matchIndex">
 				<div class="item" bindtap="confirmMatch" data-index="{{matchIndex}}">
 					<div class=" demo-text-3">添加比赛</div>
@@ -103,51 +92,5 @@
 			</view>
 		</scroll-view>
 	</div>
-	<div class="option">其他</div>
-	<view class="rowdiv1" bindtap="addMatches" style="width:100%">
-		<div class="item">
-			<div class=" demo-text-3">添加比赛</div>
-			<div class="divid" />
-			<div class="user">
-				<div class="avator" catchtap="catch1">
-					<picker catchchange="bindPickerChange" value="{{index}}" range="{{userList}}" range-key="nickName">
-						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
-						<view class="picker">
-							{{userList[index].nickName}}
-						</view>
-					</picker>
-					<div class="namecontent"><text class="nickname">{{matches.holderName}}</text>
-						<div class="rank" wx:if="{{matches.holderrankType0}}">{{matches.holderrankType0}}</div>
-					</div>
 
-				</div>
-				<div class="score win">{{matches.holderScore}}</div>
-				<div class="dividv" />
-				<div class="score lose">{{matches.challengerScore}}</div>
-				<div class="avator" catchtap="catch1">
-					<picker catchchange="bindPickerChange2" value="{{index}}" range="{{userList}}" range-key="nickName">
-						<image bindtap="bindViewTap" class="userinfo-avatar" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
-						<view class="picker">
-							{{userList[index].nickName}}
-						</view>
-					</picker>
-					<div class="namecontent"> <text class="nickname">{{matches.challengerName}}</text>
-						<div class="rank" wx:if="{{matches.challengerrankType0}}">{{matches.challengerrankType0}}</div>
-					</div>
-				</div>
-			</div>
-			<div class="divid" />
-			<div class="bottom">
-				<div class="zone" catchtap="tapCourtLocation">
-					<image src="../../icon/position.png" class="bottomimg" />
-					<div> {{matches.courtName}}</div>
-				</div>
-				<!-- <div class="dividv" /> -->
-				<div class="zone">
-					<image src="../../icon/cal.png" class="bottomimg" />
-					<div> {{dateFilter.getDate(matches.orderTime,'-') || '时间待定'}}</div>
-				</div>
-			</div>
-		</div>
-	</view>
 </view>

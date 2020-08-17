@@ -44,9 +44,7 @@ lifetimes:{
         }
         )
       })
-    },
-    scrollTop(){
-      console.log("触底事件");
     }
+  
   }
 })

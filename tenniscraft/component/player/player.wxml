@@ -13,9 +13,8 @@
       </div>
   
 			<div class="zone" style="width:35%">
-				<!-- <image src="../../icon/position.png" class="bottomimg" /> -->
-				<!-- <div> {{courtName}}</div> -->
-					<div> 全服第<span style="color:rgba(39, 130, 215, 1)">{{position}}</span>名</div>
+				<image src="../../icon/position.png" class="bottomimg" />
+				<div> {{courtName}}</div>
 			</div>
 			<div class="zone"  style="width:35%">
 				<image src="../../icon/rank.png" class="bottomimg" />

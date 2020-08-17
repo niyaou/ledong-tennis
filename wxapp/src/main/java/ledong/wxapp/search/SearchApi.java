@@ -297,7 +297,10 @@ public class SearchApi {
     }
 
     public static LinkedList<HashMap<String, Object>> searchByLocation(String indexName, String key, String value,
-            String distance) {
+            String distance,Integer size) {
+        if(size ==null){
+            size=50;
+        }
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         GeoDistanceQueryBuilder qb = QueryBuilders.geoDistanceQuery(key);
@@ -307,7 +310,7 @@ public class SearchApi {
         qb.point(Double.parseDouble(value.split(",")[0]), Double.parseDouble(value.split(",")[1]));
         qb.distance(String.format("%skm", distance));
         searchSourceBuilder.query(QueryBuilders.boolQuery().must(qb)).sort(sort);
-        searchSourceBuilder.size(2);
+        searchSourceBuilder.size(size);
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }

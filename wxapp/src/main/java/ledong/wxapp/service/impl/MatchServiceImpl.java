@@ -623,7 +623,7 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public LinkedList<HashMap<String, Object>> nearByCourt(String gps,Integer size) {
-        return SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps, String.valueOf(size));
+        return SearchApi.searchByLocation(DataSetConstant.COURT_INFORMATION, CourtVo.LOCATION, gps,"50", size);
     }
 
     @Override
