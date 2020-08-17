@@ -59,6 +59,14 @@ public interface IRankService {
     public Object getRankingList(String grade);
 
     /**
+     * get Double Ranking List
+     * 
+     * @param grade
+     * @return
+     */
+    public Object getDoubleRankingList(String grade);
+
+    /**
      * get ranking list by count
      * 
      * @param count

@@ -226,5 +226,7 @@ Page({
     this.setData({
       isSingal:!this.data.isSingal
     })
+    var ladderComp = this.selectComponent('#ladder');
+    ladderComp.switchMode(this.data.isSingal)
   }
 })

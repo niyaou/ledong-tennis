@@ -8,6 +8,10 @@ Component({
     isPicked:{
       type: Boolean,
       value: false
+    },
+    isSingle:{
+      type: Boolean,
+      value: false
     }
   },
 
@@ -21,29 +25,37 @@ Component({
   },
 lifetimes:{
   attached(){
-    let that = this
-    http.getReq(`rank/rankList`,app.globalData.jwt, (res)=>{
-
-      that.setData({
-        players:res.data}
-      )
-    })
+this.initLadder()
   }
 },
   /**
    * 组件的方法列表
    */
   methods: {
+    initLadder(){
+      let that = this
+      let url=this.data.isSingle?'rank/rankList':'rank/doubleRankList'
+      http.getReq(`${url}`,app.globalData.jwt, (res)=>{
+        that.setData({
+          players:res.data
+        })
+      })
+    },
     tapTabStatus(event){
       let that = this
       http.getReq(`rank/rankList?grade=${event.currentTarget.dataset.gid}`,app.globalData.jwt, (res)=>{
-  
         that.setData({
           players:res.data,
           tabStatus:event.currentTarget.dataset.gid
         }
         )
       })
+    },
+    switchMode(isSingle){
+      this.setData({
+        isSingle:isSingle
+      } )
+      this.initLadder()
     }
   
   }

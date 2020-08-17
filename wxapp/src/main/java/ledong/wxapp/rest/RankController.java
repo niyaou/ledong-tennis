@@ -81,6 +81,17 @@ public class RankController {
     }
 
 
+    @RequestMapping(value = "/doubleRankList", method = RequestMethod.GET)
+    @ApiOperation(value = "explore  ranking list ", notes = "")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "grade", value = "grade name", required = false, dataType = "string", paramType = "query"),
+        @ApiImplicitParam(name = "count", value = "list count ", required = false, dataType = "string", paramType = "query")  })
+    public ResponseEntity<?> userDoubleRankList(   @RequestParam(value = "grade", required = false) String grade,
+    @RequestParam(value = "count", required = false) Integer count) {
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getDoubleRankingList(grade)), HttpStatus.OK);
+    }
+
+
     @RequestMapping(value = "/rankNewList", method = RequestMethod.GET)
     @ApiOperation(value = "explore  ranking list ", notes = "")
     @ApiImplicitParams({

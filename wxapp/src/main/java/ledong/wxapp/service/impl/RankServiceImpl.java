@@ -41,6 +41,7 @@ import ledong.wxapp.strategy.RankingStrategy;
 import ledong.wxapp.strategy.context.GradingContext;
 import ledong.wxapp.strategy.context.RankingContext;
 import ledong.wxapp.strategy.impl.rank.ConsecutiveRanking;
+import ledong.wxapp.strategy.impl.rank.DoubleGradeRanking;
 import ledong.wxapp.strategy.impl.rank.GradeRanking;
 import ledong.wxapp.strategy.impl.rank.PondRanking;
 import ledong.wxapp.strategy.impl.rank.VictoryRanking;
@@ -122,9 +123,41 @@ public class RankServiceImpl implements IRankService {
 
     @Override
     public Object getRankingList(String grade) {
-
         List<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,
                 RankInfoVo.RANKTYPE0, grade, RankInfoVo.SCORE, SortOrder.DESC, 0, 50);
+        if (users != null) {
+            String[] idsArr = new String[users.size()];
+            List<String> ids = new ArrayList<String>();
+            users = users.stream().map(match -> {
+                ids.add((String) match.get(RankInfoVo.OPENID));
+                return match;
+            }).collect(Collectors.toList());
+
+            List<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
+                    ids.toArray(idsArr));
+
+            users = users.stream().map(match -> {
+                List<Map<String, Object>> holder = userInfos.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
+                        .collect(Collectors.toList());
+
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.COURTNAME, iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID))
+                        .get(MatchPostVo.COURTNAME));
+                return match;
+            }).collect(Collectors.toList());
+
+        }
+
+        return users;
+    }
+
+
+    @Override
+    public Object getDoubleRankingList(String grade) {
+        List<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,
+                RankInfoVo.DOUBLERANKTYPE0, grade, RankInfoVo.DOUBLESCORE, SortOrder.DESC, 0, 50);
         if (users != null) {
             String[] idsArr = new String[users.size()];
             List<String> ids = new ArrayList<String>();
@@ -286,12 +319,10 @@ public class RankServiceImpl implements IRankService {
 
             LinkedList<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.USER_INFORMATION,
                     ids.toArray(idsArr));
-
             users = users.stream().map(match -> {
                 List<Map<String, Object>> holder = userInfos.stream()
                         .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
                         .collect(Collectors.toList());
-
                 match.put(UserVo.CREATETIME, holder.get(0).get(UserVo.CREATETIME));
                 match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
                 match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
@@ -327,10 +358,12 @@ public class RankServiceImpl implements IRankService {
                 null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, 200);
         int[] position = { 0 };
         LinkedList<RankInfoVo> vos=new LinkedList<RankInfoVo> ();
+        GradingContext gContext = new GradingContext(new DoubleGradeRanking());
         users.forEach(u -> {
             position[0] = position[0]+1;
             u.put(RankInfoVo.POSITION, position[0]);
             RankInfoVo rank=JSON.parseObject(JSON.toJSONString(u),RankInfoVo.class);
+            rank= gContext.rankMatch(rank);
             vos.add(rank);
         });
         RankingStrategy.bulkUpdateRankInfo(vos);
