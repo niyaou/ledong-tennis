@@ -2,6 +2,7 @@
 //获取应用实例
 const app = getApp()
 var http = require('../../utils/http.js')
+const chooseLocation = requirePlugin('chooseLocation');
 Page({
   data: {
     motto: 'Hello World',
@@ -19,7 +20,7 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     ratio: getApp().globalData.ratio,
-    tabBarStatus: 2 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
+    tabBarStatus: 1 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
   },
   //事件处理函数
   bindViewTap: function () {
@@ -68,6 +69,31 @@ Page({
     if (matchComp != null && matchComp.data.tabStatus == 1){
       matchComp. clearMatches()
     }
+
+    const location = chooseLocation.getLocation();
+    if (location) {
+      console.log('-----------1',location)
+      chooseLocation.setLocation();
+      }
+   
+  },
+  onLocationTapped(e){
+    console.log(e)
+    const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
+    const referer = 'dd'; //调用插件的app的名称
+
+    const location = JSON.stringify({
+      latitude: e.detail[0].courtGPS ? e.detail[0].courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
+      longitude: e.detail[0].courtGPS ?e.detail[0].courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
+    });
+    const category = '体育户外,体育场馆,';
+    wx.navigateTo({
+      url: `plugin://chooseLocation/index?key=${key}&referer=${referer}&location=${location}&category=${category}`,
+      success: function(res) {
+        console.log(res)
+        res.eventChannel.emit('acceptDataFromOpenerPage', { data: res})
+      }
+    })
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo

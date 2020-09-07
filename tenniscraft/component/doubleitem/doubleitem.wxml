@@ -1,0 +1,57 @@
+<!--component/playitem/playitem.wxml-->
+<wxs module="dateFilter" src="../../filter/dateFilter.wxs"></wxs>
+<view class="rowdiv" >
+	<div class="item">
+		<div class="{{matches.status ==2001 ? 'title demo-text-2':matches.status ==2002?'title demo-text-1':'title demo-text-3'}}">{{matches.status ==2000 ? '寻找球友的比赛':matches.status ==2001?'等待开始的比赛':matches.status ==2002?'正在进行的比赛':'比赛结束'}}</div>
+		<div class="divid" />
+		<div class="user">
+			<div class="avator">
+				<image bindtap="detail" data-gid="1"  class="userinfo-avatar1" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="namecontent1"><text class="nickname">{{matches.holderName}}</text>
+					<div class="rank">{{matches.holderrankType0}}</div>
+				</div>
+						<div class="dividh" />
+        			<image bindtap="detail" data-gid="2"   class="userinfo-avatar2" src="{{matches.holderAvator2}}" mode="cover" style="z-index:30"></image>
+				<div class="namecontent2"><text class="nickname">{{matches.holderName2}}</text>
+					<div class="rank">{{matches.holderrankType0}}</div>
+				</div>
+			</div>
+		
+	
+
+
+
+
+			<div class="score win">{{matches.holderScore}}</div>
+			<div class="dividv" />
+			<div class="score lose">{{matches.challengerScore}}</div>
+			<div class="avator">
+				<image  bindtap="detail" data-gid="3"   class="userinfo-avatar1" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
+				<div class="namecontent1"> <text class="nickname">{{matches.challengerName}}</text>
+					<div class="rank">{{matches.challengerrankType0}}</div>
+				</div>
+				<div class="dividh" />
+					<image  bindtap="detail" data-gid="4"  class="userinfo-avatar2" src="{{matches.challengerAvator2}}" mode="cover" style="z-index:30"></image>
+					<div class="namecontent2"> <text class="nickname">{{matches.challengerName2}}</text>
+          			<div class="rank">{{matches.challengerrankType0}}</div></div>
+		
+			</div>
+		</div>
+		<div class="divid" />
+		<div class="bottom">
+			<div class="zone" catchtap="tapCourtLocation">
+				<image src="../../icon/position.png" class="bottomimg" />
+				<div> {{matches.courtName}}</div>
+			</div>
+			<!-- <div class="dividv" /> -->
+			<div class="zone">
+				<image src="../../icon/cal.png" class="bottomimg" />
+				<div> {{dateFilter.getDate(matches.orderTime,'-') || '时间待定'}}</div>
+			</div>
+				<div class="zone">
+				<image src="../../icon/tobeconfirm.png" class="bottomimg" />
+			
+			</div>
+		</div>
+	</div>
+</view>

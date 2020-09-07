@@ -59,20 +59,27 @@ Component({
       })
     },
     onLocationTapped(e) {
-      this.setData({
-        latitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
-        longitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
-        markers: e.detail.courtGPS ? [{
-          id: 1,
-          latitude: e.detail.courtGPS.split(',')[0],
-          longitude: e.detail.courtGPS.split(',')[1],
-          name: e.detail.courtName
-        }] : []
-      });
+      this.triggerEvent('locationTapped',this.data.matches);
+      // this.setData({
+      //   latitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
+      //   longitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
+      //   markers: e.detail.courtGPS ? [{
+      //     id: 1,
+      //     latitude: e.detail.courtGPS.split(',')[0],
+      //     longitude: e.detail.courtGPS.split(',')[1],
+      //     name: e.detail.courtName
+      //   }] : []
+      // });
 
-      this.setData({
-        showMap: true
-      })
+      // this.setData({
+      //   showMap: true
+      // })
+   
+        if (parseInt(this.data.matches.status) == 2002 && this.data.matches.matchType !=3001) {
+          return
+        }
+       
+     
     },
     tapTabStatus(event) {
       this.setData({
@@ -106,6 +113,7 @@ Component({
                 that.setData({
                   matches: [resMatch.data]
                 })
+
               }
             })
           }, 1000)
@@ -130,8 +138,18 @@ Component({
       let that = this
       http.getReq('match/matchedGames/10', app.globalData.jwt, (res) => {
         if (res.code === 0) {
+          // that.setData({
+          //   matches: res.data
+          // })
           that.setData({
-            matches: res.data
+            matches: [{
+              "challengerScore":6,"holderScore":4,
+              "holderrankType0":"白银",
+              "challengerrankType0":"黄金",
+              "challengerAvator":"https://thirdwx.qlogo.cn/mmopen/vi_32/VUDUy2iac9PAhMicdfU4FfAlgQT7cSJl5ILnQwiaYQicUibVq7iamKvxwHJ4IkjOm6ShEgeAW4Eu8Soadzl6iajU72M0Q/132","challengerName":"Jerry",
+            "challengerAvator2":"https://thirdwx.qlogo.cn/mmopen/vi_32/x307v1K8rWibQemibA649icojHU3TBFlxJR9EBr0jjRGYIZYkjZGbUDfwBwTSUTIJEEbf97K9gmV8ickNG7h9nx4Ag/132","challengerName2":"JU4ever",
+            "holderAvator":"https://thirdwx.qlogo.cn/mmopen/vi_32/EjkFziczku4zYERlfjgpZ6SQU8t03tF0FJuF3j8xNZbX4YlzSlVp2MXbibjQvMPJaV3nWTPB1qiadKTRwTqbhqvhQ/132","holderName":"别吹啊",
+            "holderAvator2":"https://thirdwx.qlogo.cn/mmopen/vi_32/NFicMFicPicibcUGhPPHsWURhpCG3zptECkm1iazd0A20mLR9YYibnOh6YHScXTxIsoy5gjoHZBqNjh2qXJuTu5oH6CA/132","holderName2":"Michael Zheng"}]
           })
         }
       })

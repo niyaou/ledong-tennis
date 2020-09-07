@@ -89,6 +89,7 @@ Page({
     }
     const eventChannel = this.getOpenerEventChannel()
     let that = this
+
     eventChannel.on('acceptDataFromOpenerPage', function (data) {
       that.setData({
         matches: data.data,
