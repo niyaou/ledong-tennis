@@ -253,6 +253,16 @@ Page({
       isSingal:!this.data.isSingal
     })
     var ladderComp = this.selectComponent('#ladder');
-    ladderComp.switchMode(this.data.isSingal)
+    if(ladderComp){
+      ladderComp.switchMode(this.data.isSingal)
+    }
+
+
+    var matchComp = this.selectComponent('#match');
+    if(matchComp){
+      matchComp.switchMode(this.data.isSingal)
+    }
+ 
+
   }
 })

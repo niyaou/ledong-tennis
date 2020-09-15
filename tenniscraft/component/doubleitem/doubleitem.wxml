@@ -12,8 +12,8 @@
 				</div>
 						<div class="dividh" />
         			<image bindtap="detail" data-gid="2"   class="userinfo-avatar2" src="{{matches.holderAvator2}}" mode="cover" style="z-index:30"></image>
-				<div class="namecontent2"><text class="nickname">{{matches.holderName2}}</text>
-					<div class="rank">{{matches.holderrankType0}}</div>
+				<div class="namecontent2"><text class="nickname">{{matches.holderName2||'等待加入'}}</text>
+					<div class="{{matches.holder2rankType0?'rank':''}}">{{matches.holder2rankType0}}</div>
 				</div>
 			</div>
 		
@@ -31,9 +31,12 @@
 					<div class="rank">{{matches.challengerrankType0}}</div>
 				</div>
 				<div class="dividh" />
-					<image  bindtap="detail" data-gid="4"  class="userinfo-avatar2" src="{{matches.challengerAvator2}}" mode="cover" style="z-index:30"></image>
-					<div class="namecontent2"> <text class="nickname">{{matches.challengerName2}}</text>
-          			<div class="rank">{{matches.challengerrankType0}}</div></div>
+					<image  bindtap="detail" data-gid="4"  class="userinfo-avatar2" src="{{matches.challenger2Avator}}" mode="cover" style="z-index:30"></image>
+					<div class="namecontent2"> <text class="nickname">{{matches.challenger2Name||'等待加入'}}</text>
+       
+											<div class="{{matches.challenger2rankType0?'rank':''}}">{{matches.challenger2rankType0}}</div>
+								</div>
+						
 		
 			</div>
 		</div>
@@ -48,8 +51,8 @@
 				<image src="../../icon/cal.png" class="bottomimg" />
 				<div> {{dateFilter.getDate(matches.orderTime,'-') || '时间待定'}}</div>
 			</div>
-				<div class="zone">
-				<image src="../../icon/tobeconfirm.png" class="bottomimg" />
+				<div class="zone" bindtap="onconfirm">
+				<image src="../../icon/tobeconfirm.png" class="bottomimg" data-gid="{{matches.matchId}}"/>
 			
 			</div>
 		</div>

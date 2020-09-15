@@ -77,6 +77,10 @@ Component({
     detail(e){
       let that = this
   console.log(e.currentTarget.dataset.gid)
+    },
+    onconfirm(e){
+      let that = this
+      console.log(e.currentTarget.dataset.gid)
     }
   }
 })

@@ -36,6 +36,14 @@ public interface IMatchService {
      */
     public String requestMatching(String user, String courtGps);
 
+
+    /**
+     * required a random match
+     * @param user
+     * @return
+     */
+    public String  requestDoubleMatching(String user);
+
     /**
      * create a intentional match post data.
      * 
@@ -64,6 +72,16 @@ public interface IMatchService {
      * @return
      */
     public Object getMatchedList(String user, Integer count);
+
+        /**
+     * 
+     * get the list of matched games
+     * 
+     * @param user
+     * @param count
+     * @return
+     */
+    public Object getDoubleMatchedList(String user, Integer count);
 
     /**
      * start a challenge match
@@ -101,6 +119,12 @@ public interface IMatchService {
      */
     public String postMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
             String orderTime, String courtName, String courtGps);
+
+
+
+    public String postDoubleMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
+    String orderTime, String courtName, String courtGps);
+
 
     /**
      * create a session
@@ -155,6 +179,16 @@ public interface IMatchService {
      * @return
      */
     public Object getMatchInfos(String matchId);
+
+    
+    /**
+     * 
+     * get the given double match infos
+     * 
+     * @param matchId
+     * @return
+     */
+    public Object getDoubleMatchInfos(String matchId);
 
     /**
      * 

@@ -56,6 +56,20 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
+
+        @RequestMapping(value = "/randomDoubleMatch", method = RequestMethod.POST)
+        @ApiOperation(value = "request a random double match", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "gps", value = "random request user's location \"latitude,longitude\"", required = true, dataType = "string", paramType = "query") })
+        // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+        public ResponseEntity<?> randomDoubleMatch(@RequestHeader("Authorization") String authHeader                        ) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                return new ResponseEntity<Object>(CommonResponse.success(matchService.requestDoubleMatching(userId)),
+                                HttpStatus.OK);
+        }
+
+
         @RequestMapping(value = "/intentionalMatch", method = RequestMethod.POST)
         @ApiOperation(value = "request a intentional match", notes = "")
         @ApiImplicitParams({
@@ -96,10 +110,23 @@ public class MatchController {
         // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
         public ResponseEntity<?> exploreMatchedGames(@PathVariable(value = "count", required = true) Integer count,
                         @RequestHeader("Authorization") String authHeader) {
-                MatchRequestVo vo = new MatchRequestVo();
                 Claims claims = tokenService.getClaimByToken(authHeader);
                 String userId = claims.getSubject();
                 return new ResponseEntity<Object>(CommonResponse.success(matchService.getMatchedList(userId, count)),
+                                HttpStatus.OK);
+        }
+
+
+        @RequestMapping(value = "/doubleMatchedGames/{count}", method = RequestMethod.GET)
+        @ApiOperation(value = "request  doubleMatched games", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "count", value = "matched request count", required = true, dataType = "int", paramType = "path") })
+        // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+        public ResponseEntity<?> exploreDoubleMatchedGames(@PathVariable(value = "count", required = true) Integer count,
+                        @RequestHeader("Authorization") String authHeader) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                return new ResponseEntity<Object>(CommonResponse.success(matchService.getDoubleMatchedList(userId, count)),
                                 HttpStatus.OK);
         }
 
@@ -137,6 +164,16 @@ public class MatchController {
         // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
         public ResponseEntity<?> getMatchInfos(@PathVariable(value = "matchId", required = true) String matchId) {
                 return new ResponseEntity<Object>(CommonResponse.success(matchService.getMatchInfos(matchId)),
+                                HttpStatus.OK);
+        }
+
+        @RequestMapping(value = "/doubleMatchInfo/{matchId}", method = RequestMethod.GET)
+        @ApiOperation(value = "get  match infos", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "matchId", value = "matched request count", required = true, dataType = "string", paramType = "path") })
+        // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+        public ResponseEntity<?> getDoubleMatchInfos(@PathVariable(value = "matchId", required = true) String matchId) {
+                return new ResponseEntity<Object>(CommonResponse.success(matchService.getDoubleMatchInfos(matchId)),
                                 HttpStatus.OK);
         }
 

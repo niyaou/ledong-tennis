@@ -9,6 +9,10 @@ Component({
     isPicked: {
       type: Boolean,
       value: false
+    },
+    isSingle:{
+      type: Boolean,
+      value: false
     }
   },
 
@@ -81,6 +85,41 @@ Component({
        
      
     },
+     // 上拉加载更多
+  loadMore: function(){
+    var self = this;
+    // 当前页是最后一页
+    if (self.data.currentPage == self.data.allPages){
+      self.setData({
+        loadMoreData: '已经到顶'
+      })
+      return;
+    }
+    setTimeout(function(){
+      console.log('上拉加载更多');
+      // var tempCurrentPage = self.data.currentPage;
+      // tempCurrentPage = tempCurrentPage + 1;
+      // self.setData({
+      //   currentPage: tempCurrentPage,
+      //   hideBottom: false  
+      // })
+      // self.getData();  
+    },300);
+  },
+  // 下拉刷新
+  refresh: function(e){
+    var self = this;
+    setTimeout(function(){
+      console.log('下拉刷新');
+      // var date = new Date();
+      // self.setData({
+      //   currentPage: 1,
+      //   refreshTime: date.toLocaleTimeString(),
+      //   hideHeader: false
+      // })
+      // self.getData();
+    },300);
+  },
     tapTabStatus(event) {
       this.setData({
         tabStatus: event.currentTarget.dataset.gid
@@ -98,16 +137,18 @@ Component({
     },
     matching() {
       let that = this
-      http.postReq('match/randomMatch', app.globalData.jwt, {
+      let url= this.data.isSingle?'match/randomMatch':'match/randomDoubleMatch'
+      http.postReq(url, app.globalData.jwt, {
         gps: app.globalData.gps
       }, (res) => {
         if (res.code == 0 && res.data != null) {
-          // console.info(res)
+
           wx.showLoading({
             title: 'loading...',
           })
           setTimeout(function () {
-            http.getReq(`match/matchInfo/${res.data}`, app.globalData.jwt, (resMatch) => {
+            let matchUrl=this.data.isSingle?'match/matchInfo':'match/doubleMatchInfo'
+            http.getReq(`${matchUrl}/${res.data}`, app.globalData.jwt, (resMatch) => {
               // console.info(resMatch)
               if (resMatch.code === 0) {
                 that.setData({
@@ -136,20 +177,22 @@ Component({
     },
     matchedGame() {
       let that = this
-      http.getReq('match/matchedGames/10', app.globalData.jwt, (res) => {
+      let url= this.data.isSingle?'match/matchedGames':'match/doubleMatchedGames'
+      http.getReq(`${url}/10`, app.globalData.jwt, (res) => {
         if (res.code === 0) {
+          console.log(res)
           // that.setData({
-          //   matches: res.data
+          //   matches: [{
+          //     "challengerScore":6,"holderScore":4,
+          //     "holderrankType0":"白银",
+          //     "challengerrankType0":"黄金",
+          //     "challengerAvator":"https://thirdwx.qlogo.cn/mmopen/vi_32/VUDUy2iac9PAhMicdfU4FfAlgQT7cSJl5ILnQwiaYQicUibVq7iamKvxwHJ4IkjOm6ShEgeAW4Eu8Soadzl6iajU72M0Q/132","challengerName":"Jerry",
+          //   "challengerAvator2":"https://thirdwx.qlogo.cn/mmopen/vi_32/x307v1K8rWibQemibA649icojHU3TBFlxJR9EBr0jjRGYIZYkjZGbUDfwBwTSUTIJEEbf97K9gmV8ickNG7h9nx4Ag/132","challengerName2":"JU4ever",
+          //   "holderAvator":"https://thirdwx.qlogo.cn/mmopen/vi_32/EjkFziczku4zYERlfjgpZ6SQU8t03tF0FJuF3j8xNZbX4YlzSlVp2MXbibjQvMPJaV3nWTPB1qiadKTRwTqbhqvhQ/132","holderName":"别吹啊",
+          //   "holderAvator2":"https://thirdwx.qlogo.cn/mmopen/vi_32/NFicMFicPicibcUGhPPHsWURhpCG3zptECkm1iazd0A20mLR9YYibnOh6YHScXTxIsoy5gjoHZBqNjh2qXJuTu5oH6CA/132","holderName2":"Michael Zheng"}]
           // })
           that.setData({
-            matches: [{
-              "challengerScore":6,"holderScore":4,
-              "holderrankType0":"白银",
-              "challengerrankType0":"黄金",
-              "challengerAvator":"https://thirdwx.qlogo.cn/mmopen/vi_32/VUDUy2iac9PAhMicdfU4FfAlgQT7cSJl5ILnQwiaYQicUibVq7iamKvxwHJ4IkjOm6ShEgeAW4Eu8Soadzl6iajU72M0Q/132","challengerName":"Jerry",
-            "challengerAvator2":"https://thirdwx.qlogo.cn/mmopen/vi_32/x307v1K8rWibQemibA649icojHU3TBFlxJR9EBr0jjRGYIZYkjZGbUDfwBwTSUTIJEEbf97K9gmV8ickNG7h9nx4Ag/132","challengerName2":"JU4ever",
-            "holderAvator":"https://thirdwx.qlogo.cn/mmopen/vi_32/EjkFziczku4zYERlfjgpZ6SQU8t03tF0FJuF3j8xNZbX4YlzSlVp2MXbibjQvMPJaV3nWTPB1qiadKTRwTqbhqvhQ/132","holderName":"别吹啊",
-            "holderAvator2":"https://thirdwx.qlogo.cn/mmopen/vi_32/NFicMFicPicibcUGhPPHsWURhpCG3zptECkm1iazd0A20mLR9YYibnOh6YHScXTxIsoy5gjoHZBqNjh2qXJuTu5oH6CA/132","holderName2":"Michael Zheng"}]
+            matches:res.data
           })
         }
       })
@@ -187,6 +230,19 @@ Component({
           })
         }
       })
+    },
+    switchMode(isSingle){
+      this.setData({
+        isSingle:isSingle
+      } )
+      let event = {
+        currentTarget: {
+          dataset: {
+            gid: 0
+          }
+        }
+      }
+      this.tapTabStatus(event)
     }
   }
 })
