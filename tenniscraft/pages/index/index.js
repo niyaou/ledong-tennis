@@ -73,6 +73,11 @@ Page({
     const location = chooseLocation.getLocation();
     if (location) {
       console.log('-----------1',location)
+      var matchComp = this.selectComponent('#match');
+      if(matchComp && !this.data.isSingal){
+        matchComp.updateMatchCourt(`${location.latitude},${location.longitude}`,location.name)
+      }
+
       chooseLocation.setLocation();
       }
    

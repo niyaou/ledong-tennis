@@ -203,6 +203,19 @@ public interface IMatchService {
     public Object updateMatchInfos(String matchId, String orderTime, String courtName,String courtGPS);
 
 
+/**
+     * 
+     * update double match infos
+     * 
+     * @param matchId
+     * @param orderTime
+     * @param courtName
+     * @param courtGPS
+     * @param holder2
+     * @param challenger2
+     * @return
+     */
+    public Object updateDoubleMatchInfos(String matchId, String courtName,String courtGPS,String holder2 ,String  challenger2);
 
     /**
      * update match score 
@@ -213,6 +226,16 @@ public interface IMatchService {
      * @return
      */
     public Object updateMatchScore(String matchId, Integer holderScore, Integer challengerScore);
+
+        /**
+     * update double match score 
+     * 
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public Object updateDoubleMatchScore(String matchId, Integer holderScore, Integer challengerScore);
 
 
 

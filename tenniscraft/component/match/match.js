@@ -243,6 +243,34 @@ Component({
         }
       }
       this.tapTabStatus(event)
+    },
+    updateMatchCourt(gps,name){
+      let that = this
+      let url= `match/doubleMatchInfo/${this.data.matches[0].id}`
+
+      http.postReq(url, app.globalData.jwt, {
+        courtGPS: gps,
+        courtName:name,
+      }, (res) => {
+        console.log(res)
+        if (res.code == 0 && res.data != null) {
+          // wx.showLoading({
+          //   title: 'loading...',
+          // })
+          // setTimeout(function () {
+          //   let matchUrl=this.data.isSingle?'match/matchInfo':'match/doubleMatchInfo'
+          //   http.getReq(`${matchUrl}/${res.data}`, app.globalData.jwt, (resMatch) => {
+          //     // console.info(resMatch)
+          //     if (resMatch.code === 0) {
+          //       that.setData({
+          //         matches: [resMatch.data]
+          //       })
+          //     }
+          //   })
+          // }, 1000)
+
+        } 
+      })
     }
   }
 })

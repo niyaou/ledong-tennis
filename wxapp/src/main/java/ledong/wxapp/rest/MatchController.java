@@ -195,6 +195,25 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
+        @RequestMapping(value = "/doubleMatchInfo/{matchId}", method = RequestMethod.POST)
+        @ApiOperation(value = "update  match infos", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "matchId", value = "matched id", required = true, dataType = "string", paramType = "path"),
+                        @ApiImplicitParam(name = "courtName", value = "intentional request court name", required = false, dataType = "string", paramType = "query"),
+                        @ApiImplicitParam(name = "courtGPS", value = "intentional request court gps", required = false, dataType = "string", paramType = "query"),
+                        @ApiImplicitParam(name = "orderTime", value = "intentional request time", required = false, dataType = "string", paramType = "query") })
+        // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+        public ResponseEntity<?> updateDoubleMatchInfos(@PathVariable(value = "matchId", required = true) String matchId,
+                        @RequestParam(value = "courtName", required = false) String courtName,
+                        @RequestParam(value = "courtGPS", required = false) String courtGPS,
+                        @RequestParam(value = "holder2", required = false) String holder2,
+                        @RequestParam(value = "challenger2", required = false) String challenger2) {
+                return new ResponseEntity<Object>(
+                                CommonResponse.success(
+                                                matchService.updateDoubleMatchInfos(matchId,  courtName, courtGPS,holder2,challenger2)),
+                                HttpStatus.OK);
+        }
+
         @RequestMapping(value = "/matchScore/{matchId}", method = RequestMethod.POST)
         @ApiOperation(value = "update  match score", notes = "")
         @ApiImplicitParams({
@@ -210,6 +229,24 @@ public class MatchController {
                                                 matchService.updateMatchScore(matchId, holderScore, challengerScore)),
                                 HttpStatus.OK);
         }
+
+
+        @RequestMapping(value = "/doubleMatchScore/{matchId}", method = RequestMethod.POST)
+        @ApiOperation(value = "update double match score", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "matchId", value = "matched id", required = true, dataType = "string", paramType = "path"),
+                        @ApiImplicitParam(name = "holderScore", value = "holder score", required = false, dataType = "integer", paramType = "query"),
+                        @ApiImplicitParam(name = "challengerScore", value = "challengerScore", required = false, dataType = "integer", paramType = "query") })
+        public ResponseEntity<?> updateDoubleMatchScore(@PathVariable(value = "matchId", required = true) String matchId,
+                        @RequestParam(value = "holderScore", required = false) Integer holderScore,
+                        @RequestParam(value = "challengerScore", required = false) Integer challengerScore) {
+                return new ResponseEntity<Object>(
+                                CommonResponse.success(
+                                                matchService.updateDoubleMatchScore(matchId, holderScore, challengerScore)),
+                                HttpStatus.OK);
+        }
+
+
 
         @RequestMapping(value = "/matchConfirm/{matchId}/{type}", method = RequestMethod.POST)
         @ApiOperation(value = "confirm   match ", notes = "")
