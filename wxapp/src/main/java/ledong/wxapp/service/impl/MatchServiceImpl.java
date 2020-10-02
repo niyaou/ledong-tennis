@@ -1069,4 +1069,66 @@ public class MatchServiceImpl implements IMatchService {
         return SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
     }
 
+    @Override
+    public Object confirmDoubleMatch(String matchId, Integer type) {
+        HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, matchId);
+        if (match == null) {
+            return null;
+        }
+        String finishId = null;
+        DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
+        if (type == 0) {
+            vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        } else if (type == 1) {
+            vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        } else {
+            vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+            vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        }
+
+        if (MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getChallengerAcknowledged())
+                && MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getHolderAcknowledged())) {
+
+            if (!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())) {
+                vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
+                vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+                vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+            } else {
+                vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+                finishId = finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
+            }
+        }
+
+        String id = SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+        if (TextUtils.isEmpty(id)) {
+            throw new CustomException(ResultCodeEnum.CONFIRMED_MATCH_ERROR);
+        }
+        if (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())
+                && TextUtils.isEmpty(finishId)) {
+            ctx.publishEvent(new MatchConfirmEvent(ctx, id));
+        }
+        return id;
+    }
+
+    @Override
+    public String finishDoubleMatch(String matchId, int holderScore, int challengerScore) {
+
+
+        HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, matchId);
+        if (match == null) {
+            return null;
+        }
+        // iRankService.matchRank(matchId, holderScore, challengerScore);
+        // MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
+        // vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
+        //         : MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode());
+        // vo.setHolderScore(holderScore);
+        // vo.setChallengerScore(challengerScore);
+        // vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
+        // vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        // vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+
+        return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
+    }
+
 }

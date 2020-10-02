@@ -11,6 +11,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import VO.DoubleMatchPostVo;
+import VO.DoubleWinRateEvent;
 import VO.MatchConfirmEvent;
 import VO.MatchPostVo;
 import VO.RankInfoVo;
@@ -54,6 +56,22 @@ public class EventsListener {
 
     @EventListener
     @Async
+    public void handleDoubleWinRateEvent(DoubleWinRateEvent event) {
+        RankInfoVo userVos = event.getUserVo();
+        log.info(JSON.toJSONString( userVos));
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+
+            e.printStackTrace();
+        }
+        userVos.setWinRate(rankService.updateDoubleWinRate(userVos.getOpenId()));
+        rankService.updateRankInfo(userVos);
+        log.info(JSON.toJSONString( userVos));
+    }
+
+    @EventListener
+    @Async
     public void handleSlamWinRateEvent(SlamWinRateEvent event) {
         RankInfoVo userVos = event.getUserVo();
         log.info(JSON.toJSONString( userVos));
@@ -77,12 +95,21 @@ public class EventsListener {
         try {
             String matchId = event.getMatchId();
             log.info("输入比分后自动确认:"+matchId);
-            Thread.sleep(120000);
-          Map<String,Object> vo=  (Map<String, Object>) matchService.getMatchInfos(matchId);
+          Thread.sleep(120000);
           rankService.updateUserPosition();
-         if(vo.get(MatchPostVo.RANKED)==null||!vo.get(MatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
-            matchService.confirmMatch(matchId, vo.get(MatchPostVo.HOLDERACKNOWLEDGED).equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode())?2:1);
-         }
+          Map<String,Object> vo=  (Map<String, Object>) matchService.getMatchInfos(matchId);
+          if(vo ==null){
+            vo=  (Map<String, Object>) matchService.getDoubleMatchInfos(matchId);
+            if(vo.get(DoubleMatchPostVo.RANKED)==null||!vo.get(DoubleMatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
+                matchService.confirmDoubleMatch(matchId, vo.get(DoubleMatchPostVo.HOLDERACKNOWLEDGED).equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode())?2:1);
+             }
+          }else{
+            if(vo.get(MatchPostVo.RANKED)==null||!vo.get(MatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
+                matchService.confirmMatch(matchId, vo.get(MatchPostVo.HOLDERACKNOWLEDGED).equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode())?2:1);
+             }
+          }
+   
+      
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

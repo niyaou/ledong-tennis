@@ -249,6 +249,18 @@ public interface IMatchService {
      */
     public Object confirmMatch(String matchId, Integer type);
 
+    
+
+    /**
+     * 
+     * user confirm double match
+     * 
+     * @param matchId
+     * @param type 0: holder, 1: challenger,  2: both
+     * @return
+     */
+    public Object confirmDoubleMatch(String matchId, Integer type);
+
     /**
      * insert session context
      * 
@@ -270,6 +282,18 @@ public interface IMatchService {
      * @return
      */
     public String finishMatch(String matchId, int holderScore, int challengerScore);
+
+       /**
+     * 
+     * finish the given double match ,upload score of this match ,and auto ranking , and
+     * cache ranked match to redis
+     * 
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public String finishDoubleMatch(String matchId, int holderScore, int challengerScore);
 
 
     /**

@@ -20,6 +20,21 @@ public interface IRankService {
      */
     public String matchRank(String matchId, int holderScore, int challengerScore);
 
+
+      /**
+     * 
+     * rank for the given double match
+     * 
+     * 1.get holder and challenger by matchid 2.get both players' current rank 3.use
+     * strategy to rank 4.update players' rank 5.return both current rank
+     * 
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public String doubleMatchRank(String matchId, int holderScore, int challengerScore);
+
     /**
      * ranking slam matches,which stored in slam index 1.get holder and challenger
      * by matchid 2.get both players' current rank 3.use strategy to rank 4.update
@@ -90,6 +105,14 @@ public interface IRankService {
      */
     public Double updateWinRate(String userId);
 
+        /**
+     * update user double win rate
+     * 
+     * @param userId
+     * @return
+     */
+    public Double updateDoubleWinRate(String userId);
+
     /**
      * update user slam win rate
      * 
@@ -129,4 +152,10 @@ public interface IRankService {
      * @return
      */
     public String updateUserPosition();
+
+        /**
+     * 
+     * @return
+     */
+    public String updateDoubleUserPosition();
 }

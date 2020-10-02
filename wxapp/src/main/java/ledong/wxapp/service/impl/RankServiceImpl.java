@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import VO.DoubleMatchPostVo;
+import VO.DoubleWinRateEvent;
 import VO.MatchPostVo;
 import VO.RankInfoVo;
 import VO.SlamWinRateEvent;
@@ -42,6 +44,7 @@ import ledong.wxapp.strategy.context.GradingContext;
 import ledong.wxapp.strategy.context.RankingContext;
 import ledong.wxapp.strategy.impl.rank.ConsecutiveRanking;
 import ledong.wxapp.strategy.impl.rank.DoubleGradeRanking;
+import ledong.wxapp.strategy.impl.rank.DoublePondRanking;
 import ledong.wxapp.strategy.impl.rank.GradeRanking;
 import ledong.wxapp.strategy.impl.rank.PondRanking;
 import ledong.wxapp.strategy.impl.rank.VictoryRanking;
@@ -358,6 +361,28 @@ public class RankServiceImpl implements IRankService {
                 null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, 200);
         int[] position = { 0 };
         LinkedList<RankInfoVo> vos=new LinkedList<RankInfoVo> ();
+        GradingContext gContext = new GradingContext(new GradeRanking());
+        users.forEach(u -> {
+            position[0] = position[0]+1;
+            u.put(RankInfoVo.POSITION, position[0]);
+            RankInfoVo rank=JSON.parseObject(JSON.toJSONString(u),RankInfoVo.class);
+            rank= gContext.rankMatch(rank);
+            vos.add(rank);
+        });
+        RankingStrategy.bulkUpdateRankInfo(vos);
+        return null;
+    }
+
+            /**
+     * 
+     * @return
+     */
+    public String updateDoubleUserPosition() {
+
+        LinkedList<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,
+                null, null, RankInfoVo.DOUBLESCORE, SortOrder.DESC, 0, 200);
+        int[] position = { 0 };
+        LinkedList<RankInfoVo> vos=new LinkedList<RankInfoVo> ();
         GradingContext gContext = new GradingContext(new DoubleGradeRanking());
         users.forEach(u -> {
             position[0] = position[0]+1;
@@ -368,5 +393,126 @@ public class RankServiceImpl implements IRankService {
         });
         RankingStrategy.bulkUpdateRankInfo(vos);
         return null;
+    }
+
+
+
+    @Override
+    public String doubleMatchRank(String matchId, int holderScore, int challengerScore) {
+        int[] scores = new int[4];
+        int[] tempScore = new int[4];
+        Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, matchId);
+        DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
+
+        RankInfoVo holder = getUserRank(vo.getHolder());
+        RankInfoVo holder2 = getUserRank(vo.getHolder2());
+        RankInfoVo challenger = getUserRank(vo.getChallenger());
+        RankInfoVo challenger2 = getUserRank(vo.getChallenger2());
+        int scoreChanged = 0;
+        RankingContext context = new RankingContext(new VictoryRanking());
+
+        int[] baseScores= context.rankMatch(matchId, holderScore, challengerScore);
+        scores [0]=baseScores[0];
+        scores [1]=baseScores[0];
+        scores [2]=baseScores[1];
+        scores [3]=baseScores[1];
+        // context = new RankingContext(new ConsecutiveRanking());
+        // tempScore = context.rankMatch(matchId, holderScore, challengerScor);
+
+        // scores[0] += tempScore[0];
+        // scores[1] += tempScore[1];
+
+        context = new RankingContext(new DoublePondRanking());
+
+        tempScore = context.rankMatch(matchId, holderScore, challengerScore);
+        scores[0] += tempScore[0];
+        scores[1] += tempScore[1];
+        scores[2] += tempScore[2];
+        scores[3] += tempScore[3];
+        holder.setScore(holder.getScore() + scores[0]);
+        holder2.setScore(holder2.getScore() + scores[1]);
+        challenger.setScore(challenger.getScore() + scores[2]);
+        challenger2.setScore(challenger2.getScore() + scores[3]);
+
+        GradingContext gContext = new GradingContext(new DoubleGradeRanking());
+
+        holder = gContext.rankMatch(holder);
+        holder2 = gContext.rankMatch(holder2);
+        challenger = gContext.rankMatch(challenger);
+        challenger2 = gContext.rankMatch(challenger2);
+
+
+
+        if (holder.getPoolRemain() >= scores[0]) {
+            holder.setPoolRemain(holder.getPoolRemain() - scores[0]);
+        }else{
+            holder.setPoolRemain(0);
+        }
+
+        if (holder2.getPoolRemain() >= scores[0]) {
+            holder2.setPoolRemain(holder2.getPoolRemain() - scores[0]);
+        }else{
+            holder2.setPoolRemain(0);
+        }
+    
+
+        if (challenger.getPoolRemain() >= scores[1]) {
+            challenger.setPoolRemain(challenger.getPoolRemain() - scores[1]);
+        }else{
+            challenger.setPoolRemain(0);
+        }
+        if (challenger2.getPoolRemain() >= scores[1]) {
+            challenger2.setPoolRemain(challenger2.getPoolRemain() - scores[1]);
+        }else{
+            challenger2.setPoolRemain(0);
+        }
+
+        updateRankInfo(holder);
+        updateRankInfo(holder2);
+        updateRankInfo(challenger);
+        updateRankInfo(challenger2);
+        ctx.publishEvent(new DoubleWinRateEvent(ctx, holder));
+        ctx.publishEvent(new DoubleWinRateEvent(ctx, holder2));
+        ctx.publishEvent(new DoubleWinRateEvent(ctx, challenger));
+        ctx.publishEvent(new DoubleWinRateEvent(ctx, challenger2));
+        updateDoubleUserPosition();
+        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        return String.valueOf(scoreChanged);
+    }
+
+    @Override
+    public Double updateDoubleWinRate(String userId) {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder user = new BoolQueryBuilder();
+        user.should(QueryBuilders.termQuery(DoubleMatchPostVo.HOLDER, userId))
+        .should(QueryBuilders.termQuery(DoubleMatchPostVo.HOLDER2, userId))
+                .should(QueryBuilders.termQuery(DoubleMatchPostVo.CHALLENGER, userId))
+                .should(QueryBuilders.termQuery(DoubleMatchPostVo.CHALLENGER2, userId));
+        BoolQueryBuilder match = new BoolQueryBuilder();
+        match.must(QueryBuilders.termQuery(DoubleMatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()))
+                .must(user);
+
+        BoolQueryBuilder win = new BoolQueryBuilder();
+
+        win.should(new BoolQueryBuilder()
+                .must(QueryBuilders.termQuery(DoubleMatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
+                .must(QueryBuilders.termQuery(DoubleMatchPostVo.HOLDER, userId)))
+                .should(new BoolQueryBuilder()
+                .must(QueryBuilders.termQuery(DoubleMatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
+                .must(QueryBuilders.termQuery(DoubleMatchPostVo.HOLDER2, userId)))
+                .should(new BoolQueryBuilder()
+                        .must(QueryBuilders.termQuery(DoubleMatchPostVo.WINNER,
+                                MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
+                        .must(QueryBuilders.termQuery(DoubleMatchPostVo.CHALLENGER, userId)))
+                        .should(new BoolQueryBuilder()
+                        .must(QueryBuilders.termQuery(DoubleMatchPostVo.WINNER,
+                                MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
+                        .must(QueryBuilders.termQuery(DoubleMatchPostVo.CHALLENGER2, userId)));
+        AggregationBuilder b = AggregationBuilders.filter("winrate", win);
+        searchSourceBuilder.query(match);
+        searchSourceBuilder.size(5000);
+        searchSourceBuilder.aggregation(b);
+        return SearchApi.winRateAggregate(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, searchSourceBuilder);
     }
 }
