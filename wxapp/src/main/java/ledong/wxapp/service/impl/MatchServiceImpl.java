@@ -1118,16 +1118,15 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
-        // iRankService.matchRank(matchId, holderScore, challengerScore);
-        // MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
-        // vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
-        //         : MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode());
-        // vo.setHolderScore(holderScore);
-        // vo.setChallengerScore(challengerScore);
-        // vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
-        // vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        // vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-
+        iRankService.doubleMatchRank(matchId, holderScore, challengerScore);
+        DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
+        vo.setWinner(holderScore > challengerScore ? MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()
+                : MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode());
+        vo.setHolderScore(holderScore);
+        vo.setChallengerScore(challengerScore);
+        vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
+        vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
         return SearchApi.updateDocument(DataSetConstant.GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
     }
 
