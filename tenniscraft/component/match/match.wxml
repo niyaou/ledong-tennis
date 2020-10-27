@@ -37,7 +37,7 @@
 	<view class="plus"  wx:if="{{tabStatus==0}}" bindtap="createIntentional"><div  class="plusinner"> +</div> </view>
 		<view wx:for="{{matches}}" wx:key="id">
 			<!-- <playitem matches="{{item}}"  bind:locationTapped="onLocationTapped"/> -->
-				<doubleitem matches="{{item}}"  bind:locationTapped="onLocationTapped"/>
+				<doubleitem matches="{{item}}" userList="{{userList}}"  bind:locationTapped="onLocationTapped"/>
 		</view>
 	</scroll-view>
 

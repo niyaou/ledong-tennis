@@ -1,5 +1,6 @@
 const app = getApp()
-var rootDocment = 'http://192.168.1.102:8081/';
+// var rootDocment = 'http://192.168.1.102:8081/';
+var rootDocment = 'http://192.168.2.106:8081/';
 // var rootDocment = 'https://106.54.80.211:8081/';
 // var rootDocment = 'https://www.ledongtennis.cn:8081/';
 var header = {

@@ -334,6 +334,32 @@ public interface IMatchService {
 
 
     /**
+     * get playing match
+     * 
+     * @param user
+     * @return
+     */
+    public Object playingDoubleMatchInfo(String user);
+
+    /**
+     * get currently ranked match
+     * 
+     * @param user
+     * @return
+     */
+    public Object rankedDoubleMatchInfo(String user);
+
+
+    /**
+     * get last match result
+     * 
+     * @param user
+     * @return
+     */
+    public Object lastDoubleMatchResult(String user);
+
+
+    /**
      * 
      * get near by court
      * 

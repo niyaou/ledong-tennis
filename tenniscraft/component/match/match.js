@@ -13,6 +13,10 @@ Component({
     isSingle:{
       type: Boolean,
       value: false
+    },
+    userList:{
+      type:Array,
+      value:[]
     }
   },
 

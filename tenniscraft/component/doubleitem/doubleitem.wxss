@@ -70,6 +70,7 @@
   display: flex;
   flex-direction: row;
   margin-left: -10rpx;
+  width:130%;
 }
 .userinfo-avatar1 {
   width: 68rpx;

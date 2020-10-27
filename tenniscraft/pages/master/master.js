@@ -44,10 +44,6 @@ Page({
       })
       chooseLocation.setLocation();
     }
-
-
-
-
   },
 
   bindScoreChange1: function (e) {
@@ -182,7 +178,7 @@ Page({
     }
 
     wx.showModal({
-      content: `是否完成${ that.data.matchList[listIndex].holderName}与${ that.data.matchList[listIndex].challengerName}比赛`,
+      content: `是否完成${that.data.matchList[listIndex].holderName}与${that.data.matchList[listIndex].challengerName}比赛`,
       success: (res) => {
         console.info('---------------------')
         if (res.confirm) {
@@ -233,7 +229,7 @@ Page({
   },
   backtoIndex() {
     wx.navigateBack({
-      complete: (res) => {},
+      complete: (res) => { },
     })
   },
   addMatches(e) {

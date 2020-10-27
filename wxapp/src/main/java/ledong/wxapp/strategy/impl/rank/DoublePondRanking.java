@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
 
+import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 
 import VO.DoubleMatchPostVo;
@@ -15,34 +16,44 @@ import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.strategy.RankingStrategy;
 
 public class DoublePondRanking extends RankingStrategy {
-    private static Logger logger = Logger.getLogger(DoublePondRanking.class);
-    @Override
-    public int[] ranking(String matchId, int holderScore, int challengerScor) {
-        int[] scores = new int[4];
-        int scoreChanged = 30;
+        private static Logger logger = Logger.getLogger(DoublePondRanking.class);
 
-        Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, matchId);
-        DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
+        @Override
+        public int[] ranking(String matchId, int holderScore, int challengerScor) {
+                int[] scores = new int[4];
+                int scoreChanged = 30;
 
-        RankInfoVo holder = getUserRank(vo.getHolder());
-        RankInfoVo challenger = getUserRank(vo.getChallenger());
-        RankInfoVo holder2 = getUserRank(vo.getHolder2());
-        RankInfoVo challenger2 = getUserRank(vo.getChallenger2());
+                Map<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION,
+                                matchId);
+                DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
 
-        scores[0] = holderScore > challengerScor
-                ? (holder.getPoolRemain() >= scoreChanged ? scoreChanged : (holder.getPoolRemain() + 5))
-                : 0;
-        scores[1] = holderScore > challengerScor
-                ? (holder2.getPoolRemain() >= scoreChanged ? scoreChanged : (holder2.getPoolRemain() + 5))
-                : 0;
-        scores[2] = holderScore < challengerScor
-                ? (challenger.getPoolRemain() >= scoreChanged ? scoreChanged : (challenger.getPoolRemain() + 5))
-                : 0;
-        scores[3] = holderScore < challengerScor
-                ? (challenger2.getPoolRemain() >= scoreChanged ? scoreChanged : (challenger2.getPoolRemain() + 5))
-                : 0;
+                RankInfoVo holder = getUserRank(vo.getHolder());
+                RankInfoVo challenger = getUserRank(vo.getChallenger());
 
-        return scores;
-    }
+                RankInfoVo holder2 = null;
+                if (!TextUtils.isEmpty(vo.getHolder2())) {
+
+                        holder2 = getUserRank(vo.getHolder2());
+                }
+                RankInfoVo challenger2 = null;
+                if (!TextUtils.isEmpty(vo.getChallenger2())) {
+                        challenger2 = getUserRank(vo.getChallenger2());
+                }
+                scores[0] = holderScore > challengerScor
+                                ? (holder.getPoolRemain() >= scoreChanged ? scoreChanged : (holder.getPoolRemain() + 5))
+                                : 0;
+                scores[1] = holder2 == null ? 0
+                                : holderScore > challengerScor ? (holder2.getPoolRemain() >= scoreChanged ? scoreChanged
+                                                : (holder2.getPoolRemain() + 5)) : 0;
+                scores[2] = holderScore < challengerScor ? (challenger.getPoolRemain() >= scoreChanged ? scoreChanged
+                                : (challenger.getPoolRemain() + 5)) : 0;
+                scores[3] = challenger2 == null ? 0
+                                : holderScore < challengerScor
+                                                ? (challenger2.getPoolRemain() >= scoreChanged ? scoreChanged
+                                                                : (challenger2.getPoolRemain() + 5))
+                                                : 0;
+
+                return scores;
+        }
 
 }

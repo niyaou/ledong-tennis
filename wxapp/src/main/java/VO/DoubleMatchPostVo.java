@@ -53,7 +53,7 @@ public class DoubleMatchPostVo implements Serializable {
     @ApiModelProperty(value = "challenger2 id")
     private String challenger2;
     public static final String CHALLENGER2 = "challenger2";
-    public static final String CHALLENGER2NAME = "challengerName";
+    public static final String CHALLENGER2NAME = "challenger2Name";
     public static final String CHALLENGER2AVATOR = "challenger2Avator";
     public static final String CHALLENGER2RANKTYPE0 = "challenger2rankType0";
 

@@ -1,40 +1,67 @@
 <!--component/playitem/playitem.wxml-->
 <wxs module="dateFilter" src="../../filter/dateFilter.wxs"></wxs>
-<view class="rowdiv" >
+<view class="rowdiv">
 	<div class="item">
 		<div class="{{matches.status ==2001 ? 'title demo-text-2':matches.status ==2002?'title demo-text-1':'title demo-text-3'}}">{{matches.status ==2000 ? '寻找球友的比赛':matches.status ==2001?'等待开始的比赛':matches.status ==2002?'正在进行的比赛':'比赛结束'}}</div>
 		<div class="divid" />
 		<div class="user">
 			<div class="avator">
-				<image bindtap="detail" data-gid="1"  class="userinfo-avatar1" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
+				<image bindtap="detail" data-gid="1" class="userinfo-avatar1" src="{{matches.holderAvator}}" mode="cover" style="z-index:30"></image>
 				<div class="namecontent1"><text class="nickname">{{matches.holderName}}</text>
 					<div class="rank">{{matches.holderrankType0}}</div>
 				</div>
-						<div class="dividh" />
-        			<image bindtap="detail" data-gid="2"   class="userinfo-avatar2" src="{{matches.holderAvator2}}" mode="cover" style="z-index:30"></image>
+				<div class="dividh" />
+								<div class="avator" catchtap="catch1">
+								<div wx:if="{{matches.holder2}}">
+												<image bindtap="detail" data-gid="2" class="userinfo-avatar2" src="{{matches.holder2Avator}}" mode="cover" style="z-index:30"></image>
 				<div class="namecontent2"><text class="nickname">{{matches.holderName2||'等待加入'}}</text>
 					<div class="{{matches.holder2rankType0?'rank':''}}">{{matches.holder2rankType0}}</div>
 				</div>
+				</div>
+					<picker wx:else catchchange="bindHolderChange"  data-gid="2" data-matchid="{{matches.id}}"  value="{{indexHolder}}" range="{{userListName}}">
+								<image bindtap="detail"  class="userinfo-avatar2" src="{{userList[indexHolder].avator||'../../icon/quest.png'}}" mode="cover" style="z-index:30"></image>
+						<!-- <image class="userinfo-avatar" src="	{{userList[index].avator}}" mode="cover" style="z-index:30"></image> -->
+						<div class="namecontent1"><text class="nickname">{{userList[indexHolder].nickName||'等待加入'}}</text>
+						<!-- <div class="rank" wx:if="{{item.holderrankType0}}">{{userList[index]}}</div> -->
+					</div>
+					</picker>	
+				</div>
 			</div>
-		
-	
-
-
-
-
-			<div class="score win">{{matches.holderScore||'0'}}</div>
+			<div class="score lose">
+				<picker wx:if="{{!matches.holderScore}}" catchchange="bindHolderScoreChange" value="{{indexHolderScore}}"  data-matchid="{{matches.id}}" data-gid="4"
+				 range="{{scoreArray}}">
+				<div>{{scoreArray[indexHolderScore]}}</div>
+				</picker>
+					<div wx:else>{{matches.holderScore}}</div>
+				</div>
 			<div class="dividv" />
-			<div class="score lose">{{matches.challengerScore||'0'}}</div>
+				<div class="score lose">
+				<picker wx:if="{{!matches.challengerScore}}" catchchange="bindChallengerScoreChange" value="{{indexChallengerScore}}"  data-matchid="{{matches.id}}" data-gid="3"			 range="{{scoreArray}}">
+				<div>{{scoreArray[indexChallengerScore]}}</div>
+				</picker>
+			<div wx:else >{{matches.challengerScore}}</div>
+			</div>
 			<div class="avator">
-				<image  bindtap="detail" data-gid="3"   class="userinfo-avatar1" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
+				<image bindtap="detail" data-gid="3" class="userinfo-avatar1" src="{{matches.challengerAvator}}" mode="cover" style="z-index:30"></image>
 				<div class="namecontent1"> <text class="nickname">{{matches.challengerName}}</text>
 					<div class="rank">{{matches.challengerrankType0}}</div>
 				</div>
 				<div class="dividh" />
-					<image  bindtap="detail" data-gid="4"  class="userinfo-avatar2" src="{{matches.challenger2Avator}}" mode="cover" style="z-index:30"></image>
-					<div class="namecontent2"> <text class="nickname">{{matches.challenger2Name||'等待加入'}}</text>
-											<div class="{{matches.challenger2rankType0?'rank':''}}">{{matches.challenger2rankType0}}</div>
-								</div>
+				<div class="avator" catchtap="catch1">
+				<div wx:if="{{matches.challenger2}}" >
+								<image bindtap="detail" data-gid="4" class="userinfo-avatar2" src="{{matches.challenger2Avator}}" mode="cover" style="z-index:30"></image>
+				<div class="namecontent2"> <text class="nickname">{{matches.challenger2Name||'等待加入'}}</text>
+					<div class="{{matches.challenger2rankType0?'rank':''}}">{{matches.challenger2rankType0}}</div>
+				</div>
+				</div>
+					<picker wx:else catchchange="bindChallengerChange" value="{{indexChallenger}}"  data-matchid="{{matches.id}}" data-gid="4" range="{{userListName}}">
+								<image bindtap="detail"  class="userinfo-avatar2" src="{{userList[indexChallenger].avator||'../../icon/quest.png'}}" mode="cover" style="z-index:30"></image>
+						<!-- <image class="userinfo-avatar" src="	{{userList[index].avator}}" mode="cover" style="z-index:30"></image> -->
+						<div class="namecontent"><text class="nickname">{{userList[indexChallenger].nickName||'等待加入'}}</text>
+						<!-- <div class="rank" wx:if="{{item.holderrankType0}}">{{userList[index]}}</div> -->
+					</div>
+					</picker>	
+				</div>
 			</div>
 		</div>
 		<div class="divid" />
@@ -48,9 +75,8 @@
 				<image src="../../icon/cal.png" class="bottomimg" />
 				<div> {{dateFilter.getDate(matches.orderTime,'-') || '时间待定'}}</div>
 			</div>
-				<div class="zone" bindtap="onconfirm">
-				<image src="../../icon/tobeconfirm.png" class="bottomimg" data-gid="{{matches.matchId}}"/>
-			
+			<div class="zone" bindtap="onconfirm" data-gid="{{matches}}">
+				<image src="../../icon/tobeconfirm.png" class="bottomimg"  />
 			</div>
 		</div>
 	</div>

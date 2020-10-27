@@ -43,6 +43,7 @@ App({
   globalData: {
     shortInterval:SHORTINTERVAL,
     slowInterval:SLOWINTERVAL,
+    userList:[],
     userInfo: null,
     userRankInfo:null,
     openId:'',

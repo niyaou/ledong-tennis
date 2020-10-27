@@ -20,7 +20,8 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     ratio: getApp().globalData.ratio,
-    tabBarStatus: 1 // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯
+    tabBarStatus: 1, // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯,
+    userList:[]
   },
   //事件处理函数
   bindViewTap: function () {
@@ -38,6 +39,19 @@ Page({
       this.getRankPosition(app.globalData.jwt)
       this.gps()
     }
+
+    http.getReq(`user/userList`, app.globalData.jwt, (res) => {
+  
+      if (res.code == 0 && res.data != null) {
+        // console.log('userlist',res.data)
+        app.globalData.userList=res.data
+        that.setData({
+          userList:res.data
+        })
+      }
+      // console.log('set app data user list',app.globalData.userList)
+  })
+
   },
   onShow: function () {
     let that = this
@@ -56,6 +70,8 @@ Page({
         })
       }
     })
+
+
     var matchComp = this.selectComponent('#match');
     if (matchComp != null && matchComp.data.tabStatus != 1) {
       matchComp.tapTabStatus({

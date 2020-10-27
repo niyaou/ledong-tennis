@@ -8,8 +8,12 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
+import java.text.Collator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.crypto.BadPaddingException;
@@ -209,9 +213,16 @@ public class UserServiceImpl implements IUserService {
     @Override
     public LinkedList<HashMap<String, Object>> getUserList() {
         try {
-          return   SearchApi.searchAll(DataSetConstant.USER_INFORMATION, 0, 200);
+            LinkedList<HashMap<String, Object>> userlist= SearchApi.searchAll(DataSetConstant.USER_INFORMATION, 0, 400);
+            if (userlist!=null){
+                // userlist.stream().sorted(Collator.getInstance(Locale.CHINESE).compare(o1, o2));
+                userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
+                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME), o2.get(UserVo.NICKNAME));
+                });
+            }
+          return  userlist;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+       
             e.printStackTrace();
         }
         return null;
