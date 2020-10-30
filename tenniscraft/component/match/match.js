@@ -66,6 +66,18 @@ Component({
         showMap: false
       })
     },
+    onConfirmEmitted(){
+      this.triggerEvent('confirmEmitted');
+      let event = {
+        currentTarget: {
+          dataset: {
+            gid: 2
+          }
+        }
+      }
+      this.tapTabStatus(event)
+      console.log('-------match confirm ----',event)
+    },
     onLocationTapped(e) {
       this.triggerEvent('locationTapped',this.data.matches);
       // this.setData({

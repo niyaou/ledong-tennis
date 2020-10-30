@@ -52,7 +52,7 @@
 		<analyze  wx:if="{{tabBarStatus==0}}" isPicked="{{tabBarStatus==0}}"  
 		rankPosition="{{rankPosition}}" score="{{userRankInfo.score}}"
 		 winRate="{{userRankInfo.winRate}}" nearByUser='{{nearByUser}}' nearByCourt='{{nearByCourt}}'/>
-		<match   wx:elif="{{tabBarStatus==1}}" isPicked="{{tabBarStatus==1}}"  id="match" userList="{{userList}}" isSingal="{{siSingal}}" bind:locationTapped="onLocationTapped"/>
+		<match   wx:elif="{{tabBarStatus==1}}" isPicked="{{tabBarStatus==1}}"  id="match" userList="{{userList}}" isSingal="{{siSingal}}" bind:locationTapped="onLocationTapped"  bind:confirmEmitted="onConfirmEmitted" />
 		<ladder wx:else id="ladder" isPicked="{{tabBarStatus==2}}" isSingal="{{siSingal}}"/>
 	</view>
 	<!-- <button bindtap="login">login</button> -->

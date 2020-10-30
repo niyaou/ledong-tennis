@@ -198,9 +198,9 @@ Component({
     onconfirm(e){
       let that = this
       let matches=e.currentTarget.dataset.gid
-      let types= (matches.challenger.indexOf(app.globalData.openId)>-1 ||matches.challenger2.indexOf(app.globalData.openId)>-1)?1:0
       console.log(e.currentTarget.dataset.gid,app.globalData.openId,types)
-
+      // let types= (matches.challenger.indexOf(app.globalData.openId)>-1 ||matches.challenger2.indexOf(app.globalData.openId)>-1)?1:0
+      let types= 0
       http.postReq(`match/doubleMatchConfirm/${matches.id}/${types}`, app.globalData.jwt, {}, (res) => {
         if (res.code !== 0) {
           wx.showToast({
@@ -217,7 +217,9 @@ Component({
           // that.setData({
           //   matchList: that.data.matchList
           // })
+          
         }
+        this.triggerEvent('confirmEmitted');
       })
     }
   }

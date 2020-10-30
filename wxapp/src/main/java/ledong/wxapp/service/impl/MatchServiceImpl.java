@@ -721,7 +721,7 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
-    
+       String finishId=null;
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         if (type == 0) {
             vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
@@ -1089,14 +1089,14 @@ public class MatchServiceImpl implements IMatchService {
         if (MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getChallengerAcknowledged())
                 && MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getHolderAcknowledged())) {
 
-            if (!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())) {
-                vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
-                vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-                vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-            } else {
+            // if (!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())) {
+            //     vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
+            //     vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+            //     vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+            // } else {
                 vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
                 finishId = finishDoubleMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
-            }
+            // }
         }
 
         String id = SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);

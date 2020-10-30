@@ -98,6 +98,9 @@ Page({
       }
    
   },
+  onConfirmEmitted(){
+    console.log('-----onConfirmEmitted------')
+  },
   onLocationTapped(e){
     console.log(e)
     const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
