@@ -18,16 +18,16 @@ public class DoubleGradeRanking extends GradingStrategy {
         } else {
             user.setDoubleRankType0(GradeCodeEnum.DIAMOND.getMessage());
         }
-        user.setRankType1(winRateFilter(user));
+        user.setDoubleRankType1(winRateFilter(user));
         return user;
     }
 
     private String winRateFilter(RankInfoVo user) {
-        String grade = user.getWinRate() > 85 ? GradeCodeEnum.FOURPOINT.getMessage()
-                : user.getWinRate() > 65 ? GradeCodeEnum.THREEANDHALF.getMessage()
-                        : user.getWinRate() > 50 ? GradeCodeEnum.THREEPOINT.getMessage()
-                                : user.getWinRate() > 35 ? GradeCodeEnum.TWOANDHALF.getMessage()
-                                        : user.getWinRate() > 20 ? GradeCodeEnum.TWOPOINT.getMessage()
+        String grade = user.getDoubleWinRate() > 85 ? GradeCodeEnum.FOURPOINT.getMessage()
+                : user.getDoubleWinRate() > 65 ? GradeCodeEnum.THREEANDHALF.getMessage()
+                        : user.getDoubleWinRate() > 50 ? GradeCodeEnum.THREEPOINT.getMessage()
+                                : user.getDoubleWinRate() > 35 ? GradeCodeEnum.TWOANDHALF.getMessage()
+                                        : user.getDoubleWinRate() > 20 ? GradeCodeEnum.TWOPOINT.getMessage()
                                                 : GradeCodeEnum.TWOPOINT.getMessage();
         return grade;
 

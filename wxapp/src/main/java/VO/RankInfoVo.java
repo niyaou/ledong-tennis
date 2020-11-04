@@ -49,7 +49,10 @@ public class RankInfoVo implements Serializable {
     private Double slamWinRate = 0.0;
     public static final String SLAMWINRATE = "slamWinRate";
 
-    
+    @ApiModelProperty(value = "doubleWinRate  ")
+    private Double doubleWinRate = 0.0;
+    public static final String DOUBLEWINRATE = "doubleWinRate";
+
     @ApiModelProperty(value = "slamScore  ")
     private Integer slamScore;
     public static final String SLAMSCORE = "slamScore";
@@ -73,9 +76,14 @@ public class RankInfoVo implements Serializable {
     public static final String DOUBLERANKTYPE1 = "doubleRankType1";
 
     @NotEmpty
-    @ApiModelProperty(value = "bardge  ")
+    @ApiModelProperty(value = "position  ")
     private Integer position=0;
     public static final String POSITION = "position";
+
+    @NotEmpty
+    @ApiModelProperty(value = "double position  ")
+    private Integer doublePosition=0;
+    public static final String DOUBLEPOSITION = "doublePosition";
 
 
     @NotEmpty
@@ -219,6 +227,22 @@ public class RankInfoVo implements Serializable {
 
     public void setDoubleRankType1(String doubleRankType1) {
         this.doubleRankType1 = doubleRankType1;
+    }
+
+    public Double getDoubleWinRate() {
+        return doubleWinRate;
+    }
+
+    public void setDoubleWinRate(Double doubleWinRate) {
+        this.doubleWinRate = doubleWinRate;
+    }
+
+    public Integer getDoublePosition() {
+        return doublePosition;
+    }
+
+    public void setDoublePosition(Integer doublePosition) {
+        this.doublePosition = doublePosition;
     }
 
 }

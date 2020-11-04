@@ -34,6 +34,7 @@ this.initLadder()
   methods: {
     initLadder(){
       let that = this
+      console.log('-----ladder ----this.data.isSingle',this.data.isSingle)
       let url=this.data.isSingle?'rank/rankList':'rank/doubleRankList'
       http.getReq(`${url}`,app.globalData.jwt, (res)=>{
         that.setData({

@@ -1,6 +1,7 @@
 {
   "component": true,
   "usingComponents": {
-    "player":"../player/player"
+    "player":"../player/player",
+    "doubleplayer":"../doubleplayer/doubleplayer"
   }
 }

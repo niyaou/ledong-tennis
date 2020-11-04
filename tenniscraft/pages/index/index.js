@@ -13,7 +13,7 @@ Page({
     nearByUser: [],
     rankPosition: 0,
     nearByCourt: [],
-    isSingal:true,
+    isSingle:true,
     hasInitial:false,
     hasUserInfo: true,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
@@ -90,7 +90,7 @@ Page({
     if (location) {
       console.log('-----------1',location)
       var matchComp = this.selectComponent('#match');
-      if(matchComp && !this.data.isSingal){
+      if(matchComp && !this.data.isSingle){
         matchComp.updateMatchCourt(`${location.latitude},${location.longitude}`,location.name)
       }
 
@@ -274,19 +274,15 @@ Page({
   },
   switchMode(){
     this.setData({
-      isSingal:!this.data.isSingal
+      isSingle:!this.data.isSingle
     })
     var ladderComp = this.selectComponent('#ladder');
     if(ladderComp){
-      ladderComp.switchMode(this.data.isSingal)
+      ladderComp.switchMode(this.data.isSingle)
     }
-
-
     var matchComp = this.selectComponent('#match');
     if(matchComp){
-      matchComp.switchMode(this.data.isSingal)
+      matchComp.switchMode(this.data.isSingle)
     }
- 
-
   }
 })

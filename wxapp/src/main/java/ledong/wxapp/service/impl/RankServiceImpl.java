@@ -177,6 +177,10 @@ public class RankServiceImpl implements IRankService {
                         .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
                         .collect(Collectors.toList());
 
+                // System.out.println(holder.get(0));
+                // match.put(RankInfoVo.DOUBLERANKTYPE0, holder.get(0).get(RankInfoVo.DOUBLERANKTYPE0));
+                // match.put(RankInfoVo.DOUBLEWINRATE, holder.get(0).get(RankInfoVo.DOUBLEWINRATE));
+                // match.put(RankInfoVo.DOUBLEPOSITION, holder.get(0).get(RankInfoVo.DOUBLEPOSITION));
                 match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
                 match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
                 match.put(MatchPostVo.COURTNAME, iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID))
@@ -194,6 +198,8 @@ public class RankServiceImpl implements IRankService {
         RankInfoVo vo = new RankInfoVo();
         vo.setOpenId(userId);
         GradingContext gContext = new GradingContext(new GradeRanking());
+        vo = gContext.rankMatch(vo);
+        gContext = new GradingContext(new DoubleGradeRanking());
         vo = gContext.rankMatch(vo);
         return RankingStrategy.createRankInfo(vo);
     }

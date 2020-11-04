@@ -24,9 +24,12 @@
 			</view>
 		</view> -->
 		<view wx:for="{{players}}">
-			<player rankType0="{{item.rankType0}}"  
+			<player wx:if="{{isSingle}}" rankType0="{{item.rankType0}}"  
 			holder="{{item.openId}}"
 			holderAvator="{{item.holderAvator}}" holderName="{{item.holderName}}" winRate="{{item.winRate}}" courtName="{{item.courtName}}"/>
+						<doubleplayer wx:else doubleRankType0="{{item.doubleRankType0}}"  
+			holder="{{item.openId}}"
+			holderAvator="{{item.holderAvator}}" holderName="{{item.holderName}}" doubleWinRate="{{item.doubleWinRate}}" courtName="{{item.courtName}}"/>
 		</view>
 	</scroll-view>
 </view>

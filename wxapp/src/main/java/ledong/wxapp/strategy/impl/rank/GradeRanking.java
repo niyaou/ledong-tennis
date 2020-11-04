@@ -18,7 +18,8 @@ public class GradeRanking extends GradingStrategy {
         } else {
             user.setRankType0(GradeCodeEnum.DIAMOND.getMessage());
         }
-        user.setDoubleRankType1(winRateFilter(user));
+        user.setRankType1(winRateFilter(user));
+
         return user;
     }
 
