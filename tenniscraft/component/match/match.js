@@ -251,16 +251,16 @@ Component({
           }
         })
       } else {
-        var matches=this.data.matches
-        if(!matches){
-          matches=[]
-        }
+        // var matches=this.data.matches
+        // if(!matches){
+        //   matches=[]
+        // }
 
-        matches.push({  holderAvator: app.globalData.userInfo.avatarUrl,     holderrankType0: app.globalData.userRankInfo.doubleRankType0,
-          holderName: app.globalData.userInfo.nickName})
-        this.setData({
-          matches:  matches
-        })
+        // matches.push({  holderAvator: app.globalData.userInfo.avatarUrl,     holderrankType0: app.globalData.userRankInfo.doubleRankType0,
+        //   holderName: app.globalData.userInfo.nickName})
+        // this.setData({
+        //   matches:  matches
+        // })
         //创建双打
         // if (res.confirm) {
         //   http.postReq(`match/postDoubleMatch`, app.globalData.jwt, {
