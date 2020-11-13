@@ -6,7 +6,7 @@
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/rank.png" style="width:80rpx;height:80rpx" />
 			<div class="columndiv">
-				<div style="font-size:36rpx;color:#000;"> {{winRate}}%</div>
+				<div style="font-size:36rpx;color:#000;"> {{isSingle?winRate:doubleWinRate}}%</div>
 				<div style="font-size:24rpx;"> 胜率</div>
 			</div>
 		</div>
@@ -14,7 +14,7 @@
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/score.png" style="width:70rpx;height:70rpx" />
 			<div class="columndiv">
-				<div style="font-size:30rpx;color:#000;"> {{score}}</div>
+				<div style="font-size:30rpx;color:#000;"> {{isSingle?score:doubleScore}}</div>
 				<div style="font-size:24rpx;"> 积分</div>
 			</div>
 		</div>
@@ -23,7 +23,7 @@
 		<div class="analyzeicon rowdiv">
 			<image src="../../icon/ranklist.png" style="width:80rpx;height:80rpx" />
 			<div class="columndiv">
-				<div  style="font-size:24rpx;color:#000;"> 第{{rankPosition}}名</div>
+				<div  style="font-size:24rpx;color:#000;"> 第{{isSingle?rankPosition:doubleRankPosition}}名</div>
 				<div style="font-size:24rpx;"> 全服</div>
 			</div>
 		</div>

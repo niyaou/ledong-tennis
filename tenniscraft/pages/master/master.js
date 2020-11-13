@@ -240,7 +240,6 @@ Page({
       that.data.matches.holderName == that.data.matches.challengerName) {
       return
     }
-
     wx.showModal({
       content: `是否添加${that.data.matches.holderName}与${that.data.matches.challengerName}比赛`,
       success: (res) => {
@@ -259,7 +258,6 @@ Page({
                 duration: 1500
               })
             } else {
-
               that.setData({
                 matches: {
                   holderAvator: '../../icon/quest.png',
@@ -269,7 +267,6 @@ Page({
             }
           })
         }
-
       }
     })
   },

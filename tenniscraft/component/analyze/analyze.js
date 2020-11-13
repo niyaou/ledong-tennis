@@ -8,6 +8,10 @@ Component({
       type: Boolean,
       value: false
     },
+    isSingle: {
+      type: Boolean,
+      value: false
+    },
     nearByCourt: {
       type: Array,
       value: []
@@ -20,11 +24,23 @@ Component({
       type:Number,
       value:0
     },
+    doubleWinRate:{
+      type:Number,
+      value:0
+    },
     score:{
       type:Number,
       value:0
     },
+    doubleScore:{
+      type:Number,
+      value:0
+    },
     rankPosition:{
+      type:Number,
+      value:0
+    },
+    doubleRankPosition:{
       type:Number,
       value:0
     }

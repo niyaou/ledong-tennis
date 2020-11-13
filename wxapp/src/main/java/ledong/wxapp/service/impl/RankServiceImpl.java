@@ -441,16 +441,29 @@ public class RankServiceImpl implements IRankService {
         scores[1] += tempScore[1];
         scores[2] += tempScore[2];
         scores[3] += tempScore[3];
-        holder.setScore(holder.getScore() + scores[0]);
+
+
+
+
+        GradingContext gContext = new GradingContext(new DoubleGradeRanking());
+
+
+
+
+        System.out.println( scores[0] );
+        System.out.println( scores[1] );
+        System.out.println( scores[2] );
+        System.out.println( scores[3] );
+
+        holder.setDoubleScore(holder.getDoubleScore() + scores[0]);
         if (holder2 != null) {
 
-            holder2.setScore(holder2.getScore() + scores[1]);
+            holder2.setDoubleScore(holder2.getDoubleScore() + scores[1]);
         }
-        challenger.setScore(challenger.getScore() + scores[2]);
+        challenger.setDoubleScore(challenger.getDoubleScore() + scores[2]);
         if (challenger2 != null) {
-            challenger2.setScore(challenger2.getScore() + scores[3]);
+            challenger2.setDoubleScore(challenger2.getDoubleScore() + scores[3]);
         }
-        GradingContext gContext = new GradingContext(new DoubleGradeRanking());
 
         holder = gContext.rankMatch(holder);
         if (holder2 != null) {
@@ -494,9 +507,15 @@ public class RankServiceImpl implements IRankService {
             redis.set(StringUtil.combiningSpecifiedUserKey(challenger2.getOpenId(), "ranked"), matchId,
                     60 * 60 * 24 * 7);
         }
+        
         updateRankInfo(holder);
 
         updateRankInfo(challenger);
+
+        System.out.println(JSONObject.toJSONString(holder));
+        System.out.println(JSONObject.toJSONString(holder2));
+        System.out.println(JSONObject.toJSONString(challenger));
+        System.out.println(JSONObject.toJSONString(challenger2));
 
         ctx.publishEvent(new DoubleWinRateEvent(ctx, holder));
 

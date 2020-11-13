@@ -10,13 +10,13 @@ Component({
       type: Boolean,
       value: false
     },
-    isSingle:{
+    isSingle: {
       type: Boolean,
       value: false
     },
-    userList:{
-      type:Array,
-      value:[]
+    userList: {
+      type: Array,
+      value: []
     }
   },
 
@@ -66,7 +66,7 @@ Component({
         showMap: false
       })
     },
-    onConfirmEmitted(){
+    onConfirmEmitted() {
       this.triggerEvent('confirmEmitted');
       let event = {
         currentTarget: {
@@ -76,10 +76,10 @@ Component({
         }
       }
       this.tapTabStatus(event)
-      console.log('-------match confirm ----',event)
+      console.log('-------match confirm ----', event)
     },
     onLocationTapped(e) {
-      this.triggerEvent('locationTapped',this.data.matches);
+      this.triggerEvent('locationTapped', this.data.matches);
       // this.setData({
       //   latitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
       //   longitude: e.detail.courtGPS ? e.detail.courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
@@ -94,48 +94,48 @@ Component({
       // this.setData({
       //   showMap: true
       // })
-   
-        if (parseInt(this.data.matches.status) == 2002 && this.data.matches.matchType !=3001) {
-          return
-        }
-       
-     
+
+      if (parseInt(this.data.matches.status) == 2002 && this.data.matches.matchType != 3001) {
+        return
+      }
+
+
     },
-     // 上拉加载更多
-  loadMore: function(){
-    var self = this;
-    // 当前页是最后一页
-    if (self.data.currentPage == self.data.allPages){
-      self.setData({
-        loadMoreData: '已经到顶'
-      })
-      return;
-    }
-    setTimeout(function(){
-      console.log('上拉加载更多');
-      // var tempCurrentPage = self.data.currentPage;
-      // tempCurrentPage = tempCurrentPage + 1;
-      // self.setData({
-      //   currentPage: tempCurrentPage,
-      //   hideBottom: false  
-      // })
-      // self.getData();  
-    },300);
-  },
-  // 下拉刷新
-  refresh: function(e){
-    var self = this;
-    setTimeout(function(){
-      console.log('下拉刷新');
-      // var date = new Date();
-      // self.setData({
-      //   currentPage: 1,
-      //   refreshTime: date.toLocaleTimeString(),
-      //   hideHeader: false
-      // })
-      // self.getData();
-    },300);
-  },
+    // 上拉加载更多
+    loadMore: function () {
+      var self = this;
+      // 当前页是最后一页
+      if (self.data.currentPage == self.data.allPages) {
+        self.setData({
+          loadMoreData: '已经到顶'
+        })
+        return;
+      }
+      setTimeout(function () {
+        console.log('上拉加载更多');
+        // var tempCurrentPage = self.data.currentPage;
+        // tempCurrentPage = tempCurrentPage + 1;
+        // self.setData({
+        //   currentPage: tempCurrentPage,
+        //   hideBottom: false  
+        // })
+        // self.getData();  
+      }, 300);
+    },
+    // 下拉刷新
+    refresh: function (e) {
+      var self = this;
+      setTimeout(function () {
+        console.log('下拉刷新');
+        // var date = new Date();
+        // self.setData({
+        //   currentPage: 1,
+        //   refreshTime: date.toLocaleTimeString(),
+        //   hideHeader: false
+        // })
+        // self.getData();
+      }, 300);
+    },
     tapTabStatus(event) {
       this.setData({
         tabStatus: event.currentTarget.dataset.gid
@@ -148,12 +148,14 @@ Component({
           matches: []
         })
       } else {
-        this.matcheExplore()
+        if (this.data.isSingle) {
+          this.matcheExplore()
+        }
       }
     },
     matching() {
       let that = this
-      let url= this.data.isSingle?'match/randomMatch':'match/randomDoubleMatch'
+      let url = this.data.isSingle ? 'match/randomMatch' : 'match/randomDoubleMatch'
       http.postReq(url, app.globalData.jwt, {
         gps: app.globalData.gps
       }, (res) => {
@@ -163,7 +165,7 @@ Component({
             title: 'loading...',
           })
           setTimeout(function () {
-            let matchUrl=this.data.isSingle?'match/matchInfo':'match/doubleMatchInfo'
+            let matchUrl = this.data.isSingle ? 'match/matchInfo' : 'match/doubleMatchInfo'
             http.getReq(`${matchUrl}/${res.data}`, app.globalData.jwt, (resMatch) => {
               // console.info(resMatch)
               if (resMatch.code === 0) {
@@ -193,7 +195,7 @@ Component({
     },
     matchedGame() {
       let that = this
-      let url= this.data.isSingle?'match/matchedGames':'match/doubleMatchedGames'
+      let url = this.data.isSingle ? 'match/matchedGames' : 'match/doubleMatchedGames'
       http.getReq(`${url}/10`, app.globalData.jwt, (res) => {
         if (res.code === 0) {
           console.log(res)
@@ -208,7 +210,7 @@ Component({
           //   "holderAvator2":"https://thirdwx.qlogo.cn/mmopen/vi_32/NFicMFicPicibcUGhPPHsWURhpCG3zptECkm1iazd0A20mLR9YYibnOh6YHScXTxIsoy5gjoHZBqNjh2qXJuTu5oH6CA/132","holderName2":"Michael Zheng"}]
           // })
           that.setData({
-            matches:res.data
+            matches: res.data
           })
         }
       })
@@ -226,31 +228,70 @@ Component({
     },
     createIntentional() {
       let that = this
-      wx.navigateTo({
-        url: '../../pages/dealing/dealing',
-        events: {
-          // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
-          acceptDataFromOpenedPage: function (data) {},
-          someEvent: function (data) {}
+      if (this.data.isSingle) {
+        //创建单打
+        wx.navigateTo({
+          url: '../../pages/dealing/dealing',
+          events: {
+            // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
+            acceptDataFromOpenedPage: function (data) { },
+            someEvent: function (data) { }
 
-        },
-        success: function (res) {
-          // 通过eventChannel向被打开页面传送数据
-          res.eventChannel.emit('acceptDataFromOpenerPage', {
-            data: {
-              holderAvator: app.globalData.userInfo.avatarUrl,
-              holderName: app.globalData.userInfo.nickName,
-              holderrankType0: app.globalData.userRankInfo.rankType0,
-              isPlus: true
-            }
-          })
+          },
+          success: function (res) {
+            // 通过eventChannel向被打开页面传送数据
+            res.eventChannel.emit('acceptDataFromOpenerPage', {
+              data: {
+                holderAvator: app.globalData.userInfo.avatarUrl,
+                holderName: app.globalData.userInfo.nickName,
+                holderrankType0: app.globalData.userRankInfo.doubleRankType0,
+                isPlus: true
+              }
+            })
+          }
+        })
+      } else {
+        var matches=this.data.matches
+        if(!matches){
+          matches=[]
         }
-      })
+
+        matches.push({  holderAvator: app.globalData.userInfo.avatarUrl,     holderrankType0: app.globalData.userRankInfo.doubleRankType0,
+          holderName: app.globalData.userInfo.nickName})
+        this.setData({
+          matches:  matches
+        })
+        //创建双打
+        // if (res.confirm) {
+        //   http.postReq(`match/postDoubleMatch`, app.globalData.jwt, {
+        //     holder: that.data.matches.holder,
+        //     challenger: that.data.matches.challenger,
+        //     courtName: that.data.matches.courtName,
+        //     courtGPS: that.data.matches.courtGPS,
+        //   }, (res) => {
+        //     if (res.code !== 0) {
+        //       wx.showToast({
+        //         title: res.message,
+        //         icon: 'none',
+        //         duration: 1500
+        //       })
+        //     } else {
+        //       that.setData({
+        //         matches: {
+        //           holderAvator: '../../icon/quest.png',
+        //           challengerAvator: '../../icon/quest.png'
+        //         }
+        //       })
+        //     }
+        //   })
+        // }
+      }
+
     },
-    switchMode(isSingle){
+    switchMode(isSingle) {
       this.setData({
-        isSingle:isSingle
-      } )
+        isSingle: isSingle
+      })
       let event = {
         currentTarget: {
           dataset: {
@@ -260,13 +301,13 @@ Component({
       }
       this.tapTabStatus(event)
     },
-    updateMatchCourt(gps,name){
+    updateMatchCourt(gps, name) {
       let that = this
-      let url= `match/doubleMatchInfo/${this.data.matches[0].id}`
+      let url = `match/doubleMatchInfo/${this.data.matches[0].id}`
 
       http.postReq(url, app.globalData.jwt, {
         courtGPS: gps,
-        courtName:name,
+        courtName: name,
       }, (res) => {
         console.log(res)
         if (res.code == 0 && res.data != null) {
@@ -285,7 +326,7 @@ Component({
           //   })
           // }, 1000)
 
-        } 
+        }
       })
     }
   }

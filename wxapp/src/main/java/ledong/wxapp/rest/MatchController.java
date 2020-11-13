@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import ledong.wxapp.auth.JwtToken;
 import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.CommonConstanst;
+import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.IMatchService;
@@ -445,6 +446,38 @@ public class MatchController {
                 }
                 return new ResponseEntity<Object>(
                                 CommonResponse.success(matchService.postSlamMatch(holder, courtName, challenger, courtGPS)),
+                                HttpStatus.OK);
+        }
+
+
+
+        @RequestMapping(value = "/postDoubleMatch", method = RequestMethod.POST)
+        @ApiOperation(value = "post double Match By  Master", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "holder", value = "holder  id", required = true, dataType = "string", paramType = "path"),
+                        @ApiImplicitParam(name = "challenger", value = "challenger id", required = true, dataType = "string", paramType = "query") ,
+                        @ApiImplicitParam(name = "courtName", value = "courtName", required = false, dataType = "string", paramType = "query") ,
+                        @ApiImplicitParam(name = "courtGPS", value = "courtGPS", required = false, dataType = "string", paramType = "query") 
+                })
+        public ResponseEntity<?> postDoubleMatchByMaster(@RequestHeader("Authorization") String authHeader,
+                        @RequestParam(value = "holder", required = true) String holder,
+                        @RequestParam(value = "challenger", required = true) String challenger,
+                        @RequestParam(value = "courtName", required = false) String courtName,
+                        @RequestParam(value = "courtGPS", required = false) String courtGPS)
+                        throws AuthenticationException {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+                        throw new AuthenticationException("token 不可用");
+                }
+                // String userId = claims.getSubject();
+                // if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+                //         throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                // }
+                String time = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+                return new ResponseEntity<Object>(
+                                // CommonResponse.success(matchService.postSlamMatch(holder, courtName, challenger, courtGPS)),
+                                CommonResponse.success(matchService.postDoubleMatches(null,holder,challenger,3000, MatchStatusCodeEnum.SLAM_MATCH.getCode(),
+                                time,null,null)),
                                 HttpStatus.OK);
         }
 

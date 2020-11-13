@@ -45,6 +45,9 @@ Component({
   methods: {
     detail(e){
       let that = this
+      if( 1==1){
+        return 
+      }
       if(app.globalData.openId !== this.data.holder){
       wx.showModal({
         content:'是否发起挑战',

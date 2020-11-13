@@ -65,7 +65,7 @@ public class EventsListener {
 
             e.printStackTrace();
         }
-        userVos.setWinRate(rankService.updateDoubleWinRate(userVos.getOpenId()));
+        userVos.setDoubleWinRate(rankService.updateDoubleWinRate(userVos.getOpenId()));
         rankService.updateRankInfo(userVos);
         log.info(JSON.toJSONString( userVos));
     }

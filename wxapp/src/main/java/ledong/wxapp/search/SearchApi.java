@@ -826,7 +826,7 @@ public class SearchApi {
         searchSourceBuilder.version(true);
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
         searchRequest.source(searchSourceBuilder);
-     log.info(searchSourceBuilder.toString());
+    //  log.info(searchSourceBuilder.toString());
         // try {
         // SearchResponse searchResponse = client.search(searchRequest,
         // RequestOptions.DEFAULT);
@@ -1074,7 +1074,7 @@ public class SearchApi {
     public static Double winRateAggregate(String indexName, SearchSourceBuilder searchSourceBuilder) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(searchSourceBuilder);
-        log.info(searchSourceBuilder.toString());
+        // log.info(searchSourceBuilder.toString());
         HashMap<String, Object> list = new HashMap<String, Object>();
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
@@ -1083,8 +1083,8 @@ public class SearchApi {
             list.put("total", a);
             Filter f = searchResponse.getAggregations().get("winrate");
             list.put("date", f.getDocCount());
-            log.info(list);
-            log.info( Double.parseDouble(String.valueOf(f.getDocCount() * 100 / a)));
+            // log.info(list);
+            // log.info( Double.parseDouble(String.valueOf(f.getDocCount() * 100 / a)));
             return Double.parseDouble(String.valueOf(f.getDocCount() * 100 / a));
         } catch (IOException | ArithmeticException e) {
             log.error(e.getMessage());
@@ -1178,7 +1178,7 @@ public class SearchApi {
     private static String parseUpdateResponse(UpdateRequest searchRequest) {
         try {
             DocWriteResponse updateResponse = client.update(searchRequest, RequestOptions.DEFAULT);
-            log.info(updateResponse.getResult().toString());
+            // log.info(updateResponse.getResult().toString());
             if (updateResponse.getResult().toString().equals(Result.UPDATED.toString())) {
                 return updateResponse.getId();
             }

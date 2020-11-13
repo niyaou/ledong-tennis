@@ -202,8 +202,13 @@ Page({
         userRankInfo: {
           rankType1: e.data.rankType1,
           rankType0: e.data.rankType0,
+          doubleRankType1: e.data.doubleRankType1,
+          doubleRankType0: e.data.doubleRankType0,
           winRate: e.data.winRate,
-          score:e.data.score
+          score:e.data.score,
+          doubleRankPosition:e.data.doublePosition,
+          doubleWinRate:e.data.doubleWinRate,
+          doubleScore:e.data.doubleScore
         }
       })
       app.globalData.userRankInfo = this.data.userRankInfo
