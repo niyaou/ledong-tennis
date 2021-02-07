@@ -22,6 +22,12 @@
                 <view class="weui-flex__item makeCenterC">
                   <view class="wfilled leftAli whiteCaptl userinfo-nickname">{{userInfo.nickName}}</view>
                   <view class="wfilled leftAli whiteCaptl">3.0 单打种子选手</view>
+                  <view class="wfilled leftAli whiteCaptl  makeCenterV rowLeft">
+                   <view class="tags"> 黑哨狗</view> 
+                   <view class="tags"> 修房子</view> 
+                   <view class="tags"> 夺夺球</view> 
+                   <view class="tags"> 跑不死</view> 
+                  </view>
                 </view>
               </view>
 
@@ -73,6 +79,27 @@
         <view class="makeCenterC ">
           <view class="statisticNum">白金</view>
           <view class="statisticSubtitle">段位</view>
+        </view>
+        <image src="../../icon/rank.png" class="iconsize"></image>
+      </view>
+    </view>
+  </view>
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card">
+        <view class="makeCenterC ">
+          <view class="statisticNum">68 场</view>
+          <view class="statisticSubtitle">比赛</view>
+        </view>
+        <image src="../../icon/tennis.png" class="iconsize"></image>
+      </view>
+
+    </view>
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card">
+        <view class="makeCenterC ">
+          <view class="statisticNum">35 人</view>
+          <view class="statisticSubtitle">对手</view>
         </view>
         <image src="../../icon/rank.png" class="iconsize"></image>
       </view>

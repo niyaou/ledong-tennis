@@ -69,9 +69,12 @@ page{
   align-items: center;
 }
 
+.rowLeft{
+  justify-content: flex-start; 
+}
 
 .placeholder {
-  margin: 25rpx;
+  margin: 15rpx;
   padding: 0 10px;
   border-radius: 0.3em;
   height: auto;
