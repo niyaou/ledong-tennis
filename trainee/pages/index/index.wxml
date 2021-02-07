@@ -1,0 +1,94 @@
+<!--index.wxml-->
+<view class="containerbg">
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+
+      <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称
+      </button>
+      <block wx:else>
+
+        <view class="card">
+          <view class="weui-flex">
+            <view class="weui-flex__item">
+              <view style='margin-top:{{totalBarHeight/2.5}}rpx;font-weight:bold'>网者争霸</view>
+            </view>
+          </view>
+          <view class="weui-flex ">
+            <view class="makeCenter" style=" height: 7.3em;  line-height: 7.3em;  ">
+              <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+            </view>
+            <view class="weui-flex__item ">
+              <view class="weui-flex filled ">
+                <view class="weui-flex__item makeCenterC">
+                  <view class="wfilled leftAli whiteCaptl userinfo-nickname">{{userInfo.nickName}}</view>
+                  <view class="wfilled leftAli whiteCaptl">3.0 单打种子选手</view>
+                </view>
+              </view>
+
+
+
+            </view>
+          </view>
+        </view>
+      </block>
+
+    </view>
+  </view>
+
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card">
+        <view class="makeCenterC ">
+          <view class="statisticNum">1200</view>
+          <view class="statisticSubtitle">积分</view>
+        </view>
+        <image src="../../icon/score.png" class="iconsize"></image>
+      </view>
+
+    </view>
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card">
+        <view class="makeCenterC ">
+          <view class="statisticNum">第 99位</view>
+          <view class="statisticSubtitle">排名</view>
+        </view>
+        <image src="../../icon/ranklist.png" class="iconsize"></image>
+      </view>
+
+    </view>
+  </view>
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card">
+        <view class="makeCenterC ">
+          <view class="statisticNum">75%</view>
+          <view class="statisticSubtitle">胜率</view>
+        </view>
+        <image src="../../icon/tennis.png" class="iconsize"></image>
+      </view>
+
+    </view>
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card">
+        <view class="makeCenterC ">
+          <view class="statisticNum">白金</view>
+          <view class="statisticSubtitle">段位</view>
+        </view>
+        <image src="../../icon/rank.png" class="iconsize"></image>
+      </view>
+    </view>
+  </view>
+
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <image src="../../icon/banner1.png" style="width:100%;height:200rpx" />
+    </view>
+  </view>
+
+  <view class="weui-footer weui-footer_fixed-bottom">
+    <view class="weui-footer__links">
+      <navigator url="" class="weui-footer__link">网者争霸</navigator>
+    </view>
+    <view class="weui-footer__text">Copyright © 2020-2021 LedongTennis</view>
+  </view>
+</view>

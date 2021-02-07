@@ -1,0 +1,40 @@
+/**index.wxss**/
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+}
+
+.userinfo-nickname {
+  color: #fff;
+font-size:40rpx;
+}
+
+
+.iconsize{
+  width:80rpx;height:80rpx
+}
+
+
+
+.card{
+  padding: 0 10px;
+  vertical-align: middle;
+  text-align: center;
+  background:-webkit-gradient(linear, 0% 30%, 20% 80%,from(#b2d235), to(rgba(12, 205, 137, 1)));
+  color: var(--weui-FG-1);
+}
+
+
+.statistics_card{
+height:9em
+}
