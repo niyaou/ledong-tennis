@@ -18,6 +18,29 @@ Page({
       url: '../logs/logs'
     })
   },
+ 
+  navigateTo(event){
+    console.log(event.currentTarget.dataset.variable)
+    if(event.currentTarget.dataset.variable===0){
+      wx.navigateTo({
+        url: '../../pages/matches/matchlist'})
+    }else
+    if(event.currentTarget.dataset.variable===1){
+      wx.navigateTo({
+        url: '../../pages/score/score'})
+    }else
+    if(event.currentTarget.dataset.variable===2){
+      wx.navigateTo({
+        url: '../../pages/player/player'})
+    }else
+    if(event.currentTarget.dataset.variable===3){
+      wx.navigateTo({
+        url: '../../pages/h2h/h2h'})
+    }
+    // event.currentTarget.dataset.variable;
+  },
+
+  
   onLoad() {
     if (app.globalData.userInfo) {
       this.setData({
