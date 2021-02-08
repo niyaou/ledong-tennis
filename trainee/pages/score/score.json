@@ -14,5 +14,6 @@
     "i-input": "../../dist/input/index",
     "i-radio-group": "../../dist/radio-group/index",
     "i-radio": "../../dist/radio/index"
-  }
+  },
+  "disableScroll": true
 }

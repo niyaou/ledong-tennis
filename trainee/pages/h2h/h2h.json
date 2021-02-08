@@ -15,5 +15,6 @@
     "i-radio-group": "../../dist/radio-group/index",
     "i-radio": "../../dist/radio/index",
     "i-tag": "../../dist/tag/index"
-  }
+  },
+  "disableScroll": true
 }
