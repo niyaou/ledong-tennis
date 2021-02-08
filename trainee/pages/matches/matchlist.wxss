@@ -1,4 +1,0 @@
-/* pages/matches/matchlist.wxss */
-.buttonfix{
-  line-height:28px;
-}

@@ -6,6 +6,14 @@ Component({
     },
 
     properties: {
+        indexs:{
+            type: Number,
+            value: 0 
+        },
+        hasSlot: {
+            type: Boolean,
+            value: true
+        },
         full: {
             type: Boolean,
             value: false
@@ -18,9 +26,20 @@ Component({
             type: String,
             value: ''
         },
+        subtitle: {
+            type: String,
+            value: ''
+        },
         extra: {
             type: String,
             value: ''
+        }
+    },
+    methods:{
+        tapTrigger(e){
+            this.triggerEvent('tapped',{
+                index:this.data.indexs
+            })
         }
     }
 });

@@ -1,8 +1,9 @@
 {
   "pages": [
+    "pages/opponent/opponent",
+    "pages/score/score",
     "pages/matches/matchlist",
     "pages/index/index"
-
   ],
   "window": {
     "backgroundTextStyle": "light",
