@@ -10,7 +10,7 @@
   </i-modal>
   <mp-navigation-bar title="比赛记录" back="{{true}}" size="{{large}}"></mp-navigation-bar>
   <i-card full="{{true}}" title="" extra="本赛季总共记录比赛65场 获取积分1200分" thumb="../../icon/match.jpg">
-    <i-icon slot="content" type="add" size="40" color="#7fb80e" />
+    <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addMatch" />
     <view slot="content">记录一场比赛</view>
     <view slot="footer">若出现没有参加的比赛，请左滑申诉</view>
 
