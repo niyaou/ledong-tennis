@@ -27,7 +27,11 @@ Component({
         operateWidth : {
             type : Number,
             value : 160
-        }
+        },        
+        indexs: {
+            value: 0,
+            type: Number
+        },
     },
     options: {
         // 在组件定义时的选项中启用多slot支持
@@ -140,7 +144,8 @@ Component({
             }
             const dataset = event.currentTarget.dataset;
             this.triggerEvent('change',{
-                index : dataset.index
+                index : dataset.index,
+                dataIndex:this.data.indexs
             })
         },
         closeButtonGroup(){
