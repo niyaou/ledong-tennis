@@ -1,50 +1,35 @@
 <!--pages/matches/matchlist.wxml-->
 <view class="containerbg">
+  <mp-navigation-bar title="比赛记录" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+  <i-card full="{{true}}" title="" extra="本赛季比赛记录" thumb="../../icon/match.png">
+    <i-icon slot="content" type="add" size="40" color="#7fb80e" />
+    <view slot="content">记录一场比赛</view>
+    <view slot="footer"></view>
+
+    <!-- <i-button  i-class="buttonfix" slot="content">默认按钮</i-button> -->
+  </i-card>
+
   <view class="weui-flex">
     <view class="weui-flex__item">
-      <view class="weui-flex">
-        <view class="weui-flex__item">
-          <view style='margin-top:{{totalBarHeight/2.5}}rpx;font-weight:bold;color:var(--weui-BG-0)'>1 </view>
-        </view>
-      </view>
 
-      <view class="page__hd">
-        <view class="page__title">Matches</view>
-        <view class="page__desc">最近比赛</view>
-      </view>
+
     </view>
   </view>
 
   <view class="page__bd ">
     <view class="weui-flex">
       <view class="weui-flex__item">
-        <!-- <mp-cells ext-class="my-cells" title="带说明的列表项" > -->
-
-        <!-- <mp-cell wx:for="{{slideButtons}}">
-                <view>标题文字（使用slot）</view>
-                <view slot="footer">说明文字</view>
-            </mp-cell> -->
 
 
-        <!-- </mp-cells> -->
-
-        <scroll-view scroll-y style="width: 100%; height: 25rem;">
+        <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
           <view wx:for="{{slideButtons}}">
-            <view style="height:3rem">
-              <view class="weui-flex">
-                <view class="weui-flex__item">
-                  <view class="makeCenterV rowLeft">
-                    <view>{{item.text}} </view>
-                    <view style="margin-left:20rpx">{{item.src}}</view>
-                  </view>
-<view>2020-02-13</view>
-                </view>
-                <view class="makeCenterV">
-                  <view>失败</view>
-                  <view> - 30</view>
-                </view>
+            <i-swipeout i-class="i-swipeout-demo-item" actions="{{actions}}">
+              <view slot="content">
+                <i-cell title="{{item.src +'    '+ item.text}}" label="{{item.time}}"
+                  value="{{item.result + item.score}}" only-tap-footer></i-cell>
+                <!-- <i-divider height="1"></i-divider> -->
               </view>
-            </view>
+            </i-swipeout>
           </view>
         </scroll-view>
       </view>

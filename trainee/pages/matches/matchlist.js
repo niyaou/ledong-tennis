@@ -8,45 +8,53 @@ Page({
   data: {
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
+    actions : [
+      {
+          name : '申诉',
+          color : '#fff',
+          fontsize : '20',
+          width : 100,
+          icon : 'interactive',
+          background : '#ed3f14'
+      },
+      {
+          name : '返回',
+          width : 100,
+          color : '#80848f',
+          fontsize : '20',
+          icon : 'undo'
+      }
+  ],
     slideButtons: [{
       text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径
+      src: '6  : 7', // icon的路径,
+      time:'2020-12-21',
+      result:'失败',
+      score:'-30'
     },{
-      text: '普通',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_star.svg', // icon的路径
+      text: 'jerry     vs      范大将军 ',
+      src: '6  : 7', // icon的路径,
+      time:'2020-12-21',
+      result:'失败',
+      score:'-30'
     },{
-      type: 'warn',
-      text: '警示',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_del.svg', // icon的路径
+      text: 'jerry     vs      范大将军 ',
+      src: '6  : 7', // icon的路径,
+      time:'2020-12-21',
+      result:'失败',
+      score:'-30'
     },{
-      text: '普通',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_star.svg', // icon的路径
+      text: 'jerry     vs      范大将军 ',
+      src: '6  : 7', // icon的路径,
+      time:'2020-12-21',
+      result:'失败',
+      score:'-30'
     },{
-      type: 'warn',
-      text: '警示',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_del.svg', // icon的路径
-    },{
-      text: '普通',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_star.svg', // icon的路径
-    },{
-      type: 'warn',
-      text: '警示',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_del.svg', // icon的路径
-    },{
-      text: '普通',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_star.svg', // icon的路径
-    },{
-      type: 'warn',
-      text: '警示',
-      extClass: 'test',
-        src: '/page/weui/cell/icon_del.svg', // icon的路径
+      text: 'jerry     vs      范大将军 ',
+      src: '6  : 7', // icon的路径,
+      time:'2020-12-21',
+      result:'失败',
+      score:'-30'
     }],
   },
 
