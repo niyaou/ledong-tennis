@@ -34,6 +34,11 @@ page{
 
 
 /*   基础布局  包括对其，方向，窗宽，颜色 */
+
+.contentSpace{
+  margin-left:15rpx;
+}
+
 .whiteCaptl{
   color:#fff;
 }

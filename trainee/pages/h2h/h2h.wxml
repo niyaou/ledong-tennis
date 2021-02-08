@@ -10,10 +10,10 @@
      color="green">{{item.name}}</i-tag>
      <div slot="footer"></div>
   </i-modal>
-  <mp-navigation-bar title="选手排名" back="{{true}}" size="{{large}}"></mp-navigation-bar>
-  <i-card full="{{true}}" title="" extra="本赛季总共230位选手参赛" thumb="../../icon/player.jpg">
-    <view slot="content">您目前排名第3位</view>
-    <view slot="footer">点击选手图标，可以对选手进行评价</view>
+  <mp-navigation-bar title="Head to Head 统计" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+  <i-card full="{{true}}" title="" extra="本赛季与15位选手进行比赛" thumb="../../icon/player.jpg">
+    <view slot="content">您保持了75%胜率</view>
+    <view slot="footer">点击选手图标，可以查看与该名选手的比赛记录</view>
   </i-card>
 
   <view class="weui-flex">

@@ -1,0 +1,55 @@
+<!--pages/matches/matchlist.wxml-->
+<view class="containerbg">
+
+  <mp-navigation-bar title="Head 2 Head 详情" back="{{true}}" size="{{small}}"></mp-navigation-bar>
+  <!-- <i-card full="{{true}}" title="" extra="本赛季总共记录比赛65场 获取积分1200分" thumb="../../icon/match.jpg">
+    <view slot="content">记录一场比赛</view>
+    <view slot="footer">若出现没有参加的比赛，请左滑申诉</view>
+
+  </i-card> -->
+  <view class="weui-flex wcard" style="height:8rem">
+    <view class="weui-flex__item makeCenter">
+      <i-avatar src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1044805839,774767965&fm=26&gp=0.jpg" size="large">1</i-avatar>
+      <view class="contentSpace">范大将军</view>
+    </view>
+    <view class="weui-flex__item makeCenter">
+    vs
+    </view>
+    <view class="weui-flex__item makeCenter">
+      <i-avatar src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3897096398,2728860915&fm=11&gp=0.jpg" size="large">1</i-avatar>
+      <view class="contentSpace">jerry</view>
+    </view>
+  </view>
+  <i-cell title="本赛季与jerry比赛30次" label="获胜3次"
+                  value="胜率10%" only-tap-footer></i-cell>
+  <i-divider height="1"></i-divider>
+  <!-- 
+  <i-row>
+    <i-col span="8" i-class="col-class">
+    
+    </i-col>
+    <i-col span="8" i-class="col-class">col-8</i-col>
+    <i-col span="8" i-class="col-class">
+      <i-avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="large">1</i-avatar>
+    </i-col>
+  </i-row> -->
+  <view class="page__bd ">
+    <view class="weui-flex">
+      <view class="weui-flex__item">
+
+
+        <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
+          <view wx:for="{{slideButtons}}">
+
+            <i-cell title="{{item.src +'    '+ item.text}}" label="{{item.time}}" value="{{item.result + item.score}}"
+              only-tap-footer></i-cell>
+            <i-divider height="1"></i-divider>
+
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+
+  </view>
+
+</view>

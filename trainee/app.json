@@ -1,10 +1,13 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/h2h/detail",
+   
     "pages/player/player",
     "pages/score/score",
     "pages/matches/matchlist",
     "pages/h2h/h2h"
+
   ],
   "window": {
     "backgroundTextStyle": "light",
