@@ -1,13 +1,18 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/master/master",
-    "pages/dealing/dealing"
+    "pages/create/create",
+    "pages/h2h/detail",
+    "pages/player/player",
+    "pages/score/score",
+    "pages/matches/matchlist",
+    "pages/h2h/h2h"
+
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "网者争霸",
+    "navigationBarTitleText": "Weixin",
     "navigationBarTextStyle": "black",
     "navigationStyle": "custom"
   },
@@ -17,6 +22,9 @@
     "scope.userLocation": {
       "desc": "你的位置信息将用于小程序位置接口的效果展示"
     }
+  },
+  "useExtendedLib": {
+    "weui": true
   },
   "plugins": {
     "chooseLocation": {

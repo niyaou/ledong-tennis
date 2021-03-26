@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "playitem":"../playitem/playitem",
-    "doubleitem":"../doubleitem/doubleitem"
-  }
-}

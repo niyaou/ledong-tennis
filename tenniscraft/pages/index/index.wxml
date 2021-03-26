@@ -1,61 +1,127 @@
 <!--index.wxml-->
-<view class="container">
-<!-- <block wx:if="{{!hasUserInfo && canIUse}}" > -->
-<block wx:if="{{!hasUserInfo}}" >
-<view class="register" >
-<text style='position:absolute;top:{{totalBarHeight/2}}rpx;color:#fff;font-weight:bold'>网者争霸</text>
-<!-- <image src="../../icon/159.png" style="height:320rpx;width:600rpx;margin-bottom:30%"/> -->
-	<button class="btn1" open-type="getUserInfo"   bindgetuserinfo="getUserInfo" bindtap="gps" 
-	style="margin-top:90%; width:70%;background-color:#66FF56;color:#100E37" wx:if="{{!vsCode}}"> 微信登录 </button>
-		<button class="btn1" open-type="getPhoneNumber"   bindgetphonenumber="getPhoneNumber" bindtap="gps" 
-	style="margin-top:90%; width:70%;background-color:#66FF56;color:#100E37" wx:else> 手机注册 </button>
-	<!-- bindgetuserinfo="getUserInfo" -->
-	</view>
-	</block>
-			<block wx:else>
-	<view class="{{isSingle?'banner':'banner2'}}">
-	<!-- getUserInfo -->
-	
+<view class="containerbg">
+  <block wx:if="{{!hasUserInfo && canIUse}}"  >
+    <!-- <button style="position:absolute;top:80%;left:25%;background-color:rgb(134,120,205);color:#fff" 
+    open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 进入天梯
+      </button> -->
+      <button  open-type="getUserInfo"   bindgetuserinfo="getUserInfo" bindtap="gps" 
+      style="position:absolute;top:80%;left:25%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:if="{{vsCode===''}}"> 微信登录 </button>
+  
+		<button open-type="getPhoneNumber"   bindgetphonenumber="getPhoneNumber" bindtap="gps" 
+    style="position:absolute;top:80%;left:25%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:else> 手机注册 </button>
 
-			<div class="detail" style='padding-top:{{totalBarHeight}}rpx;'>
-				<!-- <image src="../../assets/banner.png" class="banner-image" /> -->
-				<div class="avitorleft">
-					<image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover" style="z-index:30"></image>
-				</div>
-				<div class="avitorright" bindtap="bindViewTap">
-					<div class="nickname">{{userInfo.nickName}} </div>
-					<div class="rank">{{isSingle?userRankInfo.rankType1:userRankInfo.doubleRankType1}} <span style="background:#0a90dd;padding-left: 10rpx;padding-right: 10rpx">{{isSingle?userRankInfo.rankType0:userRankInfo.doubleRankType0}}</span></div>
-				</div>
-				<image src="{{isSingle?'../../icon/single.png':'../../icon/double.png'}}" bindtap="switchMode" style='width:50px;height:50px'/>
-				<!-- <image src='../../icon/double.png' style='width:50px;height:50px'/> -->
-				<div class="master" bindtap="masterTap"></div>
-			</div>
-			<view class="content">
-		
-			</view>
+  <image src="../../icon/splash2.jpg" class="splash"></image> 
+  </block>
 
 
+  <view class="weui-flex" wx:else>
+    <view class="weui-flex__item">
+      <block >
+        <view class="card">
+          <view class="weui-flex">
+            <view class="weui-flex__item">
+              <view style='margin-top:{{totalBarHeight/2.5}}rpx;font-weight:bold'>网者争霸</view>
+            </view>
+          </view>
+          <view class="weui-flex ">
+            <view class="makeCenter" style=" height: 7.3em;  line-height: 7.3em;  ">
+              <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+            </view>
+            <view class="weui-flex__item ">
+              <view class="weui-flex filled ">
+                <view class="weui-flex__item makeCenterC">
+                  <view class="wfilled leftAli whiteCaptl userinfo-nickname">{{userInfo.nickName}}</view>
+                  <view class="wfilled leftAli whiteCaptl">{{userRankInfo.rankType1}} 单打种子选手</view>
+                  <view class="wfilled leftAli whiteCaptl  makeCenterV rowLeft">
+                   <!-- <view class="tags"> 黑哨狗</view> 
+                   <view class="tags"> 修房子</view> 
+                   <view class="tags"> 夺夺球</view> 
+                   <view class="tags"> 跑不死</view>  -->
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
 
-	
-	</view>
-	<view class="functionbarTotal {{tabBarStatus==0?'start':tabBarStatus==1?'center':'end'}}">
-		<view class="functionbar">
-			<text bindtap="tabStatus" data-gid='0'>技术统计</text> 
-			<div>|</div>
-			 <text bindtap="tabStatus" data-gid='1'>比赛 </text> 
-			 <div>|</div>
-			  <text bindtap="tabStatus" data-gid='2'>天梯排行</text>
-		</view>
-		<div class="indicator" />
-	</view>
-	<view class="componentview">
-		<analyze  wx:if="{{tabBarStatus==0}}" isPicked="{{tabBarStatus==0}}"   isSingle="{{isSingle}}"
-		rankPosition="{{rankPosition}}" score="{{userRankInfo.score}}"	doubleRankPosition="{{userRankInfo.doubleRankPosition}}" doubleScore="{{userRankInfo.doubleScore}}"
-		 doubleWinRate="{{userRankInfo.doubleWinRate}}" 
-		 winRate="{{userRankInfo.winRate}}" nearByUser='{{nearByUser}}' nearByCourt='{{nearByCourt}}'/>
-		<match   wx:elif="{{tabBarStatus==1}}" isPicked="{{tabBarStatus==1}}"  id="match" userList="{{userList}}" isSingle="{{isSingle}}" bind:locationTapped="onLocationTapped"  bind:confirmEmitted="onConfirmEmitted" />
-		<ladder wx:else id="ladder" isPicked="{{tabBarStatus==2}}" isSingle="{{isSingle}}"/>
-	</view>
-	<!-- <button bindtap="login">login</button> -->
-		</block>
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{1}}">
+        <view class="makeCenterC ">
+          <view class="statisticNum">{{userRankInfo.score}}</view>
+          <view class="statisticSubtitle">积分</view>
+        </view>
+        <image src="../../icon/score.png" class="iconsize"></image>
+      </view>
+
+    </view>
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{2}}">
+        <view class="makeCenterC ">
+          <view class="statisticNum">第{{rankPosition}}位</view>
+          <view class="statisticSubtitle">排名</view>
+        </view>
+        <image src="../../icon/ranklist.png" class="iconsize"></image>
+      </view>
+
+    </view>
+  </view>
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" >
+        <view class="makeCenterC ">
+          <view class="statisticNum">{{userRankInfo.winRate}}%</view>
+          <view class="statisticSubtitle">胜率</view>
+        </view>
+        <image src="../../icon/tennis.png" class="iconsize"></image>
+      </view>
+
+    </view>
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{2}}">
+        <view class="makeCenterC ">
+          <view class="statisticNum">{{userRankInfo.rankType0}}</view>
+          <view class="statisticSubtitle">段位</view>
+        </view>
+        <image src="../../icon/rank.png" class="iconsize"></image>
+      </view>
+    </view>
+  </view>
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{0}}">
+        <view class="makeCenterC ">
+          <view class="statisticNum">68 场</view>
+          <view class="statisticSubtitle">比赛</view>
+        </view>
+        <image src="../../icon/tennis.png" class="iconsize"></image>
+      </view>
+
+    </view>
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{3}}">
+        <view class="makeCenterC ">
+          <view class="statisticNum">35 人</view>
+          <view class="statisticSubtitle">对手</view>
+        </view>
+        <image src="../../icon/rank.png" class="iconsize"></image>
+      </view>
+    </view>
+  </view>
+
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <image src="../../icon/banner1.png" style="width:100%;height:200rpx" />
+    </view>
+  </view>
+
+  <view class="weui-footer weui-footer_fixed-bottom" style="color:#fff">
+    <view class="weui-footer__links">
+      <navigator url="" class="weui-footer__link" style="color:#fff">网者争霸</navigator>
+    </view>
+    <view class="weui-footer__text">Copyright © 2020-2021 LedongTennis</view>
+  </view>
 </view>

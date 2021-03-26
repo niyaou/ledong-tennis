@@ -1,7 +1,0 @@
-{
-  "usingComponents": {
-    "playitem":"../../component/playitem/playitem",
-    "dialog":"../../component/dialog/dialog"
-  },
-  "disableScroll": true
-}

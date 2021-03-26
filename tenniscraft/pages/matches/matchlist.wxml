@@ -1,0 +1,49 @@
+<!--pages/matches/matchlist.wxml-->
+<view class="containerbg">
+  <i-modal title="申诉" visible="{{ visible1 }}" bind:ok="handleClose1" bind:cancel="handleClose1">
+    <i-panel title="group-水果">
+    <i-radio-group current="{{current}}" bindchange="handleFruitChange">
+        <i-radio wx:for="{{fruit}}" position="{{position}}" wx:key="{{item.id}}" value="{{item.name}}">
+        </i-radio>
+    </i-radio-group>
+</i-panel>
+  </i-modal>
+  <mp-navigation-bar title="比赛记录" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+  <i-card full="{{true}}" title="" extra="本赛季总共记录比赛65场 获取积分1200分" thumb="../../icon/match.jpg">
+    <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addMatch" />
+    <view slot="content">记录一场比赛</view>
+    <view slot="footer">若出现没有参加的比赛，请左滑申诉</view>
+
+    <!-- <i-button  i-class="buttonfix" slot="content">默认按钮</i-button> -->
+  </i-card>
+
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+
+
+    </view>
+  </view>
+
+  <view class="page__bd ">
+    <view class="weui-flex">
+      <view class="weui-flex__item">
+
+
+        <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
+          <view wx:for="{{slideButtons}}">
+            <i-swipeout i-class="i-swipeout-demo-item" indexs="{{index}}" actions="{{actions}}"
+              bind:change="handleClickItem2" unclosable="{{true}}" toggle="{{item.toggle}}">
+              <view slot="content">
+                <i-cell title="{{item.src +'    '+ item.text}}" label="{{item.time}}"
+                  value="{{item.result + item.score}}" only-tap-footer></i-cell>
+                <!-- <i-divider height="1"></i-divider> -->
+              </view>
+            </i-swipeout>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+
+  </view>
+
+</view>

@@ -1,21 +1,106 @@
 /**app.wxss**/
-.container {
+page{
   height: 100%;
   width:100%;
-   display: flex;
+  background-color:rgb(177, 177, 177);
+}
+.containerApp {
+  height: 100%;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  padding: 200rpx 0;
   box-sizing: border-box;
 } 
 
-
-.columndiv{
-  display: flex;
-  flex-direction: column;
+.containerbg{
+  height: 100%;
+  background-color: var(--weui-BG-0);
 }
 
-.rowdiv{
-  display: flex;
-  flex-direction: row;
+.containerbgW{
+  height: 100%;
+  background-color: #fff;
+}
+.playercard{
+  height: 7.3em;
+  line-height: 7.3em;
+  padding: 2em;
+
+}
+
+
+
+
+/*   基础布局  包括对其，方向，窗宽，颜色 */
+
+.contentSpace{
+  margin-left:15rpx;
+}
+
+.whiteCaptl{
+  color:#fff;
+}
+.makeCenter{
+  display:flex; justify-content: center;   align-items: center;
+}
+
+
+.filled{
+  height: 100%;
+  width:100%;
+}
+
+.hfilled{
+  height: 100%;
+}
+.wfilled{
+  width:100%;
+}
+
+.leftAli{
+  text-align: left;
+}
+
+.makeCenterC{
+  display:flex; 
+  flex-direction: column;
+  justify-content: center; 
+   align-items: center;
+}
+
+
+.makeCenterV{
+  display:flex; 
+  flex-direction:row;
+  justify-content: center; 
+  align-items: center;
+}
+
+.rowLeft{
+  justify-content: flex-start; 
+}
+
+.placeholder {
+  margin: 15rpx;
+  padding: 0 10px;
+  border-radius: 0.3em;
+  height: auto;
+  line-height:auto;
+}
+
+.wcard{
+  background:#fff;
+}
+
+.statisticNum{
+  font-size:1rem;
+  font-weight: bold;
+  color:#000;
+}
+
+.statisticSubtitle{
+  font-size:0.5rem;
+  color:rgb(105, 105, 105);
 }

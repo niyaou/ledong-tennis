@@ -15,7 +15,7 @@ Page({
     nearByCourt: [],
     isSingle:true,
     hasInitial:false,
-    hasUserInfo: true,
+    hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
@@ -121,6 +121,7 @@ Page({
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo
+    console.log(e)
     this.setData({
       userInfo: e.detail.userInfo,
     })
@@ -130,12 +131,15 @@ Page({
     let that = this
     wx.login({
       success(res) {
+        console.log(res)
         http.postReq('user/verified', '', {
           token: res.code,
         }, function (e) {
-          that.setData({
-            vsCode: e.data
-          })
+        
+            that.setData({
+              vsCode: e.data
+            })
+            console.log('set vscode',e)
         })
       }
     })
@@ -163,12 +167,14 @@ Page({
   },
   getPhoneNumber(e) {
     let that = this
+    console.log(e)
     http.postReq('user/phone', '', {
       vscode: this.data.vsCode,
       iv: e.detail.iv,
       data: e.detail.encryptedData,
     }, function (e) {
       let jsonData=JSON.parse(e.data)
+      console.log(jsonData)
       if (e.code == 0) {
         that.setData({
           openId:jsonData.purePhoneNumber,
@@ -187,6 +193,7 @@ Page({
         hasUserInfo: true,
         hasInitial:true
       })
+      console.log('--------1------')
     })
   },
   getRankPosition(jwt) {
@@ -253,6 +260,7 @@ Page({
   tabStatus(event) {
     if(!this.data.hasInitial && event.currentTarget.dataset.gid != 2 ){
       this.setData({hasUserInfo:false})
+      console.log('--------2------')
       return
     }
 
@@ -289,5 +297,25 @@ Page({
     if(matchComp){
       matchComp.switchMode(this.data.isSingle)
     }
-  }
+  },
+  navigateTo(event){
+    console.log(event.currentTarget.dataset.variable)
+    if(event.currentTarget.dataset.variable===0){
+      wx.navigateTo({
+        url: '../../pages/matches/matchlist'})
+    }else
+    if(event.currentTarget.dataset.variable===1){
+      wx.navigateTo({
+        url: '../../pages/score/score'})
+    }else
+    if(event.currentTarget.dataset.variable===2){
+      wx.navigateTo({
+        url: '../../pages/player/player'})
+    }else
+    if(event.currentTarget.dataset.variable===3){
+      wx.navigateTo({
+        url: '../../pages/h2h/h2h'})
+    }
+    // event.currentTarget.dataset.variable;
+  },
 })
