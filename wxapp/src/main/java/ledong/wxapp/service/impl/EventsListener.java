@@ -97,12 +97,14 @@ public class EventsListener {
             rankService.updateUserPosition();
             Map<String, Object> vo = (Map<String, Object>) matchService.getMatchInfos(matchId);
             if (vo == null) {
-                vo = (Map<String, Object>) matchService.getDoubleMatchInfos(matchId);
-                if (vo.get(DoubleMatchPostVo.RANKED) == null || !vo.get(DoubleMatchPostVo.RANKED)
-                        .equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())) {
-                    matchService.confirmDoubleMatch(matchId, vo.get(DoubleMatchPostVo.HOLDERACKNOWLEDGED)
-                            .equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode()) ? 2 : 1);
-                }
+                // vo = (Map<String, Object>) matchService.getDoubleMatchInfos(matchId);
+                // if (vo.get(DoubleMatchPostVo.RANKED) == null ||
+                // !vo.get(DoubleMatchPostVo.RANKED)
+                // .equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())) {
+                // matchService.confirmDoubleMatch(matchId,
+                // vo.get(DoubleMatchPostVo.HOLDERACKNOWLEDGED)
+                // .equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode()) ? 2 : 1);
+                // }
             } else {
                 if (vo.get(MatchPostVo.RANKED) == null
                         || !vo.get(MatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())) {

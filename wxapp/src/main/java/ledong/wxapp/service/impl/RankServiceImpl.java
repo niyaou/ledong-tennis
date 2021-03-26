@@ -74,6 +74,7 @@ public class RankServiceImpl implements IRankService {
         int scoreChanged = 0;
         RankingContext context = new RankingContext(new VictoryRanking());
         scores = context.rankMatch(matchId, holderScore, challengerScor);
+
         context = new RankingContext(new ConsecutiveRanking());
         tempScore = context.rankMatch(matchId, holderScore, challengerScor);
 

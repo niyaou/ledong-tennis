@@ -24,8 +24,8 @@ import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.utils.DateUtil;
 
-@Configuration
-@EnableScheduling
+// @Configuration
+// @EnableScheduling
 public class MatchesScheduleTask {
     private static Logger logger = Logger.getLogger(MatchesScheduleTask.class);
     @Autowired
