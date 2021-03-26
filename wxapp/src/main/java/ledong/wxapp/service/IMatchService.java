@@ -36,13 +36,13 @@ public interface IMatchService {
      */
     public String requestMatching(String user, String courtGps);
 
-
     /**
      * required a random match
+     * 
      * @param user
      * @return
      */
-    public String  requestDoubleMatching(String user);
+    public String requestDoubleMatching(String user);
 
     /**
      * create a intentional match post data.
@@ -73,7 +73,17 @@ public interface IMatchService {
      */
     public Object getMatchedList(String user, Integer count);
 
-        /**
+    /**
+     * 
+     * get the list of h2h matched games
+     * 
+     * @param user
+     * @param count
+     * @return
+     */
+    public Object getH2hMatchedList(String user, String opponent, Integer count);
+
+    /**
      * 
      * get the list of matched games
      * 
@@ -120,11 +130,8 @@ public interface IMatchService {
     public String postMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
             String orderTime, String courtName, String courtGps);
 
-
-
     public String postDoubleMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
-    String orderTime, String courtName, String courtGps);
-
+            String orderTime, String courtName, String courtGps);
 
     /**
      * create a session
@@ -144,7 +151,7 @@ public interface IMatchService {
     /**
      * find a exist intentional matchs
      * 
-     * @param postUser return list which post by given user
+     * @param postUser      return list which post by given user
      * @param exclusiveUser return list which NOT post by given user
      * @return
      */
@@ -155,7 +162,7 @@ public interface IMatchService {
      * 
      * 
      * @param sessionId
-     * @param seconds 0: all context , others : recent seconds context
+     * @param seconds   0: all context , others : recent seconds context
      * @return
      */
     public Object getSessionContext(String sessionId, int seconds);
@@ -165,7 +172,7 @@ public interface IMatchService {
      * get list of session context
      * 
      * @param sessionId
-     * @param holderCount already have quantity
+     * @param holderCount     already have quantity
      * @param challengerCount already have quantity
      * @return
      */
@@ -180,7 +187,6 @@ public interface IMatchService {
      */
     public Object getMatchInfos(String matchId);
 
-    
     /**
      * 
      * get the given double match infos
@@ -200,10 +206,9 @@ public interface IMatchService {
      * @param courtGPS
      * @return
      */
-    public Object updateMatchInfos(String matchId, String orderTime, String courtName,String courtGPS);
+    public Object updateMatchInfos(String matchId, String orderTime, String courtName, String courtGPS);
 
-
-/**
+    /**
      * 
      * update double match infos
      * 
@@ -215,10 +220,11 @@ public interface IMatchService {
      * @param challenger2
      * @return
      */
-    public Object updateDoubleMatchInfos(String matchId, String courtName,String courtGPS,String holder2 ,String  challenger2);
+    public Object updateDoubleMatchInfos(String matchId, String courtName, String courtGPS, String holder2,
+            String challenger2);
 
     /**
-     * update match score 
+     * update match score
      * 
      * @param matchId
      * @param holderScore
@@ -227,8 +233,8 @@ public interface IMatchService {
      */
     public Object updateMatchScore(String matchId, Integer holderScore, Integer challengerScore);
 
-        /**
-     * update double match score 
+    /**
+     * update double match score
      * 
      * @param matchId
      * @param holderScore
@@ -237,26 +243,22 @@ public interface IMatchService {
      */
     public Object updateDoubleMatchScore(String matchId, Integer holderScore, Integer challengerScore);
 
-
-
     /**
      * 
      * user confirm match
      * 
      * @param matchId
-     * @param type 0: holder, 1: challenger,  2: both
+     * @param type    0: holder, 1: challenger, 2: both
      * @return
      */
     public Object confirmMatch(String matchId, Integer type);
-
-    
 
     /**
      * 
      * user confirm double match
      * 
      * @param matchId
-     * @param type 0: holder, 1: challenger,  2: both
+     * @param type    0: holder, 1: challenger, 2: both
      * @return
      */
     public Object confirmDoubleMatch(String matchId, Integer type);
@@ -266,7 +268,7 @@ public interface IMatchService {
      * 
      * @param sessionId
      * @param context
-     * @param type 0: holder context , 1: challenger context
+     * @param type      0: holder context , 1: challenger context
      * @return
      */
     public String insertSessionContext(String sessionId, String context, int type);
@@ -283,10 +285,10 @@ public interface IMatchService {
      */
     public String finishMatch(String matchId, int holderScore, int challengerScore);
 
-       /**
+    /**
      * 
-     * finish the given double match ,upload score of this match ,and auto ranking , and
-     * cache ranked match to redis
+     * finish the given double match ,upload score of this match ,and auto ranking ,
+     * and cache ranked match to redis
      * 
      * @param matchId
      * @param holderScore
@@ -295,16 +297,16 @@ public interface IMatchService {
      */
     public String finishDoubleMatch(String matchId, int holderScore, int challengerScore);
 
-
     /**
      * finish slam match , set score and status
+     * 
      * @param slamId
      * @param matchId
      * @param holderScore
      * @param challengerScore
      * @return
      */
-    public String finishSlamMatch(String slamId,String matchId,Integer holderScore,Integer challengerScore);
+    public String finishSlamMatch(String slamId, String matchId, Integer holderScore, Integer challengerScore);
 
     /**
      * get playing match
@@ -322,7 +324,6 @@ public interface IMatchService {
      */
     public Object rankedMatchInfo(String user);
 
-
     /**
      * get last match result
      * 
@@ -330,8 +331,6 @@ public interface IMatchService {
      * @return
      */
     public Object lastMatchResult(String user);
-
-
 
     /**
      * get playing match
@@ -349,7 +348,6 @@ public interface IMatchService {
      */
     public Object rankedDoubleMatchInfo(String user);
 
-
     /**
      * get last match result
      * 
@@ -358,7 +356,6 @@ public interface IMatchService {
      */
     public Object lastDoubleMatchResult(String user);
 
-
     /**
      * 
      * get near by court
@@ -366,9 +363,7 @@ public interface IMatchService {
      * @param gps
      * @return
      */
-    public LinkedList<HashMap<String, Object>> nearByCourt(String gps,Integer size);
-
-
+    public LinkedList<HashMap<String, Object>> nearByCourt(String gps, Integer size);
 
     /**
      * get user most played court
@@ -376,34 +371,31 @@ public interface IMatchService {
      * @param user
      * @return
      */
-    public HashMap<String,Object> commonCourt(String user);
-
+    public HashMap<String, Object> commonCourt(String user);
 
     /**
      * delete match and session
+     * 
      * @param id
      * @return
      */
     public String deleteMatches(String id);
 
-
-
-     /**
-      * create match by master
-      * @param holder
-      * @param courtName
-      * @param challenger
-      * @param courtGPS
-      * @return
-      */
-    public String postSlamMatch(String holder, String courtName,String challenger,String courtGPS);
-
-
+    /**
+     * create match by master
+     * 
+     * @param holder
+     * @param courtName
+     * @param challenger
+     * @param courtGPS
+     * @return
+     */
+    public String postSlamMatch(String holder, String courtName, String challenger, String courtGPS);
 
     /**
      * get started match by master
      * 
      * @return
      */
-    public  LinkedList<HashMap<String, Object>>  getStartMatch();
+    public LinkedList<HashMap<String, Object>> getStartMatch();
 }

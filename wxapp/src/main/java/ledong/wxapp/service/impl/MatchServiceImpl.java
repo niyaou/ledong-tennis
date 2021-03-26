@@ -426,7 +426,7 @@ public class MatchServiceImpl implements IMatchService {
         sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
         QueryBuilder[] values = new QueryBuilder[8];
         List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
-                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, 50, params.toArray(values));
+                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, count, params.toArray(values));
         if (searchResponse != null) {
             String[] idsArr = new String[searchResponse.size()];
             List<String> idsHolder = new ArrayList<String>();
@@ -483,6 +483,81 @@ public class MatchServiceImpl implements IMatchService {
         // iUserService.getUserInfo(openId);
         return searchResponse;
 
+    }
+
+    @Override
+    public Object getH2hMatchedList(String user, String opponent, Integer count) {
+
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        BoolQueryBuilder head2Head = new BoolQueryBuilder();
+
+        // params.add(SearchApi.createSearchByFieldSource(user, MatchPostVo.HOLDER,
+        // MatchPostVo.CHALLENGER));
+        BoolQueryBuilder head1 = new BoolQueryBuilder();
+        head1.must(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, user))
+                .must(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, opponent));
+
+        BoolQueryBuilder head2 = new BoolQueryBuilder();
+        head2.must(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, opponent))
+                .must(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, user));
+        head2Head.should(head1).should(head2);
+
+        params.add(head2Head);
+
+        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
+
+        Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
+        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
+        QueryBuilder[] values = new QueryBuilder[8];
+        List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
+                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, count, params.toArray(values));
+        if (searchResponse != null) {
+            String[] idsArr = new String[searchResponse.size()];
+            List<String> idsHolder = new ArrayList<String>();
+            List<String> idsChallenger = new ArrayList<String>();
+
+            searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                // HashMap<String, Object> holder = iUserService.getUserInfo((String)
+                // match.get(MatchPostVo.HOLDER));
+                idsHolder.add((String) match.get(MatchPostVo.HOLDER));
+                idsChallenger.add((String) match.get(MatchPostVo.CHALLENGER));
+                return match;
+            }).collect(Collectors.toList());
+
+            LinkedList<Map<String, Object>> userInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_INFORMATION, idsHolder.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, idsHolder.toArray(idsArr));
+
+            LinkedList<Map<String, Object>> userInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_INFORMATION, idsChallenger.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, idsChallenger.toArray(idsArr));
+            searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                List<Map<String, Object>> holder = userInfosHolder.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
+                List<Map<String, Object>> holderRank = userRankInfosHolder.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.HOLDERRANKTYPE0, holderRank.get(0).get(RankInfoVo.RANKTYPE0));
+                List<Map<String, Object>> challenger = userInfosChallenger.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
+                List<Map<String, Object>> challengerRank = userRankInfosChallenger.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
+                match.put(MatchPostVo.CHALLENGERAVATOR, challenger.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.CHALLENGERNAME, challenger.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.CHALLENGERRANKTYPE0, challengerRank.get(0).get(RankInfoVo.RANKTYPE0));
+                return match;
+            }).collect(Collectors.toList());
+        }
+        // iUserService.getUserInfo(openId);
+        return searchResponse;
     }
 
     @Override
@@ -721,7 +796,7 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
-       String finishId=null;
+        String finishId = null;
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         if (type == 0) {
             vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
@@ -749,9 +824,10 @@ public class MatchServiceImpl implements IMatchService {
         if (TextUtils.isEmpty(id)) {
             throw new CustomException(ResultCodeEnum.CONFIRMED_MATCH_ERROR);
         }
-        // if (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())
-        //         && TextUtils.isEmpty(finishId)) {
-        //     ctx.publishEvent(new MatchConfirmEvent(ctx, id));
+        // if
+        // (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())
+        // && TextUtils.isEmpty(finishId)) {
+        // ctx.publishEvent(new MatchConfirmEvent(ctx, id));
         // }
         return id;
     }
@@ -999,13 +1075,11 @@ public class MatchServiceImpl implements IMatchService {
 
             searchResponse.put(DoubleMatchPostVo.CHALLENGERAVATOR, challenger1.get(0).get(UserVo.AVATOR));
             searchResponse.put(DoubleMatchPostVo.CHALLENGERNAME, challenger1.get(0).get(UserVo.NICKNAME));
-            searchResponse.put(DoubleMatchPostVo.CHALLENGERRANKTYPE0,
-                    challengerRank1.get(0).get(RankInfoVo.RANKTYPE0));
+            searchResponse.put(DoubleMatchPostVo.CHALLENGERRANKTYPE0, challengerRank1.get(0).get(RankInfoVo.RANKTYPE0));
 
             searchResponse.put(DoubleMatchPostVo.CHALLENGERAVATOR, challenger2.get(0).get(UserVo.AVATOR));
             searchResponse.put(DoubleMatchPostVo.CHALLENGERNAME, challenger2.get(0).get(UserVo.NICKNAME));
-            searchResponse.put(DoubleMatchPostVo.CHALLENGERRANKTYPE0,
-                    challengerRank2.get(0).get(RankInfoVo.RANKTYPE0));
+            searchResponse.put(DoubleMatchPostVo.CHALLENGERRANKTYPE0, challengerRank2.get(0).get(RankInfoVo.RANKTYPE0));
 
         });
 
@@ -1015,36 +1089,36 @@ public class MatchServiceImpl implements IMatchService {
     @Override
     public Object updateDoubleMatchInfos(String matchId, String courtName, String courtGPS, String holder2,
             String challenger2) {
-                HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, matchId);
-                if (match == null) {
-                    return null;
-                }
-        
-                DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
-                if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode().equals(vo.getStatus())
-                        && !MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode().equals(vo.getStatus())
-                        && !MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(vo.getMatchType())) {
-                    return null;
-                }
-      
-                if (!TextUtils.isEmpty(holder2)) {
-                    vo.setHolder2(holder2);
-                }
+        HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, matchId);
+        if (match == null) {
+            return null;
+        }
 
-                if (!TextUtils.isEmpty(challenger2)) {
-                    vo.setChallenger2(challenger2);
-                }
+        DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
+        if (!MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode().equals(vo.getStatus())
+                && !MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode().equals(vo.getStatus())
+                && !MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(vo.getMatchType())) {
+            return null;
+        }
 
-                if (!TextUtils.isEmpty(courtName)) {
-                    vo.setCourtName(courtName);
-                }
-                if (!TextUtils.isEmpty(courtGPS)) {
-                    vo.setCourtGPS(courtGPS);
-                }
-                vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-                vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-                return SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
-      
+        if (!TextUtils.isEmpty(holder2)) {
+            vo.setHolder2(holder2);
+        }
+
+        if (!TextUtils.isEmpty(challenger2)) {
+            vo.setChallenger2(challenger2);
+        }
+
+        if (!TextUtils.isEmpty(courtName)) {
+            vo.setCourtName(courtName);
+        }
+        if (!TextUtils.isEmpty(courtGPS)) {
+            vo.setCourtGPS(courtGPS);
+        }
+        vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+        vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+        return SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+
     }
 
     @Override
@@ -1078,28 +1152,31 @@ public class MatchServiceImpl implements IMatchService {
         String finishId = null;
         DoubleMatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), DoubleMatchPostVo.class);
         // if (type == 0) {
-        //     vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        // vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
         // } else if (type == 1) {
-        //     vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        // vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
         // } else {
-            vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
-            vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
+        vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
         // }
 
         if (MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getChallengerAcknowledged())
                 && MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode().equals(vo.getHolderAcknowledged())) {
 
-            // if (!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())) {
-            //     vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
-            //     vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
-            //     vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+            // if
+            // (!vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode()))
+            // {
+            // vo.setStatus(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode());
+            // vo.setChallengerAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
+            // vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
             // } else {
-                vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-                finishId = finishDoubleMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
+            vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
+            finishId = finishDoubleMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
             // }
         }
 
-        String id = SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo), matchId);
+        String id = SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo),
+                matchId);
         if (TextUtils.isEmpty(id)) {
             throw new CustomException(ResultCodeEnum.CONFIRMED_MATCH_ERROR);
         }
@@ -1112,7 +1189,6 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public String finishDoubleMatch(String matchId, int holderScore, int challengerScore) {
-
 
         HashMap<String, Object> match = SearchApi.searchById(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, matchId);
         if (match == null) {
@@ -1127,16 +1203,16 @@ public class MatchServiceImpl implements IMatchService {
         vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
         vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-        return SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
+        return SearchApi.updateDocument(DataSetConstant.GAME_DOUBLE_MATCH_INFORMATION, JSON.toJSONString(vo),
+                vo.getId());
     }
-
 
     @Override
     public Object playingDoubleMatchInfo(String user) {
         ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
         if (!StringUtil.isEmpty(user)) {
-            params.add(SearchApi.createMultiFieldsWithSingleValue(user, DoubleMatchPostVo.HOLDER, DoubleMatchPostVo.CHALLENGER, 
-            DoubleMatchPostVo.HOLDER2, DoubleMatchPostVo.CHALLENGER2));
+            params.add(SearchApi.createMultiFieldsWithSingleValue(user, DoubleMatchPostVo.HOLDER,
+                    DoubleMatchPostVo.CHALLENGER, DoubleMatchPostVo.HOLDER2, DoubleMatchPostVo.CHALLENGER2));
         }
         params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
                 MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode()));
