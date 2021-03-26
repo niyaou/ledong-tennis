@@ -130,6 +130,9 @@ public interface IMatchService {
     public String postMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
             String orderTime, String courtName, String courtGps);
 
+    /**
+     * 
+     */
     public String postDoubleMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
             String orderTime, String courtName, String courtGps);
 

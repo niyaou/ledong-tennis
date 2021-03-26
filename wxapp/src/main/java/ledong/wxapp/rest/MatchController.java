@@ -53,8 +53,7 @@ public class MatchController {
                 }
                 Claims claims = tokenService.getClaimByToken(authHeader);
                 String userId = claims.getSubject();
-                return new ResponseEntity<Object>(CommonResponse.success(matchService.requestMatching(userId, gps)),
-                                HttpStatus.OK);
+                return new ResponseEntity<Object>(CommonResponse.success(null), HttpStatus.OK);
         }
 
         @RequestMapping(value = "/randomDoubleMatch", method = RequestMethod.POST)
@@ -167,8 +166,7 @@ public class MatchController {
         public ResponseEntity<?> exploreLastResult(@RequestHeader("Authorization") String authHeader) {
                 Claims claims = tokenService.getClaimByToken(authHeader);
                 String userId = claims.getSubject();
-                return new ResponseEntity<Object>(CommonResponse.success(matchService.lastMatchResult(userId)),
-                                HttpStatus.OK);
+                return new ResponseEntity<Object>(CommonResponse.success(null), HttpStatus.OK);
         }
 
         @RequestMapping(value = "/matchInfo/{matchId}", method = RequestMethod.GET)

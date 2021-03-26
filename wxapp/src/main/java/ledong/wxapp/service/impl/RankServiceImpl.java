@@ -35,7 +35,6 @@ import VO.UserVo;
 import VO.WinRateEvent;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
-import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IRankService;
@@ -54,8 +53,8 @@ import ledong.wxapp.utils.StringUtil;
 @Service
 public class RankServiceImpl implements IRankService {
     private static Logger logger = Logger.getLogger(RankServiceImpl.class);
-    @Autowired
-    private RedisUtil redis;
+    // @Autowired
+    // private RedisUtil redis;
     @Autowired
     private IUserService iUserService;
     @Autowired
@@ -80,11 +79,12 @@ public class RankServiceImpl implements IRankService {
 
         scores[0] += tempScore[0];
         scores[1] += tempScore[1];
-        context = new RankingContext(new PondRanking());
 
-        tempScore = context.rankMatch(matchId, holderScore, challengerScor);
-        scores[0] += tempScore[0];
-        scores[1] += tempScore[1];
+        // context = new RankingContext(new PondRanking());
+        // tempScore = context.rankMatch(matchId, holderScore, challengerScor);
+        // scores[0] += tempScore[0];
+        // scores[1] += tempScore[1];
+
         holder.setScore(holder.getScore() + scores[0]);
         challenger.setScore(challenger.getScore() + scores[1]);
 
@@ -110,8 +110,10 @@ public class RankServiceImpl implements IRankService {
         ctx.publishEvent(new WinRateEvent(ctx, holder));
         ctx.publishEvent(new WinRateEvent(ctx, challenger));
         updateUserPosition();
-        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
-        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        // redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"),
+        // matchId, 60 * 60 * 24 * 7);
+        // redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(),
+        // "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
     }
 
@@ -123,6 +125,18 @@ public class RankServiceImpl implements IRankService {
     @Override
     public String updateRankInfo(RankInfoVo vo) {
         return RankingStrategy.updateRankInfo(vo);
+    }
+
+    @Override
+    public String updateUserTags(String userId, String tag) {
+        RankInfoVo user = RankingStrategy.getUserRank(userId);
+        String tags = user.getPolygen();
+        for (int i = 0; i < tag.split(",").length; i++)
+            if (!tags.contains(tag.split(",")[i])) {
+                tags = tags + "," + tag.split(",")[i];
+            }
+        user.setPolygen(tags);
+        return updateRankInfo(user);
     }
 
     @Override
@@ -178,9 +192,12 @@ public class RankServiceImpl implements IRankService {
                         .collect(Collectors.toList());
 
                 // System.out.println(holder.get(0));
-                // match.put(RankInfoVo.DOUBLERANKTYPE0, holder.get(0).get(RankInfoVo.DOUBLERANKTYPE0));
-                // match.put(RankInfoVo.DOUBLEWINRATE, holder.get(0).get(RankInfoVo.DOUBLEWINRATE));
-                // match.put(RankInfoVo.DOUBLEPOSITION, holder.get(0).get(RankInfoVo.DOUBLEPOSITION));
+                // match.put(RankInfoVo.DOUBLERANKTYPE0,
+                // holder.get(0).get(RankInfoVo.DOUBLERANKTYPE0));
+                // match.put(RankInfoVo.DOUBLEWINRATE,
+                // holder.get(0).get(RankInfoVo.DOUBLEWINRATE));
+                // match.put(RankInfoVo.DOUBLEPOSITION,
+                // holder.get(0).get(RankInfoVo.DOUBLEPOSITION));
                 match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
                 match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
                 match.put(MatchPostVo.COURTNAME, iMatchService.commonCourt((String) holder.get(0).get(UserVo.OPENID))
@@ -259,8 +276,10 @@ public class RankServiceImpl implements IRankService {
         updateRankInfo(challenger);
         ctx.publishEvent(new SlamWinRateEvent(ctx, holder));
         ctx.publishEvent(new SlamWinRateEvent(ctx, challenger));
-        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
-        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        // redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"),
+        // matchId, 60 * 60 * 24 * 7);
+        // redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(),
+        // "ranked"), matchId, 60 * 60 * 24 * 7);
         return null;
     }
 
@@ -362,9 +381,8 @@ public class RankServiceImpl implements IRankService {
 
     @Override
     public String updateUserPosition() {
-
         LinkedList<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.USER_RANK_INFORMATION,
-                null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, 200);
+                null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
         int[] position = { 0 };
         LinkedList<RankInfoVo> vos = new LinkedList<RankInfoVo>();
         GradingContext gContext = new GradingContext(new GradeRanking());
@@ -442,18 +460,12 @@ public class RankServiceImpl implements IRankService {
         scores[2] += tempScore[2];
         scores[3] += tempScore[3];
 
-
-
-
         GradingContext gContext = new GradingContext(new DoubleGradeRanking());
 
-
-
-
-        System.out.println( scores[0] );
-        System.out.println( scores[1] );
-        System.out.println( scores[2] );
-        System.out.println( scores[3] );
+        System.out.println(scores[0]);
+        System.out.println(scores[1]);
+        System.out.println(scores[2]);
+        System.out.println(scores[3]);
 
         holder.setDoubleScore(holder.getDoubleScore() + scores[0]);
         if (holder2 != null) {
@@ -499,15 +511,17 @@ public class RankServiceImpl implements IRankService {
         if (holder2 != null) {
             updateRankInfo(holder2);
             ctx.publishEvent(new DoubleWinRateEvent(ctx, holder2));
-            redis.set(StringUtil.combiningSpecifiedUserKey(holder2.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+            // redis.set(StringUtil.combiningSpecifiedUserKey(holder2.getOpenId(),
+            // "ranked"), matchId, 60 * 60 * 24 * 7);
         }
         if (challenger2 != null) {
             updateRankInfo(challenger2);
             ctx.publishEvent(new DoubleWinRateEvent(ctx, challenger2));
-            redis.set(StringUtil.combiningSpecifiedUserKey(challenger2.getOpenId(), "ranked"), matchId,
-                    60 * 60 * 24 * 7);
+            // redis.set(StringUtil.combiningSpecifiedUserKey(challenger2.getOpenId(),
+            // "ranked"), matchId,
+            // 60 * 60 * 24 * 7);
         }
-        
+
         updateRankInfo(holder);
 
         updateRankInfo(challenger);
@@ -522,8 +536,10 @@ public class RankServiceImpl implements IRankService {
         ctx.publishEvent(new DoubleWinRateEvent(ctx, challenger));
 
         updateDoubleUserPosition();
-        redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
-        redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(), "ranked"), matchId, 60 * 60 * 24 * 7);
+        // redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"),
+        // matchId, 60 * 60 * 24 * 7);
+        // redis.set(StringUtil.combiningSpecifiedUserKey(challenger.getOpenId(),
+        // "ranked"), matchId, 60 * 60 * 24 * 7);
         return String.valueOf(scoreChanged);
     }
 

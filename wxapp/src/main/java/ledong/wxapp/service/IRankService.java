@@ -20,8 +20,7 @@ public interface IRankService {
      */
     public String matchRank(String matchId, int holderScore, int challengerScore);
 
-
-      /**
+    /**
      * 
      * rank for the given double match
      * 
@@ -66,6 +65,15 @@ public interface IRankService {
     public String updateRankInfo(RankInfoVo vo);
 
     /**
+     * update user tag by others user
+     * 
+     * @param userId
+     * @param tag
+     * @return
+     */
+    public String updateUserTags(String userId, String tag);
+
+    /**
      * get ranking list
      * 
      * @param grade
@@ -105,7 +113,7 @@ public interface IRankService {
      */
     public Double updateWinRate(String userId);
 
-        /**
+    /**
      * update user double win rate
      * 
      * @param userId
@@ -129,23 +137,21 @@ public interface IRankService {
      */
     public Integer getUserPositionInRankList(String userId);
 
-    
-
     /**
      * get system user
+     * 
      * @return
      */
     public Long getTotalUser();
 
-
     /**
-     *  update score  only operated by master
+     * update score only operated by master
+     * 
      * @param openId
      * @param score
      * @return
      */
-    public String updateScoreByMaster(String openId,Integer score);
-
+    public String updateScoreByMaster(String openId, Integer score);
 
     /**
      * 
@@ -153,7 +159,7 @@ public interface IRankService {
      */
     public String updateUserPosition();
 
-        /**
+    /**
      * 
      * @return
      */

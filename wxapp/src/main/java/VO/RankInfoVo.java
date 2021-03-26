@@ -40,7 +40,6 @@ public class RankInfoVo implements Serializable {
     private Integer clubScore;
     public static final String CLUBSCORE = "clubScore";
 
-
     @ApiModelProperty(value = "winRate  ")
     private Double winRate = 0.0;
     public static final String WINRATE = "winRate";
@@ -77,14 +76,13 @@ public class RankInfoVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "position  ")
-    private Integer position=0;
+    private Integer position = 0;
     public static final String POSITION = "position";
 
     @NotEmpty
     @ApiModelProperty(value = "double position  ")
-    private Integer doublePosition=0;
+    private Integer doublePosition = 0;
     public static final String DOUBLEPOSITION = "doublePosition";
-
 
     @NotEmpty
     @ApiModelProperty(value = "bardge  ")
@@ -93,7 +91,7 @@ public class RankInfoVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "polygen  ")
-    private Integer polygen;
+    private String polygen;
     public static final String POLYGEN = "polygen";
 
     @NotEmpty
@@ -117,7 +115,7 @@ public class RankInfoVo implements Serializable {
         return bardge;
     }
 
-    public Integer getPolygen() {
+    public String getPolygen() {
         return polygen;
     }
 
@@ -141,7 +139,7 @@ public class RankInfoVo implements Serializable {
         this.bardge = bardge;
     }
 
-    public void setPolygen(Integer polygen) {
+    public void setPolygen(String polygen) {
         this.polygen = polygen;
     }
 

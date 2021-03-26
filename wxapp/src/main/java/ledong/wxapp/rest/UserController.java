@@ -21,7 +21,6 @@ import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.CommonConstanst;
 import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
-import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IUserService;
 
@@ -35,8 +34,8 @@ public class UserController {
     private IUserService userService;
     @Autowired
     private IMatchService matchService;
-    @Autowired
-    private RedisUtil redis;
+    // @Autowired
+    // private RedisUtil redis;
     @Autowired
     private JwtToken tokenService;
 
@@ -66,9 +65,9 @@ public class UserController {
             @RequestParam(value = "nickName", required = true) String nickName,
             @RequestParam(value = "avator", required = true) String avator,
             @RequestParam(value = "gps", required = true) String gps) {
-                if (gps.contains("undefined")) {
-                    gps = CommonConstanst.GPS;
-            }
+        if (gps.contains("undefined")) {
+            gps = CommonConstanst.GPS;
+        }
         String info = userService.accessByWxToken(token, nickName, avator, gps);
         if (null == info) {
             return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
@@ -117,11 +116,10 @@ public class UserController {
     public ResponseEntity<?> nearby(@RequestParam(value = "gps", required = true) String gps) {
         if (gps.contains("undefined")) {
             gps = CommonConstanst.GPS;
-    }
+        }
         return new ResponseEntity<Object>(CommonResponse.success(userService.getNearyByUser(gps)), HttpStatus.OK);
 
     }
-
 
     @RequestMapping(value = "/userList", method = RequestMethod.GET)
     @ApiOperation(value = "获取所有用户列表", notes = "")
@@ -133,7 +131,7 @@ public class UserController {
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
-        if(!"19960390361".equals(userId) && !"18602862619".equals(userId)){
+        if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
         return new ResponseEntity<Object>(CommonResponse.success(userService.getUserList()), HttpStatus.OK);

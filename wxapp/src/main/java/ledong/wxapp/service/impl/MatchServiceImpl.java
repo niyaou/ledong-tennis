@@ -42,7 +42,6 @@ import ledong.wxapp.config.CustomException;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.constant.enums.ResultCodeEnum;
-import ledong.wxapp.redis.RedisUtil;
 import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IRankService;
@@ -63,8 +62,8 @@ import ledong.wxapp.utils.StringUtil;
 public class MatchServiceImpl implements IMatchService {
     private final static Logger log = Logger.getLogger(MatchServiceImpl.class);
 
-    @Autowired
-    private RedisUtil redis;
+    // @Autowired
+    // private RedisUtil redis;
 
     @Autowired
     private IRankService iRankService;
@@ -78,54 +77,55 @@ public class MatchServiceImpl implements IMatchService {
     @Override
     public String requestMatching(String user, String courtGps) {
 
-        MatchRequestVo vo = new MatchRequestVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        vo.setLocation(courtGps);
-        vo.setUserName(user);
-        MatchContext strategy = null;
-        String matchId = null;
-        strategy = new MatchContext(new PickRandomMatch(redis, iRankService));
-        matchId = strategy.getMatchId(vo);
-
-        if (!TextUtils.isEmpty(matchId)) {
-            return matchId;
-        }
-
-        // strategy = new MatchContext(new PickIntentionalMatch());
+        // MatchRequestVo vo = new MatchRequestVo();
+        // vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        // vo.setLocation(courtGps);
+        // vo.setUserName(user);
+        // MatchContext strategy = null;
+        // String matchId = null;
+        // strategy = new MatchContext(new PickRandomMatch(redis, iRankService));
         // matchId = strategy.getMatchId(vo);
-        // log.info("---2" + matchId);
+
         // if (!TextUtils.isEmpty(matchId)) {
-        // return acceptIntentionalMatch(matchId, user);
+        // return matchId;
         // }
 
-        strategy = new MatchContext(new PostRandomMatch(redis));
-        matchId = strategy.getMatchId(vo);
-        if (!TextUtils.isEmpty(matchId)) {
-            return matchId;
-        }
+        // // strategy = new MatchContext(new PickIntentionalMatch());
+        // // matchId = strategy.getMatchId(vo);
+        // // log.info("---2" + matchId);
+        // // if (!TextUtils.isEmpty(matchId)) {
+        // // return acceptIntentionalMatch(matchId, user);
+        // // }
+
+        // strategy = new MatchContext(new PostRandomMatch(redis));
+        // matchId = strategy.getMatchId(vo);
+        // if (!TextUtils.isEmpty(matchId)) {
+        // return matchId;
+        // }
 
         return null;
     }
 
     @Override
     public String requestDoubleMatching(String user) {
-        DoubleMatchRequestVo vo = new DoubleMatchRequestVo();
-        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-        vo.setUserName(user);
-        DoubleMatchContext strategy = null;
-        String matchId = null;
-        strategy = new DoubleMatchContext(new DoublePickRandomMatch(redis, iRankService));
-        matchId = strategy.getMatchId(vo);
+        // DoubleMatchRequestVo vo = new DoubleMatchRequestVo();
+        // vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        // vo.setUserName(user);
+        // DoubleMatchContext strategy = null;
+        // String matchId = null;
+        // strategy = new DoubleMatchContext(new DoublePickRandomMatch(redis,
+        // iRankService));
+        // matchId = strategy.getMatchId(vo);
 
-        if (!TextUtils.isEmpty(matchId)) {
-            return matchId;
-        }
+        // if (!TextUtils.isEmpty(matchId)) {
+        // return matchId;
+        // }
 
-        strategy = new DoubleMatchContext(new PostDoubleRandomMatch(redis));
-        matchId = strategy.getMatchId(vo);
-        if (!TextUtils.isEmpty(matchId)) {
-            return matchId;
-        }
+        // strategy = new DoubleMatchContext(new PostDoubleRandomMatch(redis));
+        // matchId = strategy.getMatchId(vo);
+        // if (!TextUtils.isEmpty(matchId)) {
+        // return matchId;
+        // }
 
         return null;
     }
@@ -182,7 +182,7 @@ public class MatchServiceImpl implements IMatchService {
         }
         String matchId = postMatches(null, holder, challenger, MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(),
                 MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), null, null, null);
-        attachedMatchSession(matchId, holder, challenger);
+        // attachedMatchSession(matchId, holder, challenger);
         return matchId;
     }
 
@@ -202,7 +202,7 @@ public class MatchServiceImpl implements IMatchService {
                 MatchStatusCodeEnum.MATCH_TYPE_PICK.getCode(), MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(),
                 (String) match.get(MatchPostVo.ORDERTIME), (String) match.get(MatchPostVo.COURTNAME),
                 (String) match.get(MatchPostVo.COURTGPS));
-        attachedMatchSession(matchId, holder, challenger);
+        // attachedMatchSession(matchId, holder, challenger);
         return matchId;
     }
 
@@ -796,7 +796,7 @@ public class MatchServiceImpl implements IMatchService {
         if (match == null) {
             return null;
         }
-        String finishId = null;
+        // String finishId = null;
         MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
         if (type == 0) {
             vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode());
@@ -816,7 +816,7 @@ public class MatchServiceImpl implements IMatchService {
                 vo.setHolderAcknowledged(MatchStatusCodeEnum.USER_UN_ACKNOWLADGED.getCode());
             } else {
                 vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-                finishId = finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
+                finishMatch(matchId, vo.getHolderScore(), vo.getChallengerScore());
             }
         }
 
@@ -850,9 +850,11 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public Object rankedMatchInfo(String user) {
-        String matchId = (String) redis.get(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
-        redis.del(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
-        return getMatchInfos(matchId);
+        // String matchId = (String)
+        // redis.get(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
+        // redis.del(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
+        // return getMatchInfos(matchId);
+        return null;
     }
 
     @Override
@@ -880,10 +882,11 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public Object lastMatchResult(String user) {
-        String key = StringUtil.combiningSpecifiedUserKey(user, "ranked");
-        String matchId = (String) redis.get(key);
-        redis.del(key);
-        return getMatchInfos(matchId);
+        // String key = StringUtil.combiningSpecifiedUserKey(user, "ranked");
+        // String matchId = (String) redis.get(key);
+        // redis.del(key);
+        // return getMatchInfos(matchId);
+        return null;
     }
 
     @Override
@@ -949,7 +952,7 @@ public class MatchServiceImpl implements IMatchService {
         String matchId = postMatches(null, holder, challenger, MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode(),
                 MatchStatusCodeEnum.NON_CLUB_MATCH.getCode(), DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME),
                 courtName, courtGPS);
-        attachedMatchSession(matchId, holder, challenger);
+        // attachedMatchSession(matchId, holder, challenger);
         return matchId;
     }
 
@@ -1180,10 +1183,11 @@ public class MatchServiceImpl implements IMatchService {
         if (TextUtils.isEmpty(id)) {
             throw new CustomException(ResultCodeEnum.CONFIRMED_MATCH_ERROR);
         }
-        if (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())
-                && TextUtils.isEmpty(finishId)) {
-            ctx.publishEvent(new MatchConfirmEvent(ctx, id));
-        }
+        // if
+        // (vo.getStatus().equals(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())
+        // && TextUtils.isEmpty(finishId)) {
+        // ctx.publishEvent(new MatchConfirmEvent(ctx, id));
+        // }
         return id;
     }
 
@@ -1226,16 +1230,19 @@ public class MatchServiceImpl implements IMatchService {
 
     @Override
     public Object rankedDoubleMatchInfo(String user) {
-        String matchId = (String) redis.get(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
-        redis.del(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
-        return getDoubleMatchInfos(matchId);
+        // String matchId = (String)
+        // redis.get(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
+        // redis.del(StringUtil.combiningSpecifiedUserKey(user, "ranked"));
+        // return getDoubleMatchInfos(matchId);
+        return null;
     }
 
     @Override
     public Object lastDoubleMatchResult(String user) {
-        String key = StringUtil.combiningSpecifiedUserKey(user, "ranked");
-        String matchId = (String) redis.get(key);
-        redis.del(key);
-        return getDoubleMatchInfos(matchId);
+        // String key = StringUtil.combiningSpecifiedUserKey(user, "ranked");
+        // String matchId = (String) redis.get(key);
+        // redis.del(key);
+        // return getDoubleMatchInfos(matchId);
+        return null;
     }
 }

@@ -43,8 +43,8 @@ public class SlamServiceImpl implements ISlamService {
 
     private static Logger logger = Logger.getLogger(SlamServiceImpl.class);
 
-    @Autowired
-    private RedisUtil redis;
+    // @Autowired
+    // private RedisUtil redis;
 
     @Autowired
     private IRankService iRankService;
@@ -58,131 +58,137 @@ public class SlamServiceImpl implements ISlamService {
     @Override
     public SlamVo exploreSlams(String date) {
         SlamVo slam = null;
-        if (TextUtils.isEmpty(date)) {
-            LinkedList<HashMap<String, Object>> s = SearchApi.searchByFieldSorted(SlamVo.SLAM_INFORMATION, null, null,
-                    SlamVo.MATCHTIME, SortOrder.DESC, 1, 1);
-            if (s == null) {
-                logger.info("searchByFieldSorted slam to redis  is null");
-                return null;
-            }
-            String matchId = (String) s.getFirst().get(SlamVo.ID);
-            try {
-                slam = (SlamVo) redis.get(matchId);
-                logger.info("getSlamKey slam to redis  is " + slam.getId());
-            } catch (Exception e) {
-                logger.info("update slam to redis " + JSON.toJSONString(s.getFirst()));
-                slam = JSON.parseObject(JSON.toJSONString(s.getFirst()), SlamVo.class);
-                redis.set(slam.getId(), slam);
-            }
-        }
+        // if (TextUtils.isEmpty(date)) {
+        // LinkedList<HashMap<String, Object>> s =
+        // SearchApi.searchByFieldSorted(SlamVo.SLAM_INFORMATION, null, null,
+        // SlamVo.MATCHTIME, SortOrder.DESC, 1, 1);
+        // if (s == null) {
+        // logger.info("searchByFieldSorted slam to redis is null");
+        // return null;
+        // }
+        // String matchId = (String) s.getFirst().get(SlamVo.ID);
+        // try {
+        // // slam = (SlamVo) redis.get(matchId);
+        // // logger.info("getSlamKey slam to redis is " + slam.getId());
+        // } catch (Exception e) {
+        // logger.info("update slam to redis " + JSON.toJSONString(s.getFirst()));
+        // slam = JSON.parseObject(JSON.toJSONString(s.getFirst()), SlamVo.class);
+        // // redis.set(slam.getId(), slam);
+        // }
+        // }
         return slam;
     }
 
     @Override
     public String createSlam(String date) {
-        SlamVo slam = new SlamVo();
-        try {
-            slam.setId(
-                    SlamVo.getSlamId(DateUtil.formatDate(date, DateUtil.FORMAT_DATE_TIME, DateUtil.FORMAT_DATE_NUM)));
-            slam.setMatchTime(date);
-        } catch (ParseException e) {
-            throw new CustomException(ResultCodeEnum.SLAM_DATE_ERROR);
-        }
-        if (redis.get(slam.getId()) != null) {
-            throw new CustomException(ResultCodeEnum.SLAM_ALREADY_EXISTED);
-        }
-        slam = createFinalMatches(slam);
-        SearchApi.insertDocument(SlamVo.SLAM_INFORMATION, JSON.toJSONString(slam), slam.getId());
-        redis.set(slam.getId(), slam);
-        return slam.getId();
+        // SlamVo slam = new SlamVo();
+        // try {
+        // slam.setId(
+        // SlamVo.getSlamId(DateUtil.formatDate(date, DateUtil.FORMAT_DATE_TIME,
+        // DateUtil.FORMAT_DATE_NUM)));
+        // slam.setMatchTime(date);
+        // } catch (ParseException e) {
+        // throw new CustomException(ResultCodeEnum.SLAM_DATE_ERROR);
+        // }
+        // // if (redis.get(slam.getId()) != null) {
+        // // throw new CustomException(ResultCodeEnum.SLAM_ALREADY_EXISTED);
+        // // }
+        // slam = createFinalMatches(slam);
+        // SearchApi.insertDocument(SlamVo.SLAM_INFORMATION, JSON.toJSONString(slam),
+        // slam.getId());
+        // redis.set(slam.getId(), slam);
+        return null;
     }
 
     @Override
     public String participateSlam(String openId, String matchId) {
-        SlamVo slam = null;
-        Set<String> members = null;
-        if (SearchApi.searchById(DataSetConstant.USER_INFORMATION, openId) == null) {
-            throw new CustomException(ResultCodeEnum.SLAM_PARTICIPATE_ERROR);
-        }
-        try {
-            logger.info("participateSlam slam to  " + SlamVo.getSlamKey(matchId));
-            slam = (SlamVo) redis.get(matchId);
-            members = slam.getMembers();
-            if (members.size() >= 32) {
-                throw new CustomException(ResultCodeEnum.SLAM_MEMBER_READY);
-            }
-        } catch (NullPointerException e) {
-            slam = exploreSlams(null);
-            if (slam == null || !slam.getId().equals(matchId)) {
-                throw new CustomException(ResultCodeEnum.SLAM_NOT_EXISTED);
-            } else {
-                members = slam.getMembers();
-            }
-        }
-        members = members == null ? new HashSet<String>() : members;
+        // SlamVo slam = null;
+        // Set<String> members = null;
+        // if (SearchApi.searchById(DataSetConstant.USER_INFORMATION, openId) == null) {
+        // throw new CustomException(ResultCodeEnum.SLAM_PARTICIPATE_ERROR);
+        // }
+        // try {
+        // logger.info("participateSlam slam to " + SlamVo.getSlamKey(matchId));
+        // // slam = (SlamVo) redis.get(matchId);
+        // slam =null;
+        // // members = slam.getMembers();
+        // // if (members.size() >= 32) {
+        // // throw new CustomException(ResultCodeEnum.SLAM_MEMBER_READY);
+        // // }
+        // } catch (NullPointerException e) {
+        // slam = exploreSlams(null);
+        // if (slam == null || !slam.getId().equals(matchId)) {
+        // throw new CustomException(ResultCodeEnum.SLAM_NOT_EXISTED);
+        // } else {
+        // members = slam.getMembers();
+        // }
+        // }
+        // members = members == null ? new HashSet<String>() : members;
 
-        members.add(openId);
-        slam.setMembers(members);
-        redis.set(matchId, slam);
-        logger.info("redis slam to  " + JSON.toJSONString(slam));
-        SearchApi.updateDocument(SlamVo.SLAM_INFORMATION, JSON.toJSONString(slam), slam.getId());
+        // members.add(openId);
+        // slam.setMembers(members);
+        // redis.set(matchId, slam);
+        // logger.info("redis slam to " + JSON.toJSONString(slam));
+        // SearchApi.updateDocument(SlamVo.SLAM_INFORMATION, JSON.toJSONString(slam),
+        // slam.getId());
         return matchId;
     }
 
     @Override
     public Integer generateGroups(String slamId) {
-        SlamVo slam = null;
-        try {
-            slam = (SlamVo) redis.get(slamId);
-            logger.info("getSlamKey slam to redis  is " + slam.getId());
-        } catch (Exception e) {
-            HashMap<String, Object> s = SearchApi.searchById(SlamVo.SLAM_INFORMATION, slamId);
-            if (s == null) {
-                throw new CustomException(ResultCodeEnum.SLAM_NOT_EXISTED);
-            }
-            slam = JSON.parseObject(JSON.toJSONString(s), SlamVo.class);
-            redis.set(slam.getId(), slam);
-        }
+        // SlamVo slam = null;
+        // try {
+        // // slam = (SlamVo) redis.get(slamId);
+        // slam = null;
+        // // logger.info("getSlamKey slam to redis is " + slam.getId());
+        // } catch (Exception e) {
+        // HashMap<String, Object> s = SearchApi.searchById(SlamVo.SLAM_INFORMATION,
+        // slamId);
+        // if (s == null) {
+        // throw new CustomException(ResultCodeEnum.SLAM_NOT_EXISTED);
+        // }
+        // slam = JSON.parseObject(JSON.toJSONString(s), SlamVo.class);
+        // // redis.set(slam.getId(), slam);
+        // }
 
-        if(!slam.getStatus().equals(MatchStatusCodeEnum.SLAM_RAW_STATUS.getCode())){
-            throw new CustomException(ResultCodeEnum.SLAM_GENERATED_GROUP_ERROR);
-        }
-        if(slam.getMembers()==null||slam.getMembers().size()<16){
-            throw new CustomException(ResultCodeEnum.SLAM_MEMBER_NOT_ENOUGH_ERROR);
-        }
-        int groupSize = (int) Math.ceil((double) slam.getMembers().size() / 4);
-        Set<GroupVo> groups = new HashSet<GroupVo>();
-        Set<String> members = slam.getMembers();
-        logger.info("group size :" + groupSize);
-        LinkedList<MemberVo> m = Base32Generator.createSeeds(members);
+        // if(!slam.getStatus().equals(MatchStatusCodeEnum.SLAM_RAW_STATUS.getCode())){
+        // throw new CustomException(ResultCodeEnum.SLAM_GENERATED_GROUP_ERROR);
+        // }
+        // if(slam.getMembers()==null||slam.getMembers().size()<16){
+        // throw new CustomException(ResultCodeEnum.SLAM_MEMBER_NOT_ENOUGH_ERROR);
+        // }
+        // int groupSize = (int) Math.ceil((double) slam.getMembers().size() / 4);
+        // Set<GroupVo> groups = new HashSet<GroupVo>();
+        // Set<String> members = slam.getMembers();
+        // logger.info("group size :" + groupSize);
+        // LinkedList<MemberVo> m = Base32Generator.createSeeds(members);
 
-        while (groups.size() < groupSize) {
-            GroupVo g = new GroupVo();
-            List<MemberVo> l = new ArrayList<>();
-            l.add(m.removeFirst());
-            try {
-                l.add(m.removeLast());
-                l.add(m.removeLast());
-                if (m.size() > (groupSize- groups.size()-1)*3) {
-                    l.add(m.removeLast());
-                }
-            } catch (Exception e) {
-            }
-            g.setMembers(l);
-            g.setId(String.valueOf(groups.size() + 1));
-            g.setType(groupSize == 4 ? 0 : groupSize < 7 ? 1 : groupSize < 8 ? 2 : 3);
-            g=  createGroupMatches(slamId,g);
-            groups.add(g);
-        }
-        slam.setGroups(groups);
-        slam.setStatus(MatchStatusCodeEnum.SLAM_GENERATED_STATUS.getCode());
-        redis.set(slam.getId(), slam);
-        SearchApi.updateDocument(SlamVo.SLAM_INFORMATION, JSON.toJSONString(slam), slam.getId());
-        logger.info("group size :" + JSON.toJSONString(groups));
-        return groupSize;
+        // while (groups.size() < groupSize) {
+        // GroupVo g = new GroupVo();
+        // List<MemberVo> l = new ArrayList<>();
+        // l.add(m.removeFirst());
+        // try {
+        // l.add(m.removeLast());
+        // l.add(m.removeLast());
+        // if (m.size() > (groupSize- groups.size()-1)*3) {
+        // l.add(m.removeLast());
+        // }
+        // } catch (Exception e) {
+        // }
+        // g.setMembers(l);
+        // g.setId(String.valueOf(groups.size() + 1));
+        // g.setType(groupSize == 4 ? 0 : groupSize < 7 ? 1 : groupSize < 8 ? 2 : 3);
+        // g= createGroupMatches(slamId,g);
+        // groups.add(g);
+        // }
+        // slam.setGroups(groups);
+        // slam.setStatus(MatchStatusCodeEnum.SLAM_GENERATED_STATUS.getCode());
+        // // redis.set(slam.getId(), slam);
+        // SearchApi.updateDocument(SlamVo.SLAM_INFORMATION, JSON.toJSONString(slam),
+        // slam.getId());
+        // logger.info("group size :" + JSON.toJSONString(groups));
+        return null;
     }
-
-
 
     @Override
     public Integer gradingGroupMatches(String slamId) {
@@ -256,27 +262,27 @@ public class SlamServiceImpl implements ISlamService {
         return slam;
     }
 
-
     /**
      * create given group matches
+     * 
      * @param slamId
      * @param group
      * @return
      */
-    private GroupVo createGroupMatches(String slamId,GroupVo group) {
+    private GroupVo createGroupMatches(String slamId, GroupVo group) {
         List<MemberVo> m = group.getMembers();
-        List<MatchPostVo> matches= new ArrayList<MatchPostVo>();
+        List<MatchPostVo> matches = new ArrayList<MatchPostVo>();
         if (m.size() == 3) {
-            matches.add( createMatch(slamId, m,0,1));
-            matches.add( createMatch(slamId, m,0,2));
-            matches.add( createMatch(slamId, m,1,2));
+            matches.add(createMatch(slamId, m, 0, 1));
+            matches.add(createMatch(slamId, m, 0, 2));
+            matches.add(createMatch(slamId, m, 1, 2));
         } else {
-            matches.add( createMatch(slamId, m,0,1));
-            matches.add( createMatch(slamId, m,0,2));
-            matches.add( createMatch(slamId, m,0,3));
-            matches.add( createMatch(slamId, m,1,2));
-            matches.add( createMatch(slamId, m,1,3));
-            matches.add( createMatch(slamId, m,2,3));
+            matches.add(createMatch(slamId, m, 0, 1));
+            matches.add(createMatch(slamId, m, 0, 2));
+            matches.add(createMatch(slamId, m, 0, 3));
+            matches.add(createMatch(slamId, m, 1, 2));
+            matches.add(createMatch(slamId, m, 1, 3));
+            matches.add(createMatch(slamId, m, 2, 3));
         }
         group.setMatches(matches);
         return group;
