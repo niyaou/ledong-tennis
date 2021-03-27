@@ -74,6 +74,16 @@ public interface IMatchService {
     public Object getMatchedList(String user, Integer count);
 
     /**
+     *
+     * get the count of matched games
+     *
+     * @param user
+     * @param count
+     * @return
+     */
+    public Object getMatchedCount(String user);
+
+    /**
      * 
      * get the list of h2h matched games
      * 
@@ -82,6 +92,27 @@ public interface IMatchService {
      * @return
      */
     public Object getH2hMatchedList(String user, String opponent, Integer count);
+
+
+    /**
+     *
+     * get the list of h2h opponent
+     *
+     * @param user
+     * @param count
+     * @param opponent
+     * @return
+     */
+    public Object getH2hOpponentList(String user,String opponent, Integer count);
+
+    /**
+     *
+     * get the list of h2h opponent count
+     *
+     * @param user
+     * @return
+     */
+    public Object getH2hOpponentCount(String user);
 
     /**
      * 

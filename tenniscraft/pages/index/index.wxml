@@ -94,7 +94,7 @@
     <view class="weui-flex__item">
       <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{0}}">
         <view class="makeCenterC ">
-          <view class="statisticNum">68 场</view>
+          <view class="statisticNum">{{matchCount}} 场</view>
           <view class="statisticSubtitle">比赛</view>
         </view>
         <image src="../../icon/tennis.png" class="iconsize"></image>
@@ -104,7 +104,7 @@
     <view class="weui-flex__item">
       <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{3}}">
         <view class="makeCenterC ">
-          <view class="statisticNum">35 人</view>
+          <view class="statisticNum">{{opponents.length}} 人</view>
           <view class="statisticSubtitle">对手</view>
         </view>
         <image src="../../icon/rank.png" class="iconsize"></image>

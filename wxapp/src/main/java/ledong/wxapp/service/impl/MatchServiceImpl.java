@@ -1,23 +1,21 @@
 package ledong.wxapp.service.impl;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -410,6 +408,88 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     @Override
+    public Object getH2hOpponentList(String user, String opponent,Integer count){
+
+
+//        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+//        BoolQueryBuilder head2Head = new BoolQueryBuilder();
+//
+//
+//        BoolQueryBuilder head1 = new BoolQueryBuilder();
+//        head1.must(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, user))
+//                .must(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, opponent));
+//
+//        BoolQueryBuilder head2 = new BoolQueryBuilder();
+//        head2.must(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, opponent))
+//                .must(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, user));
+//        head2Head.should(head1).should(head2);
+//        QueryBuilder[] values = new QueryBuilder[8];
+//
+//        return SearchApi.H2HOpponentAggs( DataSetConstant.GAME_MATCH_INFORMATION,  params.toArray(values));
+        return null;
+    }
+
+    @Override
+    public Object getH2hOpponentCount(String user){
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        BoolQueryBuilder head2Head = new BoolQueryBuilder();
+
+
+
+        head2Head.should(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, user))
+                .should(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, user));
+
+
+        QueryBuilder[] values = new QueryBuilder[8];
+        params.add(head2Head);
+        SearchResponse res=  SearchApi.H2HOpponentAggs( DataSetConstant.GAME_MATCH_INFORMATION,  params.toArray(values));
+        Terms t1=   res.getAggregations().get("holder");
+        Terms t2=  res.getAggregations().get("challenger");
+        Iterator<ParsedTerms.ParsedBucket> ti1= (Iterator<ParsedTerms.ParsedBucket>)  t1.getBuckets().iterator();
+        Iterator<ParsedTerms.ParsedBucket> ti2= (Iterator<ParsedTerms.ParsedBucket>) t1.getBuckets().iterator();
+        Set<String> total=new HashSet<>();
+       while(ti1.hasNext()){
+           ParsedTerms.ParsedBucket b  = ti1.next();
+           total.add(b.getKeyAsString());
+       }
+        while(ti2.hasNext()){
+            ParsedTerms.ParsedBucket b  = ti2.next();
+            total.add(b.getKeyAsString());
+        }
+
+        return total;
+    }
+
+
+
+
+
+    @Override
+    public Object getMatchedCount(String user){
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        if (!StringUtil.isEmpty(user)) {
+            params.add(SearchApi.createMultiFieldsWithSingleValue(user, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
+        }
+
+//        params.add(SearchApi.createNotSearchSource(MatchPostVo.STATUS,
+//                MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
+        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
+
+        Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
+        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
+        QueryBuilder[] values = new QueryBuilder[8];
+        SearchResponse searchResponse = SearchApi.searchByQueryBuilder(
+                DataSetConstant.GAME_MATCH_INFORMATION,  params.toArray(values));
+        if (searchResponse != null) {
+          return   searchResponse.getHits().getTotalHits().value;
+        }
+
+        // iUserService.getUserInfo(openId);
+        return 0;
+    }
+
+    @Override
     public Object getMatchedList(String user, Integer count) {
 
         ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
@@ -417,13 +497,13 @@ public class MatchServiceImpl implements IMatchService {
             params.add(SearchApi.createMultiFieldsWithSingleValue(user, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
         }
 
-        params.add(SearchApi.createNotSearchSource(MatchPostVo.STATUS,
-                MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
-        params.add(SearchApi.createNotSearchSource(MatchPostVo.STATUS,
+//        params.add(SearchApi.createNotSearchSource(MatchPostVo.STATUS,
+//                MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode()));
+        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
                 MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
 
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
-        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
+        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.DESC);
         QueryBuilder[] values = new QueryBuilder[8];
         List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
                 DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, count, params.toArray(values));
@@ -508,7 +588,7 @@ public class MatchServiceImpl implements IMatchService {
                 MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
 
         Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
-        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.ASC);
+        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.DESC);
         QueryBuilder[] values = new QueryBuilder[8];
         List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
                 DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, count, params.toArray(values));

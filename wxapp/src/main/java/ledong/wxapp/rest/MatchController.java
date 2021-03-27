@@ -113,6 +113,17 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
+        @RequestMapping(value = "/matchedGames/count", method = RequestMethod.GET)
+        @ApiOperation(value = "request  matched games", notes = "")
+        @ApiImplicitParams({ })
+        public ResponseEntity<?> getMatchedGamesCount(
+                                                     @RequestHeader("Authorization") String authHeader) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                return new ResponseEntity<Object>(CommonResponse.success(matchService.getMatchedCount(userId)),
+                        HttpStatus.OK);
+        }
+
         @RequestMapping(value = "/matchedGames/h2h/{count}", method = RequestMethod.GET)
         @ApiOperation(value = "request  h2h matched games", notes = "")
         @ApiImplicitParams({
@@ -127,6 +138,22 @@ public class MatchController {
                                 CommonResponse.success(matchService.getH2hMatchedList(userId, opponent, count)),
                                 HttpStatus.OK);
         }
+
+
+        @RequestMapping(value = "/matchedGames/h2h/opponent", method = RequestMethod.GET)
+        @ApiOperation(value = "request  h2h matched opponent", notes = "")
+        @ApiImplicitParams({
+                @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query")
+              })
+        public ResponseEntity<?> h2hOpponentCount(   @RequestHeader("Authorization") String authHeader) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                return new ResponseEntity<Object>(
+                        CommonResponse.success(matchService.getH2hOpponentCount(userId)),
+                        HttpStatus.OK);
+        }
+
+
 
         @RequestMapping(value = "/doubleMatchedGames/{count}", method = RequestMethod.GET)
         @ApiOperation(value = "request  doubleMatched games", notes = "")

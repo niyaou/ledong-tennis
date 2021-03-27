@@ -58,6 +58,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
@@ -825,8 +826,9 @@ public class SearchApi {
         searchSourceBuilder.query(queryBuilder);
         searchSourceBuilder.version(true);
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
+
         searchRequest.source(searchSourceBuilder);
-    //  log.info(searchSourceBuilder.toString());
+      log.info(searchSourceBuilder.toString());
         // try {
         // SearchResponse searchResponse = client.search(searchRequest,
         // RequestOptions.DEFAULT);
@@ -867,6 +869,37 @@ public class SearchApi {
         return null;
     }
 
+
+    /**
+     * 根据传入的查询条件检索文档
+     *
+     * @param indexName
+     * @param query
+     * @return
+     */
+    public static SearchResponse searchByQueryBuilderShould(String indexName, QueryBuilder... queries) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        for (QueryBuilder query : queries) {
+            if (query == null) {
+                continue;
+            }
+            queryBuilder.should(query);
+        }
+        searchSourceBuilder.query(queryBuilder);
+        searchSourceBuilder.version(true);
+        searchRequest.source(searchSourceBuilder);
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            return searchResponse;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return null;
+    }
+
+
     public static Long indexCount(String indexName) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -882,6 +915,31 @@ public class SearchApi {
         return null;
     }
 
+
+    public static SearchResponse H2HOpponentAggs(String indexName, QueryBuilder... queries) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().size(0);
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+            for (QueryBuilder query : queries) {
+                if (query == null) {
+                    continue;
+                }
+                boolQueryBuilder.should(query);
+            }
+
+        TermsAggregationBuilder opps = AggregationBuilders.terms("holder").field("holder");
+        TermsAggregationBuilder opps2 = AggregationBuilders.terms("challenger").field("challenger");
+        searchSourceBuilder.query(boolQueryBuilder).aggregation(opps).aggregation(opps2);
+        searchRequest.source(searchSourceBuilder);
+        log.info(searchSourceBuilder.toString());
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            return searchResponse;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return null;
+    }
 
 
     public static SearchResponse fileStatiscByParams(String indexName, QueryBuilder... queries) {
@@ -908,7 +966,6 @@ public class SearchApi {
             log.error(e.getMessage());
         }
         return null;
-
     }
 
     /**

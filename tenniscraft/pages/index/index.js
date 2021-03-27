@@ -10,8 +10,10 @@ Page({
     userLocation: {},
     userRankInfo: {rankType0:'暂无'},
     vsCode: '',
+    matchCount:0,
     nearByUser: [],
     rankPosition: 0,
+    opponents:[],
     nearByCourt: [],
     isSingle:true,
     hasInitial:false,
@@ -119,6 +121,14 @@ Page({
       }
     })
   },
+  getTotalGames(jwt){
+    http.getReq('match/matchedGames/count', jwt, (e) => {
+      this.setData({
+        matchCount:e.data
+      })
+
+    })
+  },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo
     console.log(e)
@@ -159,8 +169,8 @@ Page({
             that.gps()
             that.getUserInfoByJwt(e.data)
             that.getUserRankInfo(e.data)
-            that.getNearByCourt(app.globalData.jwt)
-            that. getNearByUser(app.globalData.jwt)
+            // that.getNearByCourt(app.globalData.jwt)
+            // that. getNearByUser(app.globalData.jwt)
           }, 1500)
         }
       })
@@ -196,6 +206,14 @@ Page({
       console.log('--------1------')
     })
   },
+  getOpponentCount(jwt){
+    http.getReq('match/matchedGames/h2h/opponent', jwt, (e) => {
+      console.log(e)
+      this.setData({
+        opponents: e.data
+      })
+    })
+  },
   getRankPosition(jwt) {
     http.getReq('rank/rankPosition', jwt, (e) => {
       this.setData({
@@ -220,6 +238,8 @@ Page({
       })
       app.globalData.userRankInfo = this.data.userRankInfo
       app.globalData.openId = e.data.openId
+     this. getTotalGames(jwt)
+     this.getOpponentCount(jwt)
     })
   },
   getNearByUser(jwt) {
@@ -272,8 +292,9 @@ Page({
     if (event.currentTarget.dataset.gid == 0) {
       this.getUserRankInfo(app.globalData.jwt)
       this.getRankPosition(app.globalData.jwt)
-      this.getNearByCourt(app.globalData.jwt)
-      this. getNearByUser(app.globalData.jwt)
+      
+      // this.getNearByCourt(app.globalData.jwt)
+      // this. getNearByUser(app.globalData.jwt)
     }
   },
   masterTap(){
