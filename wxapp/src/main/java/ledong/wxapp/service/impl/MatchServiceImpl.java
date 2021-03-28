@@ -446,7 +446,7 @@ public class MatchServiceImpl implements IMatchService {
         Terms t1=   res.getAggregations().get("holder");
         Terms t2=  res.getAggregations().get("challenger");
         Iterator<ParsedTerms.ParsedBucket> ti1= (Iterator<ParsedTerms.ParsedBucket>)  t1.getBuckets().iterator();
-        Iterator<ParsedTerms.ParsedBucket> ti2= (Iterator<ParsedTerms.ParsedBucket>) t1.getBuckets().iterator();
+        Iterator<ParsedTerms.ParsedBucket> ti2= (Iterator<ParsedTerms.ParsedBucket>) t2.getBuckets().iterator();
         Set<String> total=new HashSet<>();
        while(ti1.hasNext()){
            ParsedTerms.ParsedBucket b  = ti1.next();
@@ -457,7 +457,41 @@ public class MatchServiceImpl implements IMatchService {
             total.add(b.getKeyAsString());
         }
 
-        return total;
+        List<String> ids = new ArrayList<String>();
+        total.forEach( t->{
+            ids.add(t);
+        });
+
+        String[] idsArr = new String[ids.size()];
+
+        LinkedList<Map<String, Object>> userInfos = SearchApi
+                .getDocsByMultiIds(DataSetConstant.USER_INFORMATION, ids.toArray(idsArr));
+
+        LinkedList<Map<String, Object>> userRankInfos = SearchApi
+                .getDocsByMultiIds(DataSetConstant.USER_RANK_INFORMATION, ids.toArray(idsArr));
+
+
+        ArrayList<Map<String, Object>> result= new ArrayList<Map<String, Object>>();
+
+       userInfos.forEach(u -> {
+            userRankInfos.forEach(r->{
+                if(r.get(RankInfoVo.OPENID).equals(  u.get(UserVo.OPENID))){
+                    u.put(RankInfoVo.RANKTYPE0,r.get(RankInfoVo.RANKTYPE0));
+                    u.put(RankInfoVo.RANKTYPE1,r.get(RankInfoVo.RANKTYPE1));
+                    u.put(RankInfoVo.WINRATE,r.get(RankInfoVo.WINRATE));
+                    u.put(RankInfoVo.POSITION,r.get(RankInfoVo.POSITION));
+                    result.add(r);
+                }
+
+            });
+
+
+        });
+
+
+
+
+        return userInfos;
     }
 
 

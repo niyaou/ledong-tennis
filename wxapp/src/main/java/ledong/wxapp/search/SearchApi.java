@@ -860,6 +860,7 @@ public class SearchApi {
         searchSourceBuilder.query(queryBuilder);
         searchSourceBuilder.version(true);
         searchRequest.source(searchSourceBuilder);
+        log.info(searchSourceBuilder.toString());
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             return searchResponse;
