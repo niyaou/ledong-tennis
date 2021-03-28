@@ -9,19 +9,19 @@
   </i-card> -->
   <view class="weui-flex wcard" style="height:8rem">
     <view class="weui-flex__item makeCenter">
-      <i-avatar src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1044805839,774767965&fm=26&gp=0.jpg" size="large">1</i-avatar>
-      <view class="contentSpace">范大将军</view>
+      <i-avatar src="{{userInfo.avatarUrl}}" size="large">*</i-avatar>
+      <view class="contentSpace">{{userInfo.nickName}}</view>
     </view>
     <view class="weui-flex__item makeCenter">
     vs
     </view>
     <view class="weui-flex__item makeCenter">
-      <i-avatar src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2527755359,3431492947&fm=26&gp=0.jpg" size="large">1</i-avatar>
-      <view class="contentSpace">jerry</view>
+      <i-avatar src="{{slideButtons[0].avator}}" size="large">*</i-avatar>
+      <view class="contentSpace">{{slideButtons[0].name}}</view>
     </view>
   </view>
-  <i-cell title="本赛季与jerry比赛30次" label="获胜3次"
-                  value="胜率10%" only-tap-footer></i-cell>
+  <i-cell title="本赛季与{{userInfo.nickName}}比赛{{slideButtons.length}}次" label="获胜{{times}}次"
+                  value="胜率{{winRate}}%" only-tap-footer></i-cell>
   <i-divider height="1"></i-divider>
   <!-- 
   <i-row>
@@ -41,7 +41,7 @@
         <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
           <view wx:for="{{slideButtons}}">
 
-            <i-cell title="{{item.src +'    '+ item.text}}" label="{{item.time}}" value="{{item.result + item.score}}"
+            <i-cell title="{{item.src +'    '+ item.text}}" label="{{item.time}}" value="{{item.result }}"
               only-tap-footer></i-cell>
             <i-divider height="1"></i-divider>
 

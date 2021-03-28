@@ -335,7 +335,7 @@ Page({
     }else
     if(event.currentTarget.dataset.variable===3){
       wx.navigateTo({
-        url: '../../pages/h2h/h2h'})
+        url: '../../pages/h2h/h2h?winRate='+this.data.userRankInfo.winRate})
     }
     // event.currentTarget.dataset.variable;
   },

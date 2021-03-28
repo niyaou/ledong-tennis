@@ -1,5 +1,6 @@
 // pages/matches/matchlist.js
 const app = getApp()
+var http = require('../../utils/http.js')
 Page({
 
   /**
@@ -9,14 +10,19 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible1: false,
+    openId: '',
+    userInfo:app.globalData.userInfo,
+    opponentId:'',
+    times:0,
+    winRate:0,
     fruit: [{
       id: 1,
       name: '没参加比赛',
-  }, {
+    }, {
       id: 2,
       name: '比分记错了'
-  }],
-  current: '没参加比赛',
+    }],
+    current: '没参加比赛',
     actions: [{
         name: '申诉',
         color: '#fff',
@@ -40,43 +46,44 @@ Page({
       result: '失败',
       score: '-30',
       toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
     }],
   },
-  handleFruitChange({ detail = {} }) {
+  getH2hList() {
+    let jwt = app.globalData.jwt
+    http.getReq('match/matchedGames/h2h/200?opponent='+this.data.opponentId, jwt, (e) => {
+      console.log(e,app.globalData.userInfo)
+      let  times=0
+      let    winRate=0
+      let opps = e.data.map(d => {
+        times+=   (d.winner===5001&& d.challenger===this.data.opponentId) || (d.winner===5000&& d.holder===this.data.opponentId)?0:1
+        return {
+          name: d.challenger===this.data.opponentId?d.challengerName:d.holderName,
+          avator: d.challenger===this.data.opponentId?d.challengerAvator:d.holderAvator,
+          text:d.holderName+'   vs   '+d.challengerName ,
+          src:d.holderScore+' : '+d.challengerScore, // icon的路径,
+          time:d.gamedTime,
+          result:(d.winner===5001&& d.challenger===this.data.opponentId) || (d.winner===5000&& d.holder===this.data.opponentId)?'失败':'胜利',
+        }
+      })
+
+      this.setData({
+        slideButtons: opps,
+        winRate:parseInt(100*times/opps.length),
+        times:times
+      })
+    })
+  },
+  handleFruitChange({
+    detail = {}
+  }) {
     this.setData({
-        current: detail.value
+      current: detail.value
     });
-},
-  handleClose1(){
-    this.setData({visible1:false})
+  },
+  handleClose1() {
+    this.setData({
+      visible1: false
+    })
   },
   handleClickItem2(e) {
     console.log(e.detail, this.data.slideButtons[e.detail.dataIndex].toggle)
@@ -86,8 +93,10 @@ Page({
         slideButtons: this.data.slideButtons
       });
 
-    }else{
-      this.setData({visible1:true})
+    } else {
+      this.setData({
+        visible1: true
+      })
     }
 
   },
@@ -95,7 +104,13 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+   
+    this.setData({
+      userInfo:app.globalData.userInfo,
+      opponentId:options.opponentId
+    })
+    console.log(options,this.data.userInfo)
+   this. getH2hList()
   },
 
   /**
