@@ -39,8 +39,8 @@ public interface IRankService {
      * by matchid 2.get both players' current rank 3.use strategy to rank 4.update
      * players' rank 5.return both current rank
      * 
-     * @param slamId
      * @param matchId
+     * @param slamId
      * @param holderScore
      * @param challengerScore
      * @return
@@ -151,8 +151,21 @@ public interface IRankService {
      * @param score
      * @return
      */
-    public String updateScoreByMaster(String openId, Integer score);
+    public String updateScoreByMaster(String openId, Integer score, String description);
 
+    /**
+     * score change log
+     * 
+     */
+    public String scoreChangeLog(String openId, Integer score, String description);
+
+
+    /**
+     * get score change log
+     * @param openId
+     * @return
+     */
+    public Object getScoreLog(String openId);
     /**
      * 
      * @return

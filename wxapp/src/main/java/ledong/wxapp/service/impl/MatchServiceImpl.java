@@ -459,7 +459,9 @@ public class MatchServiceImpl implements IMatchService {
 
         List<String> ids = new ArrayList<String>();
         total.forEach( t->{
-            ids.add(t);
+            if(!t.equals(user)){
+                ids.add(t);
+            }
         });
 
         String[] idsArr = new String[ids.size()];

@@ -1,6 +1,7 @@
 // pages/matches/matchlist.js
 const app = getApp()
 var http = require('../../utils/http.js')
+// var compare=require('../../utils/util.js')
 const chooseLocation = requirePlugin('chooseLocation');
 Page({
 
@@ -115,7 +116,6 @@ Page({
       this.setData({
         slideButtons: this.data.slideButtons
       });
-
     }else{
       this.setData({visible1:true})
     }
@@ -138,18 +138,34 @@ Page({
   onReady: function () {
 
   },
+  compare: function (property, bol) {
+    return function (a, b) {
+    var value1 = a[property];
+    var value2 = b[property];
+    if(bol){
+      return value1 - value2;
+    }else {
+      return value2 - value1;
+    }
+  }
+},
 
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-console.log(app.globalData)
+
 let that = this
-let url='rank/rankList'
+let url='rank/rankList?count=500'
 http.getReq(`${url}`,app.globalData.jwt, (res)=>{
   that.setData({
-    players:res.data
+    players:res.data.sort((a,b)=>{
+      return a['position']-b['position']
+    })
   })
+  console.log(this.data.players.map(i=>{
+    return i.position
+  }))
 })
 
 this.getRankPosition(app.globalData.jwt)
@@ -187,12 +203,11 @@ this.getRankPosition(app.globalData.jwt)
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
   },
   getRankPosition(jwt) {
     http.getReq('rank/rankPosition', jwt, (e) => {
       this.setData({
-        rankPosition: e.data
+        rankPosition: e.data.sort
       })
     })
   },

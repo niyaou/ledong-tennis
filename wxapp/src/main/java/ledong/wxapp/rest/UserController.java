@@ -131,9 +131,6 @@ public class UserController {
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
-        if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
-        }
         return new ResponseEntity<Object>(CommonResponse.success(userService.getUserList()), HttpStatus.OK);
     }
 }

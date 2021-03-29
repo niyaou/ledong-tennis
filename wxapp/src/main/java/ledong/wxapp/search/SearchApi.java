@@ -11,21 +11,15 @@ import java.util.Set;
 
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
-import org.apache.lucene.queryparser.xml.builders.TermQueryBuilder;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.join.ScoreMode;
-import org.apache.lucene.spatial3d.geom.GeoPoint;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.MultiGetItemResponse;
 import org.elasticsearch.action.get.MultiGetRequest;
-import org.elasticsearch.action.get.MultiGetRequestBuilder;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -38,7 +32,6 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.ClusterState.Custom;
 import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -63,7 +56,6 @@ import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortMode;
 import org.elasticsearch.search.sort.SortOrder;
 
 import ledong.wxapp.config.CustomException;
@@ -183,6 +175,33 @@ public class SearchApi {
     }
 
     /**
+     *
+     * 根据ID批量获取文档
+     *
+     */
+    public static HashMap<String,HashMap<String, Object>> getDocsByMultiIdsWithMap(String indexName, String key,String... ids) {
+        MultiGetRequest request = new MultiGetRequest();
+        Optional.ofNullable(ids).ifPresent(o -> {
+            for (String id : o) {
+                request.add(new MultiGetRequest.Item(indexName, id));
+            }
+        });
+
+        MultiGetResponse response;
+        HashMap<String,HashMap<String, Object>>  map = new  HashMap<String,HashMap<String, Object>> ();
+        try {
+            response = client.mget(request, RequestOptions.DEFAULT);
+            for (MultiGetItemResponse item : response.getResponses()) {
+//                list.add(item.getResponse().getSourceAsMap());
+                map.put((String)item.getResponse().getSourceAsMap().get(key), (HashMap<String, Object>) item.getResponse().getSourceAsMap());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    /**
      * 查询特定字段的指定值
      * 
      * @param indexName
@@ -202,6 +221,7 @@ public class SearchApi {
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }
+
 
     /**
      * 查询多个字段满足某个条件
@@ -273,6 +293,35 @@ public class SearchApi {
     /**
      * 查询特定字段的指定值,按指定规则排序结果
      * 
+     * @param sort
+     * @param indexName
+     * @param key
+     * @param value
+     * @param pageNo
+     * @param size
+     * @return
+     */
+    public static HashMap<String, HashMap<String, Object>> searchByFieldSortedInMap(String indexName, String key, String value,
+                                                                               String sortField, SortOrder order, Integer pageNo, Integer size) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.sort(sortField, order);
+        searchSourceBuilder.version(true);
+        if (!TextUtils.isEmpty(key) && !TextUtils.isEmpty(value)) {
+            searchSourceBuilder.query(QueryBuilders.termQuery(key, value));
+        } else {
+            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        }
+        searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
+        searchRequest.source(searchSourceBuilder);
+        return parseResponseInMap(searchRequest);
+    }
+
+
+    
+    /**
+     * 查询特定字段的指定值,按指定规则排序结果
+     * 
      * @param indexName
      * @param key
      * @param value
@@ -296,6 +345,7 @@ public class SearchApi {
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }
+
 
     public static LinkedList<HashMap<String, Object>> searchByLocation(String indexName, String key, String value,
             String distance,Integer size) {
@@ -1264,6 +1314,30 @@ public class SearchApi {
                 list.add(m);
             }
             return list.size() != 0 ? list : null;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 搜索数据，生成结果,使用map封装对象
+     *
+     * @param searchRequest
+     * @return
+     */
+    private static HashMap<String,HashMap<String, Object>> parseResponseInMap(SearchRequest searchRequest) {
+        HashMap<String,HashMap<String, Object>> map = new HashMap<String,HashMap<String, Object>>();
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHit[] searchHits = searchResponse.getHits().getHits();
+            for (SearchHit hit : searchHits) {
+                HashMap<String, Object> m = (HashMap<String, Object>) hit.getSourceAsMap();
+                m.put(ID, hit.getId());
+                m.put(VERSION, hit.getVersion());
+                map.put(hit.getId(),m);
+            }
+            return map.size() != 0 ? map : null;
         } catch (IOException e) {
             log.error(e.getMessage());
         }

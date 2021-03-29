@@ -15,6 +15,16 @@ const formatNumber = n => {
 }
 
 
+const compare=function (property) {
+  return function (a, b) {
+  var value1 = a[property];
+  var value2 = b[property];
+    return value1 - value2;
+}
+}
+
+
+
 const  stringDateFormat = (fmt, stringDate) =>{
 const date = new Date(stringDate)
   let ret;

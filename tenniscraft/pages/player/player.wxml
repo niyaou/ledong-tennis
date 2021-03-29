@@ -30,11 +30,11 @@
         <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
           <!-- <view wx:for="{{slideButtons}}"> -->
             <view wx:for="{{players}}">
-            <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="   {{item.holderName}}" 
+            <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="   {{item.nickName}}" 
            indexs="{{index}}"
             bind:tapped="handleTapped"
             subtitle="第{{item.position}}名 "
-            extra="段位:{{item.rankType0}}    积分:{{item.score}}  " thumb="{{item.holderAvator}}">
+            extra="段位:{{item.rankType0}}    积分:{{item.score}}  " thumb="{{item.avator}}">
             </i-card>
           </view>
         </scroll-view>

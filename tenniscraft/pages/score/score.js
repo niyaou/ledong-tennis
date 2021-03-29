@@ -1,5 +1,6 @@
 // pages/matches/matchlist.js
 const app = getApp()
+var http = require('../../utils/http.js')
 Page({
 
   /**
@@ -42,7 +43,6 @@ Page({
       this.setData({
         slideButtons: this.data.slideButtons
       });
-
     }else{
       this.setData({visible1:true})
     }
@@ -66,7 +66,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+this.getScoreList()
   },
 
   /**
@@ -102,5 +102,36 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+  getScoreList(){
+
+    http.getReq(`rank/scoreLog`, app.globalData.jwt, (res) => {
+      console.log(res)
+      if (res.code == 0 && res.data != null) {
+        let logs=res.data.map(l=>{
+          return {
+            text:'',
+            time:'',
+            score:''
+          }
+        })
+this.setData({
+  slideButtons:logs
+})
+        // slideButtons: [{
+        //   text: '与 范大将军 的比赛获胜',
+        //   src: '', // icon的路径,
+        //   time: '2020-12-21',
+        //   result: '',
+        //   score: '+30',
+        //   toggle: false
+        // }
+      }else{
+        this.setData({
+          slideButtons:[]
+        })
+      }
+    })
   }
+
 })
