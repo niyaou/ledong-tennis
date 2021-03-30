@@ -1,11 +1,14 @@
 // pages/matches/matchlist.js
 const app = getApp()
+var http = require('../../utils/http.js')
+var pinyinjs = require('../../utils/pinyin.js');
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
+    players:[],
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible: false,
@@ -101,22 +104,11 @@ Page({
         current: detail.value
     });
 },
-  handleClose1(){
-    this.setData({visible:false})
-  },
-  handleClickItem2(e) {
-    console.log(e.detail, this.data.slideButtons[e.detail.dataIndex].toggle)
-    if (e.detail.index === 1) {
-      this.data.slideButtons[e.detail.dataIndex].toggle = this.data.slideButtons[e.detail.dataIndex].toggle ? false : true
-      this.setData({
-        slideButtons: this.data.slideButtons
-      });
-
-    }else{
-      this.setData({visible1:true})
-    }
-
-  },
+choiceOpponent(e){
+  wx.navigateTo({
+    url: 'url',
+  })
+},
   handleTapped(e){
     // this.setData({visible:true})
     console.log(e.detail)
@@ -128,21 +120,71 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    // this.pinyin();
+  },
+  pinyin:function(){
+    var char = "使";
+    if (pinyinjs.hasOwnProperty(char)) {
+      console.log(pinyinjs[char][0].substring(0,1))
+      this.setData({
+        pinyinval: pinyinjs[char].join(', ')
+      });
+    }
+    else {
+      this.setData({
+        pinyinval: '找不到，^_^'
+      });
+    }
+ 
   },
 
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
+ 
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-console.log(app.globalData)
+
+    let url = 'rank/rankList?count=500'
+    http.getReq(`${url}`, app.globalData.jwt, (res) => {
+      let storeCity = new Array(26);
+      const words = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+      words.forEach((item,index)=>{
+          storeCity[index] = {
+              key : item,
+              list : []
+          }
+        })
+      res.data.forEach((item)=>{
+        let nickName= pinyinjs[item.nickName]
+        if(typeof nickName ==='undefined'){
+          nickName= pinyinjs["之"]
+        }
+
+          let firstName =nickName[0].substring(0,1)  ;
+          let index = words.indexOf( firstName.toUpperCase() );
+          console.log(firstName,index)
+          storeCity[index].list.push({
+              name : item.nickName,
+              key : firstName
+          });
+      })
+
+
+      this.data.players = storeCity;
+      this.setData({
+          players : this.data.players
+      })
+
+
+    })
+    
+
   },
 
   /**

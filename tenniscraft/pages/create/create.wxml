@@ -9,11 +9,11 @@
             <view class="weui-flex__item">
     <i-input value="{{ value1 }}" title="对手" autofocus placeholder="微信名" />
     </view>
-    <!-- <view class="weui-flex__item"> -->
+
     <view class="wcard">
-      <i-icon slot="content" type="addressbook" size="25" color="#666" />
+      <i-icon slot="content" type="addressbook" size="25" color="#666"  bindtap="choiceOpponent" />
     </view>
-    <!-- </view> -->
+  
     </view>
     <i-input value="{{ value2 }}" type="number" title="自己得分" placeholder="请输入比分" />
     <i-input value="{{ value2 }}" type="number" title="对手得分" placeholder="请输入比分" />
@@ -21,7 +21,22 @@
 </i-panel>
 <i-button  class="fullw" bind:click="handleClick" type="default" shape="circle" >添加比赛记录</i-button>
 
-
+<i-index height="100%" bind:change="onChange">
+        <i-index-item 
+            wx:for="{{ players }}" 
+            wx:for-index="index" 
+            wx:key="{{index}}" 
+            wx:for-item="item" name="{{item.key}}">
+            <view 
+                class="i-index-demo-item" 
+                wx:for="{{item.list}}" 
+                wx:for-index="in" 
+                wx:key="{{in}}" 
+                wx:for-item="it">
+                {{it.name}}
+            </view>
+        </i-index-item>
+    </i-index>
   
 
 </view>
