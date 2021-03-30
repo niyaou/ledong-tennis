@@ -73,6 +73,11 @@ public interface IRankService {
      */
     public String updateUserTags(String userId, String tag);
 
+
+    /**
+     * get tag list
+     */
+    public Object getTagsList();
     /**
      * get ranking list
      * 

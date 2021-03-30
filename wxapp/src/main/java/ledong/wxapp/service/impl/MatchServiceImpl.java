@@ -443,7 +443,7 @@ public class MatchServiceImpl implements IMatchService {
         QueryBuilder[] values = new QueryBuilder[8];
         params.add(head2Head);
         SearchResponse res=  SearchApi.H2HOpponentAggs( DataSetConstant.GAME_MATCH_INFORMATION,  params.toArray(values));
-        Terms t1=   res.getAggregations().get("holder");
+        Terms t1=  res.getAggregations().get("holder");
         Terms t2=  res.getAggregations().get("challenger");
         Iterator<ParsedTerms.ParsedBucket> ti1= (Iterator<ParsedTerms.ParsedBucket>)  t1.getBuckets().iterator();
         Iterator<ParsedTerms.ParsedBucket> ti2= (Iterator<ParsedTerms.ParsedBucket>) t2.getBuckets().iterator();

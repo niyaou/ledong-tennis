@@ -33,6 +33,11 @@
                   <view class="wfilled leftAli whiteCaptl userinfo-nickname">{{userInfo.nickName}}</view>
                   <view class="wfilled leftAli whiteCaptl">{{userRankInfo.rankType1}} 单打种子选手</view>
                   <view class="wfilled leftAli whiteCaptl  makeCenterV rowLeft">
+                    <div   class="tags" wx:for="{{userRankInfo.tags}}" 
+                wx:key="{{index}}" 
+                 >
+              {{item}}
+                  </div>
                    <!-- <view class="tags"> 黑哨狗</view> 
                    <view class="tags"> 修房子</view> 
                    <view class="tags"> 夺夺球</view> 

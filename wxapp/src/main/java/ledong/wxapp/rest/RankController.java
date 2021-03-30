@@ -165,7 +165,7 @@ public class RankController {
     @ApiOperation(value = "updateUserTags ", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "openId", value = "openId", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "score", value = "score ", required = true, dataType = "int", paramType = "query") })
+            @ApiImplicitParam(name = "tags", value = "tags ", required = true, dataType = "string", paramType = "query") })
     public ResponseEntity<?> updateUserTags(@RequestHeader("Authorization") String authHeader,
             @RequestParam(value = "openId", required = true) String openId,
             @RequestParam(value = "tags", required = true) String tags) throws AuthenticationException {
@@ -176,5 +176,20 @@ public class RankController {
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.updateUserTags(openId, tags)),
                 HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/getTags", method = RequestMethod.GET)
+    @ApiOperation(value = "getTags ", notes = "")
+    @ApiImplicitParams({            })
+    public ResponseEntity<?> getTags(@RequestHeader("Authorization") String authHeader
+          ) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getTagsList()),
+                HttpStatus.OK);
+    }
+
 
 }

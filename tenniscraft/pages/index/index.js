@@ -15,6 +15,7 @@ Page({
     rankPosition: 0,
     opponents:[],
     nearByCourt: [],
+    tags:[],
     isSingle:true,
     hasInitial:false,
     hasUserInfo: false,
@@ -33,6 +34,14 @@ Page({
     this.setData({hasUserInfo:false})
     return 
   },
+  
+  // onShow:function(){
+  //   console.log('on---show')
+  //  this. getUserRankInfo(app.globalData.jwt)
+  // },
+  onShow: function () {
+    console.log('----------show')
+      },
   onLoad: function () {
     let that = this
     if (app.globalData.jwt) {
@@ -223,6 +232,10 @@ Page({
   },
   getUserRankInfo(jwt) {
     http.getReq('rank/rankInfo', jwt, (e) => {
+      let tags=e.data.polygen?e.data.polygen.split(','):[]
+      if(tags[0]===''){
+        tags=tags.splice(1,tags.length)
+      }
       this.setData({
         userRankInfo: {
           rankType1: e.data.rankType1,
@@ -233,9 +246,11 @@ Page({
           score:e.data.score,
           doubleRankPosition:e.data.doublePosition,
           doubleWinRate:e.data.doubleWinRate,
-          doubleScore:e.data.doubleScore
+          doubleScore:e.data.doubleScore,
+          tags:tags
         }
       })
+      console.log('tags',e.data.polygen,tags)
       app.globalData.userRankInfo = this.data.userRankInfo
       app.globalData.openId = e.data.openId
      this. getTotalGames(jwt)
@@ -284,8 +299,6 @@ Page({
       return
     }
 
-
-
     this.setData({
       tabBarStatus: event.currentTarget.dataset.gid
     })
@@ -331,7 +344,7 @@ Page({
     }else
     if(event.currentTarget.dataset.variable===2){
       wx.navigateTo({
-        url: '../../pages/player/player'})
+        url: '../../pages/player/player?rankPosition='+this.data.rankPosition})
     }else
     if(event.currentTarget.dataset.variable===3){
       wx.navigateTo({
