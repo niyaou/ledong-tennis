@@ -33,6 +33,7 @@ import ledong.wxapp.strategy.impl.rank.DoublePondRanking;
 import ledong.wxapp.strategy.impl.rank.GradeRanking;
 import ledong.wxapp.strategy.impl.rank.PondRanking;
 import ledong.wxapp.strategy.impl.rank.VictoryRanking;
+import ledong.wxapp.utils.DateUtil;
 import ledong.wxapp.utils.StringUtil;
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
@@ -633,6 +634,7 @@ public class RankServiceImpl implements IRankService {
     log.setScore(score);
     log.setOpenId(openId);
     log.setDescription(description);
+    log.setRankingTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
     return RankingStrategy.logCreate(log);
   }
 

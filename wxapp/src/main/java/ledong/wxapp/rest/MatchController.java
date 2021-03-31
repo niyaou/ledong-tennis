@@ -101,6 +101,19 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
+    @RequestMapping(value = "/postMatch", method = RequestMethod.POST)
+    @ApiOperation(value = "post match record", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query") })
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> postMatch(@RequestHeader("Authorization") String authHeader,
+            @RequestParam(value = "opponent", required = true) String opponent) {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(matchService.postMatches(null,userId,opponent,0,0,null,null,null)),
+                HttpStatus.OK);
+    }
+
         @RequestMapping(value = "/matchedGames/{count}", method = RequestMethod.GET)
         @ApiOperation(value = "request  matched games", notes = "")
         @ApiImplicitParams({

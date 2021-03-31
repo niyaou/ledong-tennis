@@ -29,8 +29,8 @@
           <view wx:for="{{slideButtons}}">
            
             
-                <i-cell title="{{item.src +'    '+ item.text}}" label="{{item.time}}"
-                  value="{{item.result + item.score}}" only-tap-footer></i-cell>
+                <i-cell title="{{item.text}}" label="{{item.time}}"
+                  value="{{item.score}}" only-tap-footer></i-cell>
                 <i-divider height="1"></i-divider>
           
           </view>

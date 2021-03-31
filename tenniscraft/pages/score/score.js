@@ -110,9 +110,9 @@ this.getScoreList()
       if (res.code == 0 && res.data != null) {
         let logs=res.data.map(l=>{
           return {
-            text:'',
-            time:'',
-            score:''
+            text:l.description,
+            time:l.rankingTime,
+            score:l.score
           }
         })
 this.setData({

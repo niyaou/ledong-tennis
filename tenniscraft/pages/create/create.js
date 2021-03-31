@@ -1,6 +1,7 @@
 // pages/matches/matchlist.js
 const app = getApp()
 var http = require('../../utils/http.js')
+var util = require('../../utils/util.js')
 var pinyin = require('../../utils/pinyinUtil.js')
 Page({
 
@@ -8,8 +9,13 @@ Page({
    * 页面的初始数据
    */
   data: {
+    holderScore:0,
+    challengerScore:0,
     isChoiceOpponent:false,
     players:[],
+    time:util.formatTime(new Date()),
+    name:'',
+    id:'',
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible: false,
@@ -94,12 +100,59 @@ Page({
       toggle: false
     }],
   },
-  onChange(index, current){
-    console.log(index, current)
-    // const detail = event.detail;
-    //     this.setData({
-    //         ['tags['+event.detail.name+'].checked'] : detail.checked
-    //     })
+  hsChange(e){
+    console.log(e)
+    this.setData({
+      holderScore: parseInt(e.detail.detail.value)
+    })
+  },
+  csChange(e){
+   
+    console.log(e)
+    this.setData({
+      challengerScore: parseInt(e.detail.detail.value)
+    })
+  },
+  onChange(e){
+    console.log(e)
+    this.setData({
+      isChoiceOpponent:false,
+        name:e.currentTarget.dataset.id.name,
+        id: e.currentTarget.dataset.id.openId
+    })
+  },
+  handleClick(e){
+    let url = 'match/postMatch'
+    http.postReq(`${url}`, app.globalData.jwt, {opponent:this.data.id}, (res) => {
+      console.log(res)
+      if (res.code === 0) {
+        wx.showLoading({
+          mask:true,
+          title: '加载中',
+        })
+        setTimeout(()=>{
+          this. finishMatch(res.data)
+        },2000)
+    
+      }
+
+      // console.log(res)
+    })
+  },
+  finishMatch(matchId){
+    let url = 'match/matchResult/'+matchId
+    console.log('finishMatch', {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore})
+    http.postReq(`${url}`, app.globalData.jwt, {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore}, (res) => {
+      console.log(res)
+      wx.hideLoading();
+      if (res.code === 0) {
+        wx.navigateBack({
+          delta: 0,
+        })
+      }
+
+      // console.log(res)
+    })
   },
   handleFruitChange({ detail = {} }) {
     this.setData({

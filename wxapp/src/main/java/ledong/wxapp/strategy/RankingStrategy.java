@@ -55,7 +55,7 @@ public abstract class RankingStrategy {
     }
 
     public static String logCreate(ScoreLogVo vo) {
-        return SearchApi.updateDocument(ScoreLogVo.SCORE_CHANGED_LOG, JSON.toJSONString(vo), vo.getOpenId());
+        return SearchApi.insertDocument(ScoreLogVo.SCORE_CHANGED_LOG, JSON.toJSONString(vo));
     }
 
     public static void bulkUpdateRankInfo(List<RankInfoVo> vos) {
