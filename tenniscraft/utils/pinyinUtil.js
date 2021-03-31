@@ -47,7 +47,6 @@ export var pinyinUtil =
 		   */
   parseDict: function () {
     // 如果导入了 pinyin_dict_firstletter.js
-    console.log(pinyin_dict_firstletter.pinyin_dict_firstletter)
     dict.firstletter = pinyin_dict_firstletter.pinyin_dict_firstletter
 
   },

@@ -1,6 +1,6 @@
 <!--pages/matches/matchlist.wxml-->
 <view class="containerbg">
-
+<block wx:if="{{!isChoiceOpponent}}">
   <mp-navigation-bar title="记录比分" back="{{true}}" size="{{large}}"></mp-navigation-bar>
   
   <i-panel title="基础用法">
@@ -20,8 +20,9 @@
     <i-input value=" 2021-02-13 19:00 " title="比赛时间" disabled />
 </i-panel>
 <i-button  class="fullw" bind:click="handleClick" type="default" shape="circle" >添加比赛记录</i-button>
-
-<i-index height="100%" bind:change="onChange">
+</block>
+<block wx:else>
+<i-index style="margin-top:280rpx" height="100%" bind:change="onChange">
         <i-index-item 
             wx:for="{{ players }}" 
             wx:for-index="index" 
@@ -33,10 +34,18 @@
                 wx:for-index="in" 
                 wx:key="{{in}}" 
                 wx:for-item="it">
-                {{it.name}}
+                <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="   {{it.name}}" 
+           indexs="{{in}}"
+            subtitle=""
+            extra="" thumb=""
+            data-id="{{it}}"
+            bindtap="onChange">
+            </i-card>
+
+             
             </view>
         </i-index-item>
     </i-index>
-  
+</block>
 
 </view>

@@ -8,6 +8,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    isChoiceOpponent:false,
     players:[],
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
@@ -93,11 +94,12 @@ Page({
       toggle: false
     }],
   },
-  onChange(event){
-    const detail = event.detail;
-        this.setData({
-            ['tags['+event.detail.name+'].checked'] : detail.checked
-        })
+  onChange(index, current){
+    console.log(index, current)
+    // const detail = event.detail;
+    //     this.setData({
+    //         ['tags['+event.detail.name+'].checked'] : detail.checked
+    //     })
   },
   handleFruitChange({ detail = {} }) {
     this.setData({
@@ -105,9 +107,9 @@ Page({
     });
 },
 choiceOpponent(e){
-  wx.navigateTo({
-    url: 'url',
-  })
+this.setData({
+  isChoiceOpponent:true
+})
 },
   handleTapped(e){
     // this.setData({visible:true})
@@ -149,13 +151,14 @@ choiceOpponent(e){
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    console.log(pinyin.pinyinUtil)
-    let nickName = pinyin.pinyinUtil.getFirstLetter("法国大使馆反对".substring(0,1))
-    console.log(nickName)
+    // console.log(pinyin.pinyinUtil)
+    // let nickName = pinyin.pinyinUtil.getFirstLetter("法国大使馆反对".substring(0,1))
+    // console.log(nickName)
     let url = 'rank/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
+
       let storeCity = new Array(26);
-      const words = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+      const words = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","#"]
       words.forEach((item,index)=>{
           storeCity[index] = {
               key : item,
@@ -163,29 +166,27 @@ choiceOpponent(e){
           }
         })
       res.data.forEach((item)=>{
-        // let nickName= pinyinjs[item.nickName]
-        // if(typeof nickName ==='undefined'){
-        //   nickName= pinyinjs["之"]
-        // }
-        console.log()
         let nickName = pinyin.pinyinUtil.getFirstLetter(item.nickName.substring(0,1))
-
-          let firstName =nickName[0].substring(0,1)  ;
-          let index = words.indexOf( firstName.toUpperCase() );
-          console.log(firstName,index)
+        // console.log('item.nickName',item.nickName,'nickName',nickName)
+        let firstName ='#'
+        let index=words.length-1
+          firstName =nickName[0].substring(0,1)  ;
+          index = words.indexOf( firstName.toUpperCase() );
+          if(index===-1){
+            index=words.length-1
+            firstName ='#'
+          }
+          // console.log('firstName',firstName,'index',index)
           storeCity[index].list.push({
               name : item.nickName,
-              key : firstName
+              key : firstName,
+              openId:item.openId
           });
       })
-
-
       this.data.players = storeCity;
       this.setData({
           players : this.data.players
       })
-
-
     })
     
 
