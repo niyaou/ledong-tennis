@@ -1,7 +1,7 @@
 // pages/matches/matchlist.js
 const app = getApp()
 var http = require('../../utils/http.js')
-var pinyinjs = require('../../utils/pinyin.js');
+var pinyin = require('../../utils/pinyinUtil.js')
 Page({
 
   /**
@@ -124,17 +124,17 @@ choiceOpponent(e){
   },
   pinyin:function(){
     var char = "使";
-    if (pinyinjs.hasOwnProperty(char)) {
-      console.log(pinyinjs[char][0].substring(0,1))
-      this.setData({
-        pinyinval: pinyinjs[char].join(', ')
-      });
-    }
-    else {
-      this.setData({
-        pinyinval: '找不到，^_^'
-      });
-    }
+    // if (pinyinjs.hasOwnProperty(char)) {
+    //   console.log(pinyinjs[char][0].substring(0,1))
+    //   this.setData({
+    //     pinyinval: pinyinjs[char].join(', ')
+    //   });
+    // }
+    // else {
+    //   this.setData({
+    //     pinyinval: '找不到，^_^'
+    //   });
+    // }
  
   },
 
@@ -149,7 +149,9 @@ choiceOpponent(e){
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    console.log(pinyin.pinyinUtil)
+    let nickName = pinyin.pinyinUtil.getFirstLetter("法国大使馆反对".substring(0,1))
+    console.log(nickName)
     let url = 'rank/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       let storeCity = new Array(26);
@@ -161,10 +163,12 @@ choiceOpponent(e){
           }
         })
       res.data.forEach((item)=>{
-        let nickName= pinyinjs[item.nickName]
-        if(typeof nickName ==='undefined'){
-          nickName= pinyinjs["之"]
-        }
+        // let nickName= pinyinjs[item.nickName]
+        // if(typeof nickName ==='undefined'){
+        //   nickName= pinyinjs["之"]
+        // }
+        console.log()
+        let nickName = pinyin.pinyinUtil.getFirstLetter(item.nickName.substring(0,1))
 
           let firstName =nickName[0].substring(0,1)  ;
           let index = words.indexOf( firstName.toUpperCase() );
