@@ -1,0 +1,27 @@
+<!--pages/matches/matchlist.wxml-->
+<view class="containerbg">
+
+  <mp-navigation-bar title="记录比分" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+  
+  <i-panel title="基础用法">
+    <i-input value=" 范大将军 " title="自己" autofocus placeholder="名字" disabled/>
+    <view class="weui-flex">
+            <view class="weui-flex__item">
+    <i-input value="{{ value1 }}" title="对手" autofocus placeholder="微信名" />
+    </view>
+    <!-- <view class="weui-flex__item"> -->
+    <view class="wcard">
+      <i-icon slot="content" type="addressbook" size="25" color="#666" />
+    </view>
+    <!-- </view> -->
+    </view>
+    <i-input value="{{ value2 }}" type="number" title="自己得分" placeholder="请输入比分" />
+    <i-input value="{{ value2 }}" type="number" title="对手得分" placeholder="请输入比分" />
+    <i-input value=" 2021-02-13 19:00 " title="比赛时间" disabled />
+</i-panel>
+<i-button  class="fullw" bind:click="handleClick" type="default" shape="circle" >添加比赛记录</i-button>
+
+
+  
+
+</view>

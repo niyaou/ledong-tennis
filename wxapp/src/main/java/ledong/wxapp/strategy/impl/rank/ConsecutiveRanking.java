@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
+import VO.ScoreLogVo;
+import ledong.wxapp.utils.DateUtil;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
@@ -34,8 +36,8 @@ public class ConsecutiveRanking extends RankingStrategy {
         RankInfoVo holder = getUserRank(vo.getHolder());
         RankInfoVo challenger = getUserRank(vo.getChallenger());
 
-        scores[0] = consectiveVerified(holder.getOpenId()) && holderScore > challengerScor ? scoreChanged * 2 : 0;
-        scores[1] = consectiveVerified(challenger.getOpenId()) && holderScore < challengerScor ? scoreChanged * 2 : 0;
+        scores[0] = consectiveVerified(holder.getOpenId()) ? scoreChanged * -1 : 0;
+        scores[1] = consectiveVerified(challenger.getOpenId())  ? scoreChanged * -1 : 0;
         return scores;
     }
 
@@ -43,20 +45,19 @@ public class ConsecutiveRanking extends RankingStrategy {
         flag = false;
         ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
         if (!StringUtil.isEmpty(userId)) {
-            params.add(SearchApi.createMultiFieldsWithSingleValue(userId, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
+            params.add(SearchApi.createSearchByFieldSource(ScoreLogVo.OPENID,userId));
         }
-        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.RANKED,
-                MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode()));
-        Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(2);
-        sortPropertiesQueries.put(MatchPostVo.GAMEDTIME, SortOrder.DESC);
+        params.add(SearchApi.createSearchByFieldRangeGtSource(ScoreLogVo.RANKINGTIME,DateUtil.getZeroToday()));
+        params.add(SearchApi.createSearchByFieldRangeGtSource(ScoreLogVo.SCORE,0));
+
+//        params.add(SearchApi.createSearchByFieldRangeGtSource(MatchPostVo.GAMEDTIME,
+//                DateUtil.getZeroToday()));
+//
+//
         QueryBuilder[] values = new QueryBuilder[8];
         LinkedList<HashMap<String, Object>> matches = SearchApi.searchByMultiQueriesAndOrders(
-                DataSetConstant.GAME_MATCH_INFORMATION, sortPropertiesQueries, 1, 3, params.toArray(values));
-        Optional.ofNullable(matches).ifPresent(u -> flag = u.stream()
-                .filter(x -> x.get(x.get(MatchPostVo.WINNER).equals(MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode())
-                        ? MatchPostVo.HOLDER
-                        : MatchPostVo.CHALLENGER).equals(userId))
-                .count() == 3L);
+                DataSetConstant.SCORE_CHANGED_LOG,  null,1,200, params.toArray(values));
+        Optional.ofNullable(matches).ifPresent(u ->   {flag=u.size() >=3;});
 
         return flag;
 

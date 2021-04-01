@@ -37,69 +37,69 @@ public abstract class MatchStrategy {
         MatchPostVo vo = new MatchPostVo();
         vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
 
-        if (MatchStatusCodeEnum.MATCH_TYPE_INTENTIONAL.getCode().equals(matchType)) {
-            HashMap<String, Object> queries = new HashMap<String, Object>();
-            queries.put(MatchPostVo.HOLDER, holder);
-            queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode());
-            Object intentional = SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null,
-                    null, null, null);
-            if (intentional != null) {
-                throw new CustomException(ResultCodeEnum.ONLY_ONE_INTENTIONAL_MATCH);
-            }
-        }
-
-        if (MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType)) {
-            HashMap<String, Object> queries = new HashMap<String, Object>();
-            queries.put(MatchPostVo.HOLDER, holder);
-            queries.put(MatchPostVo.CHALLENGER, challenger);
-            queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode());
-            Object intentional = SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null,
-                    null, null, null);
-            if (intentional != null) {
-                throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
-            }
-        }
-
-        if (!TextUtils.isEmpty(holder) && !TextUtils.isEmpty(challenger)) {
-            ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
-            params.add(SearchApi.createMultiFieldsWithSingleValue(holder, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
-            params.add(
-                    SearchApi.createMultiFieldsWithSingleValue(challenger, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
-            params.add(QueryBuilders.termsQuery(MatchPostVo.STATUS,
-                    String.valueOf(MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()),
-                    String.valueOf(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())));
-            QueryBuilder[] values = new QueryBuilder[8];
-            Object intentional = SearchApi.searchByMultiQueriesAndOrders(DataSetConstant.GAME_MATCH_INFORMATION, null,
-                    0, 50, params.toArray(values));
-            if (intentional != null) {
-                throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
-            }
-        }
-
-        if (!StringUtil.isEmpty(parendId)) {
-            vo.setParendId(parendId);
-        }
+//        if (MatchStatusCodeEnum.MATCH_TYPE_INTENTIONAL.getCode().equals(matchType)) {
+//            HashMap<String, Object> queries = new HashMap<String, Object>();
+//            queries.put(MatchPostVo.HOLDER, holder);
+//            queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_MATCHING_STATUS.getCode());
+//            Object intentional = SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null,
+//                    null, null, null);
+//            if (intentional != null) {
+//                throw new CustomException(ResultCodeEnum.ONLY_ONE_INTENTIONAL_MATCH);
+//            }
+//        }
+//
+//        if (MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType)) {
+//            HashMap<String, Object> queries = new HashMap<String, Object>();
+//            queries.put(MatchPostVo.HOLDER, holder);
+//            queries.put(MatchPostVo.CHALLENGER, challenger);
+//            queries.put(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode());
+//            Object intentional = SearchApi.searchByMultiField(DataSetConstant.GAME_MATCH_INFORMATION, queries, null,
+//                    null, null, null);
+//            if (intentional != null) {
+//                throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
+//            }
+//        }
+//
+//        if (!TextUtils.isEmpty(holder) && !TextUtils.isEmpty(challenger)) {
+//            ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+//            params.add(SearchApi.createMultiFieldsWithSingleValue(holder, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
+//            params.add(
+//                    SearchApi.createMultiFieldsWithSingleValue(challenger, MatchPostVo.HOLDER, MatchPostVo.CHALLENGER));
+//            params.add(QueryBuilders.termsQuery(MatchPostVo.STATUS,
+//                    String.valueOf(MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING.getCode()),
+//                    String.valueOf(MatchStatusCodeEnum.MATCH_PLAYING_MATCHING.getCode())));
+//            QueryBuilder[] values = new QueryBuilder[8];
+//            Object intentional = SearchApi.searchByMultiQueriesAndOrders(DataSetConstant.GAME_MATCH_INFORMATION, null,
+//                    0, 50, params.toArray(values));
+//            if (intentional != null) {
+//                throw new CustomException(ResultCodeEnum.ALREADY_POSTED_CHALLENGE);
+//            }
+//        }
+//
+//        if (!StringUtil.isEmpty(parendId)) {
+//            vo.setParendId(parendId);
+//        }
         vo.setHolder(holder);
-        if (!StringUtil.isEmpty(challenger)) {
+//        if (!StringUtil.isEmpty(challenger)) {
             vo.setChallenger(challenger);
-        }
+//        }
         MatchStatusCodeEnum status = null;
-        if (!StringUtil.isEmpty(challenger) && !StringUtil.isEmpty(holder)) {
-            status = MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType) ? 
-            MatchStatusCodeEnum.MATCH_PLAYING_MATCHING: MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING;
-            if(MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType)){
+//        if (!StringUtil.isEmpty(challenger) && !StringUtil.isEmpty(holder)) {
+//            status = MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType) ?
+//            MatchStatusCodeEnum.MATCH_PLAYING_MATCHING: MatchStatusCodeEnum.MATCH_ACKNOWLEDGED_MATCHING;
+//            if(MatchStatusCodeEnum.MATCH_TYPE_RANDOM.getCode().equals(matchType)){
                 vo.setOrderTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
-            }
-        } else {
-            status = MatchStatusCodeEnum.MATCH_MATCHING_STATUS;
-        }
+//            }
+//        } else {
+            status = MatchStatusCodeEnum.MATCH_PLAYING_MATCHING;
+//        }
         vo.setStatus(status.getCode());
-        vo.setMatchType(matchType);
-        vo.setClubMatch(clubMatch);
+        vo.setMatchType(MatchStatusCodeEnum.MATCH_TYPE_INTENTIONAL.getCode());
+//        vo.setClubMatch(clubMatch);
 
-        if (!StringUtil.isEmpty(orderTime)) {
-            vo.setOrderTime(orderTime);
-        }
+//        if (!StringUtil.isEmpty(orderTime)) {
+//            vo.setOrderTime(orderTime);
+//        }
         if (!StringUtil.isEmpty(courtName)) {
             vo.setCourtName(courtName);
         }

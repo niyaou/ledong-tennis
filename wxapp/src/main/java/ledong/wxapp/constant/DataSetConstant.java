@@ -12,4 +12,6 @@ public class DataSetConstant {
     public static final String BARDGE_INFORMATION = "bardge_information";
     public static final String RANK_INFORMATION = "rank_information";
     public static final String COURT_INFORMATION = "court_information";
+    public static final String TAGS_INFORMATION = "tags_information";
+    public static final String SCORE_CHANGED_LOG = "score_changed_log";
 }

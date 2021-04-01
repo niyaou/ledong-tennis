@@ -20,8 +20,7 @@ public interface IRankService {
      */
     public String matchRank(String matchId, int holderScore, int challengerScore);
 
-
-      /**
+    /**
      * 
      * rank for the given double match
      * 
@@ -40,8 +39,8 @@ public interface IRankService {
      * by matchid 2.get both players' current rank 3.use strategy to rank 4.update
      * players' rank 5.return both current rank
      * 
-     * @param slamId
      * @param matchId
+     * @param slamId
      * @param holderScore
      * @param challengerScore
      * @return
@@ -65,6 +64,20 @@ public interface IRankService {
      */
     public String updateRankInfo(RankInfoVo vo);
 
+    /**
+     * update user tag by others user
+     * 
+     * @param userId
+     * @param tag
+     * @return
+     */
+    public String updateUserTags(String userId, String tag);
+
+
+    /**
+     * get tag list
+     */
+    public Object getTagsList();
     /**
      * get ranking list
      * 
@@ -105,7 +118,7 @@ public interface IRankService {
      */
     public Double updateWinRate(String userId);
 
-        /**
+    /**
      * update user double win rate
      * 
      * @param userId
@@ -129,31 +142,42 @@ public interface IRankService {
      */
     public Integer getUserPositionInRankList(String userId);
 
-    
-
     /**
      * get system user
+     * 
      * @return
      */
     public Long getTotalUser();
 
-
     /**
-     *  update score  only operated by master
+     * update score only operated by master
+     * 
      * @param openId
      * @param score
      * @return
      */
-    public String updateScoreByMaster(String openId,Integer score);
+    public String updateScoreByMaster(String openId, Integer score, String description);
+
+    /**
+     * score change log
+     * 
+     */
+    public String scoreChangeLog(String openId, Integer score, String description);
 
 
+    /**
+     * get score change log
+     * @param openId
+     * @return
+     */
+    public Object getScoreLog(String openId);
     /**
      * 
      * @return
      */
     public String updateUserPosition();
 
-        /**
+    /**
      * 
      * @return
      */

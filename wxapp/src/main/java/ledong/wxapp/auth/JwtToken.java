@@ -47,7 +47,6 @@ public class JwtToken {
         if (StringUtils.isEmpty(token)) {
             return null;
         }
-
         String[] header = token.split("Bearer");
         token = header[1];
         try {

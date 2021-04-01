@@ -14,6 +14,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 
 import VO.RankInfoVo;
+import VO.ScoreLogVo;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.search.SearchApi;
 
@@ -53,13 +54,18 @@ public abstract class RankingStrategy {
         return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
     }
 
+    public static String logCreate(ScoreLogVo vo) {
+        return SearchApi.insertDocument(ScoreLogVo.SCORE_CHANGED_LOG, JSON.toJSONString(vo));
+    }
+
     public static void bulkUpdateRankInfo(List<RankInfoVo> vos) {
         BulkRequest request = new BulkRequest();
-     
+
         vos.forEach(vo -> {
-            // Map<String,Object>  mapTypes = JSON.parseObject(JSON.toJSONString(vo)); 
+            // Map<String,Object> mapTypes = JSON.parseObject(JSON.toJSONString(vo));
             request.add(new IndexRequest(DataSetConstant.USER_RANK_INFORMATION).id(vo.getOpenId())
-                    .source( JSON.parseObject(JSON.toJSONString(vo)),XContentType.JSON).opType(DocWriteRequest.OpType.INDEX));
+                    .source(JSON.parseObject(JSON.toJSONString(vo)), XContentType.JSON)
+                    .opType(DocWriteRequest.OpType.INDEX));
         });
         try {
             SearchApi.bulkUpsert(request);
@@ -67,7 +73,6 @@ public abstract class RankingStrategy {
             e.printStackTrace();
         }
     }
-
 
     public static String createRankInfo(RankInfoVo vo) {
         return SearchApi.insertDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());

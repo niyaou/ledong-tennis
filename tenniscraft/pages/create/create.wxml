@@ -1,0 +1,54 @@
+<!--pages/matches/matchlist.wxml-->
+<view class="containerbg">
+<block wx:if="{{ !isChoiceOpponent }}">
+  <mp-navigation-bar title="记录比分" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+
+  <i-panel title="基础用法">
+    <i-input value="{{holder}}" title="自己" autofocus placeholder="名字" disabled/>
+    <view class="weui-flex">
+            <view class="weui-flex__item">
+    <i-input value="{{name}}" title="对手"  placeholder="微信名" disabled  bindtap="choiceOpponent" />
+    <!-- <div>{{name}}</div> -->
+    </view>
+
+    <view class="wcard">
+      <i-icon slot="content" type="addressbook" size="25" color="#666"  bindtap="choiceOpponent" />
+    </view>
+  
+    </view>
+    <i-input value="{{ holderScore }}" type="number" bindchange="hsChange" title="自己得分" placeholder="请输入比分" />
+    <i-input value="{{ challengerScore }}" type="number" bindchange="csChange" title="对手得分" placeholder="请输入比分" />
+    <i-input value=" {{time}} " title="比赛时间" disabled />
+</i-panel>
+<i-button  class="fullw" bind:click="handleClick" type="default" shape="circle" >添加比赛记录</i-button>
+</block>
+
+
+<block wx:else>
+<i-index style="margin-top:280rpx" height="100%" bind:change="onChange">
+        <i-index-item 
+            wx:for="{{ players }}" 
+            wx:for-index="index" 
+            wx:key="{{index}}" 
+            wx:for-item="item" name="{{item.key}}">
+            <view 
+                class="i-index-demo-item" 
+                wx:for="{{item.list}}" 
+                wx:for-index="in" 
+                wx:key="{{in}}" 
+                wx:for-item="it">
+                <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="   {{it.name}}" 
+           indexs="{{in}}"
+            subtitle=""
+            extra="" thumb=""
+            data-id="{{it}}"
+            bindtap="onChange">
+            </i-card>
+
+             
+            </view>
+        </i-index-item>
+    </i-index>
+</block>
+
+</view>

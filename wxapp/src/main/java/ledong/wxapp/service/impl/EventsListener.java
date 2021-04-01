@@ -41,24 +41,23 @@ public class EventsListener {
     @Async
     public void handleWinRateEvent(WinRateEvent event) {
         RankInfoVo userVos = event.getUserVo();
-        log.info(JSON.toJSONString( userVos));
+        log.info(JSON.toJSONString(userVos));
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-
             e.printStackTrace();
         }
         userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
         rankService.updateRankInfo(userVos);
-        log.info(JSON.toJSONString( userVos));
+        rankService.updateUserPosition();
+        log.info(JSON.toJSONString(userVos));
     }
-
 
     @EventListener
     @Async
     public void handleDoubleWinRateEvent(DoubleWinRateEvent event) {
         RankInfoVo userVos = event.getUserVo();
-        log.info(JSON.toJSONString( userVos));
+        log.info(JSON.toJSONString(userVos));
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -67,14 +66,15 @@ public class EventsListener {
         }
         userVos.setDoubleWinRate(rankService.updateDoubleWinRate(userVos.getOpenId()));
         rankService.updateRankInfo(userVos);
-        log.info(JSON.toJSONString( userVos));
+        rankService.updateUserPosition();
+        // log.info(JSON.toJSONString( userVos));
     }
 
     @EventListener
     @Async
     public void handleSlamWinRateEvent(SlamWinRateEvent event) {
         RankInfoVo userVos = event.getUserVo();
-        log.info(JSON.toJSONString( userVos));
+        log.info(JSON.toJSONString(userVos));
         try {
             Thread.sleep(800);
         } catch (InterruptedException e) {
@@ -83,33 +83,15 @@ public class EventsListener {
         userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
         // userVos.setSlamWinRate(rankService.updateSlamWinRate(userVos.getOpenId()));
         rankService.updateRankInfo(userVos);
-        log.info(JSON.toJSONString( userVos));
+        log.info(JSON.toJSONString(userVos));
     }
-
-
-
 
     @EventListener
     @Async
     public void handleConfirmEvent(MatchConfirmEvent event) {
         try {
-            String matchId = event.getMatchId();
-            log.info("输入比分后自动确认:"+matchId);
-          Thread.sleep(120000);
-          rankService.updateUserPosition();
-          Map<String,Object> vo=  (Map<String, Object>) matchService.getMatchInfos(matchId);
-          if(vo ==null){
-            vo=  (Map<String, Object>) matchService.getDoubleMatchInfos(matchId);
-            if(vo.get(DoubleMatchPostVo.RANKED)==null||!vo.get(DoubleMatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
-                matchService.confirmDoubleMatch(matchId, vo.get(DoubleMatchPostVo.HOLDERACKNOWLEDGED).equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode())?2:1);
-             }
-          }else{
-            if(vo.get(MatchPostVo.RANKED)==null||!vo.get(MatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())){
-                matchService.confirmMatch(matchId, vo.get(MatchPostVo.HOLDERACKNOWLEDGED).equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode())?2:1);
-             }
-          }
-   
-      
+            Thread.sleep(1200);
+            rankService.updateUserPosition();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
