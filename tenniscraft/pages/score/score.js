@@ -7,6 +7,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    total:0,
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible1: false,
@@ -118,6 +119,13 @@ this.getScoreList()
 this.setData({
   slideButtons:logs
 })
+let total=0
+    logs.map(l=>{
+total+=l.score
+    })
+    this.setData({
+      total:total
+    })
         // slideButtons: [{
         //   text: '与 范大将军 的比赛获胜',
         //   src: '', // icon的路径,

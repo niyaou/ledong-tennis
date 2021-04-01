@@ -52,6 +52,22 @@ public final class DateUtil {
         return df.format(new Date());
     }
 
+    public static String getZeroToday()  {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date zero = calendar.getTime();
+        String z="";
+        try {
+            z=getDate(zero,FORMAT_DATE_TIME);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return  z;
+    }
+
     /**
      * 获取指定格式的当前时间
      * 

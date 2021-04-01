@@ -7,7 +7,7 @@
     <i-input value="{{holder}}" title="自己" autofocus placeholder="名字" disabled/>
     <view class="weui-flex">
             <view class="weui-flex__item">
-    <i-input value="{{name}}" title="对手"  placeholder="微信名" disabled />
+    <i-input value="{{name}}" title="对手"  placeholder="微信名" disabled  bindtap="choiceOpponent" />
     <!-- <div>{{name}}</div> -->
     </view>
 

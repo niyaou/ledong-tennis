@@ -1,6 +1,6 @@
 <!--index.wxml-->
 <view class="containerbg">
-  <block wx:if="{{!hasUserInfo && canIUse}}"  >
+  <block wx:if="{{!hasUserInfo}}"  >
     <!-- <button style="position:absolute;top:80%;left:25%;background-color:rgb(134,120,205);color:#fff" 
     open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 进入天梯
       </button> -->
@@ -24,7 +24,7 @@
             </view>
           </view>
           <view class="weui-flex ">
-            <view class="makeCenter" style=" height: 7.3em;  line-height: 7.3em;  ">
+            <view class="makeCenter" style=" height: 7.3em;  line-height: 7.3em;  " bindtap="loginClick">
               <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
             </view>
             <view class="weui-flex__item ">
