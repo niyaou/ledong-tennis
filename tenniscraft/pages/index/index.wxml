@@ -1,20 +1,15 @@
 <!--index.wxml-->
 <view class="containerbg">
   <block wx:if="{{!hasUserInfo}}"  >
-    <!-- <button style="position:absolute;top:80%;left:25%;background-color:rgb(134,120,205);color:#fff" 
-    open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 进入天梯
-      </button> -->
       <button  open-type="getUserInfo"   bindgetuserinfo="getUserInfo" bindtap="gps" 
       style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:if="{{vsCode===''}}"> 微信登录 </button>
-  
 		<button open-type="getPhoneNumber"   bindgetphonenumber="getPhoneNumber" bindtap="gps" 
-    style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:else> 手机注册 </button>
-
+     style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:if="{{vsCode!==''}}"> 手机注册 </button>
   <image src="../../icon/splash2.jpg" class="splash"></image> 
   </block>
 
-
-  <view class="weui-flex" wx:else>
+<block  wx:else>
+  <view class="weui-flex">
     <view class="weui-flex__item">
       <block >
         <view class="card">
@@ -24,8 +19,8 @@
             </view>
           </view>
           <view class="weui-flex ">
-            <view class="makeCenter" style=" height: 7.3em;  line-height: 7.3em;  " bindtap="loginClick">
-              <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+            <view class="makeCenter" style=" height: 7.3em;  line-height: 7.3em; "  bindtap="loginClick">
+              <image  class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
             </view>
             <view class="weui-flex__item ">
               <view class="weui-flex filled ">
@@ -126,4 +121,5 @@
     </view>
     <view class="weui-footer__text">Copyright © 2020-2021 LedongTennis</view>
   </view>
+  </block>
 </view>

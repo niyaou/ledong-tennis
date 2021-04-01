@@ -87,9 +87,12 @@ Page({
     return this.data.userInfo.nickName !== "请登录"
   },
   loginClick() {
+    console.log('checkingLogin',this.checkingLogin())
     if (this.checkingLogin()) {
+      console.log('checkingLogin   1',this.checkingLogin())
       return
-    } else {
+    } else{
+      console.log('checkingLogin  2',this.checkingLogin())
       this.setData({
         hasUserInfo: false
       })
