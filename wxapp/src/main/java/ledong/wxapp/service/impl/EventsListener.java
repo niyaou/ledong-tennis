@@ -45,7 +45,6 @@ public class EventsListener {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-
             e.printStackTrace();
         }
         userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
@@ -91,28 +90,8 @@ public class EventsListener {
     @Async
     public void handleConfirmEvent(MatchConfirmEvent event) {
         try {
-            String matchId = event.getMatchId();
-            log.info("输入比分后自动确认:" + matchId);
-            Thread.sleep(120000);
+            Thread.sleep(1200);
             rankService.updateUserPosition();
-            Map<String, Object> vo = (Map<String, Object>) matchService.getMatchInfos(matchId);
-            if (vo == null) {
-                // vo = (Map<String, Object>) matchService.getDoubleMatchInfos(matchId);
-                // if (vo.get(DoubleMatchPostVo.RANKED) == null ||
-                // !vo.get(DoubleMatchPostVo.RANKED)
-                // .equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())) {
-                // matchService.confirmDoubleMatch(matchId,
-                // vo.get(DoubleMatchPostVo.HOLDERACKNOWLEDGED)
-                // .equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode()) ? 2 : 1);
-                // }
-            } else {
-                if (vo.get(MatchPostVo.RANKED) == null
-                        || !vo.get(MatchPostVo.RANKED).equals(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode())) {
-                    matchService.confirmMatch(matchId, vo.get(MatchPostVo.HOLDERACKNOWLEDGED)
-                            .equals(MatchStatusCodeEnum.USER_ACKNOWLADGED.getCode()) ? 2 : 1);
-                }
-            }
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -101,18 +101,37 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
-    @RequestMapping(value = "/postMatch", method = RequestMethod.POST)
-    @ApiOperation(value = "post match record", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query") })
-    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
-    public ResponseEntity<?> postMatch(@RequestHeader("Authorization") String authHeader,
-            @RequestParam(value = "opponent", required = true) String opponent) {
-        Claims claims = tokenService.getClaimByToken(authHeader);
-        String userId = claims.getSubject();
-        return new ResponseEntity<Object>(CommonResponse.success(matchService.postMatches(null,userId,opponent,0,0,null,null,null)),
-                HttpStatus.OK);
-    }
+        @RequestMapping(value = "/postMatch", method = RequestMethod.POST)
+        @ApiOperation(value = "post match record", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query") })
+        // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+        public ResponseEntity<?> postMatch(@RequestHeader("Authorization") String authHeader,
+                        @RequestParam(value = "opponent", required = true) String opponent) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                return new ResponseEntity<Object>(CommonResponse
+                                .success(matchService.postMatches(null, userId, opponent, 0, 0, null, null, null)),
+                                HttpStatus.OK);
+        }
+
+        @RequestMapping(value = "/postMatchByMaster", method = RequestMethod.POST)
+        @ApiOperation(value = "post match record", notes = "")
+        @ApiImplicitParams({
+                        @ApiImplicitParam(name = "holder", value = "holder name", required = true, dataType = "string", paramType = "query"),
+                        @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query") })
+        public ResponseEntity<?> postMatchByMaster(@RequestHeader("Authorization") String authHeader,
+                        @RequestParam(value = "holder", required = true) String holder,
+                        @RequestParam(value = "opponent", required = true) String opponent) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+                        throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                }
+                return new ResponseEntity<Object>(CommonResponse
+                                .success(matchService.postMatches(null, holder, opponent, 0, 0, null, null, null)),
+                                HttpStatus.OK);
+        }
 
         @RequestMapping(value = "/matchedGames/{count}", method = RequestMethod.GET)
         @ApiOperation(value = "request  matched games", notes = "")
@@ -128,13 +147,12 @@ public class MatchController {
 
         @RequestMapping(value = "/matchedGames/count", method = RequestMethod.GET)
         @ApiOperation(value = "request  matched games", notes = "")
-        @ApiImplicitParams({ })
-        public ResponseEntity<?> getMatchedGamesCount(
-                                                     @RequestHeader("Authorization") String authHeader) {
+        @ApiImplicitParams({})
+        public ResponseEntity<?> getMatchedGamesCount(@RequestHeader("Authorization") String authHeader) {
                 Claims claims = tokenService.getClaimByToken(authHeader);
                 String userId = claims.getSubject();
                 return new ResponseEntity<Object>(CommonResponse.success(matchService.getMatchedCount(userId)),
-                        HttpStatus.OK);
+                                HttpStatus.OK);
         }
 
         @RequestMapping(value = "/matchedGames/h2h/{count}", method = RequestMethod.GET)
@@ -152,21 +170,16 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
-
         @RequestMapping(value = "/matchedGames/h2h/opponent", method = RequestMethod.GET)
         @ApiOperation(value = "request  h2h matched opponent", notes = "")
         @ApiImplicitParams({
-                @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query")
-              })
-        public ResponseEntity<?> h2hOpponentCount(   @RequestHeader("Authorization") String authHeader) {
+                        @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query") })
+        public ResponseEntity<?> h2hOpponentCount(@RequestHeader("Authorization") String authHeader) {
                 Claims claims = tokenService.getClaimByToken(authHeader);
                 String userId = claims.getSubject();
-                return new ResponseEntity<Object>(
-                        CommonResponse.success(matchService.getH2hOpponentCount(userId)),
-                        HttpStatus.OK);
+                return new ResponseEntity<Object>(CommonResponse.success(matchService.getH2hOpponentCount(userId)),
+                                HttpStatus.OK);
         }
-
-
 
         @RequestMapping(value = "/doubleMatchedGames/{count}", method = RequestMethod.GET)
         @ApiOperation(value = "request  doubleMatched games", notes = "")

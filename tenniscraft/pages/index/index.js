@@ -47,7 +47,7 @@ Page({
     if (app.globalData.jwt) {
       this.getUserInfoByJwt(app.globalData.jwt)
       this.getUserRankInfo(app.globalData.jwt)
-      this.getRankPosition(app.globalData.jwt)
+      // this.getRankPosition(app.globalData.jwt)
       this.gps()
     }
 
@@ -248,9 +248,10 @@ Page({
           doubleWinRate:e.data.doubleWinRate,
           doubleScore:e.data.doubleScore,
           tags:tags
-        }
+        },
+        rankPosition:e.data.position
       })
-      console.log('tags',e.data.polygen,tags)
+     
       app.globalData.userRankInfo = this.data.userRankInfo
       app.globalData.openId = e.data.openId
      this. getTotalGames(jwt)
@@ -304,7 +305,7 @@ Page({
     })
     if (event.currentTarget.dataset.gid == 0) {
       this.getUserRankInfo(app.globalData.jwt)
-      this.getRankPosition(app.globalData.jwt)
+      // this.getRankPosition(app.globalData.jwt)
       
       // this.getNearByCourt(app.globalData.jwt)
       // this. getNearByUser(app.globalData.jwt)
@@ -330,6 +331,13 @@ Page({
     var matchComp = this.selectComponent('#match');
     if(matchComp){
       matchComp.switchMode(this.data.isSingle)
+    }
+  },
+  masterNav(e){
+    console.log('master',e,app.globalData.openId)
+    if(app.globalData.openId==="19960390361"||app.globalData.openId==="18602862619"){
+      wx.navigateTo({
+        url: '../../pages/master/player'})
     }
   },
   navigateTo(event){

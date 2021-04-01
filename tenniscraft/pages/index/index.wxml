@@ -5,10 +5,10 @@
     open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 进入天梯
       </button> -->
       <button  open-type="getUserInfo"   bindgetuserinfo="getUserInfo" bindtap="gps" 
-      style="position:absolute;top:80%;left:25%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:if="{{vsCode===''}}"> 微信登录 </button>
+      style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:if="{{vsCode===''}}"> 微信登录 </button>
   
 		<button open-type="getPhoneNumber"   bindgetphonenumber="getPhoneNumber" bindtap="gps" 
-    style="position:absolute;top:80%;left:25%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:else> 手机注册 </button>
+    style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"  wx:else> 手机注册 </button>
 
   <image src="../../icon/splash2.jpg" class="splash"></image> 
   </block>
@@ -38,10 +38,7 @@
                  >
               {{item}}
                   </div>
-                   <!-- <view class="tags"> 黑哨狗</view> 
-                   <view class="tags"> 修房子</view> 
-                   <view class="tags"> 夺夺球</view> 
-                   <view class="tags"> 跑不死</view>  -->
+             
                   </view>
                 </view>
               </view>
@@ -123,9 +120,9 @@
     </view>
   </view>
 
-  <view class="weui-footer weui-footer_fixed-bottom" style="color:#fff">
+  <view class="weui-footer weui-footer_fixed-bottom" style="color:#ccc" bindtap="masterNav">
     <view class="weui-footer__links">
-      <navigator url="" class="weui-footer__link" style="color:#fff">网者争霸</navigator>
+      <navigator url="" class="weui-footer__link" style="color:#ccc">网者争霸</navigator>
     </view>
     <view class="weui-footer__text">Copyright © 2020-2021 LedongTennis</view>
   </view>
