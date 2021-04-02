@@ -236,6 +236,7 @@ public class RankServiceImpl implements IRankService {
     vo = gContext.rankMatch(vo);
     gContext = new GradingContext(new DoubleGradeRanking());
     vo = gContext.rankMatch(vo);
+    ctx.publishEvent(new MatchConfirmEvent(ctx, null));
     return RankingStrategy.createRankInfo(vo);
   }
 
