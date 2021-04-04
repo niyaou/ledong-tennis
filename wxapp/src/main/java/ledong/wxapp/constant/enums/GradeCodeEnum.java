@@ -8,7 +8,7 @@ package ledong.wxapp.constant.enums;
  */
 public enum GradeCodeEnum {
     BRASS(1000, "青铜"), SILVER(1001, "白银"),
-    GOLDEN(1002, "黄金"), DIAMOND(1003, "钻石"),
+    GOLDEN(1002, "黄金"), DIAMOND(1003, "钻石"), MASTER(1004, "大师"),
     ONEPOINT(2001, "1.0"), ONEANDHALF(2002, "1.5"),
     TWOPOINT(2003, "2.0"), TWOANDHALF(2004, "2.5"),
     THREEPOINT(2005, "3.0"), THREEANDHALF(2006, "3.5"),

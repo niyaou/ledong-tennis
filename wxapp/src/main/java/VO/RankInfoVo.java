@@ -27,12 +27,12 @@ public class RankInfoVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "score  ")
-    private Integer score = 2000;
+    private Integer score = 0;
     public static final String SCORE = "score";
 
     @NotEmpty
     @ApiModelProperty(value = "doubleScore  ")
-    private Integer doubleScore = 2000;
+    private Integer doubleScore = 0;
     public static final String DOUBLESCORE = "doubleScore";
 
     @NotEmpty

@@ -39,14 +39,7 @@ Page({
         icon: 'undo'
       }
     ],
-    slideButtons: [{
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   getH2hList() {
     let jwt = app.globalData.jwt

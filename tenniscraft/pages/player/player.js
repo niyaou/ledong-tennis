@@ -74,49 +74,7 @@ Page({
     ],
     players: [],
     rankPosition: 300,
-    slideButtons: [{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }, {
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }, {
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   onChange(event) {
     const detail = event.detail;

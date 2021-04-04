@@ -12,22 +12,7 @@ Page({
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible1: false,
 
-    slideButtons: [{
-      text: '与 范大将军 的比赛获胜',
-      src: '', // icon的路径,
-      time: '2020-12-21',
-      result: '',
-      score: '+30',
-      toggle: false
-    },
-    {
-      text: '参加新春大师赛获得四名',
-      src: '', // icon的路径,
-      time: '2021-2-15',
-      result: '',
-      score: '+160',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   handleFruitChange({ detail = {} }) {
     this.setData({

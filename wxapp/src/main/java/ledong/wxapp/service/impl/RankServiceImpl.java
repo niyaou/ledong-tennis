@@ -89,8 +89,8 @@ public class RankServiceImpl implements IRankService {
     // scores[0] += tempScore[0];
     // scores[1] += tempScore[1];
 
-    holder.setScore(holder.getScore() + scores[0]);
-    challenger.setScore(challenger.getScore() + scores[1]);
+    holder.setScore((holder.getScore() + scores[0])<0?0:(holder.getScore() + scores[0]));
+    challenger.setScore((challenger.getScore() + scores[1])<0?0:(challenger.getScore() + scores[1]));
 
     GradingContext gContext = new GradingContext(new GradeRanking());
 

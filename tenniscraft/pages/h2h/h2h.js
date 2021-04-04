@@ -69,14 +69,7 @@ Page({
         icon: 'undo'
       }
     ],
-    slideButtons: [{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   getH2HOpponents() {
     let jwt = app.globalData.jwt

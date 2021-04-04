@@ -9,14 +9,16 @@ public class GradeRanking extends GradingStrategy {
     @Override
     public RankInfoVo ranking(RankInfoVo user) {
 
-        if (user.getScore() <= 2600) {
+        if (user.getScore() <= 400) {
             user.setRankType0(GradeCodeEnum.BRASS.getMessage());
-        } else if (user.getScore() <= 3600) {
+        } else if (user.getScore() <= 1000) {
             user.setRankType0(GradeCodeEnum.SILVER.getMessage());
-        } else if (user.getScore() <= 5000) {
+        } else if (user.getScore() <= 1600) {
             user.setRankType0(GradeCodeEnum.GOLDEN.getMessage());
-        } else {
+        } else  if (user.getScore() <= 3000){
             user.setRankType0(GradeCodeEnum.DIAMOND.getMessage());
+        }else{
+            user.setRankType0(GradeCodeEnum.MASTER.getMessage());
         }
         user.setRankType1(winRateFilter(user));
 
