@@ -15,3 +15,6 @@
 .avator{
   border-radius: 10px;
 }
+.item{
+  width:50%;
+}

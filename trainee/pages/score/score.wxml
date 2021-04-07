@@ -9,7 +9,7 @@
 </i-panel>
   </i-modal>
   <mp-navigation-bar title="积分记录" back="{{true}}" size="{{large}}"></mp-navigation-bar>
-  <i-card full="{{true}}" title="" extra="本赛季日常比赛和大师赛 获取积分1200分" thumb="../../icon/scorea.gif">
+  <i-card full="{{true}}" title="" extra="本赛季日常比赛和大师赛 获取积分{{total}}分" thumb="../../icon/scorea.gif">
     <view slot="footer">本赛季积分变化记录</view>
   </i-card>
 
@@ -29,8 +29,8 @@
           <view wx:for="{{slideButtons}}">
            
             
-                <i-cell title="{{item.src +'    '+ item.text}}" label="{{item.time}}"
-                  value="{{item.result + item.score}}" only-tap-footer></i-cell>
+                <i-cell title="{{item.text}}" label="{{item.time}}"
+                  value="{{item.score}}" only-tap-footer></i-cell>
                 <i-divider height="1"></i-divider>
           
           </view>

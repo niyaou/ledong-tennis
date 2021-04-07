@@ -1,11 +1,15 @@
 // app.js
+//app.js
+const SHORTINTERVAL=2000
+const SLOWINTERVAL=4000
 App({
   onLaunch() {
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
-
+    this.globalData.jwt= wx.getStorageSync('jwt') || ''
+    this.globalData.gps= wx.getStorageSync('gps') || ''
     // 登录
     // wx.login({
     //   success: res => {
@@ -33,9 +37,17 @@ App({
     })
   },
   globalData: {
+    shortInterval:SHORTINTERVAL,
+    slowInterval:SLOWINTERVAL,
+    userList:[],
     userInfo: null,
+    userRankInfo:null,
+    openId:'',
     totalBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight'] +44 )/wx.getSystemInfoSync()['windowWidth'],
     statusBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight']  )/wx.getSystemInfoSync()['windowWidth'],
     ratio: 750 /wx.getSystemInfoSync()['windowWidth'],
+    avator:'',
+    jwt:'',
+    gps:''
   }
 })

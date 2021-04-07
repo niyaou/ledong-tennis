@@ -1,5 +1,6 @@
 // pages/matches/matchlist.js
 const app = getApp()
+var http = require('../../utils/http.js')
 Page({
 
   /**
@@ -9,6 +10,7 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible1: false,
+    totalScore:0,
     fruit: [{
       id: 1,
       name: '没参加比赛',
@@ -33,42 +35,7 @@ Page({
         icon: 'undo'
       }
     ],
-    slideButtons: [{
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry     vs      范大将军 ',
-      src: '6  : 7', // icon的路径,
-      time: '2020-12-21',
-      result: '失败',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   addMatch(){
     wx.navigateTo({
@@ -114,7 +81,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+this.getMatchList()
   },
 
   /**
@@ -150,5 +117,31 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  getMatchList(){
+  let jwt=  app.globalData.jwt
+  http.getReq('match/matchedGames/200', jwt, (e) => {
+    let score=0
+    let lists= e.data.filter(f=>{
+      return typeof f.holderScore!=='undefined'
+    }).map( m=>{
+      score+=(m.winner===5001&&m.challenger===app.globalData.openId) ||  (m.winner===5000&&m.holder===app.globalData.openId)?30:-30
+      return {text:m.holderName+"  vs  "+m.challengerName,
+      src:m.holderScore+"  :  "+m.challengerScore,
+      time:m.gamedTime,
+      result: (m.winner===5001&&m.challenger===app.globalData.openId) ||  (m.winner===5000&&m.holder===app.globalData.openId)?"胜利":"失败",
+      score:(m.winner===5001&&m.challenger===app.globalData.openId) ||  (m.winner===5000&&m.holder===app.globalData.openId)?'  +30':'  -30',
+      toggle: false
+      }
+    })
+    // slideButtons
+    
+    this.setData({
+      slideButtons:lists,
+      totalScore:score
+    })
+    console.log('--------1------',e)
+  })
   }
 })

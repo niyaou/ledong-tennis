@@ -40,17 +40,19 @@ public class EventsListener {
     @EventListener
     @Async
     public void handleWinRateEvent(WinRateEvent event) {
-        RankInfoVo userVos = event.getUserVo();
-        log.info(JSON.toJSONString(userVos));
+        RankInfoVo[] userVos = event.getUserVo();
+
         try {
-            Thread.sleep(500);
+            Thread.sleep(2500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
-        rankService.updateRankInfo(userVos);
+        for (RankInfoVo vo:userVos) {
+            vo.setWinRate(rankService.updateWinRate(vo.getOpenId()));
+            rankService.updateRankInfo(vo);
+        }
         rankService.updateUserPosition();
-        log.info(JSON.toJSONString(userVos));
+
     }
 
     @EventListener
@@ -73,16 +75,17 @@ public class EventsListener {
     @EventListener
     @Async
     public void handleSlamWinRateEvent(SlamWinRateEvent event) {
-        RankInfoVo userVos = event.getUserVo();
-        log.info(JSON.toJSONString(userVos));
+        RankInfoVo[] userVos = event.getUserVo();
+
         try {
-            Thread.sleep(800);
+            Thread.sleep(2100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        userVos.setWinRate(rankService.updateWinRate(userVos.getOpenId()));
-        // userVos.setSlamWinRate(rankService.updateSlamWinRate(userVos.getOpenId()));
-        rankService.updateRankInfo(userVos);
+        for (RankInfoVo vo:userVos) {
+            vo.setWinRate(rankService.updateWinRate(vo.getOpenId()));
+            rankService.updateRankInfo(vo);
+        }
         log.info(JSON.toJSONString(userVos));
     }
 
@@ -92,6 +95,7 @@ public class EventsListener {
         try {
             Thread.sleep(1200);
             rankService.updateUserPosition();
+            rankService.updateLDUserPosition();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

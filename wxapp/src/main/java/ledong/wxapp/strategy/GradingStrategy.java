@@ -2,6 +2,7 @@ package ledong.wxapp.strategy;
 
 import java.util.Map;
 
+import VO.LdRankInfoVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -25,6 +26,8 @@ public abstract class GradingStrategy {
      * @return
      */
     public abstract RankInfoVo ranking(RankInfoVo user);
+
+    public abstract LdRankInfoVo ldRanking(LdRankInfoVo user);
 
     /**
      * get user rank info

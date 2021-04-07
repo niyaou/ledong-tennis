@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import VO.LdRankInfoVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
@@ -50,6 +51,18 @@ public abstract class RankingStrategy {
         return vo;
     }
 
+    /**
+     * get user rank info
+     *
+     * @param userId
+     * @return
+     */
+    public static LdRankInfoVo getLDUserRank(String userId) {
+        Map<String, Object> match = SearchApi.searchById(DataSetConstant.LD_USER_RANK_INFORMATION, userId);
+        LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), LdRankInfoVo.class);
+        return vo;
+    }
+
     public static String updateRankInfo(RankInfoVo vo) {
         return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
     }
@@ -74,8 +87,29 @@ public abstract class RankingStrategy {
         }
     }
 
+    public static void bulkUpdateLdRankInfo(List<LdRankInfoVo> vos) {
+        BulkRequest request = new BulkRequest();
+
+        vos.forEach(vo -> {
+            // Map<String,Object> mapTypes = JSON.parseObject(JSON.toJSONString(vo));
+            request.add(new IndexRequest(DataSetConstant.LD_USER_RANK_INFORMATION).id(vo.getOpenId())
+                    .source(JSON.parseObject(JSON.toJSONString(vo)), XContentType.JSON)
+                    .opType(DocWriteRequest.OpType.INDEX));
+        });
+        try {
+            SearchApi.bulkUpsert(request);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static String createRankInfo(RankInfoVo vo) {
         return SearchApi.insertDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
+    }
+
+    public static String createLDRankInfo(RankInfoVo vo) {
+        return SearchApi.insertDocument(DataSetConstant.LD_USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
     }
 
 }

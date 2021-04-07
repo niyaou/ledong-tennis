@@ -54,6 +54,22 @@ public class UserController {
         return new ResponseEntity<Object>(CommonResponse.success(userService.getUserInfo(userId)), HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = "/ldUserinfo", method = RequestMethod.GET)
+    @ApiOperation(value = "认证管理-token有效认证", notes = "")
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> getLDUserInfo(@RequestHeader("Authorization") String authHeader)
+            throws AuthenticationException {
+
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        // 根据用户id获取接口数据返回接口
+        return new ResponseEntity<Object>(CommonResponse.success(userService.getLDUserInfo(userId)), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value = "认证管理-用户登录", notes = "")
     @ApiImplicitParams({
@@ -75,6 +91,29 @@ public class UserController {
             return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
         }
     }
+
+    @RequestMapping(value = "/ldLogin", method = RequestMethod.POST)
+    @ApiOperation(value = "认证管理-用户登录", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "token", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "nickName", value = "nickName", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "avator", value = "avator", required = true, dataType = "string", paramType = "form"),
+            @ApiImplicitParam(name = "gps", value = "gps", required = true, dataType = "string", paramType = "form") })
+    public ResponseEntity<?> registerLD(@RequestParam(value = "token", required = true) String token,
+                                      @RequestParam(value = "nickName", required = true) String nickName,
+                                      @RequestParam(value = "avator", required = true) String avator,
+                                      @RequestParam(value = "gps", required = true) String gps) {
+        if (gps.contains("undefined")) {
+            gps = CommonConstanst.GPS;
+        }
+        String info = userService.accessByLDWxToken(token, nickName, avator, gps);
+        if (null == info) {
+            return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
+        }
+    }
+
 
     @RequestMapping(value = "/phone", method = RequestMethod.POST)
     @ApiOperation(value = "认证管理-用户登录", notes = "")
@@ -109,6 +148,19 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/ldVerified", method = RequestMethod.POST)
+    @ApiOperation(value = "认证管理-微信认证", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", value = "token", required = true, dataType = "string", paramType = "form") })
+    public ResponseEntity<?> ldVerified(@RequestParam(value = "token", required = true) String token) {
+        String info = userService.ldVerified(token);
+        if (null == info) {
+            return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(value = "/nearby", method = RequestMethod.GET)
     @ApiOperation(value = "用户管理-附近用户", notes = "")
     @ApiImplicitParams({
@@ -132,5 +184,18 @@ public class UserController {
         }
         String userId = claims.getSubject();
         return new ResponseEntity<Object>(CommonResponse.success(userService.getUserList()), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/ldUserList", method = RequestMethod.GET)
+    @ApiOperation(value = "获取所有用户列表", notes = "")
+    // @LogAnnotation(action = LogActionEnum.USER, message = "用户登出")
+    public ResponseEntity<?> getldUserList(@RequestHeader("Authorization") String authHeader)
+            throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(userService.getLDUserList()), HttpStatus.OK);
     }
 }

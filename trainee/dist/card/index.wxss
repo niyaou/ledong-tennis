@@ -51,7 +51,8 @@
   flex: 1;
   text-align: right;
   font-size: 14px;
-  color: #80848f
+  color: #80848f;
+  width:auto
 }
 
 .i-card-body {
@@ -82,3 +83,7 @@
   color: #80848f;
   font-size: 12px
 }
+
+ .avator{
+border-radius: 50%;
+} 

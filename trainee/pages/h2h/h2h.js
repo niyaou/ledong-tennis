@@ -1,5 +1,6 @@
 // pages/matches/matchlist.js
 const app = getApp()
+var http = require('../../utils/http.js')
 Page({
 
   /**
@@ -9,27 +10,49 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible: false,
+    winRate: 0,
     fruit: [{
       id: 1,
       name: '没参加比赛',
-  }, {
+    }, {
       id: 2,
       name: '比分记错了'
-  }],
-  current: '没参加比赛',
-  tags:[{ name :"磨神",
-  checked : false},{ name :"进攻凶猛",
-  checked : false},{ name :"发球大炮",
-  checked : false},{ name :"跑不死",
-  checked : false},{ name :"暴力正手",
-  checked : false},
-  { name :"魔鬼切削",
-  checked : false},{ name :"全场进攻",
-  checked : false},{ name :"变化多端",
-  checked : false},{ name :"发球上网",
-  checked : false},{ name :"底线AK47",
-  checked : false},],
-  currentTarget:[],
+    }],
+    current: '没参加比赛',
+    tags: [{
+        name: "磨神",
+        checked: false
+      }, {
+        name: "进攻凶猛",
+        checked: false
+      }, {
+        name: "发球大炮",
+        checked: false
+      }, {
+        name: "跑不死",
+        checked: false
+      }, {
+        name: "暴力正手",
+        checked: false
+      },
+      {
+        name: "魔鬼切削",
+        checked: false
+      }, {
+        name: "全场进攻",
+        checked: false
+      }, {
+        name: "变化多端",
+        checked: false
+      }, {
+        name: "发球上网",
+        checked: false
+      }, {
+        name: "底线AK47",
+        checked: false
+      },
+    ],
+    currentTarget: [],
     actions: [{
         name: '申诉',
         color: '#fff',
@@ -46,63 +69,45 @@ Page({
         icon: 'undo'
       }
     ],
-    slideButtons: [{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    },{
-      text: '小鱼儿 ',
-      src: '小鱼儿', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    },{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
-  onChange(event){
+  getH2HOpponents() {
+    let jwt = app.globalData.jwt
+    http.getReq('match/matchedGames/h2h/opponent', jwt, (e) => {
+      console.log(e)
+      let opps = e.data.map(d => {
+        return {
+          openId: d.openId,
+          text: d.nickName,
+          src: d.avator, // icon的路径,
+          time: "段位: " + d.rankType0 + "  |   胜率: " + d.winRate + "%",
+          result: '第' + d.position + '名',
+
+        }
+
+      })
+      this.setData({
+        slideButtons: opps
+      })
+    })
+  },
+  onChange(event) {
     const detail = event.detail;
-        this.setData({
-            ['tags['+event.detail.name+'].checked'] : detail.checked
-        })
-  },
-  handleFruitChange({ detail = {} }) {
     this.setData({
-        current: detail.value
+      ['tags[' + event.detail.name + '].checked']: detail.checked
+    })
+  },
+  handleFruitChange({
+    detail = {}
+  }) {
+    this.setData({
+      current: detail.value
     });
-},
-  handleClose1(){
-    this.setData({visible:false})
+  },
+  handleClose1() {
+    this.setData({
+      visible: false
+    })
   },
   handleClickItem2(e) {
     console.log(e.detail, this.data.slideButtons[e.detail.dataIndex].toggle)
@@ -112,23 +117,28 @@ Page({
         slideButtons: this.data.slideButtons
       });
 
-    }else{
-      this.setData({visible1:true})
+    } else {
+      this.setData({
+        visible1: true
+      })
     }
 
   },
-  handleTapped(e){
+  handleTapped(e) {
     // this.setData({visible:true})
-    console.log(e.detail)
+    console.log(e.detail, this.data.slideButtons[e.detail.index])
+
     wx.navigateTo({
-      url: './detail',
+      url: './detail?opponentId=' + this.data.slideButtons[e.detail.index].openId,
     })
   },
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    this.setData({
+      winRate: options.winRate
+    })
   },
 
   /**
@@ -142,7 +152,8 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-console.log(app.globalData)
+    console.log(app.globalData)
+    this.getH2HOpponents()
   },
 
   /**

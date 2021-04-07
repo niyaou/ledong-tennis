@@ -2,6 +2,7 @@ package ledong.wxapp.service;
 
 import java.util.HashMap;
 
+import VO.LdRankInfoVo;
 import VO.RankInfoVo;
 
 public interface IRankService {
@@ -56,6 +57,14 @@ public interface IRankService {
     public RankInfoVo getUserRank(String userId);
 
     /**
+     * get user rank information by id
+     *
+     * @param userId
+     * @return
+     */
+    public LdRankInfoVo getLDUserRank(String userId);
+
+    /**
      * update user rank information
      * 
      * @param userId
@@ -78,6 +87,7 @@ public interface IRankService {
      * get tag list
      */
     public Object getTagsList();
+
     /**
      * get ranking list
      * 
@@ -109,6 +119,16 @@ public interface IRankService {
      * @return
      */
     public String createRankInfo(String userId);
+
+    /**
+     * create user LD rank info
+     *
+     * @param userId
+     * @return
+     */
+    public String createLDRankInfo(String userId);
+
+
 
     /**
      * update user win rate
@@ -143,6 +163,14 @@ public interface IRankService {
     public Integer getUserPositionInRankList(String userId);
 
     /**
+     *
+     *
+     * @param userId
+     * @return
+     */
+    public Integer getLDUserPositionInRankList(String userId);
+
+    /**
      * get system user
      * 
      * @return
@@ -171,11 +199,18 @@ public interface IRankService {
      * @return
      */
     public Object getScoreLog(String openId);
+
     /**
      * 
      * @return
      */
     public String updateUserPosition();
+
+    /**
+     *
+     * @return
+     */
+    public String updateLDUserPosition();
 
     /**
      * 

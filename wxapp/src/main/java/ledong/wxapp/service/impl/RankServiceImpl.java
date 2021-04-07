@@ -1,14 +1,6 @@
 package ledong.wxapp.service.impl;
 
-import VO.DoubleMatchPostVo;
-import VO.DoubleWinRateEvent;
-import VO.MatchConfirmEvent;
-import VO.MatchPostVo;
-import VO.RankInfoVo;
-import VO.ScoreLogVo;
-import VO.SlamWinRateEvent;
-import VO.UserVo;
-import VO.WinRateEvent;
+import VO.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
@@ -115,8 +107,8 @@ public class RankServiceImpl implements IRankService {
     scoreChangeLog(holder.getOpenId(), scores[0], "与" + challengerVo.get(UserVo.NICKNAME) + "比赛得分");
     updateRankInfo(challenger);
     scoreChangeLog(challenger.getOpenId(), scores[1], "与" + holderVo.get(UserVo.NICKNAME) + "比赛得分");
-    ctx.publishEvent(new WinRateEvent(ctx, holder));
-    ctx.publishEvent(new WinRateEvent(ctx, challenger));
+    ctx.publishEvent(new WinRateEvent(ctx, holder, challenger));
+//    ctx.publishEvent(new WinRateEvent(ctx, challenger));
     updateUserPosition();
     // redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"),
     // matchId, 60 * 60 * 24 * 7);
@@ -128,6 +120,11 @@ public class RankServiceImpl implements IRankService {
   @Override
   public RankInfoVo getUserRank(String userId) {
     return RankingStrategy.getUserRank(userId);
+  }
+
+  @Override
+  public LdRankInfoVo getLDUserRank(String userId) {
+    return RankingStrategy.getLDUserRank(userId);
   }
 
   @Override
@@ -241,6 +238,17 @@ public class RankServiceImpl implements IRankService {
   }
 
   @Override
+  public String createLDRankInfo(String userId) {
+    RankInfoVo vo = new RankInfoVo();
+    vo.setOpenId(userId);
+    GradingContext gContext = new GradingContext(new GradeRanking());
+    vo = gContext.rankMatch(vo);
+    ctx.publishEvent(new MatchConfirmEvent(ctx, null));
+    return RankingStrategy.createLDRankInfo(vo);
+  }
+
+
+  @Override
   public Double updateWinRate(String userId) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder user = new BoolQueryBuilder();
@@ -277,6 +285,23 @@ public class RankServiceImpl implements IRankService {
       searchSourceBuilder.query(range);
       searchSourceBuilder.size(500);
       rankPosition = SearchApi.totalRawResponse(searchSourceBuilder, DataSetConstant.USER_RANK_INFORMATION);
+    }
+    return rankPosition == null ? 1 : (rankPosition + 1);
+  }
+
+
+  @Override
+  public Integer getLDUserPositionInRankList(String userId) {
+    Integer rankPosition = 0;
+    List<HashMap<String, Object>> users = SearchApi.searchByField(DataSetConstant.LD_USER_RANK_INFORMATION,
+            RankInfoVo.OPENID, userId, null, null);
+    if (users != null) {
+      SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+      QueryBuilder range = SearchApi.createSearchByFieldRangeGtSource(RankInfoVo.SCORE,
+              String.valueOf(users.get(0).get(RankInfoVo.SCORE)));
+      searchSourceBuilder.query(range);
+      searchSourceBuilder.size(500);
+      rankPosition = SearchApi.totalRawResponse(searchSourceBuilder, DataSetConstant.LD_USER_RANK_INFORMATION);
     }
     return rankPosition == null ? 1 : (rankPosition + 1);
   }
@@ -474,6 +499,24 @@ public class RankServiceImpl implements IRankService {
       vos.add(rank);
     });
     RankingStrategy.bulkUpdateRankInfo(vos);
+    return null;
+  }
+
+  @Override
+  public String updateLDUserPosition() {
+    LinkedList<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.LD_USER_RANK_INFORMATION,
+            null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
+    int[] position = { 0 };
+    LinkedList<LdRankInfoVo> vos = new LinkedList<LdRankInfoVo>();
+    GradingContext gContext = new GradingContext(new GradeRanking());
+    users.forEach(u -> {
+      position[0] = position[0] + 1;
+      u.put(LdRankInfoVo.POSITION, position[0]);
+      LdRankInfoVo rank = JSON.parseObject(JSON.toJSONString(u), LdRankInfoVo.class);
+      rank = gContext.rankMatch(rank);
+      vos.add(rank);
+    });
+    RankingStrategy.bulkUpdateLdRankInfo(vos);
     return null;
   }
 

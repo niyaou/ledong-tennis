@@ -25,12 +25,28 @@ public interface IUserService {
     public String addUser(UserVo user);
 
     /**
+     * create new user ld
+     *
+     * @param user
+     * @return
+     */
+    public String addLDUser(UserVo user);
+
+    /**
      * verified wx
      * 
      * @param token
      * @return
      */
     public String verified(String token);
+
+    /**
+     * verified ld wx
+     *
+     * @param token
+     * @return
+     */
+    public String ldVerified(String token);
 
     /**
      * get phone number
@@ -49,12 +65,23 @@ public interface IUserService {
      */
     public String getPhoneNumber(String sessionKey, String iv, String data) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException;
 
+
+
+
     /**
      * 
      * @param openId
      * @return
      */
     public String login(String openId, String nickName, String avator, String gps);
+
+    /**
+     *
+     * @param openId
+     * @return
+     */
+    public String ldLogin(String openId, String nickName, String avator, String gps);
+
 
     /**
      * 
@@ -66,6 +93,15 @@ public interface IUserService {
     public String[] getOpenId(String token);
 
     /**
+     *
+     * get ld wx open id
+     *
+     * @param token
+     * @return
+     */
+    public String[] getLDOpenId(String token);
+
+    /**
      * login by wx token ,create account if not existed;
      * 
      * @param token
@@ -74,11 +110,28 @@ public interface IUserService {
     public String accessByWxToken(String token, String nickName, String avator, String gps);
 
     /**
+     * login by wx token ,create account if not existed;
+     *
+     * @param token
+     * @return
+     */
+    public String accessByLDWxToken(String token, String nickName, String avator, String gps);
+
+
+
+    /**
      * 
      * @param object
      * @return
      */
     public HashMap<String, Object> getUserInfo(String object);
+
+    /**
+     *
+     * @param object
+     * @return
+     */
+    public HashMap<String, Object> getLDUserInfo(String object);
 
     /**
      * 
@@ -95,6 +148,13 @@ public interface IUserService {
      * @return
      */
     public LinkedList<HashMap<String, Object>> getUserList();
+
+
+    /**
+     * get user information by master
+     * @return
+     */
+    public LinkedList<HashMap<String, Object>> getLDUserList();
 
 
 }

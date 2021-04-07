@@ -31,7 +31,7 @@
   padding: 0 10px;
   vertical-align: middle;
   text-align: center;
-  background: -webkit-gradient(linear, 0% 80%, 70% 90%, from(#1cdb25), to(rgb(11, 172, 131)));
+  background: -webkit-gradient(linear, 0% 80%, 70% 90%, from(#21be29), to(rgb(11, 172, 131)));
   color: var(--weui-FG-1);
 }
 .splash{

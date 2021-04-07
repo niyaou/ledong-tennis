@@ -56,6 +56,15 @@ public class RankController {
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserRank(userId)), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/ldRankInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "explore current rank information", notes = "")
+    public ResponseEntity<?> userLdRankIformationDetail(@RequestHeader("Authorization") String authHeader) {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        String userId = claims.getSubject();
+        MatchRequestVo vo = new MatchRequestVo();
+        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getLDUserRank(userId)), HttpStatus.OK);
+    }
     @RequestMapping(value = "/rankInfo/{user}", method = RequestMethod.GET)
     @ApiOperation(value = "explore current rank information", notes = "")
     public ResponseEntity<?> userRankIformationById(@PathVariable(value = "user", required = true) String user) {
@@ -105,6 +114,21 @@ public class RankController {
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.getUserPositionInRankList(userId)),
                 HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/ldRankPosition", method = RequestMethod.GET)
+    @ApiOperation(value = "get user position in  ranking list ", notes = "")
+    public ResponseEntity<?> userLDRankingListPosition(@RequestHeader("Authorization") String authHeader)
+            throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getLDUserPositionInRankList(userId)),
+                HttpStatus.OK);
+    }
+
 
     @RequestMapping(value = "/totalUser", method = RequestMethod.GET)
     @ApiOperation(value = "get user count ", notes = "")

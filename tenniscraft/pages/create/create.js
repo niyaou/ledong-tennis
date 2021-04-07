@@ -132,16 +132,22 @@ Page({
           title: '加载中',
         })
         setTimeout(()=>{
-          this. finishMatch(res.data)
-        },2000)
+          this. finishMatch(res.data,1)
+        },2500)
     
       }
 
       // console.log(res)
     })
   },
-  finishMatch(matchId){
+  finishMatch(matchId,restTime){
+    
+    restTime=restTime-1
+    if(restTime<0){
+      return 
+    }
     let url = 'match/matchResult/'+matchId
+
     console.log('finishMatch', {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore})
     http.postReq(`${url}`, app.globalData.jwt, {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore}, (res) => {
       console.log(res)
@@ -150,6 +156,11 @@ Page({
         wx.navigateBack({
           delta: 0,
         })
+      }else{
+        setTimeout(()=>{
+          this. finishMatch(res.data,restTime)
+        },500)
+       
       }
 
       // console.log(res)

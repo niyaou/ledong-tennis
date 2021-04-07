@@ -1,19 +1,24 @@
 <!--pages/matches/matchlist.wxml-->
 <view class="containerbg">
-  <i-modal title="评价你的对手" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose1">
-    <i-tag wx:for="{{tags}}"  wx:key="{{index}}" 
-    bindchange="onChange" 
-    name="{{index}}" 
-    checkable="{{true}}"
-     class="tags" 
-     checked="{{item.checked}}" 
-     color="green">{{item.name}}</i-tag>
+  <!-- <i-modal title="分数调整" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose1">
+    <i-input value="{{ score }}" type="number" title="调分" placeholder="请输入需要调整的分数"  disabled="{{visible}}"/>
+    <i-input value="{{ descript }}" title="备注" autofocus placeholder="调分说明" disabled="{{visible}}"/>
      <div slot="footer"></div>
-  </i-modal>
+  </i-modal> -->
   <mp-navigation-bar title="选手排名" back="{{true}}" size="{{large}}"></mp-navigation-bar>
   <i-card full="{{true}}" title="" extra="本赛季总共{{players.length}}位选手参赛" thumb="../../icon/player.jpg">
-    <view slot="content">您目前排名第{{rankPosition}}位</view>
-    <view slot="footer">点击选手图标，可以对选手进行评价</view>
+   
+
+    <view slot="content">
+      <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addMatch" />
+    <view slot="content">记录一场比赛</view>
+
+      点击选手图标，可以对选手进行评价</view>
+    <view slot="footer">   <i-switch value="{{sortTog}}" size="large" bind:change="onSortChange" slot="footer">
+            <view slot="open">比分</view>
+            <view slot="close">名称</view>
+        </i-switch>
+    </view>
   </i-card>
 
   <view class="weui-flex">
@@ -27,12 +32,13 @@
     <view class="weui-flex">
       <view class="weui-flex__item">
 
-        <scroll-view scroll-y style="width: 100%; height: 30.5rem;">
+        <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
           <!-- <view wx:for="{{slideButtons}}"> -->
             <view wx:for="{{players}}">
             <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="   {{item.nickName}}" 
-           indexs="{{index}}"
+            indexs="{{index}}"
             bind:tapped="handleTapped"
+            data-info="{{item}}"
             subtitle="第{{item.position}}名 "
             extra="段位:{{item.rankType0}}    积分:{{item.score}}  " thumb="{{item.avator}}">
             </i-card>

@@ -1,5 +1,6 @@
 package ledong.wxapp.strategy.context;
 
+import VO.LdRankInfoVo;
 import VO.RankInfoVo;
 import ledong.wxapp.strategy.GradingStrategy;
 
@@ -12,5 +13,9 @@ public class GradingContext {
 
     public RankInfoVo rankMatch(RankInfoVo userRanking) {
         return ranking.ranking(userRanking);
+    }
+
+    public LdRankInfoVo rankMatch(LdRankInfoVo userRanking) {
+        return ranking.ldRanking(userRanking);
     }
 }

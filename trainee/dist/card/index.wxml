@@ -1,10 +1,10 @@
 <view class="i-class i-card {{ full ? 'i-card-full' : '' }}">
     <view class="i-class i-card-header">
-        <view class="i-card-header-content">
-            <image class="i-card-header-thumb" src="{{ thumb }}" mode="aspectFit" wx:if="{{ thumb }}" bind:tap="tapTrigger" />
-          {{ title }}
+        <view class="i-card-header-content rowflex">
+            <image class="avator i-card-header-thumb" src="{{ thumb }}" mode="aspectFit" wx:if="{{ thumb }}" bind:tap="tapTrigger" />
+            <view style="text-overflow:ellipsis;overflow: hidden;width:80%;white-space:nowrap;">{{ title}}</view>
         </view>
-        {{subtitle}}
+        <view>{{subtitle}}</view>
         <view class="i-card-header-extra" wx:if="{{ extra }}">{{ extra }}</view>
     </view>
     <view  wx:if="{{hasSlot}}" class="i-class i-card-body {{hasSlot?'':'hidden'}}"><slot name="content"></slot></view>

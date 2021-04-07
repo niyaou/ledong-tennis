@@ -9,12 +9,14 @@ Page({
    * 页面的初始数据
    */
   data: {
+    isHolder:true,
     holderScore:0,
     challengerScore:0,
     isChoiceOpponent:false,
     players:[],
-    holder:'',
     time:util.formatTime(new Date()),
+    holderName:'',
+    holderId:'',
     name:'',
     id:'',
     statusBarHeight: getApp().globalData.statusBarHeight,
@@ -116,15 +118,26 @@ Page({
   },
   onChange(e){
     console.log(e)
-    this.setData({
-      isChoiceOpponent:false,
-        name:e.currentTarget.dataset.id.name,
-        id: e.currentTarget.dataset.id.openId
-    })
+
+if(this.data.isHolder){
+  this.setData({
+    isChoiceOpponent:false,
+    holderName:e.currentTarget.dataset.id.name,
+    holderId: e.currentTarget.dataset.id.openId
+  })
+}else{
+  this.setData({
+    isChoiceOpponent:false,
+      name:e.currentTarget.dataset.id.name,
+      id: e.currentTarget.dataset.id.openId
+  })
+}
+
+
   },
   handleClick(e){
-    let url = 'match/postMatch'
-    http.postReq(`${url}`, app.globalData.jwt, {opponent:this.data.id}, (res) => {
+    let url = 'match/postMatchByMaster'
+    http.postReq(`${url}`, app.globalData.jwt, {holder:this.data.holderId,opponent:this.data.id}, (res) => {
       console.log(res)
       if (res.code === 0) {
         wx.showLoading({
@@ -134,7 +147,6 @@ Page({
         setTimeout(()=>{
           this. finishMatch(res.data)
         },2000)
-    
       }
 
       // console.log(res)
@@ -160,8 +172,15 @@ Page({
         current: detail.value
     });
 },
+choiceHolder(e){
+  this.setData({
+    isHolder:true,
+    isChoiceOpponent:true
+  })
+},
 choiceOpponent(e){
 this.setData({
+  isHolder:false,
   isChoiceOpponent:true
 })
 },
@@ -180,17 +199,6 @@ this.setData({
   },
   pinyin:function(){
     var char = "使";
-    // if (pinyinjs.hasOwnProperty(char)) {
-    //   console.log(pinyinjs[char][0].substring(0,1))
-    //   this.setData({
-    //     pinyinval: pinyinjs[char].join(', ')
-    //   });
-    // }
-    // else {
-    //   this.setData({
-    //     pinyinval: '找不到，^_^'
-    //   });
-    // }
  
   },
 
@@ -208,9 +216,6 @@ this.setData({
     // console.log(pinyin.pinyinUtil)
     // let nickName = pinyin.pinyinUtil.getFirstLetter("法国大使馆反对".substring(0,1))
     // console.log(nickName)
-    this.setData({
-      holder: app.globalData.userInfo.nickName
-    })
     let url = 'rank/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
 

@@ -3,6 +3,7 @@ const app = getApp()
 var http = require('../../utils/http.js')
 // var compare=require('../../utils/util.js')
 const chooseLocation = requirePlugin('chooseLocation');
+var pinyin = require('../../utils/pinyinUtil.js')
 Page({
 
   /**
@@ -12,16 +13,17 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible: false,
+    sortTog:true,
     currentIndex: 0,
     rankPosition: 0,
     fruit: [{
       id: 1,
-      name: '没参加比赛',
+      name: '按名称',
     }, {
       id: 2,
-      name: '比分记错了'
+      name: '按比分'
     }],
-    current: '没参加比赛',
+    current: '按名称',
     tags: [{
         name: "磨神",
         checked: false
@@ -74,7 +76,70 @@ Page({
     ],
     players: [],
     rankPosition: 300,
-    slideButtons: [],
+    slideButtons: [{
+      text: '范大将军 ',
+      src: '范大将军', // icon的路径,
+      time: '黄金 段位',
+      result: '第1',
+      score: '-30',
+      toggle: false
+    }, {
+      text: 'jerry',
+      src: 'jerry', // icon的路径,
+      time: '黄金段位',
+      result: '第2',
+      score: '-30',
+      toggle: false
+    }, {
+      text: '范大将军 ',
+      src: '范大将军', // icon的路径,
+      time: '黄金 段位',
+      result: '第1',
+      score: '-30',
+      toggle: false
+    }, {
+      text: 'jerry',
+      src: 'jerry', // icon的路径,
+      time: '黄金段位',
+      result: '第2',
+      score: '-30',
+      toggle: false
+    }, {
+      text: '范大将军 ',
+      src: '范大将军', // icon的路径,
+      time: '黄金 段位',
+      result: '第1',
+      score: '-30',
+      toggle: false
+    }, {
+      text: 'jerry',
+      src: 'jerry', // icon的路径,
+      time: '黄金段位',
+      result: '第2',
+      score: '-30',
+      toggle: false
+    }],
+  },
+  onSortChange(event){
+    console.log(event.detail)
+    this.setData({
+      sortTog:event.detail.value
+    })
+
+    if(this.data.sortTog){
+      this.setData({
+        players:this.data.players.sort((a, b) => {
+          return a['position'] - b['position']
+        })
+      })
+    }else{
+      this.setData({
+        players: this.data.players.sort((a, b) => {
+          return  pinyin.pinyinUtil.getFirstLetter(a.nickName.substring(0,1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter(b.nickName.substring(0,1)).toUpperCase()?1:-1
+        })
+      })
+    }
+
   },
   onChange(event) {
     const detail = event.detail;
@@ -116,53 +181,27 @@ Page({
           players: this.data.players
         })
       }
-      //  let tags=res.data.tagName.map(t=>{
-      //    return {name:t,checked:false}
-      //  })
-      // this.setData({
-      //   tags: tags
-      // })
       console.log(res)
     })
-
     this.setData({
       visible: false
     })
   },
-
+  addMatch(){
+    wx.navigateTo({
+      url: '../master/create',
+    })
+  },
   handleTapped(e) {
-    let userTag = this.data.players[e.detail.index].polygen
-    if (typeof userTag === 'undefined') {
-      userTag = ''
-    }
-    let tags = this.data.tags.map(p => {
-      p.checked = userTag.indexOf(p.name) > -1
-      return p
-    })
-    this.setData({
-      visible: true,
-      currentIndex: e.detail.index,
-      tags: tags
-    })
-    console.log(e.detail, this.data.players[e.detail.index])
-
-    // //获取对手的tag
-    // let url = 'rank/updateUserTags'
-    // http.getReq(`${url}`, app.globalData.jwt, (res) => {
-    //    let tags=res.data.tagName.map(t=>{
-    //      return {name:t,checked:false}
-    //    })
-    //   this.setData({
-    //     tags: tags
-    //   })
-    //   console.log(res)
-    // })
-
+console.log(e)
+wx.navigateTo({
+  url: '../master/score?id='+e.currentTarget.dataset.info.openId+'&name='+e.currentTarget.dataset.info.nickName,
+})
   },
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad: function (options) { 
     this.setData({
       rankPosition: options.rankPosition
     })
@@ -200,8 +239,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
-
+    console.log('---------player back--------')
     let url = 'rank/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       this.setData({
@@ -209,12 +247,10 @@ Page({
           return a['position'] - b['position']
         })
       })
-      console.log(this.data.players.map(i => {
-        return i.position
-      }))
+      // console.log(this.data.players.map(i => {
+      //   return i.position
+      // }))
     })
-    this.getTagsFromServe()
-    this.getRankPosition(app.globalData.jwt)
   },
 
 

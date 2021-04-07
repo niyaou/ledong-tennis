@@ -57,6 +57,12 @@ public class UserServiceImpl implements IUserService {
     @Value("${wxapp.secret}")
     private String appSecret;
 
+    @Value("${wxapp.ld.appid}")
+    private String ldAppId;
+
+    @Value("${wxapp.ld.secret}")
+    private String ldAppSecret;
+
     @Autowired
     private JwtToken jwtToken;
 
@@ -73,10 +79,27 @@ public class UserServiceImpl implements IUserService {
                 user.setGps(CommonConstanst.GPS);
             }
         } catch (Exception e) {
+        }
+        String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),
+                user.getOpenId());
+        Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getOpenId()));
+        return userId;
+    }
+
+
+    @Override
+    public String addLDUser(UserVo user) {
+        String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        user.setCreateTime(createTime);
+        try {
+            if (user.getGps().contains("undefined")) {
+                user.setGps(CommonConstanst.GPS);
+            }
+        } catch (Exception e) {
 
         }
 
-        String userId = SearchApi.insertDocument(DataSetConstant.USER_INFORMATION, JSON.toJSONString(user),
+        String userId = SearchApi.insertDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(user),
                 user.getOpenId());
         Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getOpenId()));
         return userId;
@@ -100,6 +123,27 @@ public class UserServiceImpl implements IUserService {
         return null;
     }
 
+
+    @Override
+    public String ldLogin(String openId, String nickName, String avator, String gps) {
+        HashMap<String, String> vo = new HashMap<String, String>();
+        vo.put(UserVo.OPENID, openId);
+        LinkedList<HashMap<String, Object>> loginUser = SearchApi.searchByField(DataSetConstant.LD_USER_INFORMATION,
+                UserVo.OPENID, openId, null, null);
+        if (loginUser != null) {
+            loginUser.getFirst().put(UserVo.NICKNAME, nickName);
+            loginUser.getFirst().put(UserVo.AVATOR, avator);
+            if (!gps.contains("undefined")) {
+                loginUser.getFirst().put(UserVo.GPS, gps);
+            }
+            SearchApi.updateDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()), openId);
+            return jwtToken.generateToken(openId);
+        }
+        return null;
+    }
+
+
+
     @Override
     public String[] getOpenId(String token) {
         RestTemplate restTemplate = new RestTemplate();
@@ -107,11 +151,23 @@ public class UserServiceImpl implements IUserService {
                 "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
                 appId, appSecret, token);
         try {
-            // OpenId openId = restTemplate.getForObject(url, OpenId.class);
             String json = restTemplate.getForObject(url, String.class);
-
             JSONObject openId = (JSONObject) JSONObject.parse(json);
+            return new String[] { openId.getString("openid"), openId.getString("session_key") };
+        } catch (RestClientException e) {
+            return null;
+        }
+    }
 
+    @Override
+    public String[] getLDOpenId(String token) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = String.format(
+                "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
+                ldAppId, ldAppSecret, token);
+        try {
+            String json = restTemplate.getForObject(url, String.class);
+            JSONObject openId = (JSONObject) JSONObject.parse(json);
             return new String[] { openId.getString("openid"), openId.getString("session_key") };
         } catch (RestClientException e) {
             return null;
@@ -120,8 +176,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public String accessByWxToken(String token, String nickName, String avator, String gps) {
-        // String[] userInfo = getOpenId(token);
-        // userInfo = Optional.ofNullable(userInfo).orElse(new String[] { "" });
         String jwtString = login(token, nickName, avator, gps);
         if (TextUtils.isEmpty(jwtString)) {
             UserVo user = new UserVo();
@@ -130,6 +184,20 @@ public class UserServiceImpl implements IUserService {
             user.setAvator(avator);
             user.setGps(gps);
             jwtString = jwtToken.generateToken(addUser(user));
+        }
+        return jwtString;
+    }
+
+    @Override
+    public String accessByLDWxToken(String token, String nickName, String avator, String gps) {
+        String jwtString = ldLogin(token, nickName, avator, gps);
+        if (TextUtils.isEmpty(jwtString)) {
+            UserVo user = new UserVo();
+            user.setOpenId(token);
+            user.setNickName(nickName);
+            user.setAvator(avator);
+            user.setGps(gps);
+            jwtString = jwtToken.generateToken(addLDUser(user));
         }
         return jwtString;
     }
@@ -147,8 +215,19 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public LinkedList<HashMap<String, Object>> getNearyByUser(String gps) {
+    public HashMap<String, Object> getLDUserInfo(String openId) {
+        HashMap<String, String> vo = new HashMap<String, String>();
+        vo.put(UserVo.OPENID, openId);
+        LinkedList<HashMap<String, Object>> loginUser = SearchApi.searchByField(DataSetConstant.LD_USER_INFORMATION,
+                UserVo.OPENID, openId, null, null);
+        if (loginUser != null) {
+            return loginUser.get(0);
+        }
+        return null;
+    }
 
+    @Override
+    public LinkedList<HashMap<String, Object>> getNearyByUser(String gps) {
         return SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps, "50",10);
 
     }
@@ -156,6 +235,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String verified(String token) {
         String[] userInfo = getOpenId(token);
+        return userInfo == null ? null : userInfo[1];
+    }
+
+    @Override
+    public String ldVerified(String token) {
+        String[] userInfo = getLDOpenId(token);
         return userInfo == null ? null : userInfo[1];
     }
 
@@ -168,7 +253,6 @@ public class UserServiceImpl implements IUserService {
         byte[] encrypted64 = Base64.decodeBase64(data);
         byte[] key64 = Base64.decodeBase64(sessionKey);
         byte[] iv64 = Base64.decodeBase64(iv);
-
         try {
             init();
             json = new String(decrypt(encrypted64, key64, generateIV(iv64)));
@@ -223,6 +307,24 @@ public class UserServiceImpl implements IUserService {
           return  userlist;
         } catch (IOException e) {
        
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public LinkedList<HashMap<String, Object>> getLDUserList() {
+        try {
+            LinkedList<HashMap<String, Object>> userlist= SearchApi.searchAll(DataSetConstant.LD_USER_INFORMATION, 0, 400);
+            if (userlist!=null){
+                // userlist.stream().sorted(Collator.getInstance(Locale.CHINESE).compare(o1, o2));
+                userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
+                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME), o2.get(UserVo.NICKNAME));
+                });
+            }
+            return  userlist;
+        } catch (IOException e) {
+
             e.printStackTrace();
         }
         return null;
