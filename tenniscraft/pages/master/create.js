@@ -146,7 +146,7 @@ if(this.data.isHolder){
         })
         setTimeout(()=>{
           this. finishMatch(res.data)
-        },2000)
+        },2500)
       }
 
       // console.log(res)

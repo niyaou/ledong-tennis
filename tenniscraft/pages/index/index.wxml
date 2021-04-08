@@ -119,7 +119,7 @@
     <view class="weui-footer__links">
       <navigator url="" class="weui-footer__link" style="color:#ccc">网者争霸</navigator>
     </view>
-    <view class="weui-footer__text">Copyright © 2020-2021 LedongTennis</view>
+    <view class="weui-footer__text">Copyright © 2020-2021 LedongTennis v{{versionName}}</view>
   </view>
   </block>
 </view>

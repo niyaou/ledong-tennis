@@ -20,7 +20,7 @@
       <view class="contentSpace">{{slideButtons[0].name}}</view>
     </view>
   </view>
-  <i-cell title="本赛季与{{userInfo.nickName}}比赛{{slideButtons.length}}次" label="获胜{{times}}次"
+  <i-cell title="本赛季与{{slideButtons[0].name}}比赛{{slideButtons.length}}次" label="获胜{{times}}次"
                   value="胜率{{winRate}}%" only-tap-footer></i-cell>
   <i-divider height="1"></i-divider>
   <!-- 
