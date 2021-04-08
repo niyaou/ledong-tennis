@@ -84,7 +84,6 @@ public class SearchApi {
         client = EsClientFactory.getInstance().getClient();
     }
 
-
     /**
      * 查询所有
      * 
@@ -140,11 +139,11 @@ public class SearchApi {
     public static HashMap<String, Object> searchById(String indexName, String id) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    
+
         // searchSourceBuilder.version(true);
         searchSourceBuilder.query(QueryBuilders.idsQuery().addIds(id));
         searchRequest.source(searchSourceBuilder);
-   
+
         return parseSingleResponse(searchRequest);
     }
 
@@ -179,7 +178,8 @@ public class SearchApi {
      * 根据ID批量获取文档
      *
      */
-    public static HashMap<String,HashMap<String, Object>> getDocsByMultiIdsWithMap(String indexName, String key,String... ids) {
+    public static HashMap<String, HashMap<String, Object>> getDocsByMultiIdsWithMap(String indexName, String key,
+            String... ids) {
         MultiGetRequest request = new MultiGetRequest();
         Optional.ofNullable(ids).ifPresent(o -> {
             for (String id : o) {
@@ -188,12 +188,13 @@ public class SearchApi {
         });
 
         MultiGetResponse response;
-        HashMap<String,HashMap<String, Object>>  map = new  HashMap<String,HashMap<String, Object>> ();
+        HashMap<String, HashMap<String, Object>> map = new HashMap<String, HashMap<String, Object>>();
         try {
             response = client.mget(request, RequestOptions.DEFAULT);
             for (MultiGetItemResponse item : response.getResponses()) {
-//                list.add(item.getResponse().getSourceAsMap());
-                map.put((String)item.getResponse().getSourceAsMap().get(key), (HashMap<String, Object>) item.getResponse().getSourceAsMap());
+                // list.add(item.getResponse().getSourceAsMap());
+                map.put((String) item.getResponse().getSourceAsMap().get(key),
+                        (HashMap<String, Object>) item.getResponse().getSourceAsMap());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -221,7 +222,6 @@ public class SearchApi {
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }
-
 
     /**
      * 查询多个字段满足某个条件
@@ -301,8 +301,8 @@ public class SearchApi {
      * @param size
      * @return
      */
-    public static HashMap<String, HashMap<String, Object>> searchByFieldSortedInMap(String indexName, String key, String value,
-                                                                               String sortField, SortOrder order, Integer pageNo, Integer size) {
+    public static HashMap<String, HashMap<String, Object>> searchByFieldSortedInMap(String indexName, String key,
+            String value, String sortField, SortOrder order, Integer pageNo, Integer size) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.sort(sortField, order);
@@ -317,8 +317,6 @@ public class SearchApi {
         return parseResponseInMap(searchRequest);
     }
 
-
-    
     /**
      * 查询特定字段的指定值,按指定规则排序结果
      * 
@@ -346,11 +344,10 @@ public class SearchApi {
         return parseResponse(searchRequest);
     }
 
-
     public static LinkedList<HashMap<String, Object>> searchByLocation(String indexName, String key, String value,
-            String distance,Integer size) {
-        if(size ==null){
-            size=50;
+            String distance, Integer size) {
+        if (size == null) {
+            size = 50;
         }
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -574,9 +571,9 @@ public class SearchApi {
             script = new Script(ScriptType.INLINE, Script.DEFAULT_SCRIPT_LANG, script_str, params);
 
             // logger.info("script:\n"+script);
-            log.warn(String.format("错误信息 ： %s", script_str));
+            // log.warn(String.format("错误信息 ： %s", script_str));
 
-            log.warn(String.format("params ： %s", script.getParams()));
+            // log.warn(String.format("params ： %s", script.getParams()));
         }
 
         try {
@@ -878,7 +875,7 @@ public class SearchApi {
         searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
 
         searchRequest.source(searchSourceBuilder);
-      log.info(searchSourceBuilder.toString());
+        // log.info(searchSourceBuilder.toString());
         // try {
         // SearchResponse searchResponse = client.search(searchRequest,
         // RequestOptions.DEFAULT);
@@ -910,7 +907,7 @@ public class SearchApi {
         searchSourceBuilder.query(queryBuilder);
         searchSourceBuilder.version(true);
         searchRequest.source(searchSourceBuilder);
-        log.info(searchSourceBuilder.toString());
+        // log.info(searchSourceBuilder.toString());
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             return searchResponse;
@@ -919,7 +916,6 @@ public class SearchApi {
         }
         return null;
     }
-
 
     /**
      * 根据传入的查询条件检索文档
@@ -950,7 +946,6 @@ public class SearchApi {
         return null;
     }
 
-
     public static Long indexCount(String indexName) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -958,7 +953,7 @@ public class SearchApi {
         searchRequest.source(searchSourceBuilder);
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            Long hits=searchResponse.getHits().getTotalHits().value;
+            Long hits = searchResponse.getHits().getTotalHits().value;
             return hits;
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -966,23 +961,22 @@ public class SearchApi {
         return null;
     }
 
-
     public static SearchResponse H2HOpponentAggs(String indexName, QueryBuilder... queries) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().size(0);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-            for (QueryBuilder query : queries) {
-                if (query == null) {
-                    continue;
-                }
-                boolQueryBuilder.should(query);
+        for (QueryBuilder query : queries) {
+            if (query == null) {
+                continue;
             }
+            boolQueryBuilder.should(query);
+        }
 
         TermsAggregationBuilder opps = AggregationBuilders.terms("holder").field("holder");
         TermsAggregationBuilder opps2 = AggregationBuilders.terms("challenger").field("challenger");
         searchSourceBuilder.query(boolQueryBuilder).aggregation(opps).aggregation(opps2);
         searchRequest.source(searchSourceBuilder);
-        log.info(searchSourceBuilder.toString());
+        // log.info(searchSourceBuilder.toString());
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             return searchResponse;
@@ -991,7 +985,6 @@ public class SearchApi {
         }
         return null;
     }
-
 
     public static SearchResponse fileStatiscByParams(String indexName, QueryBuilder... queries) {
         SearchRequest searchRequest = new SearchRequest(indexName);
@@ -1055,7 +1048,7 @@ public class SearchApi {
      * @return
      */
     public static DocWriteResponse deleteDocument(String indexName, String id) {
-        DeleteRequest deleteRequest = new DeleteRequest(indexName,  id);
+        DeleteRequest deleteRequest = new DeleteRequest(indexName, id);
         try {
             return client.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -1217,13 +1210,11 @@ public class SearchApi {
         return null;
     }
 
+    public static void bulkUpsert(BulkRequest request) throws IOException {
+        // BulkRequest request = new BulkRequest();
 
-    public static void bulkUpsert( BulkRequest request) throws IOException {
-        // BulkRequest request = new BulkRequest(); 
-      
         client.bulk(request, RequestOptions.DEFAULT);
     }
-
 
     /**
      * 创建搜索页码
@@ -1326,8 +1317,8 @@ public class SearchApi {
      * @param searchRequest
      * @return
      */
-    private static HashMap<String,HashMap<String, Object>> parseResponseInMap(SearchRequest searchRequest) {
-        HashMap<String,HashMap<String, Object>> map = new HashMap<String,HashMap<String, Object>>();
+    private static HashMap<String, HashMap<String, Object>> parseResponseInMap(SearchRequest searchRequest) {
+        HashMap<String, HashMap<String, Object>> map = new HashMap<String, HashMap<String, Object>>();
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             SearchHit[] searchHits = searchResponse.getHits().getHits();
@@ -1335,7 +1326,7 @@ public class SearchApi {
                 HashMap<String, Object> m = (HashMap<String, Object>) hit.getSourceAsMap();
                 m.put(ID, hit.getId());
                 m.put(VERSION, hit.getVersion());
-                map.put(hit.getId(),m);
+                map.put(hit.getId(), m);
             }
             return map.size() != 0 ? map : null;
         } catch (IOException e) {
