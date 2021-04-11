@@ -117,6 +117,49 @@ public class RankServiceImpl implements IRankService {
     return String.valueOf(scoreChanged);
   }
 
+
+  @Override
+  public String matchLDRank(String matchId, int holderScore, int challengerScor) {
+    int[] scores = new int[2];
+    int[] tempScore = new int[2];
+    Map<String, Object> match = SearchApi.searchById(DataSetConstant.LD_GAME_MATCH_INFORMATION, matchId);
+    MatchPostVo vo = JSONObject.parseObject(JSONObject.toJSONString(match), MatchPostVo.class);
+
+    LdRankInfoVo holder = getLDUserRank(vo.getHolder());
+    LdRankInfoVo challenger = getLDUserRank(vo.getChallenger());
+    int scoreChanged = 0;
+    RankingContext context = new RankingContext(new VictoryRanking());
+    scores = context.rankMatch(matchId, holderScore, challengerScor);
+
+    context = new RankingContext(new ConsecutiveRanking());
+    tempScore = context.rankMatch(matchId, holderScore, challengerScor);
+
+    scores[0] += tempScore[0];
+    scores[1] += tempScore[1];
+
+
+
+    holder.setScore((holder.getScore() + scores[0])<0?0:(holder.getScore() + scores[0]));
+    challenger.setScore((challenger.getScore() + scores[1])<0?0:(challenger.getScore() + scores[1]));
+
+    GradingContext gContext = new GradingContext(new GradeRanking());
+
+    holder = gContext.rankMatch(holder);
+    challenger = gContext.rankMatch(challenger);
+
+
+    HashMap<String, Object> holderVo = iUserService.getLDUserInfo(holder.getOpenId());
+    HashMap<String, Object> challengerVo = iUserService.getLDUserInfo(challenger.getOpenId());
+
+    updateLDRankInfo(holder);
+    scoreLDChangeLog(holder.getOpenId(), scores[0], "与" + challengerVo.get(UserVo.NICKNAME) + "比赛得分");
+    updateRankInfo(challenger);
+    scoreLDChangeLog(challenger.getOpenId(), scores[1], "与" + holderVo.get(UserVo.NICKNAME) + "比赛得分");
+    ctx.publishEvent(new WinRateEvent(ctx, holder, challenger));
+    updateLDUserPosition();
+    return String.valueOf(scoreChanged);
+  }
+
   @Override
   public RankInfoVo getUserRank(String userId) {
     return RankingStrategy.getUserRank(userId);
@@ -130,6 +173,12 @@ public class RankServiceImpl implements IRankService {
   @Override
   public String updateRankInfo(RankInfoVo vo) {
     return RankingStrategy.updateRankInfo(vo);
+  }
+
+
+  @Override
+  public String updateLDRankInfo(LdRankInfoVo vo) {
+    return RankingStrategy.updateLDRankInfo(vo);
   }
 
   @Override
@@ -153,7 +202,35 @@ public class RankServiceImpl implements IRankService {
   }
 
   @Override
+  public String updateLDUserTags(String userId, String tag) {
+    LdRankInfoVo user = RankingStrategy.getLDUserRank(userId);
+    String tags = user.getPolygen();
+
+    for (int i = 0; i < tag.split(",").length; i++) {
+      if (tags == null) {
+        tags = "";
+      }
+      if (!tags.contains(tag.split(",")[i])) {
+        tags = tags + "," + tag.split(",")[i];
+      }
+    }
+    // if(tags.contains(",")){
+    // tags= tags.substring(1,tags.length());
+    // }
+    user.setPolygen(tags);
+    return updateLDRankInfo(user);
+  }
+
+
+
+  @Override
   public Object getTagsList() {
+    HashMap<String, Object> tags = SearchApi.searchById(DataSetConstant.TAGS_INFORMATION, "1");
+    return tags;
+  }
+
+  @Override
+  public Object getLDTagsList() {
     HashMap<String, Object> tags = SearchApi.searchById(DataSetConstant.TAGS_INFORMATION, "1");
     return tags;
   }
@@ -239,7 +316,7 @@ public class RankServiceImpl implements IRankService {
 
   @Override
   public String createLDRankInfo(String userId) {
-    RankInfoVo vo = new RankInfoVo();
+    LdRankInfoVo vo = new LdRankInfoVo();
     vo.setOpenId(userId);
     GradingContext gContext = new GradingContext(new GradeRanking());
     vo = gContext.rankMatch(vo);
@@ -378,74 +455,53 @@ public class RankServiceImpl implements IRankService {
     Long start = System.currentTimeMillis();
     HashMap<String, HashMap<String, Object>> users = SearchApi.searchByFieldSortedInMap(
         DataSetConstant.USER_RANK_INFORMATION, null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
-    // Long step1 = System.currentTimeMillis();
-    // logger.info("step1" + (step1 - start) + " total" + (step1 - start));
     List<HashMap<String, Object>> result = new ArrayList<>();
     if (users != null) {
       String[] idsArr = new String[users.size()];
       List<String> ids = new ArrayList<String>();
-      // users = users.stream().map(match -> {
-      // ids.add((String) match.get(RankInfoVo.OPENID));
-      // return match;
-      // }).collect(Collectors.toList());
       for (String key : users.keySet()) {
         ids.add(key);
       }
-
-      // Long step2 = System.currentTimeMillis();
-      // logger.info("step2" + (step2 - step1) + " total" + (step2 - start));
       HashMap<String, HashMap<String, Object>> userInfos = SearchApi
           .getDocsByMultiIdsWithMap(DataSetConstant.USER_INFORMATION, UserVo.OPENID, ids.toArray(idsArr));
-      // Long step3 = System.currentTimeMillis();
-      // logger.info("step3" + (step3 - step2) + " total" + (step3 - start));
       long total = 0;
       for (String key : users.keySet()) {
-        // Long for1 = System.currentTimeMillis();
         HashMap<String, Object> u = users.get(key);
         HashMap<String, Object> info = userInfos.get(key);
         u.putAll(info);
-        // u.put(UserVo.CREATETIME,info.get(UserVo.CREATETIME));
-        // u.put(MatchPostVo.HOLDERAVATOR,info.get(UserVo.AVATOR));
-        // u.put(MatchPostVo.HOLDERNAME, info.get(UserVo.NICKNAME));
-        // u.put(MatchPostVo.COURTNAME,
-        // iMatchService.commonCourt((String)info.get(UserVo.OPENID))
-        // .get(MatchPostVo.COURTNAME)) ;
         Long for2 = System.currentTimeMillis();
         result.add(u);
         total++;
-        // logger.info("for loop--" + total + "--" + (for2 - for1));
       }
-
-      // users.forEach(u->{
-      //
-      // userInfos.forEach(i->{
-      // if(i.get(RankInfoVo.OPENID).equals(u.get(UserVo.OPENID))){
-      // u.put(UserVo.CREATETIME,i.get(UserVo.CREATETIME));
-      // u.put(MatchPostVo.HOLDERAVATOR, i.get(UserVo.AVATOR));
-      // u.put(MatchPostVo.HOLDERNAME, i.get(UserVo.NICKNAME));
-      // u.put(MatchPostVo.COURTNAME,
-      // iMatchService.commonCourt((String)i.get(UserVo.OPENID))
-      // .get(MatchPostVo.COURTNAME)) ;
-      // }
-      // });
-      // });
-
-      // users = users.stream().map(match -> {
-      // List<Map<String, Object>> holder = userInfos.stream()
-      // .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(UserVo.OPENID)))
-      // .collect(Collectors.toList());
-      // match.put(UserVo.CREATETIME, holder.get(0).get(UserVo.CREATETIME));
-      // match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
-      // match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
-      // match.put(MatchPostVo.COURTNAME, iMatchService.commonCourt((String)
-      // holder.get(0).get(UserVo.OPENID))
-      // .get(MatchPostVo.COURTNAME));
-      // return match;
-      // }).sorted(Comparator.comparing(UserVo::comparingByTime).reversed()).collect(Collectors.toList());
-      // Long step4 = System.currentTimeMillis();
-      // logger.info("step4" + (step4 - step3) + " total" + (step4 - start));
     }
+    return result;
+  }
 
+
+  @Override
+  public Object getLDRankingList(Integer count) {
+    Long start = System.currentTimeMillis();
+    HashMap<String, HashMap<String, Object>> users = SearchApi.searchByFieldSortedInMap(
+            DataSetConstant.LD_USER_RANK_INFORMATION, null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
+    List<HashMap<String, Object>> result = new ArrayList<>();
+    if (users != null) {
+      String[] idsArr = new String[users.size()];
+      List<String> ids = new ArrayList<String>();
+      for (String key : users.keySet()) {
+        ids.add(key);
+      }
+      HashMap<String, HashMap<String, Object>> userInfos = SearchApi
+              .getDocsByMultiIdsWithMap(DataSetConstant.LD_USER_INFORMATION, UserVo.OPENID, ids.toArray(idsArr));
+      long total = 0;
+      for (String key : users.keySet()) {
+        HashMap<String, Object> u = users.get(key);
+        HashMap<String, Object> info = userInfos.get(key);
+        u.putAll(info);
+        Long for2 = System.currentTimeMillis();
+        result.add(u);
+        total++;
+      }
+    }
     return result;
   }
 
@@ -478,11 +534,30 @@ public class RankServiceImpl implements IRankService {
   }
 
   @Override
+  public String scoreLDChangeLog(String openId, Integer score, String description) {
+    ScoreLogVo log = new ScoreLogVo();
+    log.setScore(score);
+    log.setOpenId(openId);
+    log.setDescription(description);
+    log.setRankingTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+    return RankingStrategy.ldLogCreate(log);
+  }
+  @Override
   public Object getScoreLog(String openId) {
     LinkedList<HashMap<String, Object>> logs = SearchApi.searchByFieldSorted(ScoreLogVo.SCORE_CHANGED_LOG,
         ScoreLogVo.OPENID, openId, ScoreLogVo.RANKINGTIME, SortOrder.DESC, 0, 1000);
     return logs;
   }
+
+
+  @Override
+  public Object getLDScoreLog(String openId) {
+    LinkedList<HashMap<String, Object>> logs = SearchApi.searchByFieldSorted(DataSetConstant.LD_SCORE_CHANGED_LOG,
+            ScoreLogVo.OPENID, openId, ScoreLogVo.RANKINGTIME, SortOrder.DESC, 0, 1000);
+    return logs;
+  }
+
+
 
   @Override
   public String updateUserPosition() {

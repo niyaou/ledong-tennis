@@ -57,49 +57,7 @@ Page({
         icon: 'undo'
       }
     ],
-    slideButtons: [{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    },{
-      text: '小鱼儿 ',
-      src: '小鱼儿', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    },{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   hsChange(e){
     console.log(e)
@@ -123,7 +81,7 @@ Page({
     })
   },
   handleClick(e){
-    let url = 'match/postMatch'
+    let url = 'match/ld/postMatch'
     http.postReq(`${url}`, app.globalData.jwt, {opponent:this.data.id}, (res) => {
       console.log(res)
       if (res.code === 0) {
@@ -141,7 +99,7 @@ Page({
     })
   },
   finishMatch(matchId){
-    let url = 'match/matchResult/'+matchId
+    let url = 'match/ld/matchResult/'+matchId
     console.log('finishMatch', {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore})
     http.postReq(`${url}`, app.globalData.jwt, {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore}, (res) => {
       console.log(res)
@@ -205,13 +163,8 @@ this.setData({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    // console.log(pinyin.pinyinUtil)
-    // let nickName = pinyin.pinyinUtil.getFirstLetter("法国大使馆反对".substring(0,1))
-    // console.log(nickName)
-    this.setData({
-      holder: app.globalData.userInfo.nickName
-    })
-    let url = 'rank/rankList?count=500'
+
+    let url = 'rank/ld/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
 
       let storeCity = new Array(26);
@@ -240,6 +193,12 @@ this.setData({
               openId:item.openId
           });
       })
+      if(app.globalData.userInfo!==null){
+        this.setData({
+          holder: app.globalData.userInfo.nickName
+        })
+      }
+
       this.data.players = storeCity;
       this.setData({
           players : this.data.players

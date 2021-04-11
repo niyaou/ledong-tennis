@@ -67,10 +67,16 @@ public abstract class RankingStrategy {
         return SearchApi.updateDocument(DataSetConstant.USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
     }
 
+    public static String updateLDRankInfo(LdRankInfoVo vo) {
+        return SearchApi.updateDocument(DataSetConstant.LD_USER_RANK_INFORMATION, JSON.toJSONString(vo), vo.getOpenId());
+    }
+
     public static String logCreate(ScoreLogVo vo) {
         return SearchApi.insertDocument(ScoreLogVo.SCORE_CHANGED_LOG, JSON.toJSONString(vo));
     }
-
+    public static String ldLogCreate(ScoreLogVo vo) {
+        return SearchApi.insertDocument(DataSetConstant.LD_SCORE_CHANGED_LOG, JSON.toJSONString(vo));
+    }
     public static void bulkUpdateRankInfo(List<RankInfoVo> vos) {
         BulkRequest request = new BulkRequest();
 

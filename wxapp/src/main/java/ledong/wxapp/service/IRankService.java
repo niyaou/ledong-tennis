@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import VO.LdRankInfoVo;
 import VO.RankInfoVo;
+import ledong.wxapp.entity.CommonResponse;
+import org.springframework.http.HttpStatus;
 
 public interface IRankService {
 
@@ -20,6 +22,23 @@ public interface IRankService {
      * @return
      */
     public String matchRank(String matchId, int holderScore, int challengerScore);
+
+
+
+    /**
+     *
+     * rank for the given match
+     *
+     * 1.get holder and challenger by matchid 2.get both players' current rank 3.use
+     * strategy to rank 4.update players' rank 5.return both current rank
+     *
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public String matchLDRank(String matchId, int holderScore, int challengerScore);
+
 
     /**
      * 
@@ -74,6 +93,15 @@ public interface IRankService {
     public String updateRankInfo(RankInfoVo vo);
 
     /**
+     * update user rank information
+     *
+     * @param userId
+     * @param RankInfoVo
+     * @return
+     */
+    public String updateLDRankInfo(LdRankInfoVo vo);
+
+    /**
      * update user tag by others user
      * 
      * @param userId
@@ -82,11 +110,26 @@ public interface IRankService {
      */
     public String updateUserTags(String userId, String tag);
 
+    /**
+     * update ld user tag by others user
+     *
+     * @param userId
+     * @param tag
+     * @return
+     */
+    public String updateLDUserTags(String userId, String tag);
+
+
 
     /**
      * get tag list
      */
     public Object getTagsList();
+
+    /**
+     * get ld tag list
+     */
+    public Object getLDTagsList();
 
     /**
      * get ranking list
@@ -111,6 +154,14 @@ public interface IRankService {
      * @return
      */
     public Object getRankingList(Integer count);
+
+    /**
+     * get ranking list by count
+     *
+     * @param count
+     * @return
+     */
+    public Object getLDRankingList(Integer count);
 
     /**
      * create user rank info
@@ -194,11 +245,25 @@ public interface IRankService {
 
 
     /**
+     * score change log
+     *
+     */
+    public String scoreLDChangeLog(String openId, Integer score, String description);
+
+    /**
      * get score change log
      * @param openId
      * @return
      */
     public Object getScoreLog(String openId);
+
+    /**
+     * get ld score change log
+     * @param openId
+     * @return
+     */
+    public Object getLDScoreLog(String openId);
+
 
     /**
      * 

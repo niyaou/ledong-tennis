@@ -101,7 +101,7 @@ public class UserServiceImpl implements IUserService {
 
         String userId = SearchApi.insertDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(user),
                 user.getOpenId());
-        Optional.ofNullable(userId).ifPresent(id -> rankService.createRankInfo(user.getOpenId()));
+        Optional.ofNullable(userId).ifPresent(id -> rankService.createLDRankInfo(user.getOpenId()));
         return userId;
     }
 

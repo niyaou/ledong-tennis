@@ -34,6 +34,35 @@ public abstract class MatchStrategy {
 
     public abstract String matchingGame(MatchRequestVo vo);
 
+
+    public static String postLDMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
+                                     String orderTime, String courtName, String courtGps) throws CustomException {
+        MatchPostVo vo = new MatchPostVo();
+        vo.setCreateTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+
+
+        vo.setHolder(holder);
+
+        vo.setChallenger(challenger);
+
+        MatchStatusCodeEnum status = null;
+
+        vo.setOrderTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
+        status = MatchStatusCodeEnum.MATCH_PLAYING_MATCHING;
+        vo.setStatus(status.getCode());
+        vo.setMatchType(MatchStatusCodeEnum.MATCH_TYPE_INTENTIONAL.getCode());
+        if (!StringUtil.isEmpty(courtName)) {
+            vo.setCourtName(courtName);
+        }
+        if (!StringUtil.isEmpty(courtGps)) {
+            vo.setCourtGPS(courtGps);
+        }
+        String id = DateUtil.getCurrentDate(DateUtil.FORMAT_DATETIME_NUM);
+        id = String.format("%s-%s-%s", id, holder, StringUtil.isEmpty(challenger) ? "" : challenger);
+        id = SearchApi.insertDocument(DataSetConstant.LD_GAME_MATCH_INFORMATION, JSON.toJSONString(vo), id);
+        return id;
+    }
+
     public static String postMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
             String orderTime, String courtName, String courtGps) throws CustomException {
         MatchPostVo vo = new MatchPostVo();

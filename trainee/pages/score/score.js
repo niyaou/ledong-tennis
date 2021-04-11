@@ -91,7 +91,7 @@ this.getScoreList()
   },
   getScoreList(){
 
-    http.getReq(`rank/scoreLog`, app.globalData.jwt, (res) => {
+    http.getReq(`rank/ld/scoreLog`, app.globalData.jwt, (res) => {
       console.log(res)
       if (res.code == 0 && res.data != null) {
         let logs=res.data.map(l=>{

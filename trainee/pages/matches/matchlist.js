@@ -121,7 +121,7 @@ this.getMatchList()
 
   getMatchList(){
   let jwt=  app.globalData.jwt
-  http.getReq('match/matchedGames/200', jwt, (e) => {
+  http.getReq('match/ld/matchedGames/200', jwt, (e) => {
     let score=0
     let lists= e.data.filter(f=>{
       return typeof f.holderScore!=='undefined'

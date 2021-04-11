@@ -75,6 +75,17 @@ public interface IMatchService {
 
     /**
      *
+     * get the list of ld matched games
+     *
+     * @param user
+     * @param count
+     * @return
+     */
+    public Object getLDMatchedList(String user, Integer count);
+
+
+    /**
+     *
      * get the count of matched games
      *
      * @param user
@@ -82,6 +93,16 @@ public interface IMatchService {
      * @return
      */
     public Object getMatchedCount(String user);
+
+    /**
+     *
+     * get the count of ld matched games
+     *
+     * @param user
+     * @return
+     */
+    public Object getLDMatchedCount(String user);
+
 
     /**
      * 
@@ -113,6 +134,17 @@ public interface IMatchService {
      * @return
      */
     public Object getH2hOpponentCount(String user);
+
+
+
+    /**
+     *
+     * get the list of ld h2h opponent count
+     *
+     * @param user
+     * @return
+     */
+    public Object getLDH2hOpponentCount(String user);
 
     /**
      * 
@@ -161,6 +193,27 @@ public interface IMatchService {
     public String postMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
             String orderTime, String courtName, String courtGps);
 
+
+
+    /**
+     * create a match post
+     *
+     * create a match post upsert post match to databases,and create a session of
+     * this post match,set the session id to post match, also upsert session to
+     * databases.
+     *
+     * @param parendId
+     * @param holder
+     * @param challenger
+     * @param matchType
+     * @param clubMatch
+     * @param orderTime
+     * @param courtName
+     * @param courtGps
+     * @return
+     */
+    public String postLDMatches(String parendId, String holder, String challenger, int matchType, int clubMatch,
+                              String orderTime, String courtName, String courtGps);
     /**
      * 
      */
@@ -318,6 +371,22 @@ public interface IMatchService {
      * @return
      */
     public String finishMatch(String matchId, int holderScore, int challengerScore);
+
+
+
+
+    /**
+     *
+     * finish the given match ,upload score of this match ,and auto ranking , and
+     * cache ranked match to redis
+     *
+     * @param matchId
+     * @param holderScore
+     * @param challengerScore
+     * @return
+     */
+    public String finishLDMatch(String matchId, int holderScore, int challengerScore);
+
 
     /**
      * 

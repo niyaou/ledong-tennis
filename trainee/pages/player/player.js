@@ -181,7 +181,7 @@ Page({
     //   name: "磨神",
     //   checked: false
     // },
-    let url = 'rank/getTags'
+    let url = 'rank/ld/getTags'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       let tags = res.data.tagName.map(t => {
         return {
@@ -202,7 +202,7 @@ Page({
   onShow: function () {
 
 
-    let url = 'rank/rankList?count=500'
+    let url = 'rank/ld/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       this.setData({
         players: res.data.sort((a, b) => {
@@ -251,7 +251,7 @@ Page({
    */
   onShareAppMessage: function () {},
   getRankPosition(jwt) {
-    http.getReq('rank/rankPosition', jwt, (e) => {
+    http.getReq('rank/ldRankPosition', jwt, (e) => {
       this.setData({
         rankPosition: e.data.sort
       })

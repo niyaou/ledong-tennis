@@ -122,7 +122,7 @@ Page({
     })
   },
   getTotalGames(jwt) {
-    http.getReq('match/matchedGames/count', jwt, (e) => {
+    http.getReq('match/ld/matchedGames/count', jwt, (e) => {
       this.setData({
         matchCount: e.data
       })
@@ -210,10 +210,10 @@ Page({
     })
   },
   getOpponentCount(jwt) {
-    http.getReq('match/matchedGames/h2h/opponent', jwt, (e) => {
-      console.log(e)
+    http.getReq('match/ld/matchedGames/h2h/opponent', jwt, (e) => {
+      console.log(e.data,e.data!==null,e.data!==null?e.data:0)
       this.setData({
-        opponents: e.data
+        opponents: e.data!==null?e.data:[]
       })
     })
   },

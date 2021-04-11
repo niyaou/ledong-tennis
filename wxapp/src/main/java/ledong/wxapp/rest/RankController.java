@@ -83,6 +83,17 @@ public class RankController {
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.getRankingList(count)), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/ld/rankList", method = RequestMethod.GET)
+    @ApiOperation(value = "explore  ranking list ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "grade", value = "grade name", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "count", value = "list count ", required = false, dataType = "string", paramType = "query") })
+    public ResponseEntity<?> userLRRankingList(@RequestParam(value = "grade", required = false) String grade,
+                                             @RequestParam(value = "count", required = false) Integer count) {
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getLDRankingList(count)), HttpStatus.OK);
+    }
+
+
     @RequestMapping(value = "/doubleRankList", method = RequestMethod.GET)
     @ApiOperation(value = "explore  ranking list ", notes = "")
     @ApiImplicitParams({
@@ -184,6 +195,19 @@ public class RankController {
     }
 
 
+    @RequestMapping(value = "/ld/scoreLog", method = RequestMethod.GET)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    @ApiImplicitParams({            })
+    public ResponseEntity<?> getLDScoreLog(@RequestHeader("Authorization") String authHeader
+    ) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(
+                CommonResponse.success(iRankService.getLDScoreLog(userId)), HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/updateUserTags", method = RequestMethod.POST)
     @ApiOperation(value = "updateUserTags ", notes = "")
@@ -201,6 +225,21 @@ public class RankController {
                 HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/ld/updateUserTags", method = RequestMethod.POST)
+    @ApiOperation(value = "updateUserTags ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "openId", value = "openId", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "tags", value = "tags ", required = true, dataType = "string", paramType = "query") })
+    public ResponseEntity<?> updateLDUserTags(@RequestHeader("Authorization") String authHeader,
+                                            @RequestParam(value = "openId", required = true) String openId,
+                                            @RequestParam(value = "tags", required = true) String tags) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.updateLDUserTags(openId, tags)),
+                HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/getTags", method = RequestMethod.GET)
     @ApiOperation(value = "getTags ", notes = "")
@@ -212,6 +251,20 @@ public class RankController {
             throw new AuthenticationException("token 不可用");
         }
         return new ResponseEntity<Object>(CommonResponse.success(iRankService.getTagsList()),
+                HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/ld/getTags", method = RequestMethod.GET)
+    @ApiOperation(value = "getTags ", notes = "")
+    @ApiImplicitParams({            })
+    public ResponseEntity<?> getLDTags(@RequestHeader("Authorization") String authHeader
+    ) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        return new ResponseEntity<Object>(CommonResponse.success(iRankService.getLDTagsList()),
                 HttpStatus.OK);
     }
 
