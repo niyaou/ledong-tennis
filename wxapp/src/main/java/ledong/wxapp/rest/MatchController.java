@@ -210,6 +210,21 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
+        @RequestMapping(value = "/ld/matchedGames/h2h/{count}", method = RequestMethod.GET)
+        @ApiOperation(value = "request  h2h matched games", notes = "")
+        @ApiImplicitParams({
+                @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query"),
+                @ApiImplicitParam(name = "count", value = "matched request count", required = true, dataType = "int", paramType = "path") })
+        public ResponseEntity<?> exploreLDMatchedGames(@RequestParam(value = "opponent", required = true) String opponent,
+                                                     @PathVariable(value = "count", required = true) Integer count,
+                                                     @RequestHeader("Authorization") String authHeader) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                return new ResponseEntity<Object>(
+                        CommonResponse.success(matchService.getLDH2hMatchedList(userId, opponent, count)),
+                        HttpStatus.OK);
+        }
+
         @RequestMapping(value = "/matchedGames/h2h/opponent", method = RequestMethod.GET)
         @ApiOperation(value = "request  h2h matched opponent", notes = "")
         @ApiImplicitParams({
@@ -220,6 +235,7 @@ public class MatchController {
                 return new ResponseEntity<Object>(CommonResponse.success(matchService.getH2hOpponentCount(userId)),
                                 HttpStatus.OK);
         }
+
 
         @RequestMapping(value = "/ld/matchedGames/h2h/opponent", method = RequestMethod.GET)
         @ApiOperation(value = "request  h2h matched opponent", notes = "")

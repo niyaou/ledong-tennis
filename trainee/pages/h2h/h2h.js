@@ -73,7 +73,7 @@ Page({
   },
   getH2HOpponents() {
     let jwt = app.globalData.jwt
-    http.getReq('match/matchedGames/h2h/opponent', jwt, (e) => {
+    http.getReq('match/ld/matchedGames/h2h/opponent', jwt, (e) => {
       console.log(e)
       let opps = e.data.map(d => {
         return {

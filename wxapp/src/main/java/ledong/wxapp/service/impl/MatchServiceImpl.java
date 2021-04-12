@@ -448,6 +448,69 @@ public class MatchServiceImpl implements IMatchService {
         return null;
     }
 
+
+
+    @Override
+    public Object getLdH2hOpponentCount(String user) {
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        BoolQueryBuilder head2Head = new BoolQueryBuilder();
+
+        head2Head.should(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, user))
+                .should(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, user));
+
+        QueryBuilder[] values = new QueryBuilder[8];
+        params.add(head2Head);
+        SearchResponse res = SearchApi.H2HOpponentAggs(DataSetConstant.LD_GAME_MATCH_INFORMATION, params.toArray(values));
+        Terms t1 = res.getAggregations().get("holder");
+        Terms t2 = res.getAggregations().get("challenger");
+        Iterator<ParsedTerms.ParsedBucket> ti1 = (Iterator<ParsedTerms.ParsedBucket>) t1.getBuckets().iterator();
+        Iterator<ParsedTerms.ParsedBucket> ti2 = (Iterator<ParsedTerms.ParsedBucket>) t2.getBuckets().iterator();
+        Set<String> total = new HashSet<>();
+        while (ti1.hasNext()) {
+            ParsedTerms.ParsedBucket b = ti1.next();
+            total.add(b.getKeyAsString());
+        }
+        while (ti2.hasNext()) {
+            ParsedTerms.ParsedBucket b = ti2.next();
+            total.add(b.getKeyAsString());
+        }
+
+        List<String> ids = new ArrayList<String>();
+        total.forEach(t -> {
+            if (!t.equals(user)) {
+                ids.add(t);
+            }
+        });
+
+        String[] idsArr = new String[ids.size()];
+
+        LinkedList<Map<String, Object>> userInfos = SearchApi.getDocsByMultiIds(DataSetConstant.LD_USER_INFORMATION,
+                ids.toArray(idsArr));
+
+        LinkedList<Map<String, Object>> userRankInfos = SearchApi
+                .getDocsByMultiIds(DataSetConstant.LD_USER_RANK_INFORMATION, ids.toArray(idsArr));
+
+        ArrayList<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+
+        userInfos.forEach(u -> {
+            userRankInfos.forEach(r -> {
+                if (r.get(RankInfoVo.OPENID).equals(u.get(UserVo.OPENID))) {
+                    u.put(RankInfoVo.RANKTYPE0, r.get(RankInfoVo.RANKTYPE0));
+                    u.put(RankInfoVo.RANKTYPE1, r.get(RankInfoVo.RANKTYPE1));
+                    u.put(RankInfoVo.WINRATE, r.get(RankInfoVo.WINRATE));
+                    u.put(RankInfoVo.POSITION, r.get(RankInfoVo.POSITION));
+                    result.add(r);
+                }
+
+            });
+
+        });
+
+        return userInfos;
+    }
+
+
+
     @Override
     public Object getH2hOpponentCount(String user) {
         ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
@@ -760,6 +823,82 @@ public class MatchServiceImpl implements IMatchService {
         return searchResponse;
 
     }
+
+    @Override
+    public Object getLDH2hMatchedList(String user, String opponent, Integer count) {
+
+        ArrayList<QueryBuilder> params = new ArrayList<QueryBuilder>();
+        BoolQueryBuilder head2Head = new BoolQueryBuilder();
+
+        // params.add(SearchApi.createSearchByFieldSource(user, MatchPostVo.HOLDER,
+        // MatchPostVo.CHALLENGER));
+        BoolQueryBuilder head1 = new BoolQueryBuilder();
+        head1.must(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, user))
+                .must(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, opponent));
+
+        BoolQueryBuilder head2 = new BoolQueryBuilder();
+        head2.must(SearchApi.createSearchByFieldSource(MatchPostVo.HOLDER, opponent))
+                .must(SearchApi.createSearchByFieldSource(MatchPostVo.CHALLENGER, user));
+        head2Head.should(head1).should(head2);
+
+        params.add(head2Head);
+
+        params.add(SearchApi.createSearchByFieldSource(MatchPostVo.STATUS,
+                MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()));
+
+        Map<String, SortOrder> sortPropertiesQueries = new HashMap<String, SortOrder>(16);
+        sortPropertiesQueries.put(MatchPostVo.ORDERTIME, SortOrder.DESC);
+        QueryBuilder[] values = new QueryBuilder[8];
+        List<HashMap<String, Object>> searchResponse = SearchApi.searchByMultiQueriesAndOrders(
+                DataSetConstant.LD_GAME_MATCH_INFORMATION, sortPropertiesQueries, 0, count, params.toArray(values));
+        if (searchResponse != null) {
+            String[] idsArr = new String[searchResponse.size()];
+            List<String> idsHolder = new ArrayList<String>();
+            List<String> idsChallenger = new ArrayList<String>();
+
+            searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                // HashMap<String, Object> holder = iUserService.getUserInfo((String)
+                // match.get(MatchPostVo.HOLDER));
+                idsHolder.add((String) match.get(MatchPostVo.HOLDER));
+                idsChallenger.add((String) match.get(MatchPostVo.CHALLENGER));
+                return match;
+            }).collect(Collectors.toList());
+
+            LinkedList<Map<String, Object>> userInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.LD_USER_INFORMATION, idsHolder.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosHolder = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.LD_USER_RANK_INFORMATION, idsHolder.toArray(idsArr));
+
+            LinkedList<Map<String, Object>> userInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.LD_USER_INFORMATION, idsChallenger.toArray(idsArr));
+            LinkedList<Map<String, Object>> userRankInfosChallenger = SearchApi
+                    .getDocsByMultiIds(DataSetConstant.LD_USER_RANK_INFORMATION, idsChallenger.toArray(idsArr));
+            searchResponse = (List<HashMap<String, Object>>) searchResponse.stream().map(match -> {
+                List<Map<String, Object>> holder = userInfosHolder.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
+                List<Map<String, Object>> holderRank = userRankInfosHolder.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.HOLDER)))
+                        .collect(Collectors.toList());
+                match.put(MatchPostVo.HOLDERAVATOR, holder.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.HOLDERNAME, holder.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.HOLDERRANKTYPE0, holderRank.get(0).get(RankInfoVo.RANKTYPE0));
+                List<Map<String, Object>> challenger = userInfosChallenger.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
+                List<Map<String, Object>> challengerRank = userRankInfosChallenger.stream()
+                        .filter(i -> i.get(RankInfoVo.OPENID).equals(match.get(MatchPostVo.CHALLENGER)))
+                        .collect(Collectors.toList());
+                match.put(MatchPostVo.CHALLENGERAVATOR, challenger.get(0).get(UserVo.AVATOR));
+                match.put(MatchPostVo.CHALLENGERNAME, challenger.get(0).get(UserVo.NICKNAME));
+                match.put(MatchPostVo.CHALLENGERRANKTYPE0, challengerRank.get(0).get(RankInfoVo.RANKTYPE0));
+                return match;
+            }).collect(Collectors.toList());
+        }
+
+        return searchResponse;
+    }
+
 
     @Override
     public Object getH2hMatchedList(String user, String opponent, Integer count) {
