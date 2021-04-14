@@ -11,7 +11,7 @@ Page({
   data: {
     tempSrc: '',
     src: '',
-    teenageId:'',
+    teenageId: '',
     isAppending: false,
     loaded: false,
     isHolder: true,
@@ -172,32 +172,35 @@ Page({
       return
     }
     this.setData({
-      teenageId:this.data.holderName
+      teenageId: this.data.holderName,
+      tempSrc: this.data.src
     })
     let url = 'user/ld/exploreTeenage'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       console.log(res)
       wx.hideLoading();
       if (res.code === 0) {
- 
+
         if (res.data !== null && res.data.length > 0) {
-         let current= res.data.filter(r=>{return r.nickName=== this.data.holderName})
-         if(current.length>0){
-          this.setData({
-            isAppending: true,
-            src:current[0].avator,
-            teenageId:current[0].openId
+          let current = res.data.filter(r => {
+            return r.nickName === this.data.holderName
           })
-          console.log(this.data)
-         }
-  
+          if (current.length > 0) {
+            this.setData({
+              isAppending: true,
+              src: current[0].avator,
+              teenageId: current[0].openId
+            })
+            console.log(this.data)
+          }
+
         } else {
           wx.showLoading({
             mask: true,
             title: '加载中',
           })
           setTimeout(() => {
-            this.finishMatch()
+            this.finishMatch(false)
           }, 1000)
         }
 
@@ -207,20 +210,28 @@ Page({
     })
   },
   finishMatch(e) {
-    let needReName=e.currentTarget.dataset.variable
-    let url = needReName?'user/ld/createTeenage':'user/ld/updateTeenageParent'
- 
+    let needReName = e.currentTarget.dataset.variable
+    let url = needReName ? 'user/ld/createTeenage' : 'user/ld/updateTeenageParent'
+    let src = needReName ? this.data.tempSrc : this.data.src
     http.postReq(`${url}`, app.globalData.jwt, {
-      openId: needReName?(this.data.teenageId+'1'):this.data.teenageId,
+      openId: needReName ? (this.data.teenageId + '1') : this.data.teenageId,
       name: this.data.holderName,
-      avator: this.data.src
+      avator: src
     }, (res) => {
       console.log(res)
-      wx.hideLoading();
+   
       if (res.code === 0) {
-        wx.navigateBack({
-          delta: 0,
+        wx.showLoading({
+          mask: true,
+          title: '加载中',
         })
+        setTimeout(() => {
+          wx.hideLoading();
+          wx.navigateBack({
+            delta: 0,
+          })
+        }, 2000)
+
       }
 
       // console.log(res)
@@ -280,7 +291,7 @@ Page({
 
     this.setData({
       isAppending: false,
-      teenageId:''
+      teenageId: ''
     })
 
     let url = 'rank/rankList?count=500'

@@ -5,7 +5,7 @@ var http = require('../../utils/http.js')
 const chooseLocation = requirePlugin('chooseLocation');
 Page({
   data: {
-    version:'1.0.0',
+    version: '1.0.0',
     motto: 'Hello World',
     userInfo: {
       nickName: "请登录",
@@ -20,6 +20,7 @@ Page({
     nearByUser: [],
     rankPosition: 0,
     opponents: [],
+    teenage: [],
     nearByCourt: [],
     tags: [],
     isSingle: true,
@@ -47,20 +48,20 @@ Page({
   onLoad: function () {
     wx.showShareMenu({
       withShareTicket: true
-      })
-   let updateManager=   wx.getUpdateManager()
-   updateManager.onCheckForUpdate((e)=>{
-        console.log(e)
-        if(e.hasUpdate){
-          updateManager.applyUpdate()
-        }
-      })
-
+    })
+    let updateManager = wx.getUpdateManager()
+    updateManager.onCheckForUpdate((e) => {
+      console.log(e)
+      if (e.hasUpdate) {
+        updateManager.applyUpdate()
+      }
+    })
     let that = this
     console.log('hasUserInfo', this.data.hasUserInfo, 'canIUse', this.data.canIUse)
     if (app.globalData.jwt) {
       this.getUserInfoByJwt(app.globalData.jwt)
       this.getUserRankInfo(app.globalData.jwt)
+      this.getTeenage(app.globalData.jwt)
       // this.getRankPosition(app.globalData.jwt)
       this.gps()
     }
@@ -80,20 +81,21 @@ Page({
     if (app.globalData.jwt) {
       this.getUserInfoByJwt(app.globalData.jwt)
       this.getUserRankInfo(app.globalData.jwt)
+      this.getTeenage(app.globalData.jwt)
       // this.getRankPosition(app.globalData.jwt)
       this.gps()
     }
   },
-  checkingLogin(){
+  checkingLogin() {
     return this.data.userInfo.nickName !== "请登录"
   },
   loginClick() {
-    console.log('checkingLogin',this.checkingLogin())
+    console.log('checkingLogin', this.checkingLogin())
     if (this.checkingLogin()) {
-      console.log('checkingLogin   1',this.checkingLogin())
+      console.log('checkingLogin   1', this.checkingLogin())
       return
-    } else{
-      console.log('checkingLogin  2',this.checkingLogin())
+    } else {
+      console.log('checkingLogin  2', this.checkingLogin())
       this.setData({
         hasUserInfo: false
       })
@@ -173,6 +175,7 @@ Page({
           that.gps()
           that.getUserInfoByJwt(e.data)
           that.getUserRankInfo(e.data)
+          that.getTeenage(e.data)
           // that.getNearByCourt(app.globalData.jwt)
           // that. getNearByUser(app.globalData.jwt)
         }, 1500)
@@ -210,11 +213,26 @@ Page({
       console.log('--------1------')
     })
   },
+  getTeenage(jwt) {
+    http.getReq('user/ld/exploreTeenage', jwt, (e) => {
+      console.log(e)
+      if (e.code === 0) {
+        this.setData({
+          teenage: e.data !== null ? e.data.filter(t => {
+            return t.parent.indexOf(app.globalData.openId) > -1
+          }) : []
+        })
+        console.log('--------getTeenage-----------', this.data.teenage)
+
+      }
+
+    })
+  },
   getOpponentCount(jwt) {
     http.getReq('match/ld/matchedGames/h2h/opponent', jwt, (e) => {
-      console.log(e.data,e.data!==null,e.data!==null?e.data:0)
+      console.log(e.data, e.data !== null, e.data !== null ? e.data : 0)
       this.setData({
-        opponents: e.data!==null?e.data:[]
+        opponents: e.data !== null ? e.data : []
       })
     })
   },
@@ -247,7 +265,7 @@ Page({
           doubleWinRate: e.data.doubleWinRate,
           doubleScore: e.data.doubleScore,
           tags: tags,
-          parent:e.data.parent
+          parent: e.data.parent
         },
         rankPosition: e.data.position
       })
@@ -325,11 +343,11 @@ Page({
   },
   navigateTo(event) {
     console.log(event.currentTarget.dataset.variable)
-    if(!this.checkingLogin()){
+    if (!this.checkingLogin()) {
       this.setData({
-        hasUserInfo:false
+        hasUserInfo: false
       })
-      return 
+      return
     }
     if (event.currentTarget.dataset.variable === -1) {
       wx.navigateTo({

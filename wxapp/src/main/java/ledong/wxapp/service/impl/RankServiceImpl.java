@@ -332,9 +332,9 @@ public class RankServiceImpl implements IRankService {
       for(int i=0;i<p.length;i++){
         parents.add(p[i]);
       }
-    }else{
-      parents.add(parent);
     }
+      parents.add(parent);
+
     String[] total=new String[1];
     vo.setParent(parents.toArray(total));
     GradingContext gContext = new GradingContext(new GradeRanking());
@@ -638,18 +638,37 @@ public class RankServiceImpl implements IRankService {
   @Override
   public String updateLDUserPosition() {
     LinkedList<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.LD_USER_RANK_INFORMATION,
-            null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
+            LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.VERIFIED), RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
     int[] position = { 0 };
     LinkedList<LdRankInfoVo> vos = new LinkedList<LdRankInfoVo>();
     GradingContext gContext = new GradingContext(new GradeRanking());
+    if(users!=null){
+      users.forEach(u -> {
+        position[0] = position[0] + 1;
+        u.put(LdRankInfoVo.POSITION, position[0]);
+        LdRankInfoVo rank = JSON.parseObject(JSON.toJSONString(u), LdRankInfoVo.class);
+        rank = gContext.rankMatch(rank);
+        vos.add(rank);
+      });
+      RankingStrategy.bulkUpdateLdRankInfo(vos);
+    }
+
+
+
+    users = SearchApi.searchByFieldSorted(DataSetConstant.LD_USER_RANK_INFORMATION,
+            LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.TEENAGE), RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
+    int[] teenage = { 0 };
+    vos.clear();
+    if(users!=null){
     users.forEach(u -> {
-      position[0] = position[0] + 1;
-      u.put(LdRankInfoVo.POSITION, position[0]);
+      teenage[0] = teenage[0] + 1;
+      u.put(LdRankInfoVo.POSITION, teenage[0]);
       LdRankInfoVo rank = JSON.parseObject(JSON.toJSONString(u), LdRankInfoVo.class);
       rank = gContext.rankMatch(rank);
       vos.add(rank);
     });
     RankingStrategy.bulkUpdateLdRankInfo(vos);
+    }
     return null;
   }
 

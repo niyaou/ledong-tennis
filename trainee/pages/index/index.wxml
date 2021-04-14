@@ -45,22 +45,30 @@
   </view>
   <view class="weui-flex">
     <view class="weui-flex__item">
-      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{-1}}">
-       <block>
-        <view class="makeCenterC ">
+      <view class="placeholder wcard makeCenterV statistics_card">
+       <block wx:if="{{teenage.length<1}}">
+        <view class="makeCenterC "  bindtap="navigateTo" data-variable="{{-1}}">
           <view class="statisticSubtitle">添加小学员</view>
         </view>
-        <i-icon type="add" size="40" color="grey" />
+        <i-icon type="add" size="40" color="grey"  bindtap="navigateTo" data-variable="{{-1}}" />
+     </block>
+     <block wx:else>
+      <image  class="userinfo-avatar" src="{{teenage[0].avator}}" mode="cover"></image>
+      {{teenage[0].nickName}}
      </block>
       </view>
     </view>
     <view class="weui-flex__item">
-      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{-1}}">
-        <block>
-        <view class="makeCenterC ">
+      <view class="placeholder wcard makeCenterV statistics_card">
+        <block wx:if="{{teenage.length<2}}">
+        <view class="makeCenterC "  bindtap="navigateTo" data-variable="{{-1}}">
           <view class="statisticSubtitle">添加小学员</view>
         </view>
-        <i-icon type="add" size="40" color="grey" />
+        <i-icon type="add" size="40" color="grey"  bindtap="navigateTo" data-variable="{{-1}}" />
+     </block>
+     <block wx:else>
+      <image  class="userinfo-avatar" src="{{teenage[1].avator}}" mode="cover"></image>
+      {{teenage[1].nickName}}
      </block>
       </view>
     </view>
