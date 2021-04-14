@@ -13,6 +13,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import VO.UserVo;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface IUserService {
 
@@ -32,6 +33,29 @@ public interface IUserService {
      */
     public String addLDUser(UserVo user);
 
+
+    /**
+     * create new user ld
+     *
+     * @param user
+     * @return
+     */
+    public String addLDTeenageUser(String  parent,String  openId,String name,String avator);
+
+
+    /**
+     *
+     * @return
+     */
+    public Object exploreLDTeenageUser();
+
+
+    /**
+     * upload avator img
+     * @param file
+     * @return
+     */
+    public String  updateTeenageAvator( MultipartFile  files[]);
     /**
      * verified wx
      * 

@@ -59,49 +59,7 @@ Page({
         icon: 'undo'
       }
     ],
-    slideButtons: [{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    },{
-      text: '小鱼儿 ',
-      src: '小鱼儿', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    },{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   hsChange(e){
     console.log(e)
@@ -136,7 +94,7 @@ if(this.data.isHolder){
 
   },
   handleClick(e){
-    let url = 'match/postMatchByMaster'
+    let url = 'match/ld/postMatchByMaster'
     http.postReq(`${url}`, app.globalData.jwt, {holder:this.data.holderId,opponent:this.data.id}, (res) => {
       console.log(res)
       if (res.code === 0) {
@@ -153,7 +111,7 @@ if(this.data.isHolder){
     })
   },
   finishMatch(matchId){
-    let url = 'match/matchResult/'+matchId
+    let url = 'match/ld/matchResult/'+matchId
     console.log('finishMatch', {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore})
     http.postReq(`${url}`, app.globalData.jwt, {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore}, (res) => {
       console.log(res)

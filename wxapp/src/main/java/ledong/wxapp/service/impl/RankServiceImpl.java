@@ -3,12 +3,8 @@ package ledong.wxapp.service.impl;
 import VO.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import ledong.wxapp.constant.DataSetConstant;
@@ -326,6 +322,55 @@ public class RankServiceImpl implements IRankService {
 
 
   @Override
+  public String updateTeenageParent(String  parent,String  openId,String name,String avator) {
+    Map<String, Object> user = SearchApi.searchById(DataSetConstant.LD_USER_RANK_INFORMATION, openId);
+    LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user),LdRankInfoVo.class);
+    vo.setClubId(LdRankInfoVo.TEENAGE);
+    String[] p = vo.getParent();
+    Set<String> parents = new HashSet<>();
+    if(p!=null){
+      for(int i=0;i<p.length;i++){
+        parents.add(p[i]);
+      }
+    }else{
+      parents.add(parent);
+    }
+    String[] total=new String[1];
+    vo.setParent(parents.toArray(total));
+    GradingContext gContext = new GradingContext(new GradeRanking());
+    vo = gContext.rankMatch(vo);
+    ctx.publishEvent(new MatchConfirmEvent(ctx, null));
+    return RankingStrategy.updateLDRankInfo(vo);
+  }
+
+
+  @Override
+  public String createLDTeenageRankInfo(String parent,String userId) {
+
+    LdRankInfoVo vo = new LdRankInfoVo();
+
+    vo.setOpenId(userId);
+    vo.setClubId(LdRankInfoVo.TEENAGE);
+    String[] p = vo.getParent();
+    Set<String> parents = new HashSet<>();
+    if(p!=null){
+      for(int i=0;i<p.length;i++){
+        parents.add(p[i]);
+      }
+    }else{
+      parents.add(parent);
+    }
+
+    String[] total=new String[1];
+    vo.setParent(parents.toArray(total));
+    GradingContext gContext = new GradingContext(new GradeRanking());
+    vo = gContext.rankMatch(vo);
+    ctx.publishEvent(new MatchConfirmEvent(ctx, null));
+    return RankingStrategy.createLDRankInfo(vo);
+  }
+
+
+  @Override
   public Double updateWinRate(String userId) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder user = new BoolQueryBuilder();
@@ -519,6 +564,19 @@ public class RankServiceImpl implements IRankService {
     holder = gContext.rankMatch(holder);
     updateRankInfo(holder);
     scoreChangeLog(openId, score, description);
+    ctx.publishEvent(new MatchConfirmEvent(ctx, null));
+    return holder.getOpenId();
+  }
+
+
+  @Override
+  public String updateLDScoreByMaster(String openId, Integer score, String description) {
+    LdRankInfoVo holder = getLDUserRank(openId);
+    holder.setScore(score + holder.getScore());
+    GradingContext gContext = new GradingContext(new GradeRanking());
+    holder = gContext.rankMatch(holder);
+    updateLDRankInfo(holder);
+    scoreLDChangeLog(openId, score, description);
     ctx.publishEvent(new MatchConfirmEvent(ctx, null));
     return holder.getOpenId();
   }

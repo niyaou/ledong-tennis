@@ -2,6 +2,7 @@
   "pages": [
 
     "pages/index/index",
+    "pages/teenage/create",
     "pages/create/create",
     "pages/h2h/detail",
     "pages/player/player",

@@ -148,6 +148,24 @@ public class MatchController {
                                 HttpStatus.OK);
         }
 
+        @RequestMapping(value = "/ld/postMatchByMaster", method = RequestMethod.POST)
+        @ApiOperation(value = "post match record", notes = "")
+        @ApiImplicitParams({
+                @ApiImplicitParam(name = "holder", value = "holder name", required = true, dataType = "string", paramType = "query"),
+                @ApiImplicitParam(name = "opponent", value = "opponent name", required = true, dataType = "string", paramType = "query") })
+        public ResponseEntity<?> postLDMatchByMaster(@RequestHeader("Authorization") String authHeader,
+                                                   @RequestParam(value = "holder", required = true) String holder,
+                                                   @RequestParam(value = "opponent", required = true) String opponent) {
+                Claims claims = tokenService.getClaimByToken(authHeader);
+                String userId = claims.getSubject();
+                if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+                        throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+                }
+                return new ResponseEntity<Object>(CommonResponse
+                        .success(matchService.postLDMatches(null, holder, opponent, 0, 0, null, null, null)),
+                        HttpStatus.OK);
+        }
+
         @RequestMapping(value = "/matchedGames/{count}", method = RequestMethod.GET)
         @ApiOperation(value = "request  matched games", notes = "")
         @ApiImplicitParams({

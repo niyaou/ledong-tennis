@@ -1,5 +1,6 @@
 package ledong.wxapp.rest;
 
+import ledong.wxapp.service.IRankService;
 import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import ledong.wxapp.constant.enums.ResultCodeEnum;
 import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.IMatchService;
 import ledong.wxapp.service.IUserService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping(value = "/user")
 @RestController
@@ -33,7 +35,7 @@ public class UserController {
     @Autowired
     private IUserService userService;
     @Autowired
-    private IMatchService matchService;
+    private IRankService rankService;
     // @Autowired
     // private RedisUtil redis;
     @Autowired
@@ -53,6 +55,76 @@ public class UserController {
         // 根据用户id获取接口数据返回接口
         return new ResponseEntity<Object>(CommonResponse.success(userService.getUserInfo(userId)), HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/ld/createTeenage", method = RequestMethod.POST)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "openId", value = "openId", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "score ", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "avator", value = "score ", required = true, dataType = "string", paramType = "query"), })
+    public ResponseEntity<?> createLDTeenage(@RequestHeader("Authorization") String authHeader,
+                                               @RequestParam(value = "openId", required = true) String openId,
+                                               @RequestParam(value = "name", required = true) String name,
+                                               @RequestParam(value = "avator", required = true) String avator) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(
+                CommonResponse.success(userService.addLDTeenageUser(userId,  openId, name, avator)), HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/ld/updateTeenageParent", method = RequestMethod.POST)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "openId", value = "openId", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "score ", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "avator", value = "score ", required = true, dataType = "string", paramType = "query"), })
+    public ResponseEntity<?> updateTeenageParent(@RequestHeader("Authorization") String authHeader,
+                                             @RequestParam(value = "openId", required = true) String openId,
+                                             @RequestParam(value = "name", required = true) String name,
+                                             @RequestParam(value = "avator", required = true) String avator) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(
+                CommonResponse.success(rankService.updateTeenageParent(userId,  openId, name, avator)), HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/ld/exploreTeenage", method = RequestMethod.GET)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    @ApiImplicitParams({
+          })
+    public ResponseEntity<?> exploreLDTeenage(@RequestHeader("Authorization") String authHeader
+                                             ) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(userService.exploreLDTeenageUser()), HttpStatus.OK);
+    }
+
+
+
+    @RequestMapping(value = "/ld/teenage/avator", method = RequestMethod.POST)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    public ResponseEntity<?> updateTeenageAvator(@RequestHeader("Authorization") String authHeader,
+                                                 @RequestParam("file") MultipartFile files[]) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(userService.updateTeenageAvator( files)), HttpStatus.OK);
+    }
+
 
 
     @RequestMapping(value = "/ldUserinfo", method = RequestMethod.GET)

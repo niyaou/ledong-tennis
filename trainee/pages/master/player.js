@@ -76,49 +76,7 @@ Page({
     ],
     players: [],
     rankPosition: 300,
-    slideButtons: [{
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }, {
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }, {
-      text: '范大将军 ',
-      src: '范大将军', // icon的路径,
-      time: '黄金 段位',
-      result: '第1',
-      score: '-30',
-      toggle: false
-    }, {
-      text: 'jerry',
-      src: 'jerry', // icon的路径,
-      time: '黄金段位',
-      result: '第2',
-      score: '-30',
-      toggle: false
-    }],
+    slideButtons: [],
   },
   onSortChange(event){
     console.log(event.detail)
@@ -240,7 +198,7 @@ wx.navigateTo({
    */
   onShow: function () {
     console.log('---------player back--------')
-    let url = 'rank/rankList?count=500'
+    let url = 'rank/ld/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       this.setData({
         players: res.data.sort((a, b) => {
@@ -287,7 +245,7 @@ wx.navigateTo({
    */
   onShareAppMessage: function () {},
   getRankPosition(jwt) {
-    http.getReq('rank/rankPosition', jwt, (e) => {
+    http.getReq('rank/ld/rankPosition', jwt, (e) => {
       this.setData({
         rankPosition: e.data.sort
       })

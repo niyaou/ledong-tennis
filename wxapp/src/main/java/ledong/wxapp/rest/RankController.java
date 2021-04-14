@@ -180,6 +180,29 @@ public class RankController {
     }
 
 
+    @RequestMapping(value = "/ld/updateUserScore", method = RequestMethod.POST)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "openId", value = "openId", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "score", value = "score ", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "score ", required = true, dataType = "string", paramType = "query"), })
+    public ResponseEntity<?> updateLDUserScore(@RequestHeader("Authorization") String authHeader,
+                                             @RequestParam(value = "openId", required = true) String openId,
+                                             @RequestParam(value = "description", required = true) String description,
+                                             @RequestParam(value = "score", required = true) Integer score) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(iRankService.updateLDScoreByMaster(openId, score, description)), HttpStatus.OK);
+    }
+
+
     @RequestMapping(value = "/scoreLog", method = RequestMethod.GET)
     @ApiOperation(value = "updateUserScore ", notes = "")
     @ApiImplicitParams({            })

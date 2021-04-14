@@ -16,14 +16,31 @@ public class LdRankInfoVo extends RankInfoVo {
 
     @NotEmpty
     @ApiModelProperty(value = "parent list ")
-    private String parent;
+    private String[] parent;
     public static final String PARENT = "parent";
 
-    public String getParent() {
+    @NotEmpty
+    @ApiModelProperty(value = "parent list ")
+    private Integer clubId=0;//0 pending user, 1 verified user , 2 teenage user , 3 master
+    public static final Integer PENDING = 0;
+    public static final Integer VERIFIED = 1;
+    public static final Integer TEENAGE = 2;
+    public static final Integer MASTER = 3;
+    public static final String CLUBID = "clubId";
+
+    public Integer getClubId() {
+        return clubId;
+    }
+
+    public void setClubId(Integer clubId) {
+        this.clubId = clubId;
+    }
+
+    public String[] getParent() {
         return parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(String[] parent) {
         this.parent = parent;
     }
 }

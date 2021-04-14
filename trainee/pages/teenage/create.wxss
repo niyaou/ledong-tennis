@@ -1,0 +1,13 @@
+/* pages/create/create.wxss */
+
+.fullw{
+  width:100%;
+}
+
+.avator{
+  background-color: white;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}

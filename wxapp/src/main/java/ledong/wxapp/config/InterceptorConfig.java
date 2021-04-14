@@ -1,6 +1,7 @@
 package ledong.wxapp.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -15,7 +16,8 @@ import ledong.wxapp.auth.JwtInterceptor;
 public class InterceptorConfig extends WebMvcConfigurationSupport {
     @Autowired
     private JwtInterceptor jwtInterceptor;
-
+    @Value("${file.upload.url}")
+    private String uploadFilePath;
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor).addPathPatterns("/**").excludePathPatterns("/user/login")
@@ -28,6 +30,8 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/teenage/**").addResourceLocations("file:"+uploadFilePath);
+
     }
 
     @Override

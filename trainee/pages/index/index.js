@@ -5,6 +5,7 @@ var http = require('../../utils/http.js')
 const chooseLocation = requirePlugin('chooseLocation');
 Page({
   data: {
+    version:'1.0.0',
     motto: 'Hello World',
     userInfo: {
       nickName: "请登录",
@@ -330,6 +331,11 @@ Page({
       })
       return 
     }
+    if (event.currentTarget.dataset.variable === -1) {
+      wx.navigateTo({
+        url: '../../pages/teenage/create'
+      })
+    } else
     if (event.currentTarget.dataset.variable === 0) {
       wx.navigateTo({
         url: '../../pages/matches/matchlist'

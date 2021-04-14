@@ -31,7 +31,7 @@ public class UserVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "club : member of club ,it is blank when user is not the member of any club ")
-    private String clubId;
+    private String clubId="";
     public static final String CLUBID = "clubId";
 
     @ApiModelProperty(value = "account charge remained quantities;rate 1:10")

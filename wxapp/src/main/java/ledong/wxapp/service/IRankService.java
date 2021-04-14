@@ -177,8 +177,27 @@ public interface IRankService {
      * @param userId
      * @return
      */
-    public String createLDRankInfo(String userId);
+    public String createLDRankInfo(String  openId);
 
+
+    /**
+     * updateTeenageParent
+     * @param parent
+     * @param openId
+     * @param name
+     * @param avator
+     * @return
+     */
+    public String updateTeenageParent(String  parent,String  openId,String name,String avator);
+
+
+    /**
+     * create user LD rank info
+     *
+     * @param userId
+     * @return
+     */
+    public String createLDTeenageRankInfo(String parent,String  openId);
 
 
     /**
@@ -236,6 +255,16 @@ public interface IRankService {
      * @return
      */
     public String updateScoreByMaster(String openId, Integer score, String description);
+
+    /**
+     * update score only operated by master
+     *
+     * @param openId
+     * @param score
+     * @return
+     */
+    public String updateLDScoreByMaster(String openId, Integer score, String description);
+
 
     /**
      * score change log

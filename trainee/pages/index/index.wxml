@@ -15,7 +15,7 @@
         <view class="card">
           <view class="weui-flex">
             <view class="weui-flex__item">
-              <view style='margin-top:{{totalBarHeight/2.5}}rpx;font-weight:bold'>网者争霸</view>
+              <view style='margin-top:{{totalBarHeight/2.5}}rpx;font-weight:bold'>乐动网球</view>
             </view>
           </view>
           <view class="weui-flex ">
@@ -43,7 +43,28 @@
       </block>
     </view>
   </view>
-
+  <view class="weui-flex">
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{-1}}">
+       <block>
+        <view class="makeCenterC ">
+          <view class="statisticSubtitle">添加小学员</view>
+        </view>
+        <i-icon type="add" size="40" color="grey" />
+     </block>
+      </view>
+    </view>
+    <view class="weui-flex__item">
+      <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{-1}}">
+        <block>
+        <view class="makeCenterC ">
+          <view class="statisticSubtitle">添加小学员</view>
+        </view>
+        <i-icon type="add" size="40" color="grey" />
+     </block>
+      </view>
+    </view>
+  </view>
   <view class="weui-flex">
     <view class="weui-flex__item">
       <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{1}}">
@@ -53,7 +74,6 @@
         </view>
         <image src="../../icon/score.png" class="iconsize"></image>
       </view>
-
     </view>
     <view class="weui-flex__item">
       <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{2}}">
@@ -63,7 +83,6 @@
         </view>
         <image src="../../icon/ranklist.png" class="iconsize"></image>
       </view>
-
     </view>
   </view>
   <view class="weui-flex">
@@ -75,7 +94,6 @@
         </view>
         <image src="../../icon/tennis.png" class="iconsize"></image>
       </view>
-
     </view>
     <view class="weui-flex__item">
       <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{2}}">
@@ -109,17 +127,17 @@
     </view>
   </view>
 
-  <view class="weui-flex">
+  <!-- <view class="weui-flex">
     <view class="weui-flex__item">
       <image src="../../icon/banner1.png" style="width:100%;height:200rpx" />
     </view>
-  </view>
+  </view> -->
 
   <view class="weui-footer weui-footer_fixed-bottom" style="color:#ccc" bindtap="masterNav">
     <view class="weui-footer__links">
-      <navigator url="" class="weui-footer__link" style="color:#ccc">网者争霸</navigator>
+      <navigator url="" class="weui-footer__link" style="color:#ccc">乐动网球</navigator>
     </view>
-    <view class="weui-footer__text">Copyright © 2020-2021 LedongTennis</view>
+    <view class="weui-footer__text">Copyright © 2020-2021 LDTennis v{{version}}</view>
   </view>
   </block>
 </view>

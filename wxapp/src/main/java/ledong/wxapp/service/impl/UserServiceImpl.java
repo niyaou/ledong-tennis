@@ -1,5 +1,6 @@
 package ledong.wxapp.service.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
@@ -9,12 +10,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.text.Collator;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -24,13 +20,20 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import VO.LdRankInfoVo;
+import VO.RankInfoVo;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
+
+
+import com.google.common.io.Files;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -45,12 +48,15 @@ import ledong.wxapp.search.SearchApi;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.service.IUserService;
 import ledong.wxapp.utils.DateUtil;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserServiceImpl implements IUserService {
     private static Logger logger = Logger.getLogger(UserServiceImpl.class);
     private static String KEY_NAME = "AES";
     public static final String CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
+    @Value("${file.upload.url}")
+    private String uploadFilePath;
     @Value("${wxapp.appid}")
     private String appId;
 
@@ -103,6 +109,80 @@ public class UserServiceImpl implements IUserService {
                 user.getOpenId());
         Optional.ofNullable(userId).ifPresent(id -> rankService.createLDRankInfo(user.getOpenId()));
         return userId;
+    }
+
+    @Override
+    public String updateTeenageAvator(MultipartFile files[]) {
+
+        String fileName = files[0].getOriginalFilename();//获取文件名称
+        String suffixName=fileName.substring(fileName.lastIndexOf("."));//获取文件后缀
+        try {
+            fileName=DigestUtils.md5DigestAsHex(files[0].getInputStream())+suffixName;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+        String directory=uploadFilePath;
+
+        File targetFile = new File(directory,fileName);
+        try {
+//            files[0].transferTo(targetFile);
+            Files.write(files[0].getBytes(),targetFile);
+
+            return fileName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
+
+    @Override
+    public String addLDTeenageUser(String  parent,String  openId,String name,String avator) {
+        UserVo user =new UserVo();
+        String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        user.setCreateTime(createTime);
+        user.setAvator(avator);
+        user.setNickName(name);
+        user.setOpenId(openId);
+
+        try {
+            if (user.getGps().contains("undefined")) {
+                user.setGps(CommonConstanst.GPS);
+            }
+        } catch (Exception e) {
+        }
+        String userId = SearchApi.insertDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(user),
+                openId);
+        Optional.ofNullable(openId).ifPresent(id -> rankService.createLDTeenageRankInfo(parent,openId));
+        return userId;
+    }
+
+
+    @Override
+    public Object exploreLDTeenageUser(){
+        HashMap<String, HashMap<String, Object>> users = SearchApi.searchByFieldSortedInMap(
+                DataSetConstant.LD_USER_RANK_INFORMATION, LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.TEENAGE), RankInfoVo.SCORE, SortOrder.DESC, 0, 500);
+        List<HashMap<String, Object>> result = new ArrayList<>();
+        if (users != null) {
+            String[] idsArr = new String[users.size()];
+            List<String> ids = new ArrayList<String>();
+            for (String key : users.keySet()) {
+                ids.add(key);
+            }
+            HashMap<String, HashMap<String, Object>> userInfos = SearchApi
+                    .getDocsByMultiIdsWithMap(DataSetConstant.LD_USER_INFORMATION, UserVo.OPENID, ids.toArray(idsArr));
+            for (String key : users.keySet()) {
+                HashMap<String, Object> u = users.get(key);
+                HashMap<String, Object> info = userInfos.get(key);
+                u.putAll(info);
+                result.add(u);
+
+            }
+        }
+        return result;
+
     }
 
     @Override

@@ -43,7 +43,7 @@ Page({
   },
   getH2hList() {
     let jwt = app.globalData.jwt
-    http.getReq('match/matchedGames/h2h/200?opponent='+this.data.opponentId, jwt, (e) => {
+    http.getReq('match/ld/matchedGames/h2h/200?opponent='+this.data.opponentId, jwt, (e) => {
       console.log(e,app.globalData.userInfo)
       let  times=0
       let    winRate=0

@@ -32,7 +32,7 @@ Page({
   },
 
   handleClick(e){
-    let url = 'rank/updateUserScore'
+    let url = 'rank/ld/updateUserScore'
     http.postReq(`${url}`, app.globalData.jwt, {openId:this.data.id,score:this.data.score,description:this.data.text}, (res) => {
       console.log(res)
       if (res.code === 0) {
