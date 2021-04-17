@@ -40,10 +40,6 @@ Page({
     return
   },
 
-  // onShow:function(){
-  //   console.log('on---show')
-  //  this. getUserRankInfo(app.globalData.jwt)
-  // },
 
   onLoad: function () {
     wx.showShareMenu({
@@ -51,13 +47,11 @@ Page({
     })
     let updateManager = wx.getUpdateManager()
     updateManager.onCheckForUpdate((e) => {
-      console.log(e)
       if (e.hasUpdate) {
         updateManager.applyUpdate()
       }
     })
     let that = this
-    console.log('hasUserInfo', this.data.hasUserInfo, 'canIUse', this.data.canIUse)
     if (app.globalData.jwt) {
       this.getUserInfoByJwt(app.globalData.jwt)
       this.getUserRankInfo(app.globalData.jwt)
@@ -76,7 +70,6 @@ Page({
     // })
   },
   onShow: function () {
-    console.log('----------show')
     let that = this
     if (app.globalData.jwt) {
       this.getUserInfoByJwt(app.globalData.jwt)
@@ -90,12 +83,9 @@ Page({
     return this.data.userInfo.nickName !== "请登录"
   },
   loginClick() {
-    console.log('checkingLogin', this.checkingLogin())
     if (this.checkingLogin()) {
-      console.log('checkingLogin   1', this.checkingLogin())
       return
     } else {
-      console.log('checkingLogin  2', this.checkingLogin())
       this.setData({
         hasUserInfo: false
       })
@@ -105,7 +95,6 @@ Page({
     console.log('-----onConfirmEmitted------')
   },
   onLocationTapped(e) {
-    console.log(e)
     const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
 
@@ -117,7 +106,6 @@ Page({
     wx.navigateTo({
       url: `plugin://chooseLocation/index?key=${key}&referer=${referer}&location=${location}&category=${category}`,
       success: function (res) {
-        console.log(res)
         res.eventChannel.emit('acceptDataFromOpenerPage', {
           data: res
         })
@@ -151,7 +139,6 @@ Page({
           that.setData({
             vsCode: e.data
           })
-          console.log('set vscode', e)
         })
       }
     })
@@ -184,7 +171,6 @@ Page({
   },
   getPhoneNumber(e) {
     let that = this
-    console.log(e)
     http.postReq('user/phone', '', {
       vscode: this.data.vsCode,
       iv: e.detail.iv,
@@ -210,7 +196,6 @@ Page({
         hasUserInfo: true,
 
       })
-      console.log('--------1------')
     })
   },
   getTeenage(jwt) {
@@ -222,7 +207,6 @@ Page({
             return t.parent.indexOf(app.globalData.openId) > -1
           }) : []
         })
-        console.log('--------getTeenage-----------', this.data.teenage)
 
       }
 
@@ -230,7 +214,6 @@ Page({
   },
   getOpponentCount(jwt) {
     http.getReq('match/ld/matchedGames/h2h/opponent', jwt, (e) => {
-      console.log(e.data, e.data !== null, e.data !== null ? e.data : 0)
       this.setData({
         opponents: e.data !== null ? e.data : []
       })
@@ -245,7 +228,6 @@ Page({
   },
   getUserRankInfo(jwt) {
     http.getReq('rank/ldRankInfo', jwt, (e) => {
-      console.log(e.data)
       let tags = []
       if (typeof e.data.polygen !== 'undefined' && e.data.polygen !== null) {
         tags = e.data.polygen.split(',')
@@ -265,7 +247,8 @@ Page({
           doubleWinRate: e.data.doubleWinRate,
           doubleScore: e.data.doubleScore,
           tags: tags,
-          parent: e.data.parent
+          parent: e.data.parent,
+          clubId:e.data.clubId
         },
         rankPosition: e.data.position
       })
@@ -311,7 +294,10 @@ Page({
     })
 
   },
-
+checkChild(){
+  console.log(typeof userInfo.clubId !=='undefiled',parseInt(userInfo.clubId)!==0)
+  return typeof userInfo.clubId !=='undefiled' && parseInt(userInfo.clubId)!==0
+},
   masterTap() {
     if (app.globalData.openId == '19960390361' || app.globalData.openId == '18602862619') {
 
@@ -334,7 +320,6 @@ Page({
     }
   },
   masterNav(e) {
-    console.log('master', e, app.globalData.openId)
     if (app.globalData.openId === "19960390361" || app.globalData.openId === "18602862619") {
       wx.navigateTo({
         url: '../../pages/master/player'
@@ -342,7 +327,6 @@ Page({
     }
   },
   navigateTo(event) {
-    console.log(event.currentTarget.dataset.variable)
     if (!this.checkingLogin()) {
       this.setData({
         hasUserInfo: false
@@ -350,6 +334,12 @@ Page({
       return
     }
     if (event.currentTarget.dataset.variable === -1) {
+      if(parseInt(this.data.userInfo.clubId)!==1){
+        $Toast({
+          content: '请切换到家长账号',
+          type: 'warning'
+      });
+      }
       wx.navigateTo({
         url: '../../pages/teenage/create'
       })

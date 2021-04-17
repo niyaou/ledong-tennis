@@ -43,7 +43,7 @@
       </block>
     </view>
   </view>
-  <view class="weui-flex">
+  <view class="weui-flex" wx:if="{{ checkChild()}}">
     <view class="weui-flex__item">
       <view class="placeholder wcard makeCenterV statistics_card">
        <block wx:if="{{teenage.length<1}}">
@@ -140,7 +140,7 @@
       <image src="../../icon/banner1.png" style="width:100%;height:200rpx" />
     </view>
   </view> -->
-
+  <i-toast id="toast" />
   <view class="weui-footer weui-footer_fixed-bottom" style="color:#ccc" bindtap="masterNav">
     <view class="weui-footer__links">
       <navigator url="" class="weui-footer__link" style="color:#ccc">乐动网球</navigator>
