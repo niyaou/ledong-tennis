@@ -13,6 +13,7 @@ Page({
     holderScore:0,
     challengerScore:0,
     isChoiceOpponent:false,
+    filterType:0,
     players:[],
     time:util.formatTime(new Date()),
     holderName:'',
@@ -107,7 +108,7 @@ if(this.data.isHolder){
         },2000)
       }
 
-      // console.log(res)
+
     })
   },
   finishMatch(matchId){
@@ -153,7 +154,8 @@ this.setData({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    // this.pinyin();
+console.log('----------onload create ',options)
+    this.setData({filterType:options.filterType})
   },
   pinyin:function(){
     var char = "使";
@@ -171,10 +173,8 @@ this.setData({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    // console.log(pinyin.pinyinUtil)
-    // let nickName = pinyin.pinyinUtil.getFirstLetter("法国大使馆反对".substring(0,1))
-    // console.log(nickName)
-    let url = 'rank/rankList?count=500'
+
+    let url = 'rank/ld/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
 
       let storeCity = new Array(26);
@@ -185,9 +185,12 @@ this.setData({
               list : []
           }
         })
-      res.data.forEach((item)=>{
+      res.data.filter(i=>{
+        console.log(i)
+        return parseInt(i.clubId)===parseInt(this.data.filterType)
+  
+      }).forEach((item)=>{
         let nickName = pinyin.pinyinUtil.getFirstLetter(item.nickName.substring(0,1))
-        // console.log('item.nickName',item.nickName,'nickName',nickName)
         let firstName ='#'
         let index=words.length-1
           firstName =nickName[0].substring(0,1)  ;

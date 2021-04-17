@@ -191,6 +191,8 @@ public interface IRankService {
     public String updateTeenageParent(String  parent,String  openId,String name,String avator);
 
 
+    public String verifiedMember(String  openId);
+
     /**
      * create user LD rank info
      *
@@ -207,6 +209,8 @@ public interface IRankService {
      * @return
      */
     public Double updateWinRate(String userId);
+    public Double updateLDWinRate(String userId);
+
 
     /**
      * update user double win rate

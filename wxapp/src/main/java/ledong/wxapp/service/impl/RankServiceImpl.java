@@ -127,11 +127,11 @@ public class RankServiceImpl implements IRankService {
     RankingContext context = new RankingContext(new VictoryRanking());
     scores = context.rankMatch(matchId, holderScore, challengerScor);
 
-    context = new RankingContext(new ConsecutiveRanking());
-    tempScore = context.rankMatch(matchId, holderScore, challengerScor);
-
-    scores[0] += tempScore[0];
-    scores[1] += tempScore[1];
+//    context = new RankingContext(new ConsecutiveRanking());
+//    tempScore = context.rankMatch(matchId, holderScore, challengerScor);
+//
+//    scores[0] += tempScore[0];
+//    scores[1] += tempScore[1];
 
 
 
@@ -149,9 +149,9 @@ public class RankServiceImpl implements IRankService {
 
     updateLDRankInfo(holder);
     scoreLDChangeLog(holder.getOpenId(), scores[0], "与" + challengerVo.get(UserVo.NICKNAME) + "比赛得分");
-    updateRankInfo(challenger);
+    updateLDRankInfo(challenger);
     scoreLDChangeLog(challenger.getOpenId(), scores[1], "与" + holderVo.get(UserVo.NICKNAME) + "比赛得分");
-    ctx.publishEvent(new WinRateEvent(ctx, holder, challenger));
+    ctx.publishEvent(new LDWinRateEvent(ctx, holder, challenger));
     updateLDUserPosition();
     return String.valueOf(scoreChanged);
   }
@@ -371,6 +371,31 @@ public class RankServiceImpl implements IRankService {
 
 
   @Override
+  public Double updateLDWinRate(String userId) {
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    BoolQueryBuilder user = new BoolQueryBuilder();
+    user.should(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId))
+            .should(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId));
+    BoolQueryBuilder match = new BoolQueryBuilder();
+    match.must(QueryBuilders.termQuery(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()))
+            .must(user);
+
+    BoolQueryBuilder win = new BoolQueryBuilder();
+
+    win.should(new BoolQueryBuilder()
+            .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
+            .must(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId)))
+            .should(new BoolQueryBuilder()
+                    .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
+                    .must(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId)));
+    AggregationBuilder b = AggregationBuilders.filter("winrate", win);
+    searchSourceBuilder.query(match);
+    searchSourceBuilder.size(5000);
+    searchSourceBuilder.aggregation(b);
+    return SearchApi.winRateAggregate(DataSetConstant.LD_GAME_MATCH_INFORMATION, searchSourceBuilder);
+  }
+
+  @Override
   public Double updateWinRate(String userId) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder user = new BoolQueryBuilder();
@@ -540,7 +565,9 @@ public class RankServiceImpl implements IRankService {
       long total = 0;
       for (String key : users.keySet()) {
         HashMap<String, Object> u = users.get(key);
+
         HashMap<String, Object> info = userInfos.get(key);
+        info.put(LdRankInfoVo .CLUBID,u.get(LdRankInfoVo.CLUBID));
         u.putAll(info);
         Long for2 = System.currentTimeMillis();
         result.add(u);
@@ -568,6 +595,19 @@ public class RankServiceImpl implements IRankService {
     return holder.getOpenId();
   }
 
+
+
+  @Override
+  public String verifiedMember(String openId) {
+    Map<String, Object> user = SearchApi.searchById(DataSetConstant.LD_USER_RANK_INFORMATION, openId);
+    LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user),LdRankInfoVo.class);
+    vo.setClubId(LdRankInfoVo.VERIFIED);
+    GradingContext gContext = new GradingContext(new GradeRanking());
+    vo = gContext.rankMatch(vo);
+    ctx.publishEvent(new MatchConfirmEvent(ctx, null));
+    return RankingStrategy.updateLDRankInfo(vo);
+
+  }
 
   @Override
   public String updateLDScoreByMaster(String openId, Integer score, String description) {

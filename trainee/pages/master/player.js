@@ -4,6 +4,7 @@ var http = require('../../utils/http.js')
 // var compare=require('../../utils/util.js')
 const chooseLocation = requirePlugin('chooseLocation');
 var pinyin = require('../../utils/pinyinUtil.js')
+const { $Toast } = require('../../dist/base/index');
 Page({
 
   /**
@@ -13,9 +14,12 @@ Page({
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible: false,
-    sortTog:true,
+    sortTog: true,
+    visible5: false,
+    currentUser: '',
     currentIndex: 0,
     rankPosition: 0,
+    filterType: 0, // 0 pending    1  verified     2 teenage
     fruit: [{
       id: 1,
       name: '按名称',
@@ -75,25 +79,39 @@ Page({
       }
     ],
     players: [],
+    totalPlayers: [],
     rankPosition: 300,
     slideButtons: [],
+    actions5: [{
+        name: '取消'
+      },
+      {
+        name: '验证通过',
+        color: '#ed3f14',
+        loading: false
+      }
+    ]
   },
-  onSortChange(event){
+  onSortChange(event) {
     console.log(event.detail)
     this.setData({
-      sortTog:event.detail.value
+      sortTog: event.detail.value
     })
 
-    if(this.data.sortTog){
+    if (this.data.sortTog) {
       this.setData({
-        players:this.data.players.sort((a, b) => {
+        players: this.data.totalPlayers.sort((a, b) => {
           return a['position'] - b['position']
+        }).filter(g => {
+          return g['clubId'] === this.data.filterType
         })
       })
-    }else{
+    } else {
       this.setData({
-        players: this.data.players.sort((a, b) => {
-          return  pinyin.pinyinUtil.getFirstLetter(a.nickName.substring(0,1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter(b.nickName.substring(0,1)).toUpperCase()?1:-1
+        players: this.data.totalPlayers.sort((a, b) => {
+          return pinyin.pinyinUtil.getFirstLetter(a.nickName.substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter(b.nickName.substring(0, 1)).toUpperCase() ? 1 : -1
+        }).filter(g => {
+          return g['clubId'] === this.data.filterType
         })
       })
     }
@@ -136,7 +154,10 @@ Page({
       if (res.code === 0) {
         this.data.players[this.data.currentIndex].polygen = tags
         this.setData({
-          players: this.data.players
+          totalPlayers: this.data.players,
+          players: this.data.players.filter(g => {
+            return g['clubId'] === this.data.filterType
+          })
         })
       }
       console.log(res)
@@ -145,21 +166,70 @@ Page({
       visible: false
     })
   },
-  addMatch(){
+  addMatch() {
+    if(this.data.filterType===0){
+      $Toast({
+        content: '请选择成人或者儿童',
+        type: 'warning'
+    });
+      return
+    }
     wx.navigateTo({
-      url: '../master/create',
+      url: '../master/create?filterType='+this.data.filterType,
     })
   },
+  handleClick5({
+    detail
+  }) {
+    if (detail.index === 0) {
+      this.setData({
+        visible5: false
+      });
+    } else {
+
+
+      wx.showLoading({
+        mask: true,
+        title: '加载中',
+      })
+      let url = 'user/ld/verifiedMember'
+
+      http.postReq(`${url}`, app.globalData.jwt, {
+        openId: this.data.currentUser
+      }, (res) => {
+        wx.hideLoading();
+        this.setData({
+          visible5: false
+        });
+        setTimeout(()=>{
+          this.initList()
+        },1500)
+     
+      })
+
+
+
+
+    }
+  },
   handleTapped(e) {
-console.log(e)
-wx.navigateTo({
-  url: '../master/score?id='+e.currentTarget.dataset.info.openId+'&name='+e.currentTarget.dataset.info.nickName,
-})
+    console.log(e)
+    if (e.currentTarget.dataset.info.clubId === 0) {
+      this.setData({
+        visible5: true,
+        currentUser: e.currentTarget.dataset.info.openId
+      })
+    } else {
+      wx.navigateTo({
+        url: '../master/score?id=' + e.currentTarget.dataset.info.openId + '&name=' + e.currentTarget.dataset.info.nickName,
+      })
+    }
+
   },
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) { 
+  onLoad: function (options) {
     this.setData({
       rankPosition: options.rankPosition
     })
@@ -193,22 +263,40 @@ wx.navigateTo({
     })
   },
 
+  navigateTo(event) {
+    console.log(event.currentTarget.dataset.variable)
+    this.setData({
+      filterType: event.currentTarget.dataset.variable
+    })
+    let e = {}
+    e.detail = {
+      value: this.data.sortTog
+    }
+    this.onSortChange(e)
+
+
+  },
+
+  initList(){
+    let url = 'rank/ld/rankList?count=500'
+    http.getReq(`${url}`, app.globalData.jwt, (res) => {
+      this.setData({
+        totalPlayers: res.data,
+        players: res.data.sort((a, b) => {
+          return a['position'] - b['position']
+        }).filter(g => {
+          return g['clubId'] === this.data.filterType
+        })
+      })
+
+    })
+  },
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
     console.log('---------player back--------')
-    let url = 'rank/ld/rankList?count=500'
-    http.getReq(`${url}`, app.globalData.jwt, (res) => {
-      this.setData({
-        players: res.data.sort((a, b) => {
-          return a['position'] - b['position']
-        })
-      })
-      // console.log(this.data.players.map(i => {
-      //   return i.position
-      // }))
-    })
+this.initList()
   },
 
 

@@ -3,6 +3,7 @@ package ledong.wxapp.service.impl;
 import java.util.Map;
 import java.util.concurrent.DelayQueue;
 
+import VO.*;
 import com.alibaba.fastjson.JSON;
 
 import org.apache.log4j.Logger;
@@ -11,13 +12,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import VO.DoubleMatchPostVo;
-import VO.DoubleWinRateEvent;
-import VO.MatchConfirmEvent;
-import VO.MatchPostVo;
-import VO.RankInfoVo;
-import VO.SlamWinRateEvent;
-import VO.WinRateEvent;
 import ledong.wxapp.constant.enums.MatchStatusCodeEnum;
 import ledong.wxapp.queue.ConfirmedMatchTask;
 import ledong.wxapp.queue.MatchConfirmSchedule;
@@ -57,6 +51,25 @@ public class EventsListener {
 
     @EventListener
     @Async
+    public void handleLDWinRateEvent(LDWinRateEvent event) {
+        LdRankInfoVo[] userVos = event.getUserVo();
+
+        try {
+            Thread.sleep(2500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        for (LdRankInfoVo vo:userVos) {
+            vo.setWinRate(rankService.updateLDWinRate(vo.getOpenId()));
+            rankService.updateLDRankInfo(vo);
+        }
+        rankService.updateLDUserPosition();
+
+    }
+
+
+    @EventListener
+    @Async
     public void handleDoubleWinRateEvent(DoubleWinRateEvent event) {
         RankInfoVo userVos = event.getUserVo();
         log.info(JSON.toJSONString(userVos));
@@ -93,7 +106,7 @@ public class EventsListener {
     @Async
     public void handleConfirmEvent(MatchConfirmEvent event) {
         try {
-            Thread.sleep(1200);
+            Thread.sleep(2000);
             rankService.updateUserPosition();
             rankService.updateLDUserPosition();
         } catch (InterruptedException e) {

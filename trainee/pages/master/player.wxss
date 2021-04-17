@@ -18,3 +18,15 @@
 .item{
   width:50%;
 }
+
+.flex{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.array{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

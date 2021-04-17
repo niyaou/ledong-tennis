@@ -77,6 +77,24 @@ public class UserController {
     }
 
 
+    @RequestMapping(value = "/ld/verifiedMember", method = RequestMethod.POST)
+    @ApiOperation(value = "verifiedMember ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "openId", value = "openId", required = true, dataType = "string", paramType = "query") })
+    public ResponseEntity<?> verifiedMember(@RequestHeader("Authorization") String authHeader,
+                                                 @RequestParam(value = "openId", required = true) String openId
+                                             ) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(
+                CommonResponse.success(rankService.verifiedMember(openId)), HttpStatus.OK);
+    }
+
+
+
     @RequestMapping(value = "/ld/updateTeenageParent", method = RequestMethod.POST)
     @ApiOperation(value = "updateUserScore ", notes = "")
     @ApiImplicitParams({

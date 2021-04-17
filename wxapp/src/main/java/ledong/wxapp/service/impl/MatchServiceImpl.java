@@ -362,7 +362,6 @@ public class MatchServiceImpl implements IMatchService {
         vo.setRanked(MatchStatusCodeEnum.MATCH_RANKED_STATUS.getCode());
         vo.setGamedTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
         vo.setStatus(MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode());
-        log.info("finish match   updateDocument " + matchId);
         return SearchApi.updateDocument(DataSetConstant.LD_GAME_MATCH_INFORMATION, JSON.toJSONString(vo), vo.getId());
     }
 
