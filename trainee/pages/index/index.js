@@ -15,6 +15,7 @@ Page({
     userRankInfo: {
       rankType0: '暂无'
     },
+    isShowAppendChild:false,
     vsCode: '',
     matchCount: 0,
     nearByUser: [],
@@ -255,6 +256,7 @@ Page({
 
       app.globalData.userRankInfo = this.data.userRankInfo
       app.globalData.openId = e.data.openId
+      this.checkChild()
       this.getTotalGames(jwt)
       this.getOpponentCount(jwt)
     })
@@ -295,8 +297,11 @@ Page({
 
   },
 checkChild(){
-  console.log(typeof userInfo.clubId !=='undefiled',parseInt(userInfo.clubId)!==0)
-  return typeof userInfo.clubId !=='undefiled' && parseInt(userInfo.clubId)!==0
+  console.log( this.data.userRankInfo.clubId, this.data.userRankInfo.clubId)
+  this.setData({
+    isShowAppendChild:typeof  this.data.userRankInfo.clubId !=='undefiled' && parseInt( this.data.userRankInfo.clubId)!==0
+  })
+
 },
   masterTap() {
     if (app.globalData.openId == '19960390361' || app.globalData.openId == '18602862619') {
