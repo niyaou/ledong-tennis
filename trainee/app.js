@@ -39,6 +39,9 @@ App({
   globalData: {
     shortInterval:SHORTINTERVAL,
     slowInterval:SLOWINTERVAL,
+    parentInfo:null,
+    parentRankInfo:null,
+    childRankInfo:null,
     userList:[],
     userInfo: null,
     userRankInfo:null,

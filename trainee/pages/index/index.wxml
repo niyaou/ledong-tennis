@@ -52,10 +52,17 @@
         </view>
         <i-icon type="add" size="40" color="grey"  bindtap="navigateTo" data-variable="{{-1}}" />
      </block>
-     <block wx:else>
-      <image  class="userinfo-avatar" src="{{teenage[0].avator}}" mode="cover"></image>
-      {{teenage[0].nickName}}
+     
+    <block wx:elif="{{parseInt(userRankInfo.clubId)===2}}"> 
+      <image  class="userinfo-avatar" src="{{parentUserInfo.avator}}" mode="cover"  bindtap="teenageTap" data-variable="{{0}}"></image>
+    11  {{parentUserInfo.nickName}}
+    {{userRankInfo.clubId}}  {{userRankInfo.nickName}}
      </block>
+
+  <block wx:else>
+      <image  class="userinfo-avatar" src="{{teenage[0].avator}}" mode="cover"  bindtap="teenageTap" data-variable="{{0}}"></image>
+      {{teenage[0].nickName}} {{teenage[0].avator}}
+     </block> 
       </view>
     </view>
     <view class="weui-flex__item">

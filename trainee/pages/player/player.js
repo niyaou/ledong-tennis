@@ -113,7 +113,7 @@ Page({
       if (res.code === 0) {
         this.data.players[this.data.currentIndex].polygen = tags
         this.setData({
-          players: this.data.players
+          players: this.data.players.filter(p=>{return clubId.clubId===app.globalData.userRankInfo.clubId})
         })
       }
       //  let tags=res.data.tagName.map(t=>{
@@ -146,17 +146,7 @@ Page({
     })
     console.log(e.detail, this.data.players[e.detail.index])
 
-    // //获取对手的tag
-    // let url = 'rank/updateUserTags'
-    // http.getReq(`${url}`, app.globalData.jwt, (res) => {
-    //    let tags=res.data.tagName.map(t=>{
-    //      return {name:t,checked:false}
-    //    })
-    //   this.setData({
-    //     tags: tags
-    //   })
-    //   console.log(res)
-    // })
+
 
   },
   /**
@@ -192,7 +182,7 @@ Page({
       this.setData({
         tags: tags
       })
-      console.log(res)
+  
     })
   },
 
@@ -205,7 +195,7 @@ Page({
     let url = 'rank/ld/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       this.setData({
-        players: res.data.sort((a, b) => {
+        players: res.data .filter(p=>{return clubId.clubId===app.globalData.userRankInfo.clubId}).sort((a, b) => {
           return a['position'] - b['position']
         })
       })

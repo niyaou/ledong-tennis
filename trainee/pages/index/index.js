@@ -3,6 +3,7 @@
 const app = getApp()
 var http = require('../../utils/http.js')
 const chooseLocation = requirePlugin('chooseLocation');
+const { $Toast } = require('../../dist/base/index');
 Page({
   data: {
     version: '1.0.0',
@@ -15,12 +16,14 @@ Page({
     userRankInfo: {
       rankType0: '暂无'
     },
-    isShowAppendChild:false,
+    isShowAppendChild: false,
     vsCode: '',
     matchCount: 0,
     nearByUser: [],
     rankPosition: 0,
     opponents: [],
+    parentInfo: null,
+    parentRankInfo: null,
     teenage: [],
     nearByCourt: [],
     tags: [],
@@ -41,7 +44,12 @@ Page({
     return
   },
 
-
+  initPlayerInfo() {
+    this.getUserInfoByJwt(app.globalData.jwt)
+    this.getUserRankInfo(app.globalData.jwt)
+    this.getTeenage(app.globalData.jwt)
+    this.gps()
+  },
   onLoad: function () {
     wx.showShareMenu({
       withShareTicket: true
@@ -54,30 +62,17 @@ Page({
     })
     let that = this
     if (app.globalData.jwt) {
-      this.getUserInfoByJwt(app.globalData.jwt)
-      this.getUserRankInfo(app.globalData.jwt)
-      this.getTeenage(app.globalData.jwt)
-      // this.getRankPosition(app.globalData.jwt)
-      this.gps()
+      this.initPlayerInfo()
+
     }
-    // http.getReq(`user/userList`, app.globalData.jwt, (res) => {
-    //   if (res.code == 0 && res.data != null) {
-    //     // console.log('userlist',res.data)
-    //     app.globalData.userList = res.data
-    //     that.setData({
-    //       userList: res.data
-    //     })
-    //   }
-    // })
+
   },
   onShow: function () {
     let that = this
     if (app.globalData.jwt) {
-      this.getUserInfoByJwt(app.globalData.jwt)
-      this.getUserRankInfo(app.globalData.jwt)
-      this.getTeenage(app.globalData.jwt)
-      // this.getRankPosition(app.globalData.jwt)
-      this.gps()
+
+      this.initPlayerInfo()
+
     }
   },
   checkingLogin() {
@@ -144,14 +139,18 @@ Page({
       }
     })
   },
-  login() {
+  login(user) {
     let that = this
-    http.postReq('user/ldLogin', '', {
+    let parent = {
       token: that.data.openId,
       nickName: that.data.userInfo.nickName,
       avator: that.data.userInfo.avatarUrl,
       gps: `${that.data.userLocation.latitude},${that.data.userLocation.longitude}`
-    }, function (e) {
+    }
+    if (typeof user !== "undefined") {
+      parent = user
+    }
+    http.postReq('user/ldLogin', '', parent, function (e) {
       wx.setStorageSync('jwt', e.data)
       if (e.code == 0) {
         app.globalData.jwt = e.data
@@ -160,12 +159,7 @@ Page({
           title: '加载中',
         })
         setTimeout(function () {
-          that.gps()
-          that.getUserInfoByJwt(e.data)
-          that.getUserRankInfo(e.data)
-          that.getTeenage(e.data)
-          // that.getNearByCourt(app.globalData.jwt)
-          // that. getNearByUser(app.globalData.jwt)
+          that.initPlayerInfo()
         }, 1500)
       }
     })
@@ -195,19 +189,28 @@ Page({
           nickName: e.data.nickName
         },
         hasUserInfo: true,
-
       })
+      if (e.data.avator.indexOf('teenage') === -1) {
+        app.globalData.parentInfo = {
+          avatarUrl: e.data.avator,
+          nickName: e.data.nickName,
+          gps:e.data.gps
+        }
+        this.setData({parentUserInfo:e.data})
+      }
     })
   },
   getTeenage(jwt) {
     http.getReq('user/ld/exploreTeenage', jwt, (e) => {
       console.log(e)
-      if (e.code === 0) {
+      if (e.code === 0 && e.data.length>0) {
+
         this.setData({
           teenage: e.data !== null ? e.data.filter(t => {
             return t.parent.indexOf(app.globalData.openId) > -1
           }) : []
         })
+        app.globalData.childRankInfo=this.data.teenage
 
       }
 
@@ -228,6 +231,7 @@ Page({
     })
   },
   getUserRankInfo(jwt) {
+    let that= this
     http.getReq('rank/ldRankInfo', jwt, (e) => {
       let tags = []
       if (typeof e.data.polygen !== 'undefined' && e.data.polygen !== null) {
@@ -249,13 +253,17 @@ Page({
           doubleScore: e.data.doubleScore,
           tags: tags,
           parent: e.data.parent,
-          clubId:e.data.clubId
+          clubId: e.data.clubId
         },
         rankPosition: e.data.position
       })
 
       app.globalData.userRankInfo = this.data.userRankInfo
       app.globalData.openId = e.data.openId
+      if(parseInt(that.data.userRankInfo.clubId) ===1){
+        app.globalData.parentRankInfo= app.globalData.userRankInfo
+        that.setData({parentRankInfo: app.globalData.userRankInfo})
+      }
       this.checkChild()
       this.getTotalGames(jwt)
       this.getOpponentCount(jwt)
@@ -296,16 +304,15 @@ Page({
     })
 
   },
-checkChild(){
-  console.log( this.data.userRankInfo.clubId, this.data.userRankInfo.clubId)
-  this.setData({
-    isShowAppendChild:typeof  this.data.userRankInfo.clubId !=='undefiled' && parseInt( this.data.userRankInfo.clubId)!==0
-  })
+  checkChild() {
+    console.log(this.data.userRankInfo.clubId, this.data.userRankInfo.clubId)
+    this.setData({
+      isShowAppendChild: typeof this.data.userRankInfo.clubId !== 'undefiled' && parseInt(this.data.userRankInfo.clubId) !== 0
+    })
 
-},
+  },
   masterTap() {
     if (app.globalData.openId == '19960390361' || app.globalData.openId == '18602862619') {
-
       wx.navigateTo({
         url: '../master/master'
       })
@@ -331,6 +338,19 @@ checkChild(){
       })
     }
   },
+  teenageTap(event){
+    console.log(app.globalData.childRankInfo[event.currentTarget.dataset.variable])
+
+    if (event.currentTarget.dataset.variable === 0) {
+      let child=app.globalData.childRankInfo[event.currentTarget.dataset.variable]
+      let user = {
+        token: child.id,
+        nickName:child.nickName,
+        gps: app.globalData.parentInfo.gps
+      }
+      this.login(user)
+    }
+  },
   navigateTo(event) {
     if (!this.checkingLogin()) {
       this.setData({
@@ -339,15 +359,17 @@ checkChild(){
       return
     }
     if (event.currentTarget.dataset.variable === -1) {
-      if(parseInt(this.data.userInfo.clubId)!==1){
+      if (parseInt(this.data.userRankInfo.clubId) !== 1) {
         $Toast({
           content: '请切换到家长账号',
           type: 'warning'
-      });
+        });
+      }else{
+        wx.navigateTo({
+          url: '../../pages/teenage/create'
+        })
       }
-      wx.navigateTo({
-        url: '../../pages/teenage/create'
-      })
+
     } else
     if (event.currentTarget.dataset.variable === 0) {
       wx.navigateTo({
