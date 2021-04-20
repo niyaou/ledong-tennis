@@ -325,6 +325,7 @@ public class RankServiceImpl implements IRankService {
   public String updateTeenageParent(String  parent,String  openId,String name,String avator) {
     Map<String, Object> user = SearchApi.searchById(DataSetConstant.LD_USER_RANK_INFORMATION, openId);
     LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user),LdRankInfoVo.class);
+
     vo.setClubId(LdRankInfoVo.TEENAGE);
     String[] p = vo.getParent();
     Set<String> parents = new HashSet<>();

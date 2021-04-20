@@ -195,7 +195,7 @@ Page({
     let url = 'rank/ld/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       this.setData({
-        players: res.data .filter(p=>{return clubId.clubId===app.globalData.userRankInfo.clubId}).sort((a, b) => {
+        players: res.data .filter(p=>{return p.clubId===app.globalData.userRankInfo.clubId}).sort((a, b) => {
           return a['position'] - b['position']
         })
       })

@@ -10,13 +10,11 @@ App({
     wx.setStorageSync('logs', logs)
     this.globalData.jwt= wx.getStorageSync('jwt') || ''
     this.globalData.gps= wx.getStorageSync('gps') || ''
-    // 登录
-    // wx.login({
-    //   success: res => {
-    //     // 发送 res.code 到后台换取 openId, sessionKey, unionId
-    //   }
-    // })
-    // 获取用户信息
+    this.globalData.parentInfo=wx.getStorageSync('parentUserInfo')||{}
+    this.globalData.parentRankInfo=wx.getStorageSync('parentRankInfo')||{}
+    this.globalData.parentOpenId=wx.getStorageSync('parentOpenId')||''
+    this.globalData.childRankInfo=wx.getStorageSync('children')||''
+  
     wx.getSetting({
       success: res => {
         if (res.authSetting['scope.userInfo']) {

@@ -191,22 +191,18 @@ Page({
               src: current[0].avator,
               teenageId: current[0].openId
             })
-            console.log(this.data)
+          
           }
-
         } else {
           wx.showLoading({
             mask: true,
             title: '加载中',
           })
           setTimeout(() => {
-            this.finishMatch(false)
+            this.finishMatch({currentTarget:{dataset:{variable:true}}})
           }, 1000)
         }
-
       }
-
-
     })
   },
   finishMatch(e) {
