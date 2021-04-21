@@ -9,9 +9,9 @@
           <i-input value="{{holderName}}" title="姓名"  placeholder="您家小学员姓名" />
         </view>
 
-        <view class="wcard">
+        <!-- <view class="wcard">
           <i-icon slot="content" type="addressbook" size="25" color="#666" bindtap="choiceHolder" />
-        </view>
+        </view> -->
       </view>
 
       <view class="avator weui-flex" bindtap="uploadAvator">
@@ -33,7 +33,7 @@
 
 
   <block wx:else>
-    <i-index style="margin-top:280rpx" height="100%" bind:change="onChange">
+    <!-- <i-index style="margin-top:280rpx" height="100%" bind:change="onChange">
       <i-index-item wx:for="{{ players }}" wx:for-index="index" wx:key="{{index}}" wx:for-item="item"
         name="{{item.key}}">
         <view class="i-index-demo-item" wx:for="{{item.list}}" wx:for-index="in" wx:key="{{in}}" wx:for-item="it">
@@ -44,7 +44,7 @@
 
         </view>
       </i-index-item>
-    </i-index>
+    </i-index> -->
   </block>
 
 </view>

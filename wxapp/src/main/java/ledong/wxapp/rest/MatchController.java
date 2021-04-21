@@ -2,6 +2,8 @@ package ledong.wxapp.rest;
 
 import javax.annotation.Resource;
 
+import VO.LdRankInfoVo;
+import ledong.wxapp.service.IRankService;
 import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -40,6 +42,8 @@ public class MatchController {
         private JwtToken tokenService;
         @Autowired
         private IMatchService matchService;
+        @Autowired
+        private IRankService iRankService;
 
         @RequestMapping(value = "/randomMatch", method = RequestMethod.POST)
         @ApiOperation(value = "request a random match", notes = "")
@@ -158,7 +162,12 @@ public class MatchController {
                                                    @RequestParam(value = "opponent", required = true) String opponent) {
                 Claims claims = tokenService.getClaimByToken(authHeader);
                 String userId = claims.getSubject();
-                if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+//                if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+//                        throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+//                }
+
+                LdRankInfoVo vo= iRankService.getLDUserRank(userId);
+                if (vo.getClubId()!=LdRankInfoVo.MASTER) {
                         throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
                 }
                 return new ResponseEntity<Object>(CommonResponse

@@ -1,5 +1,6 @@
 package ledong.wxapp.rest;
 
+import VO.LdRankInfoVo;
 import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -195,7 +196,11 @@ public class RankController {
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
-        if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+//        if (!"19960390361".equals(userId) && !"18602862619".equals(userId)) {
+//            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+//        }
+        LdRankInfoVo vo= iRankService.getLDUserRank(userId);
+        if (vo.getClubId()!=LdRankInfoVo.MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
         return new ResponseEntity<Object>(

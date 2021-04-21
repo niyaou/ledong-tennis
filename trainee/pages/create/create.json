@@ -17,7 +17,8 @@
     "i-tag": "../../dist/tag/index",
     "i-input-number": "../../dist/input-number/index",
     "i-index": "../../dist/index/index",
-    "i-index-item": "../../dist/index-item/index"
+    "i-index-item": "../../dist/index-item/index",
+    "i-toast": "../../dist/toast/index"
   },
   "disableScroll": true
 }

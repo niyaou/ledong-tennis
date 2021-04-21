@@ -1,5 +1,6 @@
 <!--pages/matches/matchlist.wxml-->
 <view class="containerbg">
+  <i-toast id="toast" />
 <block wx:if="{{ !isChoiceOpponent }}">
   <mp-navigation-bar title="记录比分" back="{{true}}" size="{{large}}"></mp-navigation-bar>
 
@@ -25,7 +26,8 @@
 
 
 <block wx:else>
-<i-index style="margin-top:280rpx" height="100%" bind:change="onChange">
+  <div  style="margin-top:480rpx" > </div>
+<i-index style="margin-top:480rpx" height="100%" bind:change="onChange">
         <i-index-item 
             wx:for="{{ players }}" 
             wx:for-index="index" 

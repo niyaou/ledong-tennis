@@ -49,7 +49,6 @@ Page({
   initPlayerInfo() {
     this.getUserInfoByJwt(app.globalData.jwt)
     this.getUserRankInfo(app.globalData.jwt)
-
     this.gps()
   },
   onLoad: function () {
@@ -115,6 +114,7 @@ Page({
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo
+    console.log('-------getUserInfo---set global user info ',   app.globalData.userInfo)
     this.setData({
       userInfo: e.detail.userInfo,
     })
@@ -188,6 +188,8 @@ Page({
         },
         hasUserInfo: true,
       })
+      app.globalData.userInfo=this.data.userInfo
+      console.log('---set app global user info ', app.globalData.userInfo)
       if (e.data.avator.indexOf('teenage') === -1) {
         app.globalData.parentInfo = {
           avatarUrl: e.data.avator,
@@ -201,7 +203,6 @@ Page({
     })
   },
   getTeenage(jwt) {
-    console.log('-------getTeenage------',app.globalData.childRankInfo)
     if (this.data.userRankInfo.clubId === 2) {
      
       this.setData({
@@ -278,7 +279,6 @@ Page({
         that.setData({
           parentRankInfo: app.globalData.parentRankInfo
         })
-        console.log('------222222222 ', this.data.parentRankInfo)
       }
       this.getTeenage(app.globalData.jwt)
       this.checkChild()
@@ -327,13 +327,6 @@ Page({
     })
 
   },
-  masterTap() {
-    if (app.globalData.openId == '19960390361' || app.globalData.openId == '18602862619') {
-      wx.navigateTo({
-        url: '../master/master'
-      })
-    } else {}
-  },
   switchMode() {
     this.setData({
       isSingle: !this.data.isSingle
@@ -348,16 +341,16 @@ Page({
     }
   },
   masterNav(e) {
-    if (app.globalData.openId === "19960390361" || app.globalData.openId === "18602862619") {
+    if (app.globalData.userRankInfo.clubId === 3 ) {
       wx.navigateTo({
         url: '../../pages/master/player'
       })
     }
   },
   teenageTap(event) {
-
     if (event.currentTarget.dataset.variable !== -1) {
-      let child = app.globalData.childRankInfo[event.currentTarget.dataset.variable]
+      // let child = app.globalData.childRankInfo[event.currentTarget.dataset.variable]
+      let child = this.data.teenage[event.currentTarget.dataset.variable]
       let user = {
         token: child.id,
         nickName: child.nickName,

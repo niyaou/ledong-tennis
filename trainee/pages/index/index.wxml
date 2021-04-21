@@ -6,7 +6,7 @@
       wx:if="{{vsCode===''}}"> 微信登录 </button>
     <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" bindtap="gps"
       style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"
-      wx:if="{{vsCode!==''}}"> 手机注册 </button>
+      wx:if="{{vsCode!==''}}"> 绑定手机 </button>
     <image src="../../icon/splash2.jpg" class="splash"></image>
   </block>
 
@@ -109,7 +109,7 @@
             <view class="statisticNum">{{userRankInfo.winRate}}%</view>
             <view class="statisticSubtitle">胜率</view>
           </view>
-          <image src="../../icon/tennis.png" class="iconsize"></image>
+          <image src="../../icon/winrate.png" class="iconsize"></image>
         </view>
       </view>
       <view class="weui-flex__item">
@@ -139,7 +139,7 @@
             <view class="statisticNum">{{opponents.length}} 人</view>
             <view class="statisticSubtitle">对手</view>
           </view>
-          <image src="../../icon/rank.png" class="iconsize"></image>
+          <image src="../../icon/opponent.png" class="iconsize"></image>
         </view>
       </view>
     </view>

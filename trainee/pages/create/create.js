@@ -3,6 +3,9 @@ const app = getApp()
 var http = require('../../utils/http.js')
 var util = require('../../utils/util.js')
 var pinyin = require('../../utils/pinyinUtil.js')
+const {
+  $Toast
+} = require('../../dist/base/index');
 Page({
 
   /**
@@ -81,6 +84,23 @@ Page({
     })
   },
   handleClick(e){
+   
+if(this.data.holderScore===0 &&this.data.challengerScore===0 ){
+  $Toast({
+    content: '请输入比分',
+    type: 'warning'
+  });
+  return
+}
+
+if(this.data.holderScore===this.data.challengerScore){
+  $Toast({
+    content: '比分不能相同',
+    type: 'warning'
+  });
+  return
+}
+
     let url = 'match/ld/postMatch'
     http.postReq(`${url}`, app.globalData.jwt, {opponent:this.data.id}, (res) => {
       console.log(res)
@@ -138,18 +158,6 @@ this.setData({
   },
   pinyin:function(){
     var char = "使";
-    // if (pinyinjs.hasOwnProperty(char)) {
-    //   console.log(pinyinjs[char][0].substring(0,1))
-    //   this.setData({
-    //     pinyinval: pinyinjs[char].join(', ')
-    //   });
-    // }
-    // else {
-    //   this.setData({
-    //     pinyinval: '找不到，^_^'
-    //   });
-    // }
- 
   },
 
   /**
@@ -177,7 +185,7 @@ this.setData({
         })
       res.data.forEach((item)=>{
         let nickName = pinyin.pinyinUtil.getFirstLetter(item.nickName.substring(0,1))
-        // console.log('item.nickName',item.nickName,'nickName',nickName)
+      
         let firstName ='#'
         let index=words.length-1
           firstName =nickName[0].substring(0,1)  ;
@@ -186,13 +194,16 @@ this.setData({
             index=words.length-1
             firstName ='#'
           }
-          // console.log('firstName',firstName,'index',index)
-          storeCity[index].list.push({
+          if(item.openId!==app.globalData.openId && item.clubId===app.globalData.userRankInfo.clubId){
+            storeCity[index].list.push({
               name : item.nickName,
               key : firstName,
               openId:item.openId
           });
+          }
+ 
       })
+      console.log('app.globalData.userInfo',app.globalData.userInfo)
       if(app.globalData.userInfo!==null){
         this.setData({
           holder: app.globalData.userInfo.nickName

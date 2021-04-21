@@ -290,40 +290,40 @@ Page({
       teenageId: ''
     })
 
-    let url = 'rank/rankList?count=500'
-    http.getReq(`${url}`, app.globalData.jwt, (res) => {
+    // let url = 'rank/rankList?count=500'
+    // http.getReq(`${url}`, app.globalData.jwt, (res) => {
 
-      let storeCity = new Array(26);
-      const words = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"]
-      words.forEach((item, index) => {
-        storeCity[index] = {
-          key: item,
-          list: []
-        }
-      })
-      res.data.forEach((item) => {
-        let nickName = pinyin.pinyinUtil.getFirstLetter(item.nickName.substring(0, 1))
-        // console.log('item.nickName',item.nickName,'nickName',nickName)
-        let firstName = '#'
-        let index = words.length - 1
-        firstName = nickName[0].substring(0, 1);
-        index = words.indexOf(firstName.toUpperCase());
-        if (index === -1) {
-          index = words.length - 1
-          firstName = '#'
-        }
-        // console.log('firstName',firstName,'index',index)
-        storeCity[index].list.push({
-          name: item.nickName,
-          key: firstName,
-          openId: item.openId
-        });
-      })
-      this.data.players = storeCity;
-      this.setData({
-        players: this.data.players
-      })
-    })
+    //   let storeCity = new Array(26);
+    //   const words = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"]
+    //   words.forEach((item, index) => {
+    //     storeCity[index] = {
+    //       key: item,
+    //       list: []
+    //     }
+    //   })
+    //   res.data.forEach((item) => {
+    //     let nickName = pinyin.pinyinUtil.getFirstLetter(item.nickName.substring(0, 1))
+    //     // console.log('item.nickName',item.nickName,'nickName',nickName)
+    //     let firstName = '#'
+    //     let index = words.length - 1
+    //     firstName = nickName[0].substring(0, 1);
+    //     index = words.indexOf(firstName.toUpperCase());
+    //     if (index === -1) {
+    //       index = words.length - 1
+    //       firstName = '#'
+    //     }
+    //     // console.log('firstName',firstName,'index',index)
+    //     storeCity[index].list.push({
+    //       name: item.nickName,
+    //       key: firstName,
+    //       openId: item.openId
+    //     });
+    //   })
+    //   this.data.players = storeCity;
+    //   this.setData({
+    //     players: this.data.players
+    //   })
+    // })
 
 
   },

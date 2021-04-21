@@ -46,7 +46,6 @@ public class EventsListener {
             rankService.updateRankInfo(vo);
         }
         rankService.updateUserPosition();
-
     }
 
     @EventListener
