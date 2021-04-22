@@ -7,6 +7,7 @@
     <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" bindtap="gps"
       style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"
       wx:if="{{vsCode!==''}}"> 绑定手机 </button>
+      <i-icon type="delete"    style="position:absolute;top:90%;left:45%;z-index:10;" size="32" color="#fff" bindtap="returnMainPage" />
     <image src="../../icon/splash2.jpg" class="splash"></image>
   </block>
 

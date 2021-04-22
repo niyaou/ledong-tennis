@@ -8,7 +8,7 @@ const {
 } = require('../../dist/base/index');
 Page({
   data: {
-    version: '1.0.0',
+    version: '1.0.2',
     motto: 'Hello World',
     userInfo: {
       nickName: "请登录",
@@ -77,6 +77,19 @@ Page({
   checkingLogin() {
     return this.data.userInfo.nickName !== "请登录"
   },
+  returnMainPage(){
+    this.setData({
+      hasUserInfo: true,
+      userInfo: {
+        nickName: "请登录",
+        avatarUrl: "../../icon/user2.png"
+      },
+      vsCode:''
+    })
+    app.globalData.userInfo = null
+    wx.removeStorageSync('parentUserInfo')
+
+  },
   loginClick() {
     if (this.checkingLogin()) {
       return
@@ -114,11 +127,9 @@ Page({
   },
   getUserInfo: function (e) {
     app.globalData.userInfo = e.detail.userInfo
-    console.log('-------getUserInfo---set global user info ',   app.globalData.userInfo)
     this.setData({
       userInfo: e.detail.userInfo,
     })
-    console.log('-------getUserInfo', e.detail.userInfo)
     wx.setStorageSync('parentUserInfo', e.detail.userInfo)
     this.verified()
   },
@@ -390,6 +401,13 @@ Page({
 
     } else
     if (event.currentTarget.dataset.variable === 0) {
+      if(this.data.userRankInfo.clubId===0){
+        $Toast({
+          content: '请联系俱乐部管理员进行会员验证',
+          type: 'warning'
+        });
+        return 
+      }
       wx.navigateTo({
         url: '../../pages/matches/matchlist'
       })
@@ -400,6 +418,13 @@ Page({
       })
     } else
     if (event.currentTarget.dataset.variable === 2) {
+      if(this.data.userRankInfo.clubId===0){
+        $Toast({
+          content: '请联系俱乐部管理员进行会员验证',
+          type: 'warning'
+        });
+        return 
+      }
       wx.navigateTo({
         url: '../../pages/player/player?rankPosition=' + this.data.rankPosition
       })
