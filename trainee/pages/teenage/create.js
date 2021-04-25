@@ -102,21 +102,9 @@ Page({
   },
   onChange(e) {
     console.log(e)
-
-    if (this.data.isHolder) {
       this.setData({
-        isChoiceOpponent: false,
-        holderName: e.currentTarget.dataset.id.name,
-        holderId: e.currentTarget.dataset.id.openId
+        holderName: e.detail.detail.value
       })
-    } else {
-      this.setData({
-        isChoiceOpponent: false,
-        name: e.currentTarget.dataset.id.name,
-        id: e.currentTarget.dataset.id.openId
-      })
-    }
-
 
   },
   uploadAvator(e) {
