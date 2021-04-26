@@ -168,7 +168,6 @@ Page({
       console.log(res)
       wx.hideLoading();
       if (res.code === 0) {
-
         if (res.data !== null && res.data.length > 0) {
           let current = res.data.filter(r => {
             return r.nickName === this.data.holderName
@@ -179,7 +178,6 @@ Page({
               src: current[0].avator,
               teenageId: current[0].openId
             })
-          
           }
         } else {
           wx.showLoading({
@@ -203,7 +201,6 @@ Page({
       avator: src
     }, (res) => {
       console.log(res)
-   
       if (res.code === 0) {
         wx.showLoading({
           mask: true,
@@ -215,10 +212,13 @@ Page({
             delta: 0,
           })
         }, 2000)
-
+      }else{
+        wx.showToast({
+          title: '添加失败',
+          icon: 'none',
+          duration: 2000
+        })
       }
-
-      // console.log(res)
     })
   },
   handleFruitChange({
