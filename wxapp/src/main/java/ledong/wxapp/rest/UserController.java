@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.apache.log4j.Logger;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(value = "user management", tags = "UserController")
 @Validated
 public class UserController {
-
+    private static Logger logger = Logger.getLogger(UserController.class);
     @Autowired
     private IUserService userService;
     @Autowired
@@ -67,11 +67,14 @@ public class UserController {
                                                @RequestParam(value = "openId", required = true) String openId,
                                                @RequestParam(value = "name", required = true) String name,
                                                @RequestParam(value = "avator", required = true) String avator) throws AuthenticationException {
+                                                logger.info(authHeader,openId,name,avator);
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
+        logger.info(userId);
         return new ResponseEntity<Object>(
                 CommonResponse.success(userService.addLDTeenageUser(userId,  openId, name, avator)), HttpStatus.OK);
     }
@@ -105,11 +108,14 @@ public class UserController {
                                              @RequestParam(value = "openId", required = true) String openId,
                                              @RequestParam(value = "name", required = true) String name,
                                              @RequestParam(value = "avator", required = true) String avator) throws AuthenticationException {
+                                                logger.info(authHeader,openId,name,avator);
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
+        logger.info(userId);
         return new ResponseEntity<Object>(
                 CommonResponse.success(rankService.updateTeenageParent(userId,  openId, name, avator)), HttpStatus.OK);
     }

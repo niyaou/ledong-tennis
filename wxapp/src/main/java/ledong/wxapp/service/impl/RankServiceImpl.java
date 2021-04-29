@@ -325,7 +325,7 @@ public class RankServiceImpl implements IRankService {
   public String updateTeenageParent(String  parent,String  openId,String name,String avator) {
     Map<String, Object> user = SearchApi.searchById(DataSetConstant.LD_USER_RANK_INFORMATION, openId);
     LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user),LdRankInfoVo.class);
-
+    logger.info(openId,name,avator);
     vo.setClubId(LdRankInfoVo.TEENAGE);
     String[] p = vo.getParent();
     Set<String> parents = new HashSet<>();
@@ -335,12 +335,14 @@ public class RankServiceImpl implements IRankService {
       }
     }
       parents.add(parent);
-
+      logger.info("add parent");
     String[] total=new String[1];
     vo.setParent(parents.toArray(total));
     GradingContext gContext = new GradingContext(new GradeRanking());
     vo = gContext.rankMatch(vo);
+    logger.info("set rank ");
     ctx.publishEvent(new MatchConfirmEvent(ctx, null));
+    logger.info("before rank");
     return RankingStrategy.updateLDRankInfo(vo);
   }
 
