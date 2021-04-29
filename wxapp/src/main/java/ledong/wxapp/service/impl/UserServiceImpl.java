@@ -160,7 +160,7 @@ public class UserServiceImpl implements IUserService {
             rankService.createLDTeenageRankInfo(parent,openId);
             logger.info("after create tennage");
         });
-        logger.info("after create tennage   2",userId);
+        logger.info("after create tennage   2"+userId);
         return userId;
     }
 
