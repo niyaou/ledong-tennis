@@ -67,7 +67,7 @@ public class UserController {
                                                @RequestParam(value = "openId", required = true) String openId,
                                                @RequestParam(value = "name", required = true) String name,
                                                @RequestParam(value = "avator", required = true) String avator) throws AuthenticationException {
-                                                logger.info(authHeader,openId,name,avator);
+                                                logger.info(authHeader+openId+name+avator);
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
             logger.info("----token 不可用----");
@@ -108,7 +108,7 @@ public class UserController {
                                              @RequestParam(value = "openId", required = true) String openId,
                                              @RequestParam(value = "name", required = true) String name,
                                              @RequestParam(value = "avator", required = true) String avator) throws AuthenticationException {
-                                                logger.info(authHeader,openId,name,avator);
+                                                logger.info(authHeader+openId+name+avator);
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
             logger.info("----token 不可用----");

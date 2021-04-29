@@ -137,14 +137,14 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public String addLDTeenageUser(String  parent,String  openId,String name,String avator) {
-        logger.info(openId,name,avator);
+        logger.info(openId+name+avator);
         UserVo user =new UserVo();
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
         user.setAvator(avator);
         user.setNickName(name);
         user.setOpenId(openId);
-        logger.info(user);
+        logger.info(user.toString());
         try {
             if (user.getGps().contains("undefined")) {
                 user.setGps(CommonConstanst.GPS);
