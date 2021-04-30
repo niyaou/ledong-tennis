@@ -102,9 +102,9 @@ Page({
   },
   onChange(e) {
     console.log(e)
-      this.setData({
-        holderName: e.detail.detail.value
-      })
+    this.setData({
+      holderName: e.detail.detail.value
+    })
 
   },
   uploadAvator(e) {
@@ -178,6 +178,20 @@ Page({
               src: current[0].avator,
               teenageId: current[0].openId
             })
+          } else {
+            wx.showLoading({
+              mask: true,
+              title: '加载中',
+            })
+            setTimeout(() => {
+              this.finishMatch({
+                currentTarget: {
+                  dataset: {
+                    variable: true
+                  }
+                }
+              })
+            }, 1000)
           }
         } else {
           wx.showLoading({
@@ -185,7 +199,13 @@ Page({
             title: '加载中',
           })
           setTimeout(() => {
-            this.finishMatch({currentTarget:{dataset:{variable:true}}})
+            this.finishMatch({
+              currentTarget: {
+                dataset: {
+                  variable: true
+                }
+              }
+            })
           }, 1000)
         }
       }
@@ -212,7 +232,7 @@ Page({
             delta: 0,
           })
         }, 2000)
-      }else{
+      } else {
         wx.showToast({
           title: '添加失败',
           icon: 'none',
