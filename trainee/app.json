@@ -1,6 +1,6 @@
 {
   "pages": [
-
+    "pages/schedule/schedule",
     "pages/index/index",
     "pages/teenage/create",
     "pages/create/create",
@@ -12,8 +12,7 @@
     "pages/master/player",
     "pages/master/score",
     "pages/master/create"
-  
-
+    
   ],
   "window": {
     "backgroundTextStyle": "light",

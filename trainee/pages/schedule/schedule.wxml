@@ -1,0 +1,12 @@
+<!--pages/schedule/schedule.wxml-->
+<calendar id="calendar" bind:takeoverTap="takeoverTap" bind:afterTapDate="afterTapDate"
+  bind:afterCalendarRender="afterCalendarRender" bind:onSwipe="onSwipe" bind:whenChangeMonth="whenChangeMonth"
+  config="{{calendarConfig}}" />
+<view class='b cc wrap btn-wrap'>
+  <button class='b cc btn btn-{{item.color}} btn-action-{{item.action}}' wx:for="{{actionBtn}}" wx:key="action"
+    data-action="{{item.action}}" data-disable="{{item.disable}}" bindtap="handleAction">{{item.text}}</button>
+</view>
+<view class="show-rst-wrap">
+  <view wx:if="{{rst}}" wx:for="{{rst}}" wx:key="index" class="show-rst">{{item}}</view>
+  <view wx:if="{{rstStr}}" wx:key="index" class="show-rst">{{rstStr}}</view>
+</view>
