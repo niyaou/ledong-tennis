@@ -8,7 +8,7 @@ const {
 } = require('../../dist/base/index');
 Page({
   data: {
-    version: '1.0.5',
+    version: '1.0.6',
     motto: 'Hello World',
     userInfo: {
       nickName: "请登录",
@@ -43,6 +43,7 @@ Page({
     this.setData({
       hasUserInfo: false
     })
+    console.log('bindViewTap---hasuserinfo',this.data.hasUserInfo)
     return
   },
 
@@ -77,14 +78,14 @@ Page({
   checkingLogin() {
     return this.data.userInfo.nickName !== "请登录"
   },
-  returnMainPage(){
+  returnMainPage() {
     this.setData({
       hasUserInfo: true,
       userInfo: {
         nickName: "请登录",
         avatarUrl: "../../icon/user2.png"
       },
-      vsCode:''
+      vsCode: ''
     })
     app.globalData.userInfo = null
     wx.removeStorageSync('parentUserInfo')
@@ -97,9 +98,10 @@ Page({
       this.setData({
         hasUserInfo: false
       })
+      console.log('--loginClick-----',this.data.hasUserInfo)
     }
   },
-  onConfirmEmitted() {},
+  onConfirmEmitted() { },
   onLocationTapped(e) {
     const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
     const referer = 'dd'; //调用插件的app的名称
@@ -126,12 +128,20 @@ Page({
     })
   },
   getUserInfo: function (e) {
-    app.globalData.userInfo = e.detail.userInfo
-    this.setData({
-      userInfo: e.detail.userInfo,
+    wx.getUserProfile({
+      desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+      success: (res) => {
+        app.globalData.userInfo = res.userInfo
+        this.setData({
+          userInfo: res.userInfo,
+        })
+        wx.setStorageSync('parentUserInfo', res.userInfo)
+        wx.setStorageSync('hasUserInfo',true)
+        this.verified()
+        this.gps()
+      }
     })
-    wx.setStorageSync('parentUserInfo', e.detail.userInfo)
-    this.verified()
+
   },
   verified() {
     let that = this
@@ -199,7 +209,7 @@ Page({
         },
         hasUserInfo: true,
       })
-      app.globalData.userInfo=this.data.userInfo
+      app.globalData.userInfo = this.data.userInfo
       console.log('---set app global user info ', app.globalData.userInfo)
       if (e.data.avator.indexOf('teenage') === -1) {
         app.globalData.parentInfo = {
@@ -215,9 +225,9 @@ Page({
   },
   getTeenage(jwt) {
     if (this.data.userRankInfo.clubId === 2) {
-     
+
       this.setData({
-        teenage: app.globalData.childRankInfo.filter(i=>{return i.openId!==this.data.userRankInfo.openId})
+        teenage: app.globalData.childRankInfo.filter(i => { return i.openId !== this.data.userRankInfo.openId })
       })
     } else if (this.data.userRankInfo.clubId === 1) {
       http.getReq('user/ld/exploreTeenage', jwt, (e) => {
@@ -260,7 +270,7 @@ Page({
       }
       this.setData({
         userRankInfo: {
-          openId:e.data.openId,
+          openId: e.data.openId,
           rankType1: e.data.rankType1,
           rankType0: e.data.rankType0,
           doubleRankType1: e.data.doubleRankType1,
@@ -352,7 +362,7 @@ Page({
     }
   },
   masterNav(e) {
-    if (app.globalData.userRankInfo.clubId === 3 ) {
+    if (app.globalData.userRankInfo.clubId === 3) {
       wx.navigateTo({
         url: '../../pages/master/player'
       })
@@ -385,6 +395,7 @@ Page({
       this.setData({
         hasUserInfo: false
       })
+      console.log('------navigateTo-----',this.data.hasUserInfo)
       return
     }
     if (event.currentTarget.dataset.variable === -1) {
@@ -400,40 +411,40 @@ Page({
       }
 
     } else
-    if (event.currentTarget.dataset.variable === 0) {
-      if(this.data.userRankInfo.clubId===0){
-        $Toast({
-          content: '请联系俱乐部管理员进行会员验证',
-          type: 'warning'
-        });
-        return 
-      }
-      wx.navigateTo({
-        url: '../../pages/matches/matchlist'
-      })
-    } else
-    if (event.currentTarget.dataset.variable === 1) {
-      wx.navigateTo({
-        url: '../../pages/score/score'
-      })
-    } else
-    if (event.currentTarget.dataset.variable === 2) {
-      if(this.data.userRankInfo.clubId===0){
-        $Toast({
-          content: '请联系俱乐部管理员进行会员验证',
-          type: 'warning'
-        });
-        return 
-      }
-      wx.navigateTo({
-        url: '../../pages/player/player?rankPosition=' + this.data.rankPosition
-      })
-    } else
-    if (event.currentTarget.dataset.variable === 3) {
-      wx.navigateTo({
-        url: '../../pages/h2h/h2h?winRate=' + this.data.userRankInfo.winRate
-      })
-    }
+      if (event.currentTarget.dataset.variable === 0) {
+        if (this.data.userRankInfo.clubId === 0) {
+          $Toast({
+            content: '请联系俱乐部管理员进行会员验证',
+            type: 'warning'
+          });
+          return
+        }
+        wx.navigateTo({
+          url: '../../pages/matches/matchlist'
+        })
+      } else
+        if (event.currentTarget.dataset.variable === 1) {
+          wx.navigateTo({
+            url: '../../pages/score/score'
+          })
+        } else
+          if (event.currentTarget.dataset.variable === 2) {
+            if (this.data.userRankInfo.clubId === 0) {
+              $Toast({
+                content: '请联系俱乐部管理员进行会员验证',
+                type: 'warning'
+              });
+              return
+            }
+            wx.navigateTo({
+              url: '../../pages/player/player?rankPosition=' + this.data.rankPosition
+            })
+          } else
+            if (event.currentTarget.dataset.variable === 3) {
+              wx.navigateTo({
+                url: '../../pages/h2h/h2h?winRate=' + this.data.userRankInfo.winRate
+              })
+            }
     // event.currentTarget.dataset.variable;
   },
 })

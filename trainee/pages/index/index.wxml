@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="containerbg">
   <block wx:if="{{!hasUserInfo}}">
-    <button open-type="getUserInfo" bindgetuserinfo="getUserInfo" bindtap="gps"
+    <button  bindtap="getUserInfo"
       style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"
       wx:if="{{vsCode===''}}"> 微信登录 </button>
     <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" bindtap="gps"
