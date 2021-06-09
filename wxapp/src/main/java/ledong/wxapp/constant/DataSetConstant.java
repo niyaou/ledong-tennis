@@ -18,4 +18,6 @@ public class DataSetConstant {
     public static final String TAGS_INFORMATION = "tags_information";
     public static final String SCORE_CHANGED_LOG = "score_changed_log";
     public static final String LD_SCORE_CHANGED_LOG = "ld_score_changed_log";
+    public static final String LD_PREPAID_CARD_INFORMATION = "ld_prepaid_card_information";
+    public static final String LD_COURSE_INFORMATION = "ld_course_information";
 }

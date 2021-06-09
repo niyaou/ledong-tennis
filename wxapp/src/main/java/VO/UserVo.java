@@ -29,9 +29,17 @@ public class UserVo implements Serializable {
     private String nickName;
     public static final String NICKNAME = "nickName";
 
+    @ApiModelProperty(value = "realName")
+    private String realName;
+    public static final String REALNAME = "realName";
+
+    @ApiModelProperty(value = "prepaidCard id")
+    private String prepaidCard;
+    public static final String PREPAIDCARD = "prepaidCard";
+
     @NotEmpty
     @ApiModelProperty(value = "club : member of club ,it is blank when user is not the member of any club ")
-    private String clubId="";
+    private String clubId = "";
     public static final String CLUBID = "clubId";
 
     @ApiModelProperty(value = "account charge remained quantities;rate 1:10")
@@ -63,7 +71,7 @@ public class UserVo implements Serializable {
     private String lastPlayingTime;
     public static final String LASTPLAYINGTIME = "lastPlayingTime";
 
-    public static String comparingByTime(Map<String, Object> map){
+    public static String comparingByTime(Map<String, Object> map) {
         return (String) map.get(CREATETIME);
     }
 
@@ -161,6 +169,22 @@ public class UserVo implements Serializable {
 
     public void setGps(String gps) {
         this.gps = gps;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getPrepaidCard() {
+        return prepaidCard;
+    }
+
+    public void setPrepaidCard(String prepaidCard) {
+        this.prepaidCard = prepaidCard;
     }
 
 }
