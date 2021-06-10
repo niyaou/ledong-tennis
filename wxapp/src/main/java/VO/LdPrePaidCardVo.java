@@ -20,6 +20,12 @@ public class LdPrePaidCardVo implements Serializable {
     private String title;
     public static final String TITLE = "title";
 
+    @NotEmpty
+    @ApiModelProperty(value = "title card name ")
+    private String createTime;
+    public static final String CREATETIME = "createTime";
+
+
     @ApiModelProperty(value = "member list ")
     private String[] member;
     public static final String MEMBER = "member";
@@ -79,4 +85,11 @@ public class LdPrePaidCardVo implements Serializable {
         this.charge = charge;
     }
 
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
 }

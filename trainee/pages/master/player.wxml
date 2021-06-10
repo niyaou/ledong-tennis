@@ -60,6 +60,9 @@
     <i-modal title="会员申请验证" visible="{{ visible5 }}" actions="{{ actions5 }}" bind:click="handleClick5">
     <view>验证通过后成为乐动俱乐部积分会员</view>
 </i-modal>
+  <i-modal title="选择绑卡或者积分" visible="{{ visible6 }}" actions="{{ actions6 }}" bind:click="handleClick6" >
+    <view>验证通过后成为乐动俱乐部积分会员</view>
+</i-modal>
 <i-toast id="toast" />
   </view>
 

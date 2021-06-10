@@ -90,7 +90,15 @@ Page({
         color: '#ed3f14',
         loading: false
       }
-    ]
+    ],
+    actions6: [{
+      name: '绑卡'
+    },
+    {
+      name: '积分',
+   
+    }
+  ]
   },
   onSortChange(event) {
     console.log(event.detail)
@@ -206,11 +214,24 @@ Page({
         },1500)
      
       })
-
-
-
-
     }
+  },
+  handleClick6({
+    detail
+  }) {
+    console.log('handleClick6',detail)
+    if (detail.index === 0) {
+      wx.navigateTo({
+        url: '../prepaidCard/masterCard?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
+      })
+    } else {
+      wx.navigateTo({
+        url: '../master/score?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
+      })
+    }
+    this.setData({
+      visible6: false
+    })  
   },
   handleTapped(e) {
     console.log(e)
@@ -220,9 +241,11 @@ Page({
         currentUser: e.currentTarget.dataset.info.openId
       })
     } else {
-      wx.navigateTo({
-        url: '../master/score?id=' + e.currentTarget.dataset.info.openId + '&name=' + e.currentTarget.dataset.info.nickName,
+      this.setData({
+        visible6: true,
+        currentUser: e.currentTarget.dataset.info
       })
+
     }
 
   },

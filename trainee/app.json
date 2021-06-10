@@ -1,7 +1,8 @@
 {
   "pages": [
-    "pages/schedule/schedule",
+  
     "pages/index/index",
+    "pages/schedule/schedule",
     "pages/teenage/create",
     "pages/create/create",
     "pages/h2h/detail",
@@ -11,7 +12,8 @@
     "pages/h2h/h2h",
     "pages/master/player",
     "pages/master/score",
-    "pages/master/create"
+    "pages/master/create",
+     "pages/prepaidCard/masterCard"
     
   ],
   "window": {
