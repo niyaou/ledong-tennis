@@ -1,9 +1,6 @@
 package ledong.wxapp.service.impl;
 
-import VO.LdPrePaidCardVo;
-import VO.LdRankInfoVo;
-import VO.RankInfoVo;
-import VO.UserVo;
+import VO.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.io.Files;
@@ -64,6 +61,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     @Autowired
     private IRankService rankService;
 
+    @Autowired
+    private IUserService userService;
+
 
     @Override
     public String addCard(String cardName, String... members) {
@@ -103,5 +103,35 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             }
 
         }
+    }
+
+
+
+    @Override
+    public String settleAccount(String courseId,String startTime, Double spendTime, HashMap<String, Integer> membersObj) {
+        //log each spend
+        ArrayList<String> members= new ArrayList<>();
+        HashMap<String,Integer> cardCharge=new HashMap<>();
+        for(String m : membersObj.keySet()){
+            members.add(m);
+            HashMap<String, Object> memberVo =userService.getLDUserInfo(m);
+            String cardId= (String) memberVo.get(UserVo.PREPAIDCARD);
+            int temp = cardCharge.get(cardId)==null?0: cardCharge.get(cardId);
+            cardCharge.put(cardId,temp+ membersObj.get(m));
+            LdSpendingVo spendVo=new LdSpendingVo();
+            spendVo.setOpenId(m);
+            spendVo.setTime(startTime);
+            spendVo.setSpend(spendTime);
+            spendVo.setCharge(membersObj.get(m));
+            spendVo.setCourse(cardId);
+            SearchApi.appendFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,LdPrePaidCardVo.SPENDING,spendVo, cardId);
+        }
+        //update total spend
+        for(String card : cardCharge.keySet()){
+            HashMap<String, Object>  cardVo=   SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,card);
+            int temp = (int) cardVo.get(LdPrePaidCardVo.BALANCE);
+            SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,LdPrePaidCardVo.BALANCE,String.valueOf(temp+cardCharge.get(card)),card)   ;
+        }
+        return courseId;
     }
 }

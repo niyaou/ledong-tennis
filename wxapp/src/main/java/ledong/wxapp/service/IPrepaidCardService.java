@@ -32,4 +32,14 @@ public interface IPrepaidCardService {
      */
     public String assignMember(String cardName,String openId);
 
+
+    /**
+     * course Log
+     * @param courseId
+     * @param spendTime
+     * @param membersObj
+     * @return
+     */
+    public String settleAccount(String courseId,String startTime,Double spendTime, HashMap<String,Integer> membersObj);
+
 }

@@ -44,8 +44,8 @@ public class PrepaidCardController {
     @RequestMapping(value = "/ld/createCard", method = RequestMethod.POST)
     @ApiOperation(value = "createCard ", notes = "")
     @ApiImplicitParams({
-                @ApiImplicitParam(name = "name", value = "score ", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "openId", value = "score ", required = false, dataType = "string", paramType = "query"), })
+                @ApiImplicitParam(name = "name", value = "name ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "openId", value = "openId ", required = false, dataType = "string", paramType = "query"), })
     public ResponseEntity<?> createCard(@RequestHeader("Authorization") String authHeader,
                                         @RequestParam(value = "name", required = true) String name,
                                                @RequestParam(value = "openId", required = true) String openId) throws AuthenticationException {
@@ -67,8 +67,8 @@ public class PrepaidCardController {
     @RequestMapping(value = "/ld/assignMember", method = RequestMethod.POST)
     @ApiOperation(value = "assignMember ", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "score ", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "openId", value = "score ", required = false, dataType = "string", paramType = "query"), })
+            @ApiImplicitParam(name = "name", value = "name ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "openId", value = "openId ", required = false, dataType = "string", paramType = "query"), })
     public ResponseEntity<?> assignMember(@RequestHeader("Authorization") String authHeader,
                                         @RequestParam(value = "name", required = true) String name,
                                         @RequestParam(value = "openId", required = true) String openId) throws AuthenticationException {

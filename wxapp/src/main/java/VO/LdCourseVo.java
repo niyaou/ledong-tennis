@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class LdCourseVo implements Serializable {
     private static final long serialVersionUID = -128233785762857928L;
 
+
     @NotEmpty
     @ApiModelProperty(value = "course start time ")
     private String start;
@@ -38,15 +39,29 @@ public class LdCourseVo implements Serializable {
     @ApiModelProperty(value = "course spendingTime  ")
     private Double spendingTime;
     public static final String SPENDINGTIME = "spendingTime";
-
+    @NotEmpty
+    @ApiModelProperty(value = "course court   1:音乐花园  2：英俊，  3：雅居乐，   4：其他      ")
+    private Integer court;
+    public static final String COURT = "court";
     @NotEmpty
     @ApiModelProperty(value = "course earned  ")
     private Integer earned;
     public static final String EARNED = "earned";
     @NotEmpty
-    @ApiModelProperty(value = "experience course  1:yes ,2: no  ")
+    @ApiModelProperty(value = "course incoming  ")
+    private Integer incoming;
+    public static final String INCOMING = "incoming";
+    @NotEmpty
+    @ApiModelProperty(value = "experience course  1:yes ,0: no  ")
     private Integer experience;
     public static final String EXPERIENCE = "experience";
+    @NotEmpty
+    @ApiModelProperty(value = "experience course dealed  1:yes ,0: no  ")
+    private Integer achieved;
+    public static final String ACHIEVED = "achieved";
+
+    public static final Integer GO = 1;
+    public static final Integer NOGO = 0;
 
     @NotEmpty
     @ApiModelProperty(value = "course courtSpend  ")
@@ -57,6 +72,30 @@ public class LdCourseVo implements Serializable {
     @ApiModelProperty(value = "course coachSpend  ")
     private Integer coachSpend;
     public static final String COACHSPEND = "coachSpend";
+
+    public Integer getCourt() {
+        return court;
+    }
+
+    public void setCourt(Integer court) {
+        this.court = court;
+    }
+
+    public Integer getIncoming() {
+        return incoming;
+    }
+
+    public void setIncoming(Integer incoming) {
+        this.incoming = incoming;
+    }
+
+    public Integer getAchieved() {
+        return achieved;
+    }
+
+    public void setAchieved(Integer achieved) {
+        this.achieved = achieved;
+    }
 
     public String getStart() {
         return start;

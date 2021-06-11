@@ -32,7 +32,7 @@ public class LdPrePaidCardVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "card balance")
-    private Integer balance;
+    private Integer balance =0;
     public static final String BALANCE = "balance";
 
     @NotEmpty

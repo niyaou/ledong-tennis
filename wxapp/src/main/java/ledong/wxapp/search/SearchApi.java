@@ -1096,6 +1096,24 @@ public class SearchApi {
 
     }
 
+
+    public static String appendFieldValueById(String indexName, String field, Object value, String id){
+        try {
+            Map<String, Object> parameters = new HashMap<String,Object>();
+            parameters.put("value",value);
+            Script inline = new Script(ScriptType.INLINE, "painless",
+                    "ctx._source."+field+" += params.value", parameters);
+            UpdateRequest updateRequest = new UpdateRequest(indexName, id);
+            updateRequest.script(inline);
+            DocWriteResponse res = client.update(updateRequest, RequestOptions.DEFAULT);
+            return res.getResult().equals(Result.UPDATED) ? res.getId() : null;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+
     /**
      * 更新指定字段
      * 
