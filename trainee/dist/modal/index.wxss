@@ -46,6 +46,15 @@
   position: relative
 }
 
+.i-modal-custom{
+  width: 500px;
+  height:400px;
+  position: relative
+}
+.i-modal-body-custom{
+  max-height: 400px !important;
+}
+
 .i-modal-content {
   border-radius: 7px;
   padding-top: 15px;

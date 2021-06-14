@@ -212,7 +212,7 @@ public class SearchApi {
      * @param size
      * @return
      */
-    public static LinkedList<HashMap<String, Object>> searchByField(String indexName, String key, String value,
+    public static LinkedList<HashMap<String, Object>> searchByField(String indexName, String key, Object value,
             Integer pageNo, Integer size) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -222,6 +222,32 @@ public class SearchApi {
         searchRequest.source(searchSourceBuilder);
         return parseResponse(searchRequest);
     }
+
+
+    public static LinkedList<HashMap<String, Object>> searchByFieldFussy(String indexName, String key, String value,
+                                                                    Integer pageNo, Integer size) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.version(true);
+        searchSourceBuilder.query( QueryBuilders.matchPhraseQuery(key, value));
+        searchSourceBuilder = createPageAble(searchSourceBuilder, pageNo, size);
+        searchRequest.source(searchSourceBuilder);
+        return parseResponse(searchRequest);
+    }
+
+//    /**
+//     * 构造文本模糊查询条件
+//     *
+//     * @param key
+//     * @param value
+//     * @return
+//     */
+//    public static QueryBuilder createFussySearchSource(String key, String value) {
+//        QueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(key, value);
+//        return matchQueryBuilder;
+//    }
+
+
 
     /**
      * 查询多个字段满足某个条件

@@ -1,9 +1,9 @@
 <view class="i-modal-mask i-class-mask {{ visible ? 'i-modal-mask-show' : '' }}"></view>
 <view class="i-class i-modal {{ visible ? 'i-modal-show' : '' }}">
-    <view class="i-modal-main">
+    <view class="i-modal-main {{custom?'i-modal-custom':''}}"  >
         <view class="i-modal-content">
             <view class="i-modal-title" wx:if="{{ title }}">{{ title }}</view>
-            <view class="i-modal-body"><slot></slot></view>
+            <view class="i-modal-body  {{custom?'i-modal-body-custom':''}}"><slot></slot></view>
             <view class="i-modal-actions" wx:if="{{ actions.length }}">
                 <block wx:if="{{ actionMode === 'horizontal' }}">
                     <i-grid i-class="i-modal-grid">

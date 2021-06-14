@@ -174,6 +174,12 @@ Page({
       visible: false
     })
   },
+  addCourse(){
+    wx.navigateTo({
+      url: '../course/masterCourse',
+    })
+  },
+
   addMatch() {
     if(this.data.filterType===0){
       $Toast({

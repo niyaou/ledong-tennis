@@ -10,10 +10,18 @@
 
 
     <view slot="content">
-      <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addMatch" />
+    <i-row>
+       <i-col span="12" i-class="col-class">  
+        <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addMatch" />
       <view slot="content">记录一场比赛</view>
-
-      点击选手图标，可以对选手进行评价
+    
+      </i-col>
+         <i-col span="12" i-class="col-class">
+          <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addCourse" />
+      <view slot="content">记录一节课</view>
+      </i-col>
+      </i-row>
+        点击选手图标，可以对选手进行评价
     </view>
     <view slot="footer">
   

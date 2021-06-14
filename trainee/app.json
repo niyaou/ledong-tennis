@@ -1,7 +1,8 @@
 {
   "pages": [
-  
     "pages/index/index",
+    "pages/course/masterCourse",
+
     "pages/schedule/schedule",
     "pages/teenage/create",
     "pages/create/create",
@@ -13,8 +14,8 @@
     "pages/master/player",
     "pages/master/score",
     "pages/master/create",
-     "pages/prepaidCard/masterCard"
-    
+    "pages/prepaidCard/masterCard"
+ 
   ],
   "window": {
     "backgroundTextStyle": "light",

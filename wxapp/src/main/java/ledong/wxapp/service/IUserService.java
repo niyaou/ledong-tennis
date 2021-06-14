@@ -180,5 +180,18 @@ public interface IUserService {
      */
     public LinkedList<HashMap<String, Object>> getLDUserList();
 
+    /**
+     * search user by name
+     * @param name
+     * @return
+     */
+    public  LinkedList<HashMap<String, Object>> getLDUsersByName(String name);
 
+
+    /**
+     * search user by type
+     * @param types
+     * @return
+     */
+    public  LinkedList<HashMap<String, Object>> getLDUsersByType(Object types);
 }

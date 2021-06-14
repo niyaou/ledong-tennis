@@ -79,6 +79,41 @@ public class UserController {
                 CommonResponse.success(userService.addLDTeenageUser(userId,  openId, name, avator)), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/ld/ldUsersByName", method = RequestMethod.GET)
+    @ApiOperation(value = "updateUserScore ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "score ", required = true, dataType = "int", paramType = "query")
+          })
+    public ResponseEntity<?> getLDUsersByName(@RequestHeader("Authorization") String authHeader,
+                                             @RequestParam(value = "name", required = true) String name) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(
+                CommonResponse.success(userService.getLDUsersByName(name)), HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/ld/ldUsersByType", method = RequestMethod.GET)
+    @ApiOperation(value = "getLDUsersByType ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "type ", required = true, dataType = "int", paramType = "query")
+    })
+    public ResponseEntity<?> getLDUsersByType(@RequestHeader("Authorization") String authHeader,
+                                              @RequestParam(value = "type", required = true) Integer type) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        return new ResponseEntity<Object>(
+                CommonResponse.success(userService.getLDUsersByType(type)), HttpStatus.OK);
+    }
+
 
     @RequestMapping(value = "/ld/verifiedMember", method = RequestMethod.POST)
     @ApiOperation(value = "verifiedMember ", notes = "")

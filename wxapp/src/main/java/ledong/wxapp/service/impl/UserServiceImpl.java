@@ -415,4 +415,30 @@ public class UserServiceImpl implements IUserService {
         return null;
     }
 
+    @Override
+    public LinkedList<HashMap<String, Object>> getLDUsersByName(String name) {
+
+            LinkedList<HashMap<String, Object>> userlist= SearchApi.searchByFieldFussy(DataSetConstant.LD_USER_INFORMATION, UserVo.REALNAME, name,0,100);
+            if (userlist!=null){
+                userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
+                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.REALNAME), o2.get(UserVo.REALNAME));
+                });
+            return  userlist;
+            }
+        return null;
+    }
+
+    @Override
+    public LinkedList<HashMap<String, Object>> getLDUsersByType(Object types) {
+
+        LinkedList<HashMap<String, Object>> userlist= SearchApi.searchByField(DataSetConstant.LD_USER_INFORMATION, UserVo.COACH, types,0,100);
+        if (userlist!=null){
+            userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
+                return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME), o2.get(UserVo.NICKNAME));
+            });
+            return  userlist;
+        }
+        return null;
+    }
+
 }

@@ -2,6 +2,10 @@ Component({
     externalClasses: ['i-class', 'i-class-mask'],
 
     properties: {
+        custom: {
+            type: Boolean,
+            value: false
+        },
         visible: {
             type: Boolean,
             value: false
@@ -36,6 +40,7 @@ Component({
             type: String,
             value: 'horizontal'
         }
+
     },
 
     methods: {

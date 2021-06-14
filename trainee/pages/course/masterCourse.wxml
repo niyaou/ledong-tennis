@@ -1,0 +1,104 @@
+<!--pages/matches/matchlist.wxml-->
+<view class="containerbg">
+  <i-toast id="toast" />
+  <block wx:if="{{ !isChoiceOpponent }}" style="background-color:#fff">
+    <mp-navigation-bar title="记录课程" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+    <i-panel title="基础用法">
+      <i-row style="background-color:#fff">
+        <i-col span="12" i-class="blankBg">
+          <picker bindchange="bindPickerChange" range-key="{{'realName'}}" value="{{index}}" range="{{coach}}">
+            <view class="i-cell i-input">
+              课程教练 {{ coach[index].realName}}
+            </view>
+          </picker>
+        </i-col>
+        <i-col span="12" i-class="col-class">
+          <i-input value="{{text}}" title="课时费" type="number" placeholder="课时费" bindchange="csChange" />
+        </i-col>
+      </i-row>
+
+      <i-input value="{{realName}}" title="真实姓名" type="text" placeholder="输入真实姓名" bindchange="hsChange" />
+      <i-row>
+        <i-col span="12" i-class="col-class" wx:for="{{players}}" wx:key="{{index}}"   bindtap='pTap' data-id="{{item}}">
+          {{item.realName}}
+        </i-col>
+      </i-row>
+      <i-row>
+        <i-col span="4" i-class="col-class" wx:for="{{selectPlayers}}" wx:key="{{index}}">
+          {{item.realName}}
+        </i-col>
+        <i-col span="8" i-class="col-class" wx:for="{{selectPlayers}}" wx:key="{{index}}">
+          {{item.realName}}
+        </i-col>
+        <i-col span="12" i-class="col-class" wx:for="{{selectPlayers}}" wx:key="{{index}}">
+          <i-input value="{{text}}" title="课时费" type="number" placeholder="课时费" bindchange="csChange" />
+        </i-col>
+      </i-row>
+      <i-row class="col-bg">
+        <i-col span="8" i-class="col-class i-cell ">
+          开始时间
+        </i-col>
+        <i-col span="12" i-class="col-class i-cell">
+          {{startTime}}
+        </i-col>
+        <i-col span="4" i-class="col-class i-cell">
+          <i-icon type="time" size="15" bind:tap="handleClickS" />
+        </i-col>
+      </i-row>
+      <i-row class="col-bg">
+        <i-col span="8" i-class="col-class i-cell ">
+          结束时间
+        </i-col>
+        <i-col span="12" i-class="col-class i-cell">
+          {{endTime}}
+        </i-col>
+        <i-col span="4" i-class="col-class i-cell">
+          <i-icon type="time" size="15" bind:tap="handleClickE" />
+        </i-col>
+      </i-row>
+      <i-input value="{{text}}" title="课程时长" type="number" placeholder="课程时长" bindchange="csChange" />
+
+      <i-input value="{{text}}" title="备注" type="text" placeholder="备注" bindchange="csChange" />
+
+      <i-row style="background-color:#fff">
+        <i-col span="24" i-class="blankBg i-cell">
+          <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+            <view class="picker">
+              课程校区：{{array[index]}}
+            </view>
+          </picker>
+        </i-col>
+      </i-row>
+
+
+
+
+      <i-input value="{{text}}" title="场地费" type="text" placeholder="场地费" bindchange="csChange" />
+    </i-panel>
+
+    <i-button class="fullw" bind:click="handleCreate" type="default" shape="circle">创建新卡</i-button>
+    <i-button class="fullw" bind:click="handleAssign" type="default" shape="circle">绑卡</i-button>
+  </block>
+
+  <block wx:else>
+    <i-button bind:click="hideInex">默认按钮</i-button>
+    <i-index style="margin-top:280rpx" height="100%" bind:change="onChange">
+      <i-index-item wx:for="{{ players }}" wx:for-index="index" wx:key="{{index}}" wx:for-item="item"
+        name="{{item.key}}">
+        <view class="i-index-demo-item" wx:for="{{item.list}}" wx:for-index="in" wx:key="{{in}}" wx:for-item="it">
+          <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="   {{it.name}}" indexs="{{in}}"
+            subtitle="" extra="" thumb="" data-id="{{it}}" bindtap="onChange">
+          </i-card>
+        </view>
+      </i-index-item>
+    </i-index>
+  </block>
+
+  <i-modal title="选择课程日期" visible="{{ visible }}" actions="{{ actions }}" bind:click="handleClick" custom="true"
+    bind:cancel="handleModalCancel">
+    <view class="row">
+      <view class="label">日期选择(附带时间)</view>
+      <date-picker catchonselectdate="handleSelecteDate" enableTime="{{true}}" />
+    </view>
+  </i-modal>
+</view>

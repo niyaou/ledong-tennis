@@ -1,5 +1,7 @@
 {
   "usingComponents": {
+    "i-checkbox-group": "../../dist/checkbox-group/index",
+    "i-checkbox": "../../dist/checkbox/index",
     "mp-cells": "weui-miniprogram/cells/cells",
     "mp-cell": "weui-miniprogram/cell/cell",
     "mp-navigation-bar": "weui-miniprogram/navigation-bar/navigation-bar",
@@ -15,11 +17,13 @@
     "i-radio-group": "../../dist/radio-group/index",
     "i-radio": "../../dist/radio/index",
     "i-tag": "../../dist/tag/index",
+    "i-input-number": "../../dist/input-number/index",
+    "i-index": "../../dist/index/index",
+    "i-index-item": "../../dist/index-item/index",
     "i-toast": "../../dist/toast/index",
-    "i-page": "../../dist/page/index",
-    "i-switch": "../../dist/switch/index",
     "i-row": "../../dist/row/index",
-    "i-col": "../../dist/col/index"
+    "i-col": "../../dist/col/index",
+    "date-picker": "../../component/date-picker/index"
   },
   "disableScroll": true
 }
