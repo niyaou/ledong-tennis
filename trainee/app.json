@@ -1,8 +1,7 @@
 {
-  "pages": [
+  "pages": [ 
     "pages/index/index",
     "pages/course/masterCourse",
-
     "pages/schedule/schedule",
     "pages/teenage/create",
     "pages/create/create",

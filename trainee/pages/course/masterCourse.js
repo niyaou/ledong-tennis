@@ -12,37 +12,17 @@ Page({
    * 页面的初始数据
    */
   data: {
-    items: [{
-        value: 'USA',
-        name: '美国'
-      },
-      {
-        value: 'CHN',
-        name: '中国',
-        checked: 'true'
-      },
-      {
-        value: 'BRA',
-        name: '巴西'
-      },
-      {
-        value: 'JPN',
-        name: '日本'
-      },
-      {
-        value: 'ENG',
-        name: '英国'
-      },
-      {
-        value: 'FRA',
-        name: '法国'
-      },
-    ],
-    index: 0,
+ 
+    index: 0,//教练index
+    courtIndex:0,
     coach: [],
     players: [],
+    // selectPlayers: [{realName:'黄守义',openId:'1'}],
     selectPlayers: [],
     text: '',
+    coachSpend:0,
+    descript:'',
+    courseTime:0,//课程时长
     time: util.formatTime(new Date()),
     name: '',
     realName: '',
@@ -56,23 +36,70 @@ Page({
 
     array: ['音乐花园', '雅居乐', '英郡', '银泰城', '一品天下', '其他'],
   },
+  coursFeeChange(e){
+    this.setData({
+      coursFee:e.detail.detail.value
+    })
+  },
+  descriptChange(e){
+    this.setData({
+      descript:e.detail.detail.value
+    })
+  },
+  courseTimeChange(e){
+    this.setData({
+      courseTime:e.detail.detail.value
+    })
+  },
+  coachSpendChange(e){
+    this.setData({
+      coachSpend:e.detail.detail.value
+    })
+  },
   handleModalCancel(e) {
     this.setData({
       visible: false
     })
   },
-  pTap(e) {
+  pRemove(e){
     console.log('ptap', e,this.data.selectPlayers)
+    let item = e.target.dataset.id
+   let arr=[]
+    arr = this.data.selectPlayers.filter(i => {
+      return i.openId !== item.openId
+    })
+    this.setData({
+      selectPlayers: arr
+    })
+
+  },
+  pTap(e) {
     let item = e.target.dataset.id
     let duplicated = this.data.selectPlayers.filter(i => {
       return i.openId === item.openId
     }).length > 0
-    let arr = this.data.selectPlayers.push(item)
+    let arr=[]
+    this.data.selectPlayers.push(item)
+    arr = this.data.selectPlayers
+    console.log('ptap', e.target.dataset,item,'arr:',arr,this.data.selectPlayers)
     if (!duplicated) {
       this.setData({
         selectPlayers: arr
       })
     }
+    console.log('ptap',this.data.selectPlayers)
+  },
+  studentFee(e){
+   console.log('studentFee',e) 
+   let arr = this.data.selectPlayers.map(s=>{
+     if(s.openId===e.currentTarget.dataset.id.openId){
+       s.courseSpend=parseInt(e.detail.detail.value)
+     }
+     return s
+   })
+   this.setData({
+    selectPlayers: arr
+   })
   },
   handleClickS(e) {
     this.setData({
@@ -109,7 +136,7 @@ Page({
   bindPickerChange: function (e) {
     console.log('picker发送选择改变，携带值为', e.detail.value)
     this.setData({
-      index: e.detail.value
+      courtIndex: e.detail.value
     })
   },
   getCoach() {
@@ -172,25 +199,30 @@ Page({
   },
   handleCreate(e) {
     let url = 'prepaidCard/ld/createCard'
-    http.postReq(`${url}`, app.globalData.jwt, {
-      openId: this.data.id,
-      name: this.data.realName,
-    }, (res) => {
-      console.log(res)
-      if (res.code === 0) {
-        setTimeout(() => {
-          wx.navigateBack({
-            delta: 0,
-          })
-        }, 1500)
 
-      } else {
-        $Toast({
-          content: '失败，请重试',
-          type: 'error'
-        });
-      }
-    })
+ console.log('handleCreate','index',this.data.index,'coachSpend',this.data.coachSpend,'startTime',this.data.startTime,'endTime',this.data.endTime,'courseTime',
+ this.data.courseTime,'descript',this.data.descript,'courtIndex',this.data.courtIndex,'coursFee',this.data.coursFee,
+ 'selectPlayers',this.data.selectPlayers)
+
+    // http.postReq(`${url}`, app.globalData.jwt, {
+    //   openId: this.data.id,
+    //   name: this.data.realName,
+    // }, (res) => {
+    //   console.log(res)
+    //   if (res.code === 0) {
+    //     setTimeout(() => {
+    //       wx.navigateBack({
+    //         delta: 0,
+    //       })
+    //     }, 1500)
+
+    //   } else {
+    //     $Toast({
+    //       content: '失败，请重试',
+    //       type: 'error'
+    //     });
+    //   }
+    // })
   },
   handleAssign(e) {
     let url = 'prepaidCard/ld/assignMember'
