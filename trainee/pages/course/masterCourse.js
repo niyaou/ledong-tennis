@@ -12,18 +12,20 @@ Page({
    * 页面的初始数据
    */
   data: {
- 
-    index: 0,//教练index
-    courtIndex:0,
+
+    index: 0, //教练index
+    courtIndex: 0,
     coach: [],
     players: [],
     // selectPlayers: [{realName:'黄守义',openId:'1'}],
     selectPlayers: [],
     text: '',
-    coachSpend:0,
-    descript:'',
-    courseTime:0,//课程时长
+    coachSpend: 0,
+    descript: '',
+    courseTime: '', //课程时长
     time: util.formatTime(new Date()),
+    experinced: false,
+    isDealing: false,
     name: '',
     realName: '',
     id: '',
@@ -36,24 +38,24 @@ Page({
 
     array: ['音乐花园', '雅居乐', '英郡', '银泰城', '一品天下', '其他'],
   },
-  coursFeeChange(e){
+  coursFeeChange(e) {
     this.setData({
-      coursFee:e.detail.detail.value
+      coursFee: e.detail.detail.value
     })
   },
-  descriptChange(e){
+  descriptChange(e) {
     this.setData({
-      descript:e.detail.detail.value
+      descript: e.detail.detail.value
     })
   },
-  courseTimeChange(e){
+  courseTimeChange(e) {
     this.setData({
-      courseTime:e.detail.detail.value
+      courseTime: e.detail.detail.value
     })
   },
-  coachSpendChange(e){
+  coachSpendChange(e) {
     this.setData({
-      coachSpend:e.detail.detail.value
+      coachSpend: e.detail.detail.value
     })
   },
   handleModalCancel(e) {
@@ -61,10 +63,10 @@ Page({
       visible: false
     })
   },
-  pRemove(e){
-    console.log('ptap', e,this.data.selectPlayers)
+  pRemove(e) {
+    console.log('ptap', e, this.data.selectPlayers)
     let item = e.target.dataset.id
-   let arr=[]
+    let arr = []
     arr = this.data.selectPlayers.filter(i => {
       return i.openId !== item.openId
     })
@@ -78,28 +80,28 @@ Page({
     let duplicated = this.data.selectPlayers.filter(i => {
       return i.openId === item.openId
     }).length > 0
-    let arr=[]
+    let arr = []
     this.data.selectPlayers.push(item)
     arr = this.data.selectPlayers
-    console.log('ptap', e.target.dataset,item,'arr:',arr,this.data.selectPlayers)
+    console.log('ptap', e.target.dataset, item, 'arr:', arr, this.data.selectPlayers)
     if (!duplicated) {
       this.setData({
         selectPlayers: arr
       })
     }
-    console.log('ptap',this.data.selectPlayers)
+    console.log('ptap', this.data.selectPlayers)
   },
-  studentFee(e){
-   console.log('studentFee',e) 
-   let arr = this.data.selectPlayers.map(s=>{
-     if(s.openId===e.currentTarget.dataset.id.openId){
-       s.courseSpend=parseInt(e.detail.detail.value)
-     }
-     return s
-   })
-   this.setData({
-    selectPlayers: arr
-   })
+  studentFee(e) {
+    console.log('studentFee', e)
+    let arr = this.data.selectPlayers.map(s => {
+      if (s.openId === e.currentTarget.dataset.id.openId) {
+        s.courseSpend = parseInt(e.detail.detail.value)
+      }
+      return s
+    })
+    this.setData({
+      selectPlayers: arr
+    })
   },
   handleClickS(e) {
     this.setData({
@@ -115,10 +117,10 @@ Page({
   },
 
   handleSelecteDate(e) {
-    wx.showToast({
-      title: `${e.detail.date}`,
-      icon: false
-    })
+    // wx.showToast({
+    //   title: `${e.detail.date}`,
+    //   icon: false
+    // })
     console.log(e.detail.date)
     this.setData({
       visible: false
@@ -197,32 +199,60 @@ Page({
       visible: true
     })
   },
+  onExperincedChange(e) {
+    console.log('onExperincedChange', e.detail.value)
+    this.setData({
+      experinced: e.detail.value
+    })
+  },
+  onIsDealingChange(e) {
+    console.log('onIsDealingChange', e.detail.value)
+    this.setData({
+      isDealing: e.detail.value
+    })
+  },
   handleCreate(e) {
-    let url = 'prepaidCard/ld/createCard'
+    let url = 'course/ld/createCourse'
+    let membobj={}
+    this.data.selectPlayers.map(s => {
 
- console.log('handleCreate','index',this.data.index,'coachSpend',this.data.coachSpend,'startTime',this.data.startTime,'endTime',this.data.endTime,'courseTime',
- this.data.courseTime,'descript',this.data.descript,'courtIndex',this.data.courtIndex,'coursFee',this.data.coursFee,
- 'selectPlayers',this.data.selectPlayers)
+     Object.assign(membobj, {
+        [s.openId]: s.courseSpend
+      })
+    })
+    console.log('handleCreate', 'index', this.data.index,this.data.coach[this.data.index].openId, 'coachSpend', this.data.coachSpend, 'startTime', this.data.startTime, 'endTime', this.data.endTime, 'courseTime',
+      this.data.courseTime, 'descript', this.data.descript, 'courtIndex', this.data.array[this.data.courtIndex], 'coursFee', this.data.coursFee,
+      'selectPlayers', this.data.selectPlayers, 'membobj', membobj, 'experinced',  this.data.experinced, 'isDealing',  this.data.isDealing)
 
-    // http.postReq(`${url}`, app.globalData.jwt, {
-    //   openId: this.data.id,
-    //   name: this.data.realName,
-    // }, (res) => {
-    //   console.log(res)
-    //   if (res.code === 0) {
-    //     setTimeout(() => {
-    //       wx.navigateBack({
-    //         delta: 0,
-    //       })
-    //     }, 1500)
 
-    //   } else {
-    //     $Toast({
-    //       content: '失败，请重试',
-    //       type: 'error'
-    //     });
-    //   }
-    // })
+    http.postReq(`${url}`, app.globalData.jwt, {
+      startTime: this.data.startTime,
+      endTime: this.data.endTime,
+      coach: this.data.coach[this.data.index].openId,
+      isExperience: this.data.experinced?1:0,
+      isDealing: this.data.isDealing?1:0,
+      spendingTime: this.data.courseTime,
+      courtSpend: this.data.coursFee,
+      coachSpend: this.data.coachSpend,
+      court: this.data.array[this.data.courtIndex],
+      membersObj: JSON.stringify( membobj),
+
+    }, (res) => {
+      console.log(res)
+      if (res.code === 0) {
+        setTimeout(() => {
+          wx.navigateBack({
+            delta: 0,
+          })
+        }, 1500)
+
+      } else {
+        $Toast({
+          content: '失败，请重试',
+          type: 'error'
+        });
+      }
+    })
   },
   handleAssign(e) {
     let url = 'prepaidCard/ld/assignMember'

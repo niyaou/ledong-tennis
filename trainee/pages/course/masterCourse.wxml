@@ -73,7 +73,18 @@
 
       <i-input value="{{coursFee}}" title="场地费" type="number" placeholder="场地费"  bindchange="coursFeeChange" />
     </i-panel>
-
+    <i-cell title="体验课">
+        <i-switch value="{{experinced}}" size="large" bind:change="onExperincedChange" slot="footer">
+            <view slot="open">体验</view>
+            <view slot="close">普通</view>
+        </i-switch>
+    </i-cell>
+    <i-cell title="体验课是否转化" wx:if="{{experinced}}">
+        <i-switch value="{{isDealing}}" size="large" bind:change="onIsDealingChange" slot="footer">
+            <view slot="open">成功</view>
+            <view slot="close">失败</view>
+        </i-switch>
+    </i-cell>
     <i-button class="fullw" bind:click="handleCreate" type="default" shape="circle">记录课程</i-button>
  
   </block>

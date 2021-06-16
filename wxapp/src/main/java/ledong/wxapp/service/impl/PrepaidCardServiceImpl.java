@@ -116,6 +116,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             members.add(m);
             HashMap<String, Object> memberVo =userService.getLDUserInfo(m);
             String cardId= (String) memberVo.get(UserVo.PREPAIDCARD);
+            if(TextUtils.isEmpty(cardId)){
+                continue;
+            }
             int temp = cardCharge.get(cardId)==null?0: cardCharge.get(cardId);
             cardCharge.put(cardId,temp+ membersObj.get(m));
             LdSpendingVo spendVo=new LdSpendingVo();

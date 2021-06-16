@@ -20,7 +20,7 @@ public interface ICourseService {
      * @return
      */
     public String addCourse(String startTime, String endTime, String coach, Integer isExperience, Integer isDealing, Double spendingTime,
-                            Integer courtSpend, Integer coachSpend, Integer court,HashMap<String,Integer> membersObj);
+                            Integer courtSpend, Integer coachSpend, String court,HashMap<String,Integer> membersObj);
 
 
 

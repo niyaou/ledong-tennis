@@ -35,7 +35,7 @@ public class CourseServiceImpl implements ICourseService {
 
     @Override
     public String addCourse(String startTime, String endTime, String coach, Integer isExperience, Integer isDealing, Double spendingTime,
-                          Integer courtSpend, Integer coachSpend, Integer court,HashMap<String,Integer> membersObj) {
+                          Integer courtSpend, Integer coachSpend, String court,HashMap<String,Integer> membersObj) {
 
         LdCourseVo course = new LdCourseVo();
         course.setStart(startTime);
@@ -59,17 +59,13 @@ public class CourseServiceImpl implements ICourseService {
         course.setMember(members.toArray(mA));
         course.setIncoming(incoming);
         course.setEarned(incoming-coachSpend-courtSpend);
-
-         String id=   SearchApi.insertDocument(DataSetConstant.LD_COURSE_INFORMATION, JSON.toJSONString(course));
+        logger.info(JSON.toJSONString(course));
+         String id= SearchApi.insertDocument(DataSetConstant.LD_COURSE_INFORMATION, JSON.toJSONString(course));
          if(TextUtils.isEmpty(id)){
              return null;
          }
 
-//        for(String m : membersObj.keySet()){
-//            members.add(m);
-////            String courseId,String startTime, Double spendTime, HashMap<String, Integer> membersObj
-//
-//        }
+
         prepaidCardService.settleAccount(id,startTime,spendingTime,membersObj);
         return id;
     }

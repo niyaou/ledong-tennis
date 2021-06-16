@@ -56,7 +56,7 @@ public class CourseController {
             @ApiImplicitParam(name = "spendingTime", value = "spendingTime ", required = true, dataType = "double", paramType = "query"),
             @ApiImplicitParam(name = "courtSpend", value = "courtSpend ", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "coachSpend", value = "coachSpend ", required = true, dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "court", value = "court ", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "court", value = "court ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "membersObj", value = "membersObj ", required = true, dataType = "string", paramType = "query"),
     })
     public ResponseEntity<?> createCourse(@RequestHeader("Authorization") String authHeader,
@@ -68,7 +68,7 @@ public class CourseController {
                                         @RequestParam(value = "spendingTime", required = true) Double spendingTime,
                                         @RequestParam(value = "courtSpend", required = true) Integer courtSpend,
                                         @RequestParam(value = "coachSpend", required = true) Integer coachSpend,
-                                        @RequestParam(value = "court", required = true) Integer court,
+                                        @RequestParam(value = "court", required = true) String court,
                                         @RequestParam(value = "membersObj", required = true) String membersObj
 
                                    ) throws AuthenticationException {
