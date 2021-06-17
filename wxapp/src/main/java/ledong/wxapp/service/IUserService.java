@@ -33,15 +33,13 @@ public interface IUserService {
      */
     public String addLDUser(UserVo user);
 
-
     /**
      * create new user ld
      *
      * @param user
      * @return
      */
-    public String addLDTeenageUser(String  parent,String  openId,String name,String avator);
-
+    public String addLDTeenageUser(String parent, String openId, String name, String avator);
 
     /**
      *
@@ -49,13 +47,14 @@ public interface IUserService {
      */
     public Object exploreLDTeenageUser();
 
-
     /**
      * upload avator img
+     * 
      * @param file
      * @return
      */
-    public String  updateTeenageAvator( MultipartFile  files[]);
+    public String updateTeenageAvator(MultipartFile files[]);
+
     /**
      * verified wx
      * 
@@ -87,10 +86,9 @@ public interface IUserService {
      * @throws IllegalBlockSizeException
      * @throws UnsupportedEncodingException
      */
-    public String getPhoneNumber(String sessionKey, String iv, String data) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException;
-
-
-
+    public String getPhoneNumber(String sessionKey, String iv, String data) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
+            BadPaddingException, UnsupportedEncodingException;
 
     /**
      * 
@@ -106,6 +104,14 @@ public interface IUserService {
      */
     public String ldLogin(String openId, String nickName, String avator, String gps);
 
+    /**
+     * set real name
+     * 
+     * @param openId
+     * @param realName
+     * @return
+     */
+    public String ldRealName(String openId, String realName);
 
     /**
      * 
@@ -141,8 +147,6 @@ public interface IUserService {
      */
     public String accessByLDWxToken(String token, String nickName, String avator, String gps);
 
-
-
     /**
      * 
      * @param object
@@ -166,32 +170,33 @@ public interface IUserService {
      */
     public LinkedList<HashMap<String, Object>> getNearyByUser(String gps);
 
-
     /**
      * get user information by master
+     * 
      * @return
      */
     public LinkedList<HashMap<String, Object>> getUserList();
 
-
     /**
      * get user information by master
+     * 
      * @return
      */
     public LinkedList<HashMap<String, Object>> getLDUserList();
 
     /**
      * search user by name
+     * 
      * @param name
      * @return
      */
-    public  LinkedList<HashMap<String, Object>> getLDUsersByName(String name);
-
+    public LinkedList<HashMap<String, Object>> getLDUsersByName(String name);
 
     /**
      * search user by type
+     * 
      * @param types
      * @return
      */
-    public  LinkedList<HashMap<String, Object>> getLDUsersByType(Object types);
+    public LinkedList<HashMap<String, Object>> getLDUsersByType(Object types);
 }

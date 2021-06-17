@@ -26,7 +26,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 
-
 import com.google.common.io.Files;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.elasticsearch.search.sort.SortOrder;
@@ -92,7 +91,6 @@ public class UserServiceImpl implements IUserService {
         return userId;
     }
 
-
     @Override
     public String addLDUser(UserVo user) {
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
@@ -114,18 +112,18 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String updateTeenageAvator(MultipartFile files[]) {
 
-        String fileName = files[0].getOriginalFilename();//获取文件名称
-        String suffixName=fileName.substring(fileName.lastIndexOf("."));//获取文件后缀
+        String fileName = files[0].getOriginalFilename();// 获取文件名称
+        String suffixName = fileName.substring(fileName.lastIndexOf("."));// 获取文件后缀
         try {
-            fileName=DigestUtils.md5DigestAsHex(files[0].getInputStream())+suffixName;
+            fileName = DigestUtils.md5DigestAsHex(files[0].getInputStream()) + suffixName;
         } catch (IOException e) {
             e.printStackTrace();
             return "";
         }
-        String directory=uploadFilePath;
-        File targetFile = new File(directory,fileName);
+        String directory = uploadFilePath;
+        File targetFile = new File(directory, fileName);
         try {
-            Files.write(files[0].getBytes(),targetFile);
+            Files.write(files[0].getBytes(), targetFile);
             return fileName;
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,12 +131,10 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-
-
     @Override
-    public String addLDTeenageUser(String  parent,String  openId,String name,String avator) {
-        logger.info(openId+name+avator);
-        UserVo user =new UserVo();
+    public String addLDTeenageUser(String parent, String openId, String name, String avator) {
+        logger.info(openId + name + avator);
+        UserVo user = new UserVo();
         String createTime = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         user.setCreateTime(createTime);
         user.setAvator(avator);
@@ -152,23 +148,22 @@ public class UserServiceImpl implements IUserService {
         } catch (Exception e) {
             logger.info("get gps error");
         }
-        String userId = SearchApi.insertDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(user),
-                openId);
-                logger.info(userId);
+        String userId = SearchApi.insertDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(user), openId);
+        logger.info(userId);
         Optional.ofNullable(openId).ifPresent(id -> {
             logger.info("before create tennage");
-            rankService.createLDTeenageRankInfo(parent,openId);
+            rankService.createLDTeenageRankInfo(parent, openId);
             logger.info("after create tennage");
         });
-        logger.info("after create tennage   2"+userId);
+        logger.info("after create tennage   2" + userId);
         return userId;
     }
 
-
     @Override
-    public Object exploreLDTeenageUser(){
+    public Object exploreLDTeenageUser() {
         HashMap<String, HashMap<String, Object>> users = SearchApi.searchByFieldSortedInMap(
-                DataSetConstant.LD_USER_RANK_INFORMATION, LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.TEENAGE), RankInfoVo.SCORE, SortOrder.DESC, 0, 500);
+                DataSetConstant.LD_USER_RANK_INFORMATION, LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.TEENAGE),
+                RankInfoVo.SCORE, SortOrder.DESC, 0, 500);
         List<HashMap<String, Object>> result = new ArrayList<>();
         if (users != null) {
             String[] idsArr = new String[users.size()];
@@ -208,7 +203,6 @@ public class UserServiceImpl implements IUserService {
         return null;
     }
 
-
     @Override
     public String ldLogin(String openId, String nickName, String avator, String gps) {
         HashMap<String, String> vo = new HashMap<String, String>();
@@ -221,13 +215,12 @@ public class UserServiceImpl implements IUserService {
             if (!gps.contains("undefined")) {
                 loginUser.getFirst().put(UserVo.GPS, gps);
             }
-            SearchApi.updateDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()), openId);
+            SearchApi.updateDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()),
+                    openId);
             return jwtToken.generateToken(openId);
         }
         return null;
     }
-
-
 
     @Override
     public String[] getOpenId(String token) {
@@ -312,8 +305,18 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public String ldRealName(String openId, String realName) {
+        HashMap<String, Object> vo = getLDUserInfo(openId);
+        if (vo != null) {
+            vo.put(UserVo.REALNAME, realName);
+            return SearchApi.updateDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(vo), openId);
+        }
+        return null;
+    }
+
+    @Override
     public LinkedList<HashMap<String, Object>> getNearyByUser(String gps) {
-        return SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps, "50",10);
+        return SearchApi.searchByLocation(DataSetConstant.USER_INFORMATION, UserVo.GPS, gps, "50", 10);
 
     }
 
@@ -382,16 +385,19 @@ public class UserServiceImpl implements IUserService {
     @Override
     public LinkedList<HashMap<String, Object>> getUserList() {
         try {
-            LinkedList<HashMap<String, Object>> userlist= SearchApi.searchAll(DataSetConstant.USER_INFORMATION, 0, 400);
-            if (userlist!=null){
-                // userlist.stream().sorted(Collator.getInstance(Locale.CHINESE).compare(o1, o2));
-                userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
-                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME), o2.get(UserVo.NICKNAME));
+            LinkedList<HashMap<String, Object>> userlist = SearchApi.searchAll(DataSetConstant.USER_INFORMATION, 0,
+                    400);
+            if (userlist != null) {
+                // userlist.stream().sorted(Collator.getInstance(Locale.CHINESE).compare(o1,
+                // o2));
+                userlist.sort((HashMap<String, Object> o1, HashMap<String, Object> o2) -> {
+                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME),
+                            o2.get(UserVo.NICKNAME));
                 });
             }
-          return  userlist;
+            return userlist;
         } catch (IOException e) {
-       
+
             e.printStackTrace();
         }
         return null;
@@ -400,14 +406,17 @@ public class UserServiceImpl implements IUserService {
     @Override
     public LinkedList<HashMap<String, Object>> getLDUserList() {
         try {
-            LinkedList<HashMap<String, Object>> userlist= SearchApi.searchAll(DataSetConstant.LD_USER_INFORMATION, 0, 400);
-            if (userlist!=null){
-                // userlist.stream().sorted(Collator.getInstance(Locale.CHINESE).compare(o1, o2));
-                userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
-                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME), o2.get(UserVo.NICKNAME));
+            LinkedList<HashMap<String, Object>> userlist = SearchApi.searchAll(DataSetConstant.LD_USER_INFORMATION, 0,
+                    400);
+            if (userlist != null) {
+                // userlist.stream().sorted(Collator.getInstance(Locale.CHINESE).compare(o1,
+                // o2));
+                userlist.sort((HashMap<String, Object> o1, HashMap<String, Object> o2) -> {
+                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME),
+                            o2.get(UserVo.NICKNAME));
                 });
             }
-            return  userlist;
+            return userlist;
         } catch (IOException e) {
 
             e.printStackTrace();
@@ -417,26 +426,27 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public LinkedList<HashMap<String, Object>> getLDUsersByName(String name) {
-
-            LinkedList<HashMap<String, Object>> userlist= SearchApi.searchByFieldFussy(DataSetConstant.LD_USER_INFORMATION, UserVo.REALNAME, name,0,100);
-            if (userlist!=null){
-                userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
-                    return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.REALNAME), o2.get(UserVo.REALNAME));
-                });
-            return  userlist;
-            }
+        LinkedList<HashMap<String, Object>> userlist = SearchApi.searchByFieldFussy(DataSetConstant.LD_USER_INFORMATION,
+                UserVo.REALNAME, name, 0, 100);
+        if (userlist != null) {
+            userlist.sort((HashMap<String, Object> o1, HashMap<String, Object> o2) -> {
+                return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.REALNAME), o2.get(UserVo.REALNAME));
+            });
+            return userlist;
+        }
         return null;
     }
 
     @Override
     public LinkedList<HashMap<String, Object>> getLDUsersByType(Object types) {
 
-        LinkedList<HashMap<String, Object>> userlist= SearchApi.searchByField(DataSetConstant.LD_USER_INFORMATION, UserVo.COACH, types,0,100);
-        if (userlist!=null){
-            userlist.sort((HashMap<String, Object>o1,HashMap<String, Object>o2)->{
+        LinkedList<HashMap<String, Object>> userlist = SearchApi.searchByField(DataSetConstant.LD_USER_INFORMATION,
+                UserVo.COACH, types, 0, 100);
+        if (userlist != null) {
+            userlist.sort((HashMap<String, Object> o1, HashMap<String, Object> o2) -> {
                 return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.NICKNAME), o2.get(UserVo.NICKNAME));
             });
-            return  userlist;
+            return userlist;
         }
         return null;
     }

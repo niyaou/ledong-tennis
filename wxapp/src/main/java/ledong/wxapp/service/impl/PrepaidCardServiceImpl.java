@@ -91,7 +91,6 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             return null;
         } else {
             ArrayList<String> member = (ArrayList<String>) card.get(LdPrePaidCardVo.MEMBER);
-
             if (member.indexOf(openId) < 0) {
                 HashMap<String, Object> vo = userService.getLDUserInfo(openId);
                 vo.put(UserVo.PREPAIDCARD, card.get(LdPrePaidCardVo.TITLE));
@@ -140,5 +139,34 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                     String.valueOf(temp + cardCharge.get(card)), card);
         }
         return courseId;
+    }
+
+    @Override
+    public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,
+            String coachId, String courseId, String description) {
+        LdChargeVo vo = new LdChargeVo();
+        // String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        vo.setAmount(amount);
+        vo.setTime(time);
+        vo.setOpenId(openId);
+        vo.setOwner(coachId);
+        vo.setCourse(courseId);
+        vo.setDescription(description);
+        LdPrePaidCardVo card = getInstance(cardId);
+        if (card != null) {
+            HashMap<String, Object> charge = JSON.parseObject(JSON.toJSONString(card), HashMap.class);
+            card.setCharge(charge);
+            return card.getTitle();
+        }
+        return null;
+    }
+
+    private LdPrePaidCardVo getInstance(String cardId) {
+        HashMap<String, Object> card = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
+        if (card == null) {
+            return null;
+        }
+        return JSON.parseObject(JSON.toJSONString(card), LdPrePaidCardVo.class);
+
     }
 }

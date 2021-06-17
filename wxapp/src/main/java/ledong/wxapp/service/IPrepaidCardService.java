@@ -15,31 +15,42 @@ import java.util.LinkedList;
 
 public interface IPrepaidCardService {
 
-
     /**
      * create new card
+     * 
      * @param cardName
      * @param members
      * @return
      */
-    public String addCard(String  cardName,String ... members);
+    public String addCard(String cardName, String... members);
 
     /**
      * assign member to card
+     * 
      * @param cardName
      * @param openId
      * @return
      */
-    public String assignMember(String cardName,String openId);
-
+    public String assignMember(String cardName, String openId);
 
     /**
      * course Log
+     * 
      * @param courseId
      * @param spendTime
      * @param membersObj
      * @return
      */
-    public String settleAccount(String courseId,String startTime,Double spendTime, HashMap<String,Integer> membersObj);
+    public String settleAccount(String courseId, String startTime, Double spendTime,
+            HashMap<String, Integer> membersObj);
+
+    /**
+     * user charge log
+     * 
+     * 
+     * 
+     */
+    public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,
+            String coachId, String courseId, String description);
 
 }

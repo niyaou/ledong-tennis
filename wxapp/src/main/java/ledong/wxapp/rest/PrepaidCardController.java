@@ -1,6 +1,7 @@
 package ledong.wxapp.rest;
 
 import VO.LdRankInfoVo;
+import VO.UserVo;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -14,6 +15,9 @@ import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.IPrepaidCardService;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.service.IUserService;
+
+import java.util.HashMap;
+
 import org.apache.http.auth.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,15 +44,14 @@ public class PrepaidCardController {
     @Autowired
     private JwtToken tokenService;
 
-
     @RequestMapping(value = "/ld/createCard", method = RequestMethod.POST)
     @ApiOperation(value = "createCard ", notes = "")
     @ApiImplicitParams({
-                @ApiImplicitParam(name = "name", value = "name ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "name ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "openId", value = "openId ", required = false, dataType = "string", paramType = "query"), })
     public ResponseEntity<?> createCard(@RequestHeader("Authorization") String authHeader,
-                                        @RequestParam(value = "name", required = true) String name,
-                                               @RequestParam(value = "openId", required = true) String openId) throws AuthenticationException {
+            @RequestParam(value = "name", required = true) String name,
+            @RequestParam(value = "openId", required = true) String openId) throws AuthenticationException {
 
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
@@ -56,12 +59,12 @@ public class PrepaidCardController {
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
-        LdRankInfoVo vo= rankService.getLDUserRank(userId);
-        if (vo.getClubId()!= LdRankInfoVo.MASTER) {
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        if (vo.getClubId() != LdRankInfoVo.MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
-        return new ResponseEntity<Object>(
-                CommonResponse.success(prepaidCardService.addCard(name, openId)), HttpStatus.OK);
+        return new ResponseEntity<Object>(CommonResponse.success(prepaidCardService.addCard(name, openId)),
+                HttpStatus.OK);
     }
 
     @RequestMapping(value = "/ld/assignMember", method = RequestMethod.POST)
@@ -70,8 +73,8 @@ public class PrepaidCardController {
             @ApiImplicitParam(name = "name", value = "name ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "openId", value = "openId ", required = false, dataType = "string", paramType = "query"), })
     public ResponseEntity<?> assignMember(@RequestHeader("Authorization") String authHeader,
-                                        @RequestParam(value = "name", required = true) String name,
-                                        @RequestParam(value = "openId", required = true) String openId) throws AuthenticationException {
+            @RequestParam(value = "name", required = true) String name,
+            @RequestParam(value = "openId", required = true) String openId) throws AuthenticationException {
 
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
@@ -79,12 +82,52 @@ public class PrepaidCardController {
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
-        LdRankInfoVo vo= rankService.getLDUserRank(userId);
-        if (vo.getClubId()!= LdRankInfoVo.MASTER) {
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        if (vo.getClubId() != LdRankInfoVo.MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
+        return new ResponseEntity<Object>(CommonResponse.success(prepaidCardService.assignMember(name, openId)),
+                HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/ld/chargeAnnotation", method = RequestMethod.POST)
+    @ApiOperation(value = "chargeAnnotation ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "openId", value = "openId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "time", value = "time ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "amount", value = "amount ", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "coachId", value = "coachId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "courseId", value = "courseId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "description ", required = false, dataType = "string", paramType = "query"), })
+    public ResponseEntity<?> chargeAnnotation(@RequestHeader("Authorization") String authHeader,
+            @RequestParam(value = "cardId", required = true) String cardId,
+            @RequestParam(value = "openId", required = true) String openId,
+            @RequestParam(value = "time", required = true) String time,
+            @RequestParam(value = "amount", required = true) Integer amount,
+            @RequestParam(value = "coachId", required = true) String coachId,
+            @RequestParam(value = "courseId", required = true) String courseId,
+            @RequestParam(value = "description", required = true) String description) throws AuthenticationException {
+
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        HashMap<String, Object> user = userService.getLDUserInfo(userId);
+        if (vo.getClubId() != LdRankInfoVo.MASTER) {
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+        // String cardId, String openId, String operatorName, String time, Integer
+        // amount,
+        // String coachId, String courseId, String description
+
         return new ResponseEntity<Object>(
-                CommonResponse.success(prepaidCardService.assignMember(name, openId)), HttpStatus.OK);
+                CommonResponse.success(prepaidCardService.chargeAnnotation(cardId, openId,
+                        user.get(UserVo.REALNAME).toString(), time, amount, coachId, courseId, description)),
+                HttpStatus.OK);
     }
 
 }
