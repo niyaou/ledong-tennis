@@ -91,6 +91,10 @@ Page({
         loading: false
       }
     ],
+    actions5Dis: [{
+      name: '取消'
+    }
+  ],
     actions6: [{
       name: '绑卡'
     },
@@ -99,6 +103,12 @@ Page({
    
     }
   ]
+  },
+  realNameChange(e){
+    console.log('--realNameChange--',e.detail.detail.value)
+    this.setData({
+      realName: e.detail.detail.value
+    })
   },
   onSortChange(event) {
     console.log(event.detail)
@@ -207,18 +217,23 @@ Page({
         title: '加载中',
       })
       let url = 'user/ld/verifiedMember'
-
+      let nameUrl = 'user/ldRealName'
       http.postReq(`${url}`, app.globalData.jwt, {
         openId: this.data.currentUser
       }, (res) => {
         wx.hideLoading();
-        this.setData({
-          visible5: false
-        });
-        setTimeout(()=>{
-          this.initList()
-        },1500)
-     
+        http.postReq(`${nameUrl}`, app.globalData.jwt, {
+          openId: this.data.currentUser,
+          realName:this.data.realName
+        }, (res) => {
+          wx.hideLoading();
+          this.setData({
+            visible5: false
+          });
+          setTimeout(()=>{
+            this.initList()
+          },1500)
+        })
       })
     }
   },

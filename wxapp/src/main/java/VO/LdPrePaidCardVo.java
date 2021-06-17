@@ -5,6 +5,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * a intentional match requirement ,which create by user's own means
@@ -37,7 +39,7 @@ public class LdPrePaidCardVo implements Serializable {
 
     @NotEmpty
     @ApiModelProperty(value = "spending list  ,spend means course time, charge means fee ")
-    private HashMap<String, Object> spending;
+    private List<HashMap<String, Object>> spending= new LinkedList<HashMap<String, Object>> ();
     public static final String SPENDING = "spending";
 
     @NotEmpty
@@ -69,11 +71,11 @@ public class LdPrePaidCardVo implements Serializable {
         this.balance = balance;
     }
 
-    public HashMap<String, Object> getSpending() {
+    public List<HashMap<String, Object>> getSpending() {
         return spending;
     }
 
-    public void setSpending(HashMap<String, Object> spending) {
+    public void setSpending(List<HashMap<String, Object>> spending) {
         this.spending = spending;
     }
 

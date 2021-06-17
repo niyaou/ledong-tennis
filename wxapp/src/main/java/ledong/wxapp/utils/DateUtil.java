@@ -21,6 +21,8 @@ public final class DateUtil {
     public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
     /** 日期格式： yyyy-MM-dd HH:mm:ss.SSS */
     public static final String FORMAT_DATE_TIME2 = "yyyy-MM-dd HH:mm:ss.SSS";
+    /** 日期格式： yyyy-MM-dd HH:mm:ss.SSS */
+    public static final String FORMAT_DATE_TIME4 = "yyyy-MM-dd HH:mm";
     /** 日期格式： yyyy-MM-dd HH:mm:ss:SSS */
     public static final String FORMAT_DATE_TIME3 = "yyyy-MM-dd HH:mm:ss:SSS";
     /** 日期格式： yyyy-MM-dd */

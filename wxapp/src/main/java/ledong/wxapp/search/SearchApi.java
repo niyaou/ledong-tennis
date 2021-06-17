@@ -1,13 +1,7 @@
 package ledong.wxapp.search;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
@@ -1139,6 +1133,28 @@ public class SearchApi {
         }
     }
 
+    public static String appendNestedFieldValueById(String indexName, String field,   HashMap<String,Object> value, String id){
+        try {
+
+
+            Map<String, Object> personCerts = Collections.singletonMap("value",value);
+
+//            Script inline = new Script(ScriptType.INLINE, "painless",
+//                    "if(ctx._source."+field+"==null){ctx._source."+field+"=params.value}else{ if (!(ctx._source."+field+" instanceof Collection)) {ctx._source."+field+" = [ctx._source.\"+field+\"];} ctx._source."+field+".add(params.value) }", parameters);
+            Script inline = new Script(ScriptType.INLINE, "painless",
+                    "if(!ctx._source.containsKey('"+field+"')){ctx._source."+field+"=[params.value]}else{ctx._source."+field+".add(params.value)}  ", personCerts);
+            System.out.println(inline.toString());
+            UpdateRequest updateRequest = new UpdateRequest(indexName, id);
+            updateRequest.script(inline);
+            System.out.println(updateRequest.toString());
+            DocWriteResponse res = client.update(updateRequest, RequestOptions.DEFAULT);
+            return res.getResult().equals(Result.UPDATED) ? res.getId() : null;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
 
     /**
      * 更新指定字段
@@ -1149,7 +1165,7 @@ public class SearchApi {
      * @param id
      * @return
      */
-    public static String updateFieldValueById(String indexName, String field, String value, String id) {
+    public static String updateFieldValueById(String indexName, String field, Object value, String id) {
 
         try {
             XContentBuilder builder = XContentFactory.jsonBuilder();

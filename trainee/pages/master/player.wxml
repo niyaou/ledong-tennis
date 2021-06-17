@@ -33,10 +33,6 @@
       <i-icon  bindtap="navigateTo" type="{{filterType===1?'addressbook_fill':'addressbook'}}"  size="40" style="margin-left:10px"  data-variable="{{1}}"/>
       <i-icon  bindtap="navigateTo" type="{{filterType===2?'group_fill':'group'}}"  size="40" style="margin-left:10px"  data-variable="{{2}}" />
       <i-icon  bindtap="navigateTo" type="{{filterType===0?'success_fill':'success'}}"  size="40" style="margin-left:10px"  data-variable="{{0}}" />
-        <!-- <i-radio-group current="{{current}}" bindchange="handleFruitChange" >
-          <i-radio wx:for="{{fruit}}" position="{{position}}" wx:key="{{item.id}}" value="{{item.name}}">
-          </i-radio>
-        </i-radio-group> -->
      </i-panel> 
   
  
@@ -57,7 +53,7 @@
         <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
           <!-- <view wx:for="{{slideButtons}}"> -->
           <view wx:for="{{players}}">
-            <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="   {{item.nickName}}"
+            <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="名:{{item.realName}} | {{item.nickName}}"
               indexs="{{index}}" bind:tapped="handleTapped" data-info="{{item}}" subtitle="第{{item.position}}名 "
               extra="段位:{{item.rankType0}}    积分:{{item.score}}  " thumb="{{item.avator}}">
             </i-card>
@@ -65,7 +61,8 @@
         </scroll-view>
       </view>
     </view>
-    <i-modal title="会员申请验证" visible="{{ visible5 }}" actions="{{ actions5 }}" bind:click="handleClick5">
+    <i-modal title="会员申请验证" visible="{{ visible5 }}" actions="{{ realName.length>0 ? actions5:actions5Dis }}" bind:click="handleClick5">
+      <i-input value="{{ realName }}" title="真实姓名"  placeholder="输入真实姓名" bindchange="realNameChange"  visible="{{ visible5 }}" wx:if="{{visible5}}" />
     <view>验证通过后成为乐动俱乐部积分会员</view>
 </i-modal>
   <i-modal title="选择绑卡或者积分" visible="{{ visible6 }}" actions="{{ actions6 }}" bind:click="handleClick6" >

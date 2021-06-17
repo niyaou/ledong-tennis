@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.text.Collator;
+import java.text.ParseException;
 import java.util.*;
 
 @Service
@@ -68,6 +69,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     public String addCard(String cardName, String... members) {
         LdPrePaidCardVo card = new LdPrePaidCardVo();
         card.setTitle(cardName);
+
         if (members != null) {
             card.setMember(members);
         }
@@ -124,19 +126,23 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             cardCharge.put(cardId, temp + membersObj.get(m));
             LdSpendingVo spendVo = new LdSpendingVo();
             spendVo.setOpenId(m);
-            spendVo.setTime(startTime);
+            try {
+                spendVo.setTime(DateUtil.getDate(DateUtil.getDate(startTime, DateUtil.FORMAT_DATE_TIME4), DateUtil.FORMAT_DATE_TIME));
+            }catch (ParseException e){
+
+            }
             spendVo.setSpend(spendTime);
             spendVo.setCharge(membersObj.get(m));
             spendVo.setCourse(cardId);
-            SearchApi.appendFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.SPENDING,
-                    spendVo, cardId);
+            SearchApi.appendNestedFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.SPENDING,
+                    JSON.parseObject(JSON.toJSONString(spendVo),HashMap.class), cardId);
         }
         // update total spend
         for (String card : cardCharge.keySet()) {
             HashMap<String, Object> cardVo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, card);
             int temp = (int) cardVo.get(LdPrePaidCardVo.BALANCE);
             SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.BALANCE,
-                    String.valueOf(temp + cardCharge.get(card)), card);
+                    temp -cardCharge.get(card), card);
         }
         return courseId;
     }

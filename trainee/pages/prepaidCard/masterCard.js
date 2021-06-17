@@ -10,7 +10,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    score:0,
+    score:'',
     text:'',
     time:util.formatTime(new Date()),
     name:'',
@@ -53,12 +53,18 @@ Page({
     http.postReq(`${url}`, app.globalData.jwt, {openId:this.data.id,name:this.data.realName,}, (res) => {
       console.log(res)
       if (res.code === 0) {
+        if(res.data===null){
+          $Toast({
+            content: '该卡已存在',
+            type: 'error'
+        });
+        }else{
         setTimeout(()=>{
           wx.navigateBack({
             delta: 0,
           })
         },1500)
-      
+        }
       }else{
         $Toast({
           content: '失败，请重试',
