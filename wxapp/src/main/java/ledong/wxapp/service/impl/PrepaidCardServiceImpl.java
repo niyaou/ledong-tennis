@@ -127,22 +127,23 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             LdSpendingVo spendVo = new LdSpendingVo();
             spendVo.setOpenId(m);
             try {
-                spendVo.setTime(DateUtil.getDate(DateUtil.getDate(startTime, DateUtil.FORMAT_DATE_TIME4), DateUtil.FORMAT_DATE_TIME));
-            }catch (ParseException e){
+                spendVo.setTime(DateUtil.getDate(DateUtil.getDate(startTime, DateUtil.FORMAT_DATE_TIME4),
+                        DateUtil.FORMAT_DATE_TIME));
+            } catch (ParseException e) {
 
             }
             spendVo.setSpend(spendTime);
             spendVo.setCharge(membersObj.get(m));
-            spendVo.setCourse(cardId);
+            spendVo.setCourse(courseId);
             SearchApi.appendNestedFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.SPENDING,
-                    JSON.parseObject(JSON.toJSONString(spendVo),HashMap.class), cardId);
+                    JSON.parseObject(JSON.toJSONString(spendVo), HashMap.class), cardId);
         }
         // update total spend
         for (String card : cardCharge.keySet()) {
             HashMap<String, Object> cardVo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, card);
             int temp = (int) cardVo.get(LdPrePaidCardVo.BALANCE);
             SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.BALANCE,
-                    temp -cardCharge.get(card), card);
+                    temp - cardCharge.get(card), card);
         }
         return courseId;
     }
