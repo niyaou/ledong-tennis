@@ -77,8 +77,8 @@ public class RankServiceImpl implements IRankService {
     // scores[0] += tempScore[0];
     // scores[1] += tempScore[1];
 
-    holder.setScore((holder.getScore() + scores[0])<0?0:(holder.getScore() + scores[0]));
-    challenger.setScore((challenger.getScore() + scores[1])<0?0:(challenger.getScore() + scores[1]));
+    holder.setScore((holder.getScore() + scores[0]) < 0 ? 0 : (holder.getScore() + scores[0]));
+    challenger.setScore((challenger.getScore() + scores[1]) < 0 ? 0 : (challenger.getScore() + scores[1]));
 
     GradingContext gContext = new GradingContext(new GradeRanking());
 
@@ -104,7 +104,7 @@ public class RankServiceImpl implements IRankService {
     updateRankInfo(challenger);
     scoreChangeLog(challenger.getOpenId(), scores[1], "与" + holderVo.get(UserVo.NICKNAME) + "比赛得分");
     ctx.publishEvent(new WinRateEvent(ctx, holder, challenger));
-//    ctx.publishEvent(new WinRateEvent(ctx, challenger));
+    // ctx.publishEvent(new WinRateEvent(ctx, challenger));
     updateUserPosition();
     // redis.set(StringUtil.combiningSpecifiedUserKey(holder.getOpenId(), "ranked"),
     // matchId, 60 * 60 * 24 * 7);
@@ -112,7 +112,6 @@ public class RankServiceImpl implements IRankService {
     // "ranked"), matchId, 60 * 60 * 24 * 7);
     return String.valueOf(scoreChanged);
   }
-
 
   @Override
   public String matchLDRank(String matchId, int holderScore, int challengerScor) {
@@ -127,22 +126,19 @@ public class RankServiceImpl implements IRankService {
     RankingContext context = new RankingContext(new VictoryRanking());
     scores = context.rankMatch(matchId, holderScore, challengerScor);
 
-//    context = new RankingContext(new ConsecutiveRanking());
-//    tempScore = context.rankMatch(matchId, holderScore, challengerScor);
-//
-//    scores[0] += tempScore[0];
-//    scores[1] += tempScore[1];
+    // context = new RankingContext(new ConsecutiveRanking());
+    // tempScore = context.rankMatch(matchId, holderScore, challengerScor);
+    //
+    // scores[0] += tempScore[0];
+    // scores[1] += tempScore[1];
 
-
-
-    holder.setScore((holder.getScore() + scores[0])<0?0:(holder.getScore() + scores[0]));
-    challenger.setScore((challenger.getScore() + scores[1])<0?0:(challenger.getScore() + scores[1]));
+    holder.setScore((holder.getScore() + scores[0]) < 0 ? 0 : (holder.getScore() + scores[0]));
+    challenger.setScore((challenger.getScore() + scores[1]) < 0 ? 0 : (challenger.getScore() + scores[1]));
 
     GradingContext gContext = new GradingContext(new GradeRanking());
 
     holder = gContext.rankMatch(holder);
     challenger = gContext.rankMatch(challenger);
-
 
     HashMap<String, Object> holderVo = iUserService.getLDUserInfo(holder.getOpenId());
     HashMap<String, Object> challengerVo = iUserService.getLDUserInfo(challenger.getOpenId());
@@ -170,7 +166,6 @@ public class RankServiceImpl implements IRankService {
   public String updateRankInfo(RankInfoVo vo) {
     return RankingStrategy.updateRankInfo(vo);
   }
-
 
   @Override
   public String updateLDRankInfo(LdRankInfoVo vo) {
@@ -216,8 +211,6 @@ public class RankServiceImpl implements IRankService {
     user.setPolygen(tags);
     return updateLDRankInfo(user);
   }
-
-
 
   @Override
   public Object getTagsList() {
@@ -320,35 +313,30 @@ public class RankServiceImpl implements IRankService {
     return RankingStrategy.createLDRankInfo(vo);
   }
 
-
   @Override
-  public String updateTeenageParent(String  parent,String  openId,String name,String avator) {
+  public String updateTeenageParent(String parent, String openId, String name, String avator) {
     Map<String, Object> user = SearchApi.searchById(DataSetConstant.LD_USER_RANK_INFORMATION, openId);
-    LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user),LdRankInfoVo.class);
-    logger.info(openId+name+avator);
+    LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user), LdRankInfoVo.class);
+    logger.info(openId + name + avator);
     vo.setClubId(LdRankInfoVo.TEENAGE);
     String[] p = vo.getParent();
     Set<String> parents = new HashSet<>();
-    if(p!=null){
-      for(int i=0;i<p.length;i++){
+    if (p != null) {
+      for (int i = 0; i < p.length; i++) {
         parents.add(p[i]);
       }
     }
-      parents.add(parent);
-      logger.info("add parent");
-    String[] total=new String[1];
+    parents.add(parent);
+    String[] total = new String[1];
     vo.setParent(parents.toArray(total));
     GradingContext gContext = new GradingContext(new GradeRanking());
     vo = gContext.rankMatch(vo);
-    logger.info("set rank ");
     ctx.publishEvent(new MatchConfirmEvent(ctx, null));
-    logger.info("before rank");
     return RankingStrategy.updateLDRankInfo(vo);
   }
 
-
   @Override
-  public String createLDTeenageRankInfo(String parent,String userId) {
+  public String createLDTeenageRankInfo(String parent, String userId) {
 
     LdRankInfoVo vo = new LdRankInfoVo();
 
@@ -356,15 +344,15 @@ public class RankServiceImpl implements IRankService {
     vo.setClubId(LdRankInfoVo.TEENAGE);
     String[] p = vo.getParent();
     Set<String> parents = new HashSet<>();
-    if(p!=null){
-      for(int i=0;i<p.length;i++){
+    if (p != null) {
+      for (int i = 0; i < p.length; i++) {
         parents.add(p[i]);
       }
-    }else{
+    } else {
       parents.add(parent);
     }
 
-    String[] total=new String[1];
+    String[] total = new String[1];
     vo.setParent(parents.toArray(total));
     GradingContext gContext = new GradingContext(new GradeRanking());
     vo = gContext.rankMatch(vo);
@@ -372,25 +360,24 @@ public class RankServiceImpl implements IRankService {
     return RankingStrategy.createLDRankInfo(vo);
   }
 
-
   @Override
   public Double updateLDWinRate(String userId) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder user = new BoolQueryBuilder();
     user.should(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId))
-            .should(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId));
+        .should(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId));
     BoolQueryBuilder match = new BoolQueryBuilder();
     match.must(QueryBuilders.termQuery(MatchPostVo.STATUS, MatchStatusCodeEnum.MATCH_GAMED_MATCHING.getCode()))
-            .must(user);
+        .must(user);
 
     BoolQueryBuilder win = new BoolQueryBuilder();
 
     win.should(new BoolQueryBuilder()
-            .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
-            .must(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId)))
-            .should(new BoolQueryBuilder()
-                    .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
-                    .must(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId)));
+        .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.HOLDER_WIN_MATCH.getCode()))
+        .must(QueryBuilders.termQuery(MatchPostVo.HOLDER, userId)))
+        .should(new BoolQueryBuilder()
+            .must(QueryBuilders.termQuery(MatchPostVo.WINNER, MatchStatusCodeEnum.CHALLENGER_WIN_MATCH.getCode()))
+            .must(QueryBuilders.termQuery(MatchPostVo.CHALLENGER, userId)));
     AggregationBuilder b = AggregationBuilders.filter("winrate", win);
     searchSourceBuilder.query(match);
     searchSourceBuilder.size(5000);
@@ -439,16 +426,15 @@ public class RankServiceImpl implements IRankService {
     return rankPosition == null ? 1 : (rankPosition + 1);
   }
 
-
   @Override
   public Integer getLDUserPositionInRankList(String userId) {
     Integer rankPosition = 0;
     List<HashMap<String, Object>> users = SearchApi.searchByField(DataSetConstant.LD_USER_RANK_INFORMATION,
-            RankInfoVo.OPENID, userId, null, null);
+        RankInfoVo.OPENID, userId, null, null);
     if (users != null) {
       SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
       QueryBuilder range = SearchApi.createSearchByFieldRangeGtSource(RankInfoVo.SCORE,
-              String.valueOf(users.get(0).get(RankInfoVo.SCORE)));
+          String.valueOf(users.get(0).get(RankInfoVo.SCORE)));
       searchSourceBuilder.query(range);
       searchSourceBuilder.size(500);
       rankPosition = SearchApi.totalRawResponse(searchSourceBuilder, DataSetConstant.LD_USER_RANK_INFORMATION);
@@ -550,12 +536,11 @@ public class RankServiceImpl implements IRankService {
     return result;
   }
 
-
   @Override
   public Object getLDRankingList(Integer count) {
     Long start = System.currentTimeMillis();
     HashMap<String, HashMap<String, Object>> users = SearchApi.searchByFieldSortedInMap(
-            DataSetConstant.LD_USER_RANK_INFORMATION, null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
+        DataSetConstant.LD_USER_RANK_INFORMATION, null, null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
     List<HashMap<String, Object>> result = new ArrayList<>();
     if (users != null) {
       String[] idsArr = new String[users.size()];
@@ -564,13 +549,13 @@ public class RankServiceImpl implements IRankService {
         ids.add(key);
       }
       HashMap<String, HashMap<String, Object>> userInfos = SearchApi
-              .getDocsByMultiIdsWithMap(DataSetConstant.LD_USER_INFORMATION, UserVo.OPENID, ids.toArray(idsArr));
+          .getDocsByMultiIdsWithMap(DataSetConstant.LD_USER_INFORMATION, UserVo.OPENID, ids.toArray(idsArr));
       long total = 0;
       for (String key : users.keySet()) {
         HashMap<String, Object> u = users.get(key);
 
         HashMap<String, Object> info = userInfos.get(key);
-        info.put(LdRankInfoVo .CLUBID,u.get(LdRankInfoVo.CLUBID));
+        info.put(LdRankInfoVo.CLUBID, u.get(LdRankInfoVo.CLUBID));
         u.putAll(info);
         Long for2 = System.currentTimeMillis();
         result.add(u);
@@ -598,12 +583,10 @@ public class RankServiceImpl implements IRankService {
     return holder.getOpenId();
   }
 
-
-
   @Override
   public String verifiedMember(String openId) {
     Map<String, Object> user = SearchApi.searchById(DataSetConstant.LD_USER_RANK_INFORMATION, openId);
-    LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user),LdRankInfoVo.class);
+    LdRankInfoVo vo = JSONObject.parseObject(JSONObject.toJSONString(user), LdRankInfoVo.class);
     vo.setClubId(LdRankInfoVo.VERIFIED);
     GradingContext gContext = new GradingContext(new GradeRanking());
     vo = gContext.rankMatch(vo);
@@ -643,6 +626,7 @@ public class RankServiceImpl implements IRankService {
     log.setRankingTime(DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME));
     return RankingStrategy.ldLogCreate(log);
   }
+
   @Override
   public Object getScoreLog(String openId) {
     LinkedList<HashMap<String, Object>> logs = SearchApi.searchByFieldSorted(ScoreLogVo.SCORE_CHANGED_LOG,
@@ -650,15 +634,12 @@ public class RankServiceImpl implements IRankService {
     return logs;
   }
 
-
   @Override
   public Object getLDScoreLog(String openId) {
     LinkedList<HashMap<String, Object>> logs = SearchApi.searchByFieldSorted(DataSetConstant.LD_SCORE_CHANGED_LOG,
-            ScoreLogVo.OPENID, openId, ScoreLogVo.RANKINGTIME, SortOrder.DESC, 0, 1000);
+        ScoreLogVo.OPENID, openId, ScoreLogVo.RANKINGTIME, SortOrder.DESC, 0, 1000);
     return logs;
   }
-
-
 
   @Override
   public String updateUserPosition() {
@@ -681,11 +662,11 @@ public class RankServiceImpl implements IRankService {
   @Override
   public String updateLDUserPosition() {
     LinkedList<HashMap<String, Object>> users = SearchApi.searchByFieldSorted(DataSetConstant.LD_USER_RANK_INFORMATION,
-            LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.VERIFIED), RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
+        LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.VERIFIED), RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
     int[] position = { 0 };
     LinkedList<LdRankInfoVo> vos = new LinkedList<LdRankInfoVo>();
     GradingContext gContext = new GradingContext(new GradeRanking());
-    if(users!=null){
+    if (users != null) {
       users.forEach(u -> {
         position[0] = position[0] + 1;
         u.put(LdRankInfoVo.POSITION, position[0]);
@@ -696,21 +677,19 @@ public class RankServiceImpl implements IRankService {
       RankingStrategy.bulkUpdateLdRankInfo(vos);
     }
 
-
-
-    users = SearchApi.searchByFieldSorted(DataSetConstant.LD_USER_RANK_INFORMATION,
-            LdRankInfoVo.CLUBID, String.valueOf(LdRankInfoVo.TEENAGE), RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
+    users = SearchApi.searchByFieldSorted(DataSetConstant.LD_USER_RANK_INFORMATION, LdRankInfoVo.CLUBID,
+        String.valueOf(LdRankInfoVo.TEENAGE), RankInfoVo.SCORE, SortOrder.DESC, 0, 1000);
     int[] teenage = { 0 };
     vos.clear();
-    if(users!=null){
-    users.forEach(u -> {
-      teenage[0] = teenage[0] + 1;
-      u.put(LdRankInfoVo.POSITION, teenage[0]);
-      LdRankInfoVo rank = JSON.parseObject(JSON.toJSONString(u), LdRankInfoVo.class);
-      rank = gContext.rankMatch(rank);
-      vos.add(rank);
-    });
-    RankingStrategy.bulkUpdateLdRankInfo(vos);
+    if (users != null) {
+      users.forEach(u -> {
+        teenage[0] = teenage[0] + 1;
+        u.put(LdRankInfoVo.POSITION, teenage[0]);
+        LdRankInfoVo rank = JSON.parseObject(JSON.toJSONString(u), LdRankInfoVo.class);
+        rank = gContext.rankMatch(rank);
+        vos.add(rank);
+      });
+      RankingStrategy.bulkUpdateLdRankInfo(vos);
     }
     return null;
   }

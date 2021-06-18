@@ -130,4 +130,24 @@ public class PrepaidCardController {
                 HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/ld/finacialLogs", method = RequestMethod.POST)
+    @ApiOperation(value = "finacialLogs ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "startTime", value = "startTime ", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "endTime", value = "endTime ", required = false, dataType = "string", paramType = "query") })
+    public ResponseEntity<?> finacialLogs(@RequestHeader("Authorization") String authHeader,
+            @RequestParam(value = "cardId", required = true) String cardId,
+            @RequestParam(value = "startTime", required = false) String startTime,
+            @RequestParam(value = "endTime", required = false) String endTime) throws AuthenticationException {
+
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(prepaidCardService.finacialLogs(cardId, startTime, endTime)), HttpStatus.OK);
+    }
+
 }

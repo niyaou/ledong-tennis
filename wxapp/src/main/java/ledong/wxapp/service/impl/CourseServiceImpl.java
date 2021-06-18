@@ -70,4 +70,10 @@ public class CourseServiceImpl implements ICourseService {
         return id;
     }
 
+    @Override
+    public String courseLogs(String cardId, String startTime, String endTime) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

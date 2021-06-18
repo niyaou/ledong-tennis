@@ -176,4 +176,15 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         return JSON.parseObject(JSON.toJSONString(card), LdPrePaidCardVo.class);
 
     }
+
+    @Override
+    public Object finacialLogs(String cardId, String startTime, String endTime) {
+        HashMap<String, Object> vo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
+        List<LdSpendingVo> spend = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.SPENDING)), List.class);
+        List<LdChargeVo> charge = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.CHARGE)), List.class);
+
+        String total = JSON.toJSONString(spend) + JSON.toJSONString(charge);
+        return total;
+    }
+
 }

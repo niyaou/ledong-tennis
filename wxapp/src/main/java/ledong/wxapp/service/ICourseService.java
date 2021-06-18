@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 public interface ICourseService {
 
-
     /**
      * CREATE course
+     * 
      * @param startTime
      * @param endTime
      * @param coach
@@ -19,9 +19,18 @@ public interface ICourseService {
      * @param membersObj
      * @return
      */
-    public String addCourse(String startTime, String endTime, String coach, Integer isExperience, Integer isDealing, Double spendingTime,
-                            Integer courtSpend, Integer coachSpend, String court,HashMap<String,Integer> membersObj);
+    public String addCourse(String startTime, String endTime, String coach, Integer isExperience, Integer isDealing,
+            Double spendingTime, Integer courtSpend, Integer coachSpend, String court,
+            HashMap<String, Integer> membersObj);
 
-
+    /**
+     * get course log by card id
+     * 
+     * @param cardId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public String courseLogs(String cardId, String startTime, String endTime);
 
 }
