@@ -4,7 +4,9 @@ var http = require('../../utils/http.js')
 // var compare=require('../../utils/util.js')
 const chooseLocation = requirePlugin('chooseLocation');
 var pinyin = require('../../utils/pinyinUtil.js')
-const { $Toast } = require('../../dist/base/index');
+const {
+  $Toast
+} = require('../../dist/base/index');
 Page({
 
   /**
@@ -93,19 +95,27 @@ Page({
     ],
     actions5Dis: [{
       name: '取消'
-    }
-  ],
+    }],
+    assignedCard: false, //是否绑卡
     actions6: [{
-      name: '绑卡'
-    },
-    {
-      name: '积分',
-   
-    }
-  ]
+        name: '绑卡'
+      },
+      {
+        name: '积分',
+
+      }
+    ],
+    actions6Assigned: [{
+        name: '充值'
+      },
+      {
+        name: '积分',
+
+      }
+    ]
   },
-  realNameChange(e){
-    console.log('--realNameChange--',e.detail.detail.value)
+  realNameChange(e) {
+    console.log('--realNameChange--', e.detail.detail.value)
     this.setData({
       realName: e.detail.detail.value
     })
@@ -184,22 +194,21 @@ Page({
       visible: false
     })
   },
-  addCourse(){
+  addCourse() {
     wx.navigateTo({
       url: '../course/masterCourse',
     })
   },
-
   addMatch() {
-    if(this.data.filterType===0){
+    if (this.data.filterType === 0) {
       $Toast({
         content: '请选择成人或者儿童',
         type: 'warning'
-    });
+      });
       return
     }
     wx.navigateTo({
-      url: '../master/create?filterType='+this.data.filterType,
+      url: '../master/create?filterType=' + this.data.filterType,
     })
   },
   handleClick5({
@@ -210,8 +219,6 @@ Page({
         visible5: false
       });
     } else {
-
-
       wx.showLoading({
         mask: true,
         title: '加载中',
@@ -224,15 +231,15 @@ Page({
         wx.hideLoading();
         http.postReq(`${nameUrl}`, app.globalData.jwt, {
           openId: this.data.currentUser,
-          realName:this.data.realName
+          realName: this.data.realName
         }, (res) => {
           wx.hideLoading();
           this.setData({
             visible5: false
           });
-          setTimeout(()=>{
+          setTimeout(() => {
             this.initList()
-          },1500)
+          }, 1500)
         })
       })
     }
@@ -240,11 +247,18 @@ Page({
   handleClick6({
     detail
   }) {
-    console.log('handleClick6',detail)
+    console.log('handleClick6', detail)
     if (detail.index === 0) {
-      wx.navigateTo({
-        url: '../prepaidCard/masterCard?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
-      })
+      if(this.data.assignedCard){
+        wx.navigateTo({
+          url: './charge?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName+'&prepaidCard='+this.data.currentUser.prepaidCard,
+        })
+      }else{
+
+        wx.navigateTo({
+          url: '../prepaidCard/masterCard?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
+        })
+      }
     } else {
       wx.navigateTo({
         url: '../master/score?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
@@ -252,20 +266,25 @@ Page({
     }
     this.setData({
       visible6: false
-    })  
+    })
   },
   handleTapped(e) {
-    console.log(e)
+    console.log(e.currentTarget.dataset.info)
     if (e.currentTarget.dataset.info.clubId === 0) {
       this.setData({
         visible5: true,
         currentUser: e.currentTarget.dataset.info.openId
       })
     } else {
+      let card = e.currentTarget.dataset.info.prepaidCard
+
       this.setData({
+        assignedCard: typeof card !== 'undefined' && card.length > 0,
         visible6: true,
         currentUser: e.currentTarget.dataset.info
       })
+
+
 
     }
 
@@ -321,7 +340,7 @@ Page({
 
   },
 
-  initList(){
+  initList() {
     let url = 'rank/ld/rankList?count=500'
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       this.setData({
@@ -340,7 +359,7 @@ Page({
    */
   onShow: function () {
     console.log('---------player back--------')
-this.initList()
+    this.initList()
   },
 
 

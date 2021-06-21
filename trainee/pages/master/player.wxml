@@ -65,7 +65,7 @@
       <i-input value="{{ realName }}" title="真实姓名"  placeholder="输入真实姓名" bindchange="realNameChange"  visible="{{ visible5 }}" wx:if="{{visible5}}" />
     <view>验证通过后成为乐动俱乐部积分会员</view>
 </i-modal>
-  <i-modal title="选择绑卡或者积分" visible="{{ visible6 }}" actions="{{ actions6 }}" bind:click="handleClick6" >
+  <i-modal title="选择绑卡或者积分" visible="{{ visible6 }}" actions="{{ assignedCard?actions6Assigned:actions6 }}" bind:click="handleClick6" >
     <view>验证通过后成为乐动俱乐部积分会员</view>
 </i-modal>
 <i-toast id="toast" />
