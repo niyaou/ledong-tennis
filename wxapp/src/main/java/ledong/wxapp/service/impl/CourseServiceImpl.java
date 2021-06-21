@@ -76,4 +76,14 @@ public class CourseServiceImpl implements ICourseService {
         return null;
     }
 
+    @Override
+    public LdCourseVo getCourseById(String courseId) {
+
+        HashMap<String, Object> vo = SearchApi.searchById(DataSetConstant.LD_COURSE_INFORMATION, courseId);
+        if (vo == null) {
+            return null;
+        }
+        return JSON.parseObject(JSON.toJSONString(vo), LdCourseVo.class);
+    }
+
 }

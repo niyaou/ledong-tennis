@@ -2,6 +2,8 @@ package ledong.wxapp.service;
 
 import java.util.HashMap;
 
+import VO.LdCourseVo;
+
 public interface ICourseService {
 
     /**
@@ -32,5 +34,11 @@ public interface ICourseService {
      * @return
      */
     public String courseLogs(String cardId, String startTime, String endTime);
+
+    /**
+     * as name
+     * 
+     */
+    public LdCourseVo getCourseById(String courseId);
 
 }

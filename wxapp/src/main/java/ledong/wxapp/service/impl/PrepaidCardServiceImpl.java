@@ -8,6 +8,7 @@ import ledong.wxapp.auth.JwtToken;
 import ledong.wxapp.constant.CommonConstanst;
 import ledong.wxapp.constant.DataSetConstant;
 import ledong.wxapp.search.SearchApi;
+import ledong.wxapp.service.ICourseService;
 import ledong.wxapp.service.IPrepaidCardService;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.service.IUserService;
@@ -64,6 +65,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private ICourseService courseService;
 
     @Override
     public String addCard(String cardName, String... members) {
@@ -181,9 +185,18 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     public Object finacialLogs(String cardId, String startTime, String endTime) {
         HashMap<String, Object> vo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
         List<LdSpendingVo> spend = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.SPENDING)), List.class);
-        List<LdChargeVo> charge = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.CHARGE)), List.class);
+        if (spend.size() > 0) {
+            spend.stream().forEach(s -> {
+                LdCourseVo course = courseService.getCourseById(s.getCourse());
+                String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
+                s.setDescription(s.getDescription() + "   |   " + coachName + "     " + course.getStart() + "   在  "
+                        + course.getCourt() + "  上课  " + course.getSpendingTime() + "  小时");
+            });
+        }
 
+        List<LdChargeVo> charge = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.CHARGE)), List.class);
         String total = JSON.toJSONString(spend) + JSON.toJSONString(charge);
+
         return total;
     }
 
