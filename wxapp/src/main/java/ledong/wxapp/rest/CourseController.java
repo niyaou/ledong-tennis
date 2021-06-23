@@ -57,6 +57,7 @@ public class CourseController {
             @ApiImplicitParam(name = "courtSpend", value = "courtSpend ", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "coachSpend", value = "coachSpend ", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "court", value = "court ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "grade", value = "grade ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "membersObj", value = "membersObj ", required = true, dataType = "string", paramType = "query"),
     })
     public ResponseEntity<?> createCourse(@RequestHeader("Authorization") String authHeader,
@@ -69,6 +70,7 @@ public class CourseController {
                                         @RequestParam(value = "courtSpend", required = true) Integer courtSpend,
                                         @RequestParam(value = "coachSpend", required = true) Integer coachSpend,
                                         @RequestParam(value = "court", required = true) String court,
+                                          @RequestParam(value = "grade", required = true) String grade,
                                         @RequestParam(value = "membersObj", required = true) String membersObj
 
                                    ) throws AuthenticationException {
@@ -86,7 +88,7 @@ public class CourseController {
         HashMap<String,Integer> obj= JSON.parseObject(membersObj,HashMap.class);
         return new ResponseEntity<Object>(
                 CommonResponse.success(courseService.addCourse(startTime, endTime,  coach,  isExperience,  isDealing,  spendingTime,
-                         courtSpend,  coachSpend,  court, obj)), HttpStatus.OK);
+                         courtSpend,  coachSpend, grade, court, obj)), HttpStatus.OK);
     }
 
 

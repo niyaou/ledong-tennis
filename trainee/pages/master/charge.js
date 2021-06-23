@@ -34,7 +34,7 @@ Page({
     timePoint: 0, //0 :start time ,  1: end time
     startTime: 'N/A',
     endTime: 'N/A',
-
+    coursFee:'',
     array: ['音乐花园', '雅居乐', '英郡', '银泰城', '一品天下', '其他'],
   },
   coursFeeChange(e) {
@@ -141,7 +141,6 @@ Page({
     })
   },
   getCoach() {
-
     let url = `user/ld/ldUsersByType?type=1`
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       console.log(res)
@@ -211,31 +210,21 @@ Page({
     })
   },
   handleCreate(e) {
-    let url = 'course/ld/createCourse'
-    let membobj={}
-    this.data.selectPlayers.map(s => {
-
-     Object.assign(membobj, {
-        [s.openId]: s.courseSpend
-      })
-    })
-    console.log('handleCreate', 'index', this.data.index,this.data.coach[this.data.index].openId, 'coachSpend', this.data.coachSpend, 'startTime', this.data.startTime, 'endTime', this.data.endTime, 'courseTime',
-      this.data.courseTime, 'descript', this.data.descript, 'courtIndex', this.data.array[this.data.courtIndex], 'coursFee', this.data.coursFee,
-      'selectPlayers', this.data.selectPlayers, 'membobj', membobj, 'experinced',  this.data.experinced, 'isDealing',  this.data.isDealing)
-
-
+    let url = 'prepaidCard/ld/chargeAnnotation'
+  
     http.postReq(`${url}`, app.globalData.jwt, {
-      startTime: this.data.startTime,
-      endTime: this.data.endTime,
-      coach: this.data.coach[this.data.index].openId,
-      isExperience: this.data.experinced?1:0,
-      isDealing: this.data.isDealing?1:0,
-      spendingTime: this.data.courseTime,
-      courtSpend: this.data.coursFee,
-      coachSpend: this.data.coachSpend,
-      court: this.data.array[this.data.courtIndex],
-      membersObj: JSON.stringify( membobj),
-
+      // startTime: this.data.startTime,
+      // endTime: this.data.endTime,
+      coachId: this.data.coach[this.data.index].openId,
+      // isExperience: this.data.experinced?1:0,
+      // isDealing: this.data.isDealing?1:0,
+      // spendingTime: this.data.courseTime,
+      // courtSpend: this.data.coursFee,
+      // coachSpend: this.data.coachSpend,
+      cardId: this.data.prepaidCard,
+      openId: this.data.id,
+      amount:this.data.coursFee,
+      description:this.data.descript,
     }, (res) => {
       console.log(res)
       if (res.code === 0) {
@@ -253,48 +242,8 @@ Page({
       }
     })
   },
-  handleAssign(e) {
-    let url = 'prepaidCard/ld/assignMember'
-    http.postReq(`${url}`, app.globalData.jwt, {
-      openId: this.data.id,
-      name: this.data.realName,
-    }, (res) => {
-      console.log(res)
-      if (res.code === 0) {
-        if (res.data === null) {
-          $Toast({
-            content: '该卡不存在',
-            type: 'error'
-          });
-        } else {
 
-          setTimeout(() => {
-            wx.navigateBack({
-              delta: 0,
-            })
-          }, 1500)
-        }
-
-
-
-      }
-    })
-  },
-  // finishMatch(matchId){
-  //   let url = 'match/matchResult/'+matchId
-  //   console.log('finishMatch', {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore})
-  //   http.postReq(`${url}`, app.globalData.jwt, {holderScore:this.data.holderScore,challengerScore:this.data.challengerScore}, (res) => {
-  //     console.log(res)
-  //     wx.hideLoading();
-  //     if (res.code === 0) {
-  //       wx.navigateBack({
-  //         delta: 0,
-  //       })
-  //     }
-
-  //     // console.log(res)
-  //   })
-  // },
+ 
 
   handleTapped(e) {
 

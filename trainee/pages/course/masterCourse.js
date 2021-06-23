@@ -15,6 +15,7 @@ Page({
 
     index: 0, //教练index
     courtIndex: 0,
+    gradeIndex: 0,
     coach: [],
     players: [],
     // selectPlayers: [{realName:'黄守义',openId:'1'}],
@@ -35,8 +36,8 @@ Page({
     timePoint: 0, //0 :start time ,  1: end time
     startTime: 'N/A',
     endTime: 'N/A',
-
     array: ['音乐花园', '雅居乐', '英郡', '银泰城', '一品天下', '其他'],
+    gradeArray: ['红球','橙球','绿球','标球'],
   },
   coursFeeChange(e) {
     this.setData({
@@ -141,6 +142,12 @@ Page({
       courtIndex: e.detail.value
     })
   },
+  bindGradeChange: function (e) {
+    console.log('picker发送选择改变，携带值为', e.detail.value)
+    this.setData({
+      gradeIndex: e.detail.value
+    })
+  },
   getCoach() {
 
     let url = `user/ld/ldUsersByType?type=1`
@@ -235,6 +242,7 @@ Page({
       courtSpend: this.data.coursFee,
       coachSpend: this.data.coachSpend,
       court: this.data.array[this.data.courtIndex],
+      grade: this.data.gradeArray[this.data.gradeIndex],
       membersObj: JSON.stringify( membobj),
 
     }, (res) => {

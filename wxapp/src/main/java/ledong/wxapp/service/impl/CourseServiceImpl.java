@@ -35,7 +35,7 @@ public class CourseServiceImpl implements ICourseService {
 
     @Override
     public String addCourse(String startTime, String endTime, String coach, Integer isExperience, Integer isDealing,
-            Double spendingTime, Integer courtSpend, Integer coachSpend, String court,
+            Double spendingTime, Integer courtSpend, Integer coachSpend, String court,String grade,
             HashMap<String, Integer> membersObj) {
 
         LdCourseVo course = new LdCourseVo();
@@ -45,9 +45,9 @@ public class CourseServiceImpl implements ICourseService {
         course.setExperience(isExperience);
         course.setAchieved(isDealing);
         course.setSpendingTime(spendingTime);
-
         course.setCourtSpend(courtSpend);
         course.setCourt(court);
+        course.setGrade(grade);
         course.setCoachSpend(coachSpend);
 
         ArrayList<String> members = new ArrayList<>();
@@ -72,7 +72,7 @@ public class CourseServiceImpl implements ICourseService {
 
     @Override
     public String courseLogs(String cardId, String startTime, String endTime) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

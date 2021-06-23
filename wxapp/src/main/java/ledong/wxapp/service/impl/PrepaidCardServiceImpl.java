@@ -156,18 +156,38 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,
             String coachId, String courseId, String description) {
         LdChargeVo vo = new LdChargeVo();
-        // String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+         String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         vo.setAmount(amount);
-        vo.setTime(time);
+        vo.setTime(date);
         vo.setOpenId(openId);
         vo.setOwner(coachId);
-        vo.setCourse(courseId);
-        vo.setDescription(description);
+        if(!TextUtils.isEmpty(courseId)){
+            vo.setCourse(courseId);
+        }
+        if(!TextUtils.isEmpty(description)){
+            vo.setDescription(description);
+        }
+
         LdPrePaidCardVo card = getInstance(cardId);
         if (card != null) {
-            HashMap<String, Object> charge = JSON.parseObject(JSON.toJSONString(card), HashMap.class);
-            card.setCharge(charge);
-            return card.getTitle();
+           int current =  card.getBalance();
+            current+=amount;
+            card.setBalance(current);
+            LdChargeVo chargLog=new LdChargeVo();
+            chargLog.setAmount(amount);
+            if(!TextUtils.isEmpty(description)){
+                chargLog.setDescription(description);
+            }
+            chargLog.setTime(date);
+            chargLog.setOwner(coachId);
+
+            String id = SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,LdPrePaidCardVo.BALANCE,current,cardId);
+             if(TextUtils.isEmpty(id)){
+                 return null;
+             }
+
+            return SearchApi.appendNestedFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.CHARGE,
+                    JSON.parseObject(JSON.toJSONString(chargLog), HashMap.class), cardId);
         }
         return null;
     }
@@ -193,7 +213,6 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                         + course.getCourt() + "  上课  " + course.getSpendingTime() + "  小时");
             });
         }
-
         List<LdChargeVo> charge = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.CHARGE)), List.class);
         String total = JSON.toJSONString(spend) + JSON.toJSONString(charge);
 

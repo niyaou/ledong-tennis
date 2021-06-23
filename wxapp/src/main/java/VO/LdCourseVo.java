@@ -43,6 +43,13 @@ public class LdCourseVo implements Serializable {
     @ApiModelProperty(value = "course court   1:音乐花园  2：英俊，  3：雅居乐，   4：其他      ")
     private String court;
     public static final String COURT = "court";
+
+    @NotEmpty
+    @ApiModelProperty(value = "course grade     红球 橙球 绿球  标球   ")
+    private String grade;
+    public static final String GRADE = "grade";
+
+
     @NotEmpty
     @ApiModelProperty(value = "course earned  ")
     private Integer earned;
@@ -72,6 +79,14 @@ public class LdCourseVo implements Serializable {
     @ApiModelProperty(value = "course coachSpend  ")
     private Integer coachSpend;
     public static final String COACHSPEND = "coachSpend";
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
 
     public String getCourt() {
         return court;

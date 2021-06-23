@@ -95,19 +95,19 @@ public class PrepaidCardController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "openId", value = "openId ", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "time", value = "time ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "time", value = "time ", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "amount", value = "amount ", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "coachId", value = "coachId ", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "courseId", value = "courseId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "courseId", value = "courseId ", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "description ", required = false, dataType = "string", paramType = "query"), })
     public ResponseEntity<?> chargeAnnotation(@RequestHeader("Authorization") String authHeader,
             @RequestParam(value = "cardId", required = true) String cardId,
             @RequestParam(value = "openId", required = true) String openId,
-            @RequestParam(value = "time", required = true) String time,
+            @RequestParam(value = "time", required = false) String time,
             @RequestParam(value = "amount", required = true) Integer amount,
             @RequestParam(value = "coachId", required = true) String coachId,
-            @RequestParam(value = "courseId", required = true) String courseId,
-            @RequestParam(value = "description", required = true) String description) throws AuthenticationException {
+            @RequestParam(value = "courseId", required = false) String courseId,
+            @RequestParam(value = "description", required = false) String description) throws AuthenticationException {
 
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
