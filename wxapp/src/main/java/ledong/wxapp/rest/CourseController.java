@@ -88,7 +88,7 @@ public class CourseController {
         HashMap<String,Integer> obj= JSON.parseObject(membersObj,HashMap.class);
         return new ResponseEntity<Object>(
                 CommonResponse.success(courseService.addCourse(startTime, endTime,  coach,  isExperience,  isDealing,  spendingTime,
-                         courtSpend,  coachSpend, grade, court, obj)), HttpStatus.OK);
+                         courtSpend,  coachSpend,  court,grade, obj)), HttpStatus.OK);
     }
 
 

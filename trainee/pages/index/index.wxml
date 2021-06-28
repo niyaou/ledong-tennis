@@ -127,10 +127,10 @@
       <view class="weui-flex__item">
         <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{0}}">
           <view class="makeCenterC ">
-            <view class="statisticNum">{{matchCount}} 场</view>
-            <view class="statisticSubtitle">比赛</view>
+            <view class="statisticNum">会员卡</view>
+            <!-- <view class="statisticSubtitle">比赛</view> -->
           </view>
-          <image src="../../icon/tennis.png" class="iconsize"></image>
+          <image src="../../icon/vipcard.png" class="iconsize"></image>
         </view>
 
       </view>

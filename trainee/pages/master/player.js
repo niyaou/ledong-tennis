@@ -254,7 +254,6 @@ Page({
           url: './charge?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName+'&prepaidCard='+this.data.currentUser.prepaidCard,
         })
       }else{
-
         wx.navigateTo({
           url: '../prepaidCard/masterCard?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
         })

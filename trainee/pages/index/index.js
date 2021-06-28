@@ -419,8 +419,15 @@ Page({
           });
           return
         }
+        if (typeof this.data.userInfo.prepaidCard==='undefined') {
+          $Toast({
+            content: '请联系俱乐部管理员绑定会员卡',
+            type: 'warning'
+          });
+          return
+        }
         wx.navigateTo({
-          url: '../../pages/matches/matchlist'
+          url: '../../pages/prepaidCard/cardLog?cardId='+this.data.userInfo.prepaidCard
         })
       } else
         if (event.currentTarget.dataset.variable === 1) {

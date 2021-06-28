@@ -1,0 +1,59 @@
+/* pages/opponent/opponent.wxss */
+
+.noneborder{
+
+  background: #5751dc;
+  /* border: 1rpx solid #dddee1; */
+  border: 0px;
+  border-radius: 5px
+}
+
+.tags{
+  margin:10rpx;
+}
+
+.avator{
+  border-radius: 10px;
+}
+.i-cell {
+  position: relative;
+  padding: 12.5px 15px;
+  display: flex;
+  background: #fff;
+  align-items: center;
+  line-height: 1.4;
+  font-size: 14px;
+  overflow: hidden
+}
+.i-input {
+  padding: 12.5px 15px;
+  color: #495060
+}
+.i-cell::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  transform: scale(.5);
+  transform-origin: 0 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  border: 0 solid #e9eaec;
+  border-bottom-width: 1px;
+  left: 15px;
+  right: 0
+}
+
+.col-bg{
+  background-color: #fff;
+  height:30px;
+}
+.output{
+  color:rgb(100, 201, 18)
+}
+
+.input{
+  color:rgb(204, 69, 28)
+}

@@ -204,19 +204,29 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     @Override
     public Object finacialLogs(String cardId, String startTime, String endTime) {
         HashMap<String, Object> vo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
-        List<LdSpendingVo> spend = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.SPENDING)), List.class);
+        Integer balance= (Integer) vo.get(LdPrePaidCardVo.BALANCE);
+        List<HashMap<String,Object>> spend= (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.SPENDING);
+
+        HashMap<String,Object> bm=new HashMap<String,Object>();
+        bm.put(LdPrePaidCardVo.BALANCE,balance);
         if (spend.size() > 0) {
             spend.stream().forEach(s -> {
-                LdCourseVo course = courseService.getCourseById(s.getCourse());
+
+                LdSpendingVo stemp= JSON.parseObject(JSON.toJSONString(s),LdSpendingVo.class);
+                LdCourseVo course = courseService.getCourseById(stemp.getCourse());
+                HashMap<String, Object> ld=userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
+                String trainee = (String) ld.get(UserVo.REALNAME);
                 String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
-                s.setDescription(s.getDescription() + "   |   " + coachName + "     " + course.getStart() + "   在  "
-                        + course.getCourt() + "  上课  " + course.getSpendingTime() + "  小时");
+                String desript=TextUtils.isEmpty(stemp.getDescription())?"":(stemp.getDescription() + "   |   ");
+                stemp.setDescription(desript + coachName + " " + course.getStart() + " 在 "
+                        + course.getCourt() +" 给 "+ trainee+" 上课 " + course.getSpendingTime() + " 小时");
+                s.put(LdSpendingVo.DESCRIPTION,stemp.getDescription());
             });
         }
-        List<LdChargeVo> charge = JSON.parseObject(JSON.toJSONString(vo.get(LdPrePaidCardVo.CHARGE)), List.class);
-        String total = JSON.toJSONString(spend) + JSON.toJSONString(charge);
-
-        return total;
+        List<HashMap<String,Object>> charge= (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.CHARGE);
+        spend.addAll(charge);
+        spend.add(bm);
+        return JSON.toJSONString(spend);
     }
 
 }

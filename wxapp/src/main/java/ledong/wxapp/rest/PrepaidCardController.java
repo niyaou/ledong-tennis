@@ -130,7 +130,7 @@ public class PrepaidCardController {
                 HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/ld/finacialLogs", method = RequestMethod.POST)
+    @RequestMapping(value = "/ld/finacialLogs", method = RequestMethod.GET)
     @ApiOperation(value = "finacialLogs ", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
