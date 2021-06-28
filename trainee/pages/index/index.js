@@ -205,7 +205,8 @@ Page({
       this.setData({
         userInfo: {
           avatarUrl: e.data.avator,
-          nickName: e.data.nickName
+          nickName: e.data.nickName,
+          prepaidCard:e.data.prepaidCard
         },
         hasUserInfo: true,
       })
