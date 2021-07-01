@@ -250,6 +250,14 @@ Page({
     console.log('handleClick6', detail)
     if (detail.index === 0) {
       if(this.data.assignedCard){
+        console.log('------app.globalData.parentInfo--------',app.globalData.userRankInfo)
+        if( app.globalData.userRankInfo.clubId<4){
+          this.setData({
+            visible6: false
+          })
+          console.log('--------------')
+          return
+        }
         wx.navigateTo({
           url: './charge?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName+'&prepaidCard='+this.data.currentUser.prepaidCard,
         })

@@ -104,8 +104,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    console.log('onload ',options)
     this.setData({
-      prepaidCard: options.prepaidCard
+      prepaidCard: options.cardId
     })
   },
 
@@ -117,7 +118,7 @@ Page({
   },
 
 getCardLogs(){
-  let url = 'prepaidCard/ld/finacialLogs?cardId='+(typeof this.data.prepaidCard!=='undefined'?this.data.prepaidCard:'黄守义')
+  let url = 'prepaidCard/ld/finacialLogs?cardId='+this.data.prepaidCard
   http.getReq(`${url}`, app.globalData.jwt, (res) => {
     // this.setData({
     //   players: res.data .filter(p=>{return p.clubId===app.globalData.userRankInfo.clubId}).sort((a, b) => {

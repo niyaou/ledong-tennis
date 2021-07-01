@@ -216,7 +216,8 @@ Page({
         app.globalData.parentInfo = {
           avatarUrl: e.data.avator,
           nickName: e.data.nickName,
-          gps: e.data.gps
+          gps: e.data.gps,
+          prepaidCard:e.data.prepaidCard,
         }
         this.setData({
           parentUserInfo: e.data
@@ -363,7 +364,7 @@ Page({
     }
   },
   masterNav(e) {
-    if (app.globalData.userRankInfo.clubId === 3) {
+    if (app.globalData.userRankInfo.clubId >= 3) {
       wx.navigateTo({
         url: '../../pages/master/player'
       })

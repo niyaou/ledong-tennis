@@ -38,6 +38,8 @@ Page({
     endTime: 'N/A',
     array: ['音乐花园', '雅居乐', '英郡', '银泰城', '一品天下', '其他'],
     gradeArray: ['红球','橙球','绿球','标球'],
+    timeArray: [1,1.5,2,2.5,3],
+    timeIndex:0,
   },
   coursFeeChange(e) {
     this.setData({
@@ -72,7 +74,7 @@ Page({
       return i.openId !== item.openId
     })
     this.setData({
-      selectPlayers: arr
+      selectPlayers: arr,
     })
 
   },
@@ -87,7 +89,14 @@ Page({
     console.log('ptap', e.target.dataset, item, 'arr:', arr, this.data.selectPlayers)
     if (!duplicated) {
       this.setData({
-        selectPlayers: arr
+        selectPlayers: arr,
+        players:[],
+        realName:'',
+      })
+    }else{
+      this.setData({
+        players:[],
+        realName:'',
       })
     }
     console.log('ptap', this.data.selectPlayers)
@@ -146,6 +155,11 @@ Page({
     console.log('picker发送选择改变，携带值为', e.detail.value)
     this.setData({
       gradeIndex: e.detail.value
+    })
+  },
+  bindTimeChange: function (e) {
+    this.setData({
+      timeIndex: e.detail.value
     })
   },
   getCoach() {
@@ -227,9 +241,9 @@ Page({
         [s.openId]: s.courseSpend
       })
     })
-    console.log('handleCreate', 'index', this.data.index,this.data.coach[this.data.index].openId, 'coachSpend', this.data.coachSpend, 'startTime', this.data.startTime, 'endTime', this.data.endTime, 'courseTime',
-      this.data.courseTime, 'descript', this.data.descript, 'courtIndex', this.data.array[this.data.courtIndex], 'coursFee', this.data.coursFee,
-      'selectPlayers', this.data.selectPlayers, 'membobj', membobj, 'experinced',  this.data.experinced, 'isDealing',  this.data.isDealing)
+    // console.log('handleCreate', 'index', this.data.index,this.data.coach[this.data.index].openId, 'coachSpend', this.data.coachSpend, 'startTime', this.data.startTime, 'endTime', this.data.endTime, 'courseTime',
+    //   this.data.courseTime, 'descript', this.data.descript, 'courtIndex', this.data.array[this.data.courtIndex], 'coursFee', this.data.coursFee,
+    //   'selectPlayers', this.data.selectPlayers, 'membobj', membobj, 'experinced',  this.data.experinced, 'isDealing',  this.data.isDealing)
 
 
     http.postReq(`${url}`, app.globalData.jwt, {
@@ -238,7 +252,7 @@ Page({
       coach: this.data.coach[this.data.index].openId,
       isExperience: this.data.experinced?1:0,
       isDealing: this.data.isDealing?1:0,
-      spendingTime: this.data.courseTime,
+      spendingTime:  this.data.timeArray[this.data.timeIndex] ,
       courtSpend: this.data.coursFee,
       coachSpend: this.data.coachSpend,
       court: this.data.array[this.data.courtIndex],
