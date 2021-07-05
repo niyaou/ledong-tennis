@@ -15,6 +15,7 @@ Page({
   data: {
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
+    clubId:0,
     visible: false,
     sortTog: true,
     visible5: false,
@@ -97,20 +98,14 @@ Page({
       name: '取消'
     }],
     assignedCard: false, //是否绑卡
-    actions6: [{
-        name: '绑卡'
-      },
+    actions6: [
       {
         name: '积分',
-
       }
     ],
-    actions6Assigned: [{
-        name: '充值'
-      },
+    actions6Assigned: [
       {
         name: '积分',
-
       }
     ]
   },
@@ -301,8 +296,22 @@ Page({
    */
   onLoad: function (options) {
     this.setData({
-      rankPosition: options.rankPosition
+      rankPosition: options.rankPosition,
+      clubId:parseInt(options.clubId)
     })
+if(parseInt(options.clubId)===4){
+  let actions6=[...this.data.actions6,{
+    name: '绑卡'
+  }]
+  let actions6Assigned=[...actions6Assigned,{
+    name: '积分',
+  }]
+}
+    this.setData({
+      actions6:actions6,
+      actions6Assigned:actions6Assigned
+    })
+    console.log('周期函数--监听页面加载    options',this.data.actions6,this.data.actions6Assigned)
   },
 
   /**

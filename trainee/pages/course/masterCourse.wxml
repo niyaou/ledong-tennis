@@ -76,7 +76,7 @@
 
       <i-row style="background-color:#fff">
         <i-col span="24" i-class="blankBg i-cell">
-          <picker bindchange="bindPickerChange" value="{{courtIndex}}" range="{{array}}">
+          <picker bindchange="bindCourtPickerChange" value="{{courtIndex}}" range="{{array}}">
             <view class="picker">
               课程校区：{{array[courtIndex]}}
             </view>

@@ -8,7 +8,7 @@ const {
 } = require('../../dist/base/index');
 Page({
   data: {
-    version: '1.0.7',
+    version: '1.0.8',
     motto: 'Hello World',
     userInfo: {
       nickName: "请登录",
@@ -366,7 +366,7 @@ Page({
   masterNav(e) {
     if (app.globalData.userRankInfo.clubId >= 3) {
       wx.navigateTo({
-        url: '../../pages/master/player'
+        url: '../../pages/master/player?clubId='+app.globalData.userRankInfo.clubId
       })
     }
   },

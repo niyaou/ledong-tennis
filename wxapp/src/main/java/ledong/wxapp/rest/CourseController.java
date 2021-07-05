@@ -82,7 +82,7 @@ public class CourseController {
         }
         String userId = claims.getSubject();
         LdRankInfoVo vo= rankService.getLDUserRank(userId);
-        if (vo.getClubId()!= LdRankInfoVo.MASTER) {
+        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
         HashMap<String,Integer> obj= JSON.parseObject(membersObj,HashMap.class);

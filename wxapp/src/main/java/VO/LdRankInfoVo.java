@@ -26,6 +26,7 @@ public class LdRankInfoVo extends RankInfoVo {
     public static final Integer VERIFIED = 1;
     public static final Integer TEENAGE = 2;
     public static final Integer MASTER = 3;
+    public static final Integer SUPER_MASTER = 4;
     public static final String CLUBID = "clubId";
 
     public Integer getClubId() {

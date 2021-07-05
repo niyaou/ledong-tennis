@@ -16,7 +16,7 @@
       <view slot="content">记录一场比赛</view>
     
       </i-col>
-         <i-col span="12" i-class="col-class">
+         <i-col span="12" i-class="col-class" wx:if="{{clubId===4}}">
           <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addCourse" />
       <view slot="content">记录一节课</view>
       </i-col>

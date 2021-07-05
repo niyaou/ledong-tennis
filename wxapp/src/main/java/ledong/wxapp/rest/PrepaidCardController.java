@@ -60,7 +60,7 @@ public class PrepaidCardController {
         }
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
-        if (vo.getClubId() != LdRankInfoVo.MASTER) {
+        if ( vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
         return new ResponseEntity<Object>(CommonResponse.success(prepaidCardService.addCard(name, openId)),
@@ -83,7 +83,7 @@ public class PrepaidCardController {
         }
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
-        if (vo.getClubId() != LdRankInfoVo.MASTER) {
+        if ( vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
         return new ResponseEntity<Object>(CommonResponse.success(prepaidCardService.assignMember(name, openId)),
@@ -117,16 +117,14 @@ public class PrepaidCardController {
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
         HashMap<String, Object> user = userService.getLDUserInfo(userId);
-        if (vo.getClubId() != LdRankInfoVo.MASTER) {
+        if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
-        // String cardId, String openId, String operatorName, String time, Integer
-        // amount,
-        // String coachId, String courseId, String description
-
+        Object temp=   user.get(UserVo.REALNAME);
+        String temp_s =temp.toString();
         return new ResponseEntity<Object>(
                 CommonResponse.success(prepaidCardService.chargeAnnotation(cardId, openId,
-                        user.get(UserVo.REALNAME).toString(), time, amount, coachId, courseId, description)),
+                        temp_s, time, amount, coachId, courseId, description)),
                 HttpStatus.OK);
     }
 

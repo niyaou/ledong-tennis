@@ -168,11 +168,11 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             vo.setDescription(description);
         }
 
-        LdPrePaidCardVo card = getInstance(cardId);
+        HashMap<String, Object> card = getInstance(cardId);
         if (card != null) {
-           int current =  card.getBalance();
+           int current = (int) card.get(LdPrePaidCardVo.BALANCE);
             current+=amount;
-            card.setBalance(current);
+            card.put(LdPrePaidCardVo.BALANCE,current);
             LdChargeVo chargLog=new LdChargeVo();
             chargLog.setAmount(amount);
             if(!TextUtils.isEmpty(description)){
@@ -192,12 +192,12 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         return null;
     }
 
-    private LdPrePaidCardVo getInstance(String cardId) {
+    private HashMap<String, Object> getInstance(String cardId) {
         HashMap<String, Object> card = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
         if (card == null) {
             return null;
         }
-        return JSON.parseObject(JSON.toJSONString(card), LdPrePaidCardVo.class);
+        return card;
 
     }
 
