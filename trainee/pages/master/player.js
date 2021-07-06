@@ -15,7 +15,7 @@ Page({
   data: {
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
-    clubId:0,
+    clubId: 0,
     visible: false,
     sortTog: true,
     visible5: false,
@@ -98,16 +98,12 @@ Page({
       name: '取消'
     }],
     assignedCard: false, //是否绑卡
-    actions6: [
-      {
-        name: '积分',
-      }
-    ],
-    actions6Assigned: [
-      {
-        name: '积分',
-      }
-    ]
+    actions6: [{
+      name: '积分',
+    }],
+    actions6Assigned: [{
+      name: '积分',
+    }]
   },
   realNameChange(e) {
     console.log('--realNameChange--', e.detail.detail.value)
@@ -209,6 +205,7 @@ Page({
   handleClick5({
     detail
   }) {
+   
     if (detail.index === 0) {
       this.setData({
         visible5: false
@@ -243,10 +240,10 @@ Page({
     detail
   }) {
     console.log('handleClick6', detail)
-    if (detail.index === 0) {
-      if(this.data.assignedCard){
-        console.log('------app.globalData.parentInfo--------',app.globalData.userRankInfo)
-        if( app.globalData.userRankInfo.clubId<4){
+    if (detail.index === 1) {
+      if (this.data.assignedCard) {
+        console.log('------app.globalData.parentInfo--------', app.globalData.userRankInfo)
+        if (app.globalData.userRankInfo.clubId < 4) {
           this.setData({
             visible6: false
           })
@@ -254,9 +251,9 @@ Page({
           return
         }
         wx.navigateTo({
-          url: './charge?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName+'&prepaidCard='+this.data.currentUser.prepaidCard,
+          url: './charge?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName + '&prepaidCard=' + this.data.currentUser.prepaidCard,
         })
-      }else{
+      } else {
         wx.navigateTo({
           url: '../prepaidCard/masterCard?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
         })
@@ -297,21 +294,22 @@ Page({
   onLoad: function (options) {
     this.setData({
       rankPosition: options.rankPosition,
-      clubId:parseInt(options.clubId)
+      clubId: parseInt(options.clubId)
     })
-if(parseInt(options.clubId)===4){
-  let actions6=[...this.data.actions6,{
-    name: '绑卡'
-  }]
-  let actions6Assigned=[...actions6Assigned,{
-    name: '积分',
-  }]
-}
-    this.setData({
-      actions6:actions6,
-      actions6Assigned:actions6Assigned
-    })
-    console.log('周期函数--监听页面加载    options',this.data.actions6,this.data.actions6Assigned)
+    if (parseInt(options.clubId) === 4) {
+      let actions6 = [...this.data.actions6, {
+        name: '绑卡'
+      }]
+      let actions6Assigned = [...this.data.actions6Assigned, {
+        name: '充值',
+      }]
+      this.setData({
+        actions6: actions6,
+        actions6Assigned: actions6Assigned
+      })
+    }
+
+    console.log('周期函数--监听页面加载    options', this.data.actions6, this.data.actions6Assigned)
   },
 
   /**
