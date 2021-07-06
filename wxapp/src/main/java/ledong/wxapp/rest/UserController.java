@@ -240,7 +240,7 @@ public class UserController {
         Claims claims = tokenService.getClaimByToken(authHeader);
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
-        if (vo.getClubId() != LdRankInfoVo.MASTER) {
+        if (vo.getClubId() != LdRankInfoVo.MASTER && vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
         return new ResponseEntity<Object>(CommonResponse.success(userService.ldRealName(openId, realName)),
