@@ -1,8 +1,9 @@
 // pages/matches/matchlist.js
 const app = getApp()
 var http = require('../../utils/http.js')
+var util = require('../../utils/util.js')
 // var compare=require('../../utils/util.js')
-const chooseLocation = requirePlugin('chooseLocation');
+// const chooseLocation = requirePlugin('chooseLocation');
 Page({
   /**
    * 页面的初始数据
@@ -37,6 +38,10 @@ Page({
     players: [],
 
     slideButtons: [],
+  },
+  formatTime(time,pattern){
+    console.log(util.stringDateFormat('YYYY-mm-dd HH:MM',time))
+    return util.stringDateFormat('YYYY-mm-dd HH:MM',time)
   },
   onChange(event) {
     const detail = event.detail;
@@ -120,11 +125,6 @@ Page({
 getCardLogs(){
   let url = 'prepaidCard/ld/finacialLogs?cardId='+this.data.prepaidCard
   http.getReq(`${url}`, app.globalData.jwt, (res) => {
-    // this.setData({
-    //   players: res.data .filter(p=>{return p.clubId===app.globalData.userRankInfo.clubId}).sort((a, b) => {
-    //     return a['position'] - b['position']
-    //   })
-    // })
     if(res.code===0){
       let result=JSON.parse(res.data)
       result.forEach(r=>{

@@ -1,4 +1,3 @@
-<!--pages/matches/matchlist.wxml-->
 <view class="containerbg">
   <i-modal title="评价你的对手" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose1">
     <i-tag wx:for="{{tags}}"  wx:key="{{index}}" 
@@ -27,13 +26,12 @@
        <i-row style="background-color:#fff;width:100%;" wx:for="{{spendLogs}}">
         <i-col span="24" i-class="blankBg i-cell output">
           {{item.description}} 消费 {{item.charge}}
-        <i-divider height="12" content=""></i-divider>
+        <!-- <i-divider height="12" content=""></i-divider> -->
         </i-col>
         </i-row>
         <i-row style="background-color:#fff;width:100%;" wx:for="{{chargeLogs}}">
         <i-col span="24" i-class="blankBg i-cell input">
           {{item.time}} 充值 {{item.amount}} 备注{{item.description}}
-        <i-divider height="12" content=""></i-divider>
         </i-col>
         </i-row>
 

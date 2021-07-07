@@ -1,4 +1,3 @@
-<!--pages/matches/matchlist.wxml-->
 <view class="containerbg">
   <!-- <i-modal title="分数调整" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose1">
     <i-input value="{{ score }}" type="number" title="调分" placeholder="请输入需要调整的分数"  disabled="{{visible}}"/>
@@ -7,35 +6,24 @@
   </i-modal> -->
   <mp-navigation-bar title="选手排名" back="{{true}}" size="{{large}}"></mp-navigation-bar>
   <i-card full="{{true}}" title="" extra="本赛季总共{{players.length}}位选手参赛" thumb="../../icon/player.jpg">
-
-
     <view slot="content">
-    
         点击选手图标，可以查看充值消课记录
     </view>
     <view slot="footer">
-  
         <i-panel title="group-水果"> 
       <i-icon  bindtap="navigateTo" type="{{filterType===1?'addressbook_fill':'addressbook'}}"  size="40" style="margin-left:10px"  data-variable="{{1}}"/>
       <i-icon  bindtap="navigateTo" type="{{filterType===2?'group_fill':'group'}}"  size="40" style="margin-left:10px"  data-variable="{{2}}" />
       <i-icon  bindtap="navigateTo" type="{{filterType===0?'success_fill':'success'}}"  size="40" style="margin-left:10px"  data-variable="{{0}}" />
      </i-panel> 
-  
- 
     </view>
   </i-card>
-
   <view class="weui-flex">
     <view class="weui-flex__item">
-
-
     </view>
   </view>
-
   <view class="page__bd ">
     <view class="weui-flex">
       <view class="weui-flex__item">
-
         <scroll-view scroll-y style="width: 100%; height: 30.5rem;">
           <!-- <view wx:for="{{slideButtons}}"> -->
           <view wx:for="{{players}}">

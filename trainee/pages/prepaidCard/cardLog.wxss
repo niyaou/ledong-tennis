@@ -1,13 +1,11 @@
 /* pages/opponent/opponent.wxss */
 
 .noneborder{
-
   background: #5751dc;
   /* border: 1rpx solid #dddee1; */
   border: 0px;
   border-radius: 5px
 }
-
 .tags{
   margin:10rpx;
 }
@@ -53,7 +51,6 @@
 .output{
   color:rgb(100, 201, 18)
 }
-
 .input{
   color:rgb(204, 69, 28)
 }

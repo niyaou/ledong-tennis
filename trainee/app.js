@@ -1,5 +1,6 @@
-// app.js
-//app.js
+// ,
+// "pages/prepaidCard/cardLog"
+  // "pages/master/exploreMember"
 const SHORTINTERVAL=2000
 const SLOWINTERVAL=4000
 App({

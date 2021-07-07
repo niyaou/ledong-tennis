@@ -15,9 +15,9 @@
     "pages/master/create",
     "pages/prepaidCard/masterCard",
     "pages/master/charge",
-    "pages/prepaidCard/cardLog",
-    "pages/master/exploreMember"
+    "pages/prepaidCard/cardLog"
   ],
+
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",

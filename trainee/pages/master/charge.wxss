@@ -49,7 +49,10 @@ width:auto
   left: 15px;
   right: 0
 }
-
+.alignSwitch{
+  height: 110rpx;
+  line-height: 110rpx;
+}
 .col-bg{
   background-color: #fff;
   height:30px;

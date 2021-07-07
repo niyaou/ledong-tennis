@@ -8,7 +8,7 @@ const {
 } = require('../../dist/base/index');
 Page({
   data: {
-    version: '1.0.9',
+    version: '1.1.0',
     motto: 'Hello World',
     userInfo: {
       nickName: "请登录",

@@ -20,6 +20,7 @@ Page({
     text: '',
     coachSpend: 0,
     descript: '',
+    sortTog: true,
     courseTime: '', //课程时长
     time: util.formatTime(new Date()),
     experinced: false,
@@ -60,6 +61,12 @@ Page({
   handleModalCancel(e) {
     this.setData({
       visible: false
+    })
+  },
+  onSortChange(event) {
+    this.setData({
+      sortTog: event.detail.value,
+      coursFee:-this.data.coursFee
     })
   },
   pRemove(e) {
