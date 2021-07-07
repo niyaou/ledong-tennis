@@ -156,38 +156,39 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,
             String coachId, String courseId, String description) {
         LdChargeVo vo = new LdChargeVo();
-         String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         vo.setAmount(amount);
         vo.setTime(date);
         vo.setOpenId(openId);
         vo.setOwner(coachId);
-        if(!TextUtils.isEmpty(courseId)){
+        if (!TextUtils.isEmpty(courseId)) {
             vo.setCourse(courseId);
         }
-        if(!TextUtils.isEmpty(description)){
+        if (!TextUtils.isEmpty(description)) {
             vo.setDescription(description);
         }
 
         HashMap<String, Object> card = getInstance(cardId);
         if (card != null) {
-           int current = (int) card.get(LdPrePaidCardVo.BALANCE);
-            current+=amount;
-            card.put(LdPrePaidCardVo.BALANCE,current);
-            LdChargeVo chargLog=new LdChargeVo();
+            int current = (int) card.get(LdPrePaidCardVo.BALANCE);
+            current += amount;
+            card.put(LdPrePaidCardVo.BALANCE, current);
+            LdChargeVo chargLog = new LdChargeVo();
             chargLog.setAmount(amount);
-            if(!TextUtils.isEmpty(description)){
+            if (!TextUtils.isEmpty(description)) {
                 chargLog.setDescription(description);
             }
             chargLog.setTime(date);
             chargLog.setOwner(coachId);
 
-            String id = SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,LdPrePaidCardVo.BALANCE,current,cardId);
-             if(TextUtils.isEmpty(id)){
-                 return null;
-             }
+            String id = SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,
+                    LdPrePaidCardVo.BALANCE, current, cardId);
+            if (TextUtils.isEmpty(id)) {
+                return null;
+            }
 
-            return SearchApi.appendNestedFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.CHARGE,
-                    JSON.parseObject(JSON.toJSONString(chargLog), HashMap.class), cardId);
+            return SearchApi.appendNestedFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,
+                    LdPrePaidCardVo.CHARGE, JSON.parseObject(JSON.toJSONString(chargLog), HashMap.class), cardId);
         }
         return null;
     }
@@ -204,27 +205,31 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     @Override
     public Object finacialLogs(String cardId, String startTime, String endTime) {
         HashMap<String, Object> vo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
-        Integer balance= (Integer) vo.get(LdPrePaidCardVo.BALANCE);
-        List<HashMap<String,Object>> spend= (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.SPENDING);
+        Integer balance = (Integer) vo.get(LdPrePaidCardVo.BALANCE);
+        List<HashMap<String, Object>> spend = (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.SPENDING);
 
-        HashMap<String,Object> bm=new HashMap<String,Object>();
-        bm.put(LdPrePaidCardVo.BALANCE,balance);
+        HashMap<String, Object> bm = new HashMap<String, Object>();
+        bm.put(LdPrePaidCardVo.BALANCE, balance);
         if (spend.size() > 0) {
             spend.stream().forEach(s -> {
 
-                LdSpendingVo stemp= JSON.parseObject(JSON.toJSONString(s),LdSpendingVo.class);
+                LdSpendingVo stemp = JSON.parseObject(JSON.toJSONString(s), LdSpendingVo.class);
                 LdCourseVo course = courseService.getCourseById(stemp.getCourse());
-                HashMap<String, Object> ld=userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
+                HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
                 String trainee = (String) ld.get(UserVo.REALNAME);
                 String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
-                String desript=TextUtils.isEmpty(stemp.getDescription())?"":(stemp.getDescription() + "   |   ");
-                stemp.setDescription(desript + coachName + " " + course.getStart() + " 在 "
-                        + course.getCourt() +" 给 "+ trainee+" 上课 " + course.getSpendingTime() + " 小时");
-                s.put(LdSpendingVo.DESCRIPTION,stemp.getDescription());
+                // String desript = TextUtils.isEmpty(stemp.getDescription()) ? "" :
+                // (stemp.getDescription() + " | ");
+                String desript = "";
+                stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
+                        + course.getSpendingTime() + " 小时");
+                s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
             });
         }
-        List<HashMap<String,Object>> charge= (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.CHARGE);
-        spend.addAll(charge);
+        if (vo.get(LdPrePaidCardVo.CHARGE) != null) {
+            List<HashMap<String, Object>> charge = (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.CHARGE);
+            spend.addAll(charge);
+        }
         spend.add(bm);
         return JSON.toJSONString(spend);
     }
