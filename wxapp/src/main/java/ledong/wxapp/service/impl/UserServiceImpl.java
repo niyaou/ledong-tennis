@@ -139,6 +139,7 @@ public class UserServiceImpl implements IUserService {
         user.setCreateTime(createTime);
         user.setAvator(avator);
         user.setNickName(name);
+        user.setRealName(openId);
         user.setOpenId(openId);
         logger.info(user.toString());
         try {
@@ -151,9 +152,7 @@ public class UserServiceImpl implements IUserService {
         String userId = SearchApi.insertDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(user), openId);
         logger.info(userId);
         Optional.ofNullable(openId).ifPresent(id -> {
-            logger.info("before create tennage");
             rankService.createLDTeenageRankInfo(parent, openId);
-            logger.info("after create tennage");
         });
         logger.info("after create tennage   2" + userId);
         return userId;
