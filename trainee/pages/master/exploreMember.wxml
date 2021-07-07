@@ -10,29 +10,12 @@
 
 
     <view slot="content">
-    <i-row>
-       <i-col span="12" i-class="col-class" wx:if="{{clubId===3}}">  
-        <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addMatch" />
-      <view slot="content">记录一场比赛</view>
-      </i-col>
-      <i-col span="12" i-class="col-class" wx:if="{{clubId===4}}">  
-        <i-icon slot="content" type="redpacket" size="40" color="#7fb80e" bindtap="cardExplore" />
-      <view slot="content">查看会员卡记录</view>
-      </i-col>
-         <i-col span="12" i-class="col-class" wx:if="{{clubId===4}}">
-          <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addCourse" />
-      <view slot="content">记录一节课</view>
-      </i-col>
-      </i-row>
-        点击选手图标，可以对选手进行评价
+    
+        点击选手图标，可以查看充值消课记录
     </view>
     <view slot="footer">
   
         <i-panel title="group-水果"> 
-         <!-- <i-switch value="{{sortTog}}" size="large" bind:change="onSortChange" slot="footer">
-        <view slot="open">比分</view>
-        <view slot="close">名称</view>
-      </i-switch> -->
       <i-icon  bindtap="navigateTo" type="{{filterType===1?'addressbook_fill':'addressbook'}}"  size="40" style="margin-left:10px"  data-variable="{{1}}"/>
       <i-icon  bindtap="navigateTo" type="{{filterType===2?'group_fill':'group'}}"  size="40" style="margin-left:10px"  data-variable="{{2}}" />
       <i-icon  bindtap="navigateTo" type="{{filterType===0?'success_fill':'success'}}"  size="40" style="margin-left:10px"  data-variable="{{0}}" />
@@ -53,7 +36,7 @@
     <view class="weui-flex">
       <view class="weui-flex__item">
 
-        <scroll-view scroll-y style="width: 100%; height: 27.5rem;">
+        <scroll-view scroll-y style="width: 100%; height: 30.5rem;">
           <!-- <view wx:for="{{slideButtons}}"> -->
           <view wx:for="{{players}}">
             <i-card hasSlot="{{false}}" class="noneborder" full="{{true}}" title="名:{{item.realName}} | {{item.nickName}}"

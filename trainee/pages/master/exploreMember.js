@@ -15,7 +15,7 @@ Page({
   data: {
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
-    clubId: 0,
+    clubId:0,
     visible: false,
     sortTog: true,
     visible5: false,
@@ -98,12 +98,16 @@ Page({
       name: '取消'
     }],
     assignedCard: false, //是否绑卡
-    actions6: [{
-      name: '积分',
-    }],
-    actions6Assigned: [{
-      name: '积分',
-    }]
+    actions6: [
+      {
+        name: '积分',
+      }
+    ],
+    actions6Assigned: [
+      {
+        name: '积分',
+      }
+    ]
   },
   realNameChange(e) {
     console.log('--realNameChange--', e.detail.detail.value)
@@ -190,11 +194,7 @@ Page({
       url: '../course/masterCourse',
     })
   },
-  cardExplore(){
-    wx.navigateTo({
-      url: '../master/exploreMember',
-    })
-  },
+
   addMatch() {
     if (this.data.filterType === 0) {
       $Toast({
@@ -210,7 +210,6 @@ Page({
   handleClick5({
     detail
   }) {
-   
     if (detail.index === 0) {
       this.setData({
         visible5: false
@@ -245,10 +244,10 @@ Page({
     detail
   }) {
     console.log('handleClick6', detail)
-    if (detail.index === 1) {
-      if (this.data.assignedCard) {
-        console.log('------app.globalData.parentInfo--------', app.globalData.userRankInfo)
-        if (app.globalData.userRankInfo.clubId < 4) {
+    if (detail.index === 0) {
+      if(this.data.assignedCard){
+        console.log('------app.globalData.parentInfo--------',app.globalData.userRankInfo)
+        if( app.globalData.userRankInfo.clubId<4){
           this.setData({
             visible6: false
           })
@@ -256,9 +255,9 @@ Page({
           return
         }
         wx.navigateTo({
-          url: './charge?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName + '&prepaidCard=' + this.data.currentUser.prepaidCard,
+          url: './charge?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName+'&prepaidCard='+this.data.currentUser.prepaidCard,
         })
-      } else {
+      }else{
         wx.navigateTo({
           url: '../prepaidCard/masterCard?id=' + this.data.currentUser.openId + '&name=' + this.data.currentUser.nickName,
         })
@@ -274,24 +273,19 @@ Page({
   },
   handleTapped(e) {
     console.log(e.currentTarget.dataset.info)
-    if (e.currentTarget.dataset.info.clubId === 0) {
-      this.setData({
-        visible5: true,
-        currentUser: e.currentTarget.dataset.info.openId
-      })
-    } else {
       let card = e.currentTarget.dataset.info.prepaidCard
-
-      this.setData({
-        assignedCard: typeof card !== 'undefined' && card.length > 0,
-        visible6: true,
-        currentUser: e.currentTarget.dataset.info
-      })
-
-
-
-    }
-
+     let  assignedCard= typeof card !== 'undefined' && card.length > 0
+     if(assignedCard){
+       wx.navigateTo({
+         url: '../../pages/prepaidCard/cardLog?cardId='+card
+        })
+      }else{
+        $Toast({
+          content: '请先绑卡',
+          type: 'warning'
+        });
+      }
+    
   },
   /**
    * 生命周期函数--监听页面加载
@@ -299,22 +293,21 @@ Page({
   onLoad: function (options) {
     this.setData({
       rankPosition: options.rankPosition,
-      clubId: parseInt(options.clubId)
+      clubId:parseInt(options.clubId)
     })
-    if (parseInt(options.clubId) === 4) {
-      let actions6 = [...this.data.actions6, {
-        name: '绑卡'
-      }]
-      let actions6Assigned = [...this.data.actions6Assigned, {
-        name: '充值',
-      }]
-      this.setData({
-        actions6: actions6,
-        actions6Assigned: actions6Assigned
-      })
-    }
-
-    console.log('周期函数--监听页面加载    options', this.data.actions6, this.data.actions6Assigned)
+if(parseInt(options.clubId)===4){
+  let actions6=[...this.data.actions6,{
+    name: '绑卡'
+  }]
+  let actions6Assigned=[...actions6Assigned,{
+    name: '积分',
+  }]
+}
+    this.setData({
+      actions6:actions6,
+      actions6Assigned:actions6Assigned
+    })
+    console.log('周期函数--监听页面加载    options',this.data.actions6,this.data.actions6Assigned)
   },
 
   /**

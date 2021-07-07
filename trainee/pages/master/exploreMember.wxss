@@ -1,0 +1,32 @@
+/* pages/opponent/opponent.wxss */
+
+.noneborder{
+
+  background: #5751dc;
+  /* border: 1rpx solid #dddee1; */
+  border: 0px;
+  border-radius: 5px
+}
+
+.tags{
+  margin:10rpx;
+}
+
+.avator{
+  border-radius: 10px;
+}
+.item{
+  width:50%;
+}
+
+.flex{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.array{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

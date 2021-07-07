@@ -215,6 +215,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
                 LdSpendingVo stemp = JSON.parseObject(JSON.toJSONString(s), LdSpendingVo.class);
                 LdCourseVo course = courseService.getCourseById(stemp.getCourse());
+                if(course!=null){
                 HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
                 String trainee = (String) ld.get(UserVo.REALNAME);
                 String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
@@ -224,6 +225,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                 stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
                         + course.getSpendingTime() + " 小时");
                 s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
+                }
             });
         }
         if (vo.get(LdPrePaidCardVo.CHARGE) != null) {
