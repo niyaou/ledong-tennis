@@ -1,0 +1,51 @@
+/* pages/opponent/opponent.wxss */
+
+.noneborder{
+
+  background: #5751dc;
+  /* border: 1rpx solid #dddee1; */
+  border: 0px;
+  border-radius: 5px
+}
+
+.tags{
+  margin:10rpx;
+}
+
+.avator{
+  border-radius: 10px;
+}
+.item{
+  width:50%;
+}
+
+.flex{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.array{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-cell {
+  background: #fff;
+height: 4rem;
+line-height: 4rem;
+border-radius: 5%;
+text-align: center;
+}
+
+
+.flex-card{
+  justify-items: center;
+}
+.input{
+  color:rgb(100, 201, 18)
+}
+.output {
+  color:rgb(204, 69, 28)
+}

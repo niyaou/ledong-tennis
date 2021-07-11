@@ -11,17 +11,21 @@
 
     <view slot="content">
     <i-row>
-       <i-col span="12" i-class="col-class" wx:if="{{clubId===3}}">  
+       <i-col span="8" i-class="col-class" wx:if="{{clubId===3}}">  
         <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addMatch" />
       <view slot="content">记录一场比赛</view>
       </i-col>
-      <i-col span="12" i-class="col-class" wx:if="{{clubId===4}}">  
+      <i-col span="8" i-class="col-class" wx:if="{{clubId===4}}">  
         <i-icon slot="content" type="redpacket" size="40" color="#7fb80e" bindtap="cardExplore" />
       <view slot="content">查看会员卡记录</view>
       </i-col>
-         <i-col span="12" i-class="col-class" wx:if="{{clubId===4}}">
+         <i-col span="8" i-class="col-class" wx:if="{{clubId===4}}">
           <i-icon slot="content" type="add" size="40" color="#7fb80e" bindtap="addCourse" />
       <view slot="content">记录一节课</view>
+      </i-col>
+      <i-col span="8" i-class="col-class" wx:if="{{clubId===4}}">
+          <i-icon slot="content" type="financial_fill" size="40" color="#7fb80e" bindtap="financialPage" />
+      <view slot="content">经营数据</view>
       </i-col>
       </i-row>
         点击选手图标，可以对选手进行评价

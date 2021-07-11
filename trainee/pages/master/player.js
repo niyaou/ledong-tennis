@@ -190,6 +190,11 @@ Page({
       url: '../course/masterCourse',
     })
   },
+  financialPage(){
+    wx.navigateTo({
+      url: './financial',
+    })
+  },
   cardExplore(){
     wx.navigateTo({
       url: '../master/exploreMember',

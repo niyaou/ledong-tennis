@@ -17,6 +17,15 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.metrics.AvgAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,7 +124,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
     @Override
     public String settleAccount(String courseId, String startTime, Double spendTime,
-            HashMap<String, Integer> membersObj) {
+                                HashMap<String, Integer> membersObj) {
         // log each spend
         ArrayList<String> members = new ArrayList<>();
         HashMap<String, Integer> cardCharge = new HashMap<>();
@@ -154,7 +163,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
     @Override
     public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,
-            String coachId, String courseId, String description) {
+                                   String coachId, String courseId, String description) {
         LdChargeVo vo = new LdChargeVo();
         String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         vo.setAmount(amount);
@@ -215,14 +224,14 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
                 LdSpendingVo stemp = JSON.parseObject(JSON.toJSONString(s), LdSpendingVo.class);
                 LdCourseVo course = courseService.getCourseById(stemp.getCourse());
-                if(course!=null){
-                HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
-                String trainee = (String) ld.get(UserVo.REALNAME);
-                String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
-                String desript = TextUtils.isEmpty(stemp.getDescription()) ? "" :  stemp.getDescription() ;
-                stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
-                        + course.getSpendingTime() + " 小时, 备注 "+desript);
-                s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
+                if (course != null) {
+                    HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
+                    String trainee = (String) ld.get(UserVo.REALNAME);
+                    String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
+                    String desript = TextUtils.isEmpty(stemp.getDescription()) ? "" : stemp.getDescription();
+                    stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
+                            + course.getSpendingTime() + " 小时, 备注 " + desript);
+                    s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
                 }
             });
         }
@@ -233,5 +242,6 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         spend.add(bm);
         return JSON.toJSONString(spend);
     }
+
 
 }

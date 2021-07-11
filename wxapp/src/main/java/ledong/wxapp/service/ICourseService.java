@@ -41,4 +41,10 @@ public interface ICourseService {
      */
     public LdCourseVo getCourseById(String courseId);
 
+    /**
+     * daily statistics
+     * @return
+     */
+    public Object dailyStatistics();
+
 }

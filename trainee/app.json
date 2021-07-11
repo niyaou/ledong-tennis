@@ -1,5 +1,6 @@
 {
   "pages": [
+
     "pages/index/index",
     "pages/course/masterCourse",
     "pages/schedule/schedule",
@@ -15,9 +16,10 @@
     "pages/master/create",
     "pages/prepaidCard/masterCard",
     "pages/master/charge",
+    "pages/master/financial",
     "pages/prepaidCard/cardLog"
-  ],
 
+  ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",

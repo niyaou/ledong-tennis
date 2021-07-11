@@ -92,4 +92,24 @@ public class CourseController {
     }
 
 
+
+    @RequestMapping(value = "/ld/courseStatistic", method = RequestMethod.POST)
+    @ApiOperation(value = "courseStatistic ", notes = "")
+    @ApiImplicitParams({
+    })
+    public ResponseEntity<?> dailyStatistics(@RequestHeader("Authorization") String authHeader
+    ) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        LdRankInfoVo vo= rankService.getLDUserRank(userId);
+        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(courseService.dailyStatistics()), HttpStatus.OK);
+    }
+
 }

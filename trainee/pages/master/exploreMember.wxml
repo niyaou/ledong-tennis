@@ -4,7 +4,7 @@
     <i-input value="{{ descript }}" title="备注" autofocus placeholder="调分说明" disabled="{{visible}}"/>
      <div slot="footer"></div>
   </i-modal> -->
-  <mp-navigation-bar title="选手排名" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+  <mp-navigation-bar title="会员卡" back="{{true}}" size="{{large}}"></mp-navigation-bar>
   <i-card full="{{true}}" title="" extra="本赛季总共{{players.length}}位选手参赛" thumb="../../icon/player.jpg">
     <view slot="content">
         点击选手图标，可以查看充值消课记录

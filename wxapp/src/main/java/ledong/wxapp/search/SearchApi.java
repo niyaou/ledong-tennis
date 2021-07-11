@@ -42,6 +42,7 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -1005,6 +1006,22 @@ public class SearchApi {
         }
         return null;
     }
+
+    public static SearchResponse dailyFinancialAggs(String indexName, AggregationBuilder aggs ) {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().size(0);
+        searchSourceBuilder.aggregation(aggs);
+        searchRequest.source(searchSourceBuilder);
+        try {
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            return searchResponse;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return null;
+    }
+
+
 
     public static SearchResponse fileStatiscByParams(String indexName, QueryBuilder... queries) {
         SearchRequest searchRequest = new SearchRequest(indexName);

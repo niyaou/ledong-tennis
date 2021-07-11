@@ -1,0 +1,52 @@
+<view class="containerbg">
+  <!-- <i-modal title="分数调整" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose1">
+    <i-input value="{{ score }}" type="number" title="调分" placeholder="请输入需要调整的分数"  disabled="{{visible}}"/>
+    <i-input value="{{ descript }}" title="备注" autofocus placeholder="调分说明" disabled="{{visible}}"/>
+     <div slot="footer"></div>
+  </i-modal> -->
+  <mp-navigation-bar title="经营数据" back="{{true}}" size="{{large}}"></mp-navigation-bar>
+  <i-card full="{{true}}" title="" extra="经营数据指标" thumb="../../icon/player.jpg">
+    <view slot="content">
+   经营统计数据 | 时间 {{time}}
+    </view>
+    <view slot="footer">
+
+    </view>
+  </i-card>
+  <view class="weui-flex">
+    <view class="weui-flex__item ">
+      <i-row i-class="flex-card">
+        <i-col span="8" i-class="i-cell  ">
+     课时费     <span class="input">￥{{incoming}}</span>
+      </i-col>
+      <i-col span="8" i-class="i-cell">
+      </i-col>
+      <i-col span="8" i-class="i-cell">
+    净收入   <span class="input">￥{{earned}}</span>
+
+      </i-col>
+      <i-col span="8" i-class="i-cell  ">
+    场地费     <span class="output">￥{{courtSpend}}</span>
+    
+      </i-col>
+      <i-col span="8" i-class="i-cell">
+      </i-col>
+      <i-col span="8" i-class="i-cell">
+     教练费   <span class="output">￥{{coachSpend}}</span>
+      </i-col>
+      </i-row>
+
+    </view>
+  </view>
+  <view class="page__bd ">
+    <view class="weui-flex">
+      <view class="weui-flex__item">
+       
+      </view>
+    </view>
+
+
+<i-toast id="toast" />
+  </view>
+
+</view>
