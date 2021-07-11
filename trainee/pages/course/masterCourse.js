@@ -261,6 +261,7 @@ Page({
       spendingTime:  this.data.timeArray[this.data.timeIndex] ,
       courtSpend: this.data.coursFee,
       coachSpend: this.data.coachSpend,
+      descript:this.data.descript,
       court: this.data.array[this.data.courtIndex],
       grade: this.data.gradeArray[this.data.gradeIndex],
       membersObj: JSON.stringify( membobj),
