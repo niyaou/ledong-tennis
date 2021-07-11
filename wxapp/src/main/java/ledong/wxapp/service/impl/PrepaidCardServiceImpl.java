@@ -219,11 +219,10 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                 HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
                 String trainee = (String) ld.get(UserVo.REALNAME);
                 String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
-                // String desript = TextUtils.isEmpty(stemp.getDescription()) ? "" :
-                // (stemp.getDescription() + " | ");
-                String desript = "";
+                String desript = TextUtils.isEmpty(stemp.getDescription()) ? "" :  stemp.getDescription() ;
+                // String desript = "";
                 stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
-                        + course.getSpendingTime() + " 小时");
+                        + course.getSpendingTime() + " 小时, 备注 "+desript);
                 s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
                 }
             });
