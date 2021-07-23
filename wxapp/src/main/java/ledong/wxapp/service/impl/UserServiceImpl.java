@@ -432,7 +432,7 @@ public class UserServiceImpl implements IUserService {
             userlist.sort((HashMap<String, Object> o1, HashMap<String, Object> o2) -> {
                 return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.REALNAME), o2.get(UserVo.REALNAME));
             });
-            userlist= (LinkedList<HashMap<String, Object>>) userlist.stream().filter((HashMap<String, Object> u)->{return u.get(UserVo.PREPAIDCARD)!=null;}).collect(Collectors.toList());
+            userlist= (LinkedList<HashMap<String, Object>>) userlist.stream().filter((HashMap<String, Object> u)->{return u.get(UserVo.PREPAIDCARD)!=null;}).collect(Collectors.toCollection(LinkedList::new));
             return userlist;
         }
         return null;
