@@ -206,7 +206,10 @@ Page({
     http.getReq(`${url}`, app.globalData.jwt, (res) => {
       console.log(res)
       if (res.code === 0) {
-
+        res.data= res.data.map(p=>{
+          p.realName = p.realName.replace('1','')
+          return p
+        })
         this.setData({
           players: res.data
         })
