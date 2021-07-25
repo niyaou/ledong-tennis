@@ -58,7 +58,9 @@ public class CourseServiceImpl implements ICourseService {
         course.setCourt(court);
         course.setGrade(grade);
         course.setCoachSpend(coachSpend);
-
+        if(!TextUtils.isEmpty(descript)){
+            course.setDescript(descript);
+        }
         ArrayList<String> members = new ArrayList<>();
         Integer incoming = 0;
         for (String m : membersObj.keySet()) {
@@ -69,7 +71,6 @@ public class CourseServiceImpl implements ICourseService {
         course.setMember(members.toArray(mA));
         course.setIncoming(incoming);
         course.setEarned(incoming - coachSpend - courtSpend);
-        logger.info(JSON.toJSONString(course));
         String id = SearchApi.insertDocument(DataSetConstant.LD_COURSE_INFORMATION, JSON.toJSONString(course));
         if (TextUtils.isEmpty(id)) {
             return null;

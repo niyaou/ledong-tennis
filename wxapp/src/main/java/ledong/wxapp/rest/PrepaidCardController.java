@@ -148,4 +148,30 @@ public class PrepaidCardController {
                 CommonResponse.success(prepaidCardService.finacialLogs(cardId, startTime, endTime)), HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = "/ld/chargeLogRetreat", method = RequestMethod.POST)
+    @ApiOperation(value = "chargeLogRetreat ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "time", value = "time ", required = true, dataType = "string", paramType = "query"),
+        })
+    public ResponseEntity<?> chargeLogRetreat(@RequestHeader("Authorization") String authHeader,
+                                          @RequestParam(value = "cardId", required = true) String cardId,
+                                          @RequestParam(value = "time", required = true) String time) throws AuthenticationException {
+
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+        String userId = claims.getSubject();
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        HashMap<String, Object> user = userService.getLDUserInfo(userId);
+        if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(prepaidCardService.chargeLogRetreat(cardId, time)), HttpStatus.OK);
+    }
+
 }

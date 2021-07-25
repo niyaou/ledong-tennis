@@ -195,7 +195,8 @@ Page({
       url: './financial',
     })
   },
-  cardExplore(){
+  cardExplore(e){
+    console.log('---cardExplore---')
     wx.navigateTo({
       url: '../master/exploreMember',
     })

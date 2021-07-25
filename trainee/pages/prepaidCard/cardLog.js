@@ -2,6 +2,9 @@
 const app = getApp()
 var http = require('../../utils/http.js')
 var util = require('../../utils/util.js')
+const {
+  $Toast
+} = require('../../dist/base/index');
 // var compare=require('../../utils/util.js')
 // const chooseLocation = requirePlugin('chooseLocation');
 Page({
@@ -16,6 +19,7 @@ Page({
     balance: 0,
     prepaidCard:'',
     current: '没参加比赛',
+    selectCharge:{},
     chargeLogs:[],
     spendLogs:[],
     currentTarget: [],
@@ -36,7 +40,6 @@ Page({
       }
     ],
     players: [],
-
     slideButtons: [],
   },
   formatTime(time,pattern){
@@ -50,35 +53,31 @@ Page({
     })
     console.log(event.detail)
   },
-
-  handleClose1() {
+  showModalRetreat(e){
+    this.setData({
+      visible: true,
+      selectCharge: e.target.dataset.log
+    })
+  },
+  handleClose() {
     this.setData({
       visible: false
     })
   },
 
   handleOk() {
-    //更新
-    let tags = ''
-    this.data.tags.map(t => {
-      if (t.checked) {
-        if (tags === '') {
-          tags += t.name
-        } else {
-          tags += ',' + t.name
-        }
-      }
-    })
-  
-    let url = 'rank/updateUserTags?tags=' + tags + '&openId=' + this.data.players[this.data.currentIndex].openId
-    http.postReq(`${url}`, app.globalData.jwt, {}, (res) => {
+    let url = 'prepaidCard/ld/chargeLogRetreat'
+    let params={cardId:this.data.prepaidCard,time:this.data.selectCharge.time}
+    http.postReq(`${url}`, app.globalData.jwt, params, (res) => {
       if (res.code === 0) {
-        this.data.players[this.data.currentIndex].polygen = tags
-        this.setData({
-          players: this.data.players.filter(p=>{return clubId.clubId===app.globalData.userRankInfo.clubId})
-        })
+        this.setData({chargeLogs:[],spendLogs:[]})
+        this.getCardLogs()
+      }else{
+        $Toast({
+          content: '失败，请重试',
+          type: 'error'
+        });
       }
-      console.log(res)
     })
 
     this.setData({
@@ -101,14 +100,12 @@ Page({
       tags: tags
     })
     console.log(e.detail, this.data.players[e.detail.index])
-
-
-
   },
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    console.log('onload   ------- ')
     console.log('onload ',options)
     this.setData({
       prepaidCard: options.cardId
@@ -119,7 +116,7 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
+    console.log('onReady   ------- ')
   },
 
 getCardLogs(){
@@ -139,8 +136,6 @@ getCardLogs(){
         }
       })
     }
-    console.log(JSON.parse(res.data))
-
   })
 },
 
@@ -149,9 +144,13 @@ getCardLogs(){
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    console.log('onShow   ------- ')
     this.getCardLogs()
   },
 
+  onCreate:function(){
+    console.log('onCreate   ------- ')
+  },
 
   /**
    * 生命周期函数--监听页面隐藏

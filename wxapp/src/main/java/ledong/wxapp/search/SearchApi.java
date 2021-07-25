@@ -559,6 +559,33 @@ public class SearchApi {
         return sortPropertiesQueries;
     }
 
+
+    /**
+     * update by script
+     * @param indexName
+     * @param id
+     * @param script_str
+     * @param params
+     * @return
+     */
+    public static String updateIndexByScript(String indexName, String id, String script_str, Map<String, Object> params) {
+        UpdateResponse updateResponse = null;
+        Script script = new Script(ScriptType.INLINE, Script.DEFAULT_SCRIPT_LANG, script_str, params);
+        try {
+            UpdateRequest updateRequest = new UpdateRequest(indexName, id);
+            updateRequest.script(script);
+            updateRequest.upsertRequest();
+            updateRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
+            updateResponse = client.update(updateRequest, RequestOptions.DEFAULT);
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+
+        }
+        return updateResponse.getResult().equals(Result.UPDATED) ? updateResponse.getId() : null;
+    }
+
+
     /**
      * @param index
      * @param type
@@ -588,14 +615,14 @@ public class SearchApi {
             // 如果存在该字段,会比较传入的对象是否存在于list中存在的对象相等，如果不相等就添加，相等就更新
             script_str = "if(!ctx._source.containsKey('" + field + "'))" + "{ctx._source." + field + "=[params." + field
                     + "]} " + "else { ctx._source." + field + ".add(params." + field + ")}";
-
+        }
             script = new Script(ScriptType.INLINE, Script.DEFAULT_SCRIPT_LANG, script_str, params);
 
             // logger.info("script:\n"+script);
             // log.warn(String.format("错误信息 ： %s", script_str));
 
             // log.warn(String.format("params ： %s", script.getParams()));
-        }
+
 
         try {
             UpdateRequest updateRequest = new UpdateRequest(indexName, id);

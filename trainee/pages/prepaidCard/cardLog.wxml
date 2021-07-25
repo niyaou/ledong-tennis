@@ -1,4 +1,5 @@
 <view class="containerbg">
+  <i-toast id="toast" />
   <i-modal title="评价你的对手" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose1">
     <i-tag wx:for="{{tags}}"  wx:key="{{index}}" 
     bindchange="onChange" 
@@ -30,7 +31,7 @@
         </i-col>
         </i-row>
         <i-row style="background-color:#fff;width:100%;" wx:for="{{chargeLogs}}">
-        <i-col span="24" i-class="blankBg i-cell input">
+        <i-col span="24" i-class="blankBg i-cell input" bindtap="showModalRetreat" data-log="{{item}}">
           {{item.time}} 充值 {{item.amount}} 备注{{item.description}}
         </i-col>
         </i-row>
@@ -40,5 +41,7 @@
     </view>
 
   </view>
-
+  <i-modal title="是否需要撤回' {{selectCharge.time}} '充值￥{{selectCharge.amount}} 这条记录" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose">
+  
+  </i-modal>
 </view>

@@ -235,7 +235,12 @@ Page({
     }, (res) => {
       console.log(res)
       if (res.code === 0) {
+        wx.showLoading({
+          mask:true,
+          title: '处理中...',
+        })
         setTimeout(() => {
+          wx.hideLoading();
           wx.navigateBack({
             delta: 0,
           })

@@ -64,5 +64,11 @@ public interface IPrepaidCardService {
         public Object finacialLogs(String cardId, String startTime, String endTime);
 
 
-
+        /**
+         * retreat wrong charge ,and set balance back
+         * @param cardId
+         * @param chargedTime
+         * @return
+         */
+        public Object chargeLogRetreat(String cardId,String chargedTime);
 }

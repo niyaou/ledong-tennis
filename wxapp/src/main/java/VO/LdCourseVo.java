@@ -7,10 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- * 
- * 
  * @author uidq1343
- *
  */
 public class LdCourseVo implements Serializable {
     private static final long serialVersionUID = -128233785762857928L;
@@ -49,6 +46,9 @@ public class LdCourseVo implements Serializable {
     private String grade;
     public static final String GRADE = "grade";
 
+    @ApiModelProperty(value = "course descript     ")
+    private String descript;
+    public static final String DESCRIPT = "descript";
 
     @NotEmpty
     @ApiModelProperty(value = "course earned  ")
@@ -182,6 +182,14 @@ public class LdCourseVo implements Serializable {
 
     public void setCoachSpend(Integer coachSpend) {
         this.coachSpend = coachSpend;
+    }
+
+    public String getDescript() {
+        return descript;
+    }
+
+    public void setDescript(String descript) {
+        this.descript = descript;
     }
 
 }
