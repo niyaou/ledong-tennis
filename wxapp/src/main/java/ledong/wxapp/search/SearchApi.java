@@ -1034,10 +1034,17 @@ public class SearchApi {
         return null;
     }
 
-    public static SearchResponse dailyFinancialAggs(String indexName, AggregationBuilder aggs ) {
+    public static SearchResponse dailyFinancialAggs(String indexName, AggregationBuilder ...aggs ) {
         SearchRequest searchRequest = new SearchRequest(indexName);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().size(0);
-        searchSourceBuilder.aggregation(aggs);
+
+        for (AggregationBuilder subagg : aggs) {
+            if (subagg == null) {
+                continue;
+            }
+            searchSourceBuilder.aggregation(subagg);
+        }
+
         searchRequest.source(searchSourceBuilder);
         try {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);

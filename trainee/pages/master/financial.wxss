@@ -33,13 +33,17 @@
 
 .i-cell {
   background: #fff;
-height: 4rem;
+/* height: 4rem; */
+height:auto;
 line-height: 4rem;
 border-radius: 5%;
 text-align: center;
 }
 
-
+.i-static{
+  padding:1%;
+  line-height:2rem
+}
 .flex-card{
   justify-items: center;
 }

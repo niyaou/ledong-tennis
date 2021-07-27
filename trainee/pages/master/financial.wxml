@@ -7,7 +7,7 @@
   <mp-navigation-bar title="经营数据" back="{{true}}" size="{{large}}"></mp-navigation-bar>
   <i-card full="{{true}}" title="" extra="经营数据指标" thumb="../../icon/player.jpg">
     <view slot="content">
-   经营统计数据 | 时间 {{time}}
+      经营统计数据 | 时间 {{time}}
     </view>
     <view slot="footer">
 
@@ -16,37 +16,65 @@
   <view class="weui-flex">
     <view class="weui-flex__item ">
       <i-row i-class="flex-card">
-        <i-col span="8" i-class="i-cell  ">
-     课时费     <span class="input">￥{{incoming}}</span>
-      </i-col>
-      <i-col span="8" i-class="i-cell">
-      </i-col>
-      <i-col span="8" i-class="i-cell">
-    净收入   <span class="input">￥{{earned}}</span>
-
-      </i-col>
-      <i-col span="8" i-class="i-cell  ">
-    场地费     <span class="output">￥{{courtSpend}}</span>
-    
-      </i-col>
-      <i-col span="8" i-class="i-cell">
-      </i-col>
-      <i-col span="8" i-class="i-cell">
-     教练费   <span class="output">￥{{coachSpend}}</span>
-      </i-col>
+        <i-col span="12" i-class="i-cell  ">
+          <i-row i-class="i-static">
+            <i-col span="24">
+              本日课时费费 <span class="input">￥{{day.incoming}}</span>
+            </i-col>
+            <i-col span="24">
+              本周课时费 <span class="input">￥{{week.incoming}}</span>
+            </i-col>
+            <i-col span="24">
+              本月课时费 <span class="input">￥{{month.incoming}}</span>
+            </i-col>
+          </i-row>
+        </i-col>
+        <!-- <i-col span="8" i-class="i-cell">
+        </i-col> -->
+        <i-col span="12" i-class="i-cell">
+          <i-row i-class="i-static">
+            <i-col span="24">
+              本日净收费 <span class="input">￥{{day.earned}}</span>
+            </i-col>
+            <i-col span="24">
+              本周净收费 <span class="input">￥{{week.earned}}</span>
+            </i-col>
+            <i-col span="24">
+              本月净收费 <span class="input">￥{{month.earned}}</span>
+            </i-col>
+          </i-row>
+        </i-col>
+        <i-col span="12" i-class="i-cell  ">
+          <i-row i-class="i-static">
+            <i-col span="24">
+              本日场地费 <span class="output">￥{{day.courtSpend}}</span>
+            </i-col>
+            <i-col span="24">
+              本周场地费 <span class="output">￥{{week.courtSpend}}</span>
+            </i-col>
+            <i-col span="24">
+              本月场地费 <span class="output">￥{{month.courtSpend}}</span>
+            </i-col>
+          </i-row>
+        </i-col>
+        <!-- <i-col span="8" i-class="i-cell">
+        </i-col> -->
+        <i-col span="12" i-class="i-cell">
+          <i-row i-class="i-static">
+            <i-col span="24">
+              本日教练费 <span class="output">￥{{day.coachSpend}}</span>
+            </i-col>
+            <i-col span="24">
+              本周教练费 <span class="output">￥{{week.coachSpend}}</span>
+            </i-col>
+            <i-col span="24">
+              本月教练费 <span class="output">￥{{month.coachSpend}}</span>
+            </i-col>
+          </i-row>
+        </i-col>
       </i-row>
 
     </view>
   </view>
-  <view class="page__bd ">
-    <view class="weui-flex">
-      <view class="weui-flex__item">
-       
-      </view>
-    </view>
-
-
-<i-toast id="toast" />
-  </view>
-
+    <i-toast id="toast" />
 </view>

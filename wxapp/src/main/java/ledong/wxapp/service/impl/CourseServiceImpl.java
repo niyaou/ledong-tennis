@@ -44,8 +44,8 @@ public class CourseServiceImpl implements ICourseService {
 
     @Override
     public String addCourse(String startTime, String endTime, String coach, Integer isExperience, Integer isDealing,
-            Double spendingTime, Integer courtSpend, Integer coachSpend, String court,String grade,String descript,
-            HashMap<String, Integer> membersObj) {
+                            Double spendingTime, Integer courtSpend, Integer coachSpend, String court, String grade, String descript,
+                            HashMap<String, Integer> membersObj) {
 
         LdCourseVo course = new LdCourseVo();
         course.setStart(startTime);
@@ -58,7 +58,7 @@ public class CourseServiceImpl implements ICourseService {
         course.setCourt(court);
         course.setGrade(grade);
         course.setCoachSpend(coachSpend);
-        if(!TextUtils.isEmpty(descript)){
+        if (!TextUtils.isEmpty(descript)) {
             course.setDescript(descript);
         }
         ArrayList<String> members = new ArrayList<>();
@@ -114,7 +114,7 @@ public class CourseServiceImpl implements ICourseService {
 
 
         DateHistogramAggregationBuilder daily = AggregationBuilders
-                .dateHistogram("intervalTime")
+                .dateHistogram("intervalDay")
                 .field("start") //可以是time
                 .calendarInterval(DateHistogramInterval.DAY)
                 .order(BucketOrder.key(false))
@@ -124,20 +124,52 @@ public class CourseServiceImpl implements ICourseService {
                 .subAggregation(incoming)
                 .subAggregation(earned);
 
-        SearchResponse result = SearchApi.dailyFinancialAggs(DataSetConstant.LD_COURSE_INFORMATION, daily);
-HashMap<String ,Object> dailyMap=new HashMap<String ,Object>();
+        DateHistogramAggregationBuilder weekly = AggregationBuilders
+                .dateHistogram("intervalWeek")
+                .field("start") //可以是time
+                .calendarInterval(DateHistogramInterval.WEEK)
+                .order(BucketOrder.key(false))
+                .minDocCount(1L)
+                .subAggregation(court)
+                .subAggregation(coach)
+                .subAggregation(incoming)
+                .subAggregation(earned);
+
+
+        DateHistogramAggregationBuilder monthly = AggregationBuilders
+                .dateHistogram("intervalMonth")
+                .field("start") //可以是time
+                .calendarInterval(DateHistogramInterval.MONTH)
+                .order(BucketOrder.key(false))
+                .minDocCount(1L)
+                .subAggregation(court)
+                .subAggregation(coach)
+                .subAggregation(incoming)
+                .subAggregation(earned);
+
+
+        SearchResponse result = SearchApi.dailyFinancialAggs(DataSetConstant.LD_COURSE_INFORMATION, new DateHistogramAggregationBuilder[]{daily, weekly, monthly});
+        HashMap<String, Object> dailyMap = new HashMap<String, Object>();
 
         if (result != null) {
-            Aggregation agg = result.getAggregations().get("intervalTime");
+            Aggregation aggD = result.getAggregations().get("intervalDay");
+            Aggregation aggW = result.getAggregations().get("intervalWeek");
+            Aggregation aggM = result.getAggregations().get("intervalMonth");
 
-            List<? extends Histogram.Bucket> buckets = ((Histogram) agg).getBuckets();
-            dailyMap.put("day",buckets.get(0).getKeyAsString());
-            dailyMap.put("aggs", buckets.get(0).getAggregations().asList());
-//            for (Histogram.Bucket bucket : buckets) {
-//                bucket.getAggregations();
-//
-//            }
-            return  dailyMap;
+            List<? extends Histogram.Bucket> buckets = ((Histogram) aggD).getBuckets();
+            dailyMap.put("day", buckets.get(0).getKeyAsString());
+            dailyMap.put("aggsD", buckets.get(0).getAggregations().asList());
+
+            List<? extends Histogram.Bucket> bucketsW = ((Histogram) aggW).getBuckets();
+            dailyMap.put("week", bucketsW.get(0).getKeyAsString());
+            dailyMap.put("aggW", bucketsW.get(0).getAggregations().asList());
+
+            List<? extends Histogram.Bucket> bucketsM = ((Histogram) aggM).getBuckets();
+            dailyMap.put("month", bucketsM.get(0).getKeyAsString());
+            dailyMap.put("aggM", bucketsM.get(0).getAggregations().asList());
+
+
+            return dailyMap;
 
         }
 

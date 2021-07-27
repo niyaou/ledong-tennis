@@ -15,10 +15,9 @@ Page({
   data: {
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
-    incoming:0,
-    earned:0,
-    courtSpend:0,
-    coachSpend:0,
+   day:{},
+   week:{},
+   month:{},
     time:'',
   },
 
@@ -46,14 +45,31 @@ Page({
 
     http.postReq(`${url}`, app.globalData.jwt, {},(res) => {
       let time = res.data.day
-       res.data = res.data.aggs
+      
       this.setData({
         time:time,
-        incoming:res.data.filter(r=>{return r.name==='incoming'})[0].value,
-        earned:res.data.filter(r=>{return r.name==='earned'})[0].value,
-        courtSpend:res.data.filter(r=>{return r.name==='courtSpend'})[0].value,
-        coachSpend:res.data.filter(r=>{return r.name==='coachSpend'})[0].value,
-      })
+        day:{
+        incoming:res.data.aggsD.filter(r=>{return r.name==='incoming'})[0].value,
+        earned:res.data.aggsD.filter(r=>{return r.name==='earned'})[0].value,
+        courtSpend:res.data.aggsD.filter(r=>{return r.name==='courtSpend'})[0].value,
+        coachSpend:res.data.aggsD.filter(r=>{return r.name==='coachSpend'})[0].value,
+      },
+     week: {
+        time:time,
+        incoming:res.data.aggW.filter(r=>{return r.name==='incoming'})[0].value,
+        earned:res.data.aggW.filter(r=>{return r.name==='earned'})[0].value,
+        courtSpend:res.data.aggW.filter(r=>{return r.name==='courtSpend'})[0].value,
+        coachSpend:res.data.aggW.filter(r=>{return r.name==='coachSpend'})[0].value,
+      },
+     month: {
+        time:time,
+        incoming:res.data.aggM.filter(r=>{return r.name==='incoming'})[0].value,
+        earned:res.data.aggM.filter(r=>{return r.name==='earned'})[0].value,
+        courtSpend:res.data.aggM.filter(r=>{return r.name==='courtSpend'})[0].value,
+        coachSpend:res.data.aggM.filter(r=>{return r.name==='coachSpend'})[0].value,
+      }
+    }
+      )
 
     })
   },
