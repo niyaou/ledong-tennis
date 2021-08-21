@@ -27,11 +27,17 @@
         </i-col>
       </i-row>
       <i-row wx:for="{{selectPlayers}}"  wx:key="{{index}}">
-        <i-col span="8" i-class="i-cell i-input" >
+        <i-col span="5" i-class="i-cell i-input" >
           {{item.realName}}
         </i-col>
         <i-col span="12" i-class="col-class">
-          <i-input  title="课时费" type="number" placeholder="课时费" bindchange="studentFee" data-id="{{item}}"/>
+          <i-input  wx:if="{{!item.courseTimes}}" title="课时费" type="number" placeholder="课时费" bindchange="studentFee" data-id="{{item}}"/>
+          <div wx:else class="i-cell i-input" >消耗课程一次</div>
+        </i-col>
+        <i-col span="3" i-class="i-cell i-input">
+          <i-icon  wx:if="{{!item.courseTimes}}"  type="createtask_fill" size="15"  bindtap='pCourse' data-id="{{item}}"/>
+          <i-icon wx:else type="financial_fill" size="15"  bindtap='pCourse' data-id="{{item}}"/>
+       
         </i-col>
         <i-col span="4" i-class="i-cell i-input">
           <i-icon type="delete_fill" size="15"  bindtap='pRemove' data-id="{{item}}"/>

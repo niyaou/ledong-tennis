@@ -16,59 +16,35 @@
   <view class="weui-flex">
     <view class="weui-flex__item ">
       <i-row i-class="flex-card">
-        <i-col span="12" i-class="i-cell  ">
-          <i-row i-class="i-static">
-            <i-col span="24">
-              本日课时费费 <span class="input">￥{{day.incoming}}</span>
-            </i-col>
-            <i-col span="24">
-              本周课时费 <span class="input">￥{{week.incoming}}</span>
-            </i-col>
-            <i-col span="24">
-              本月课时费 <span class="input">￥{{month.incoming}}</span>
+        <i-col span="24" i-class="i-cell  ">
+          <i-row i-class="i-static" style="justify-content: flex-start;justify-items: flex-start;    text-align: left;">
+            <i-col span="24" >
+             本日  <span>课时费 <span class="input">￥{{day.incoming}}</span></span>
+             场地费 <span class="output">￥{{day.courtSpend}}</span>
+             教练费 <span class="output">￥{{day.coachSpend}}</span>
+             净收费 <span class="input">￥{{day.earned}}</span>
             </i-col>
           </i-row>
         </i-col>
-        <!-- <i-col span="8" i-class="i-cell">
-        </i-col> -->
-        <i-col span="12" i-class="i-cell">
-          <i-row i-class="i-static">
+
+        <i-col span="24" i-class="i-cell">
+          <i-row i-class="i-static" style="justify-content: flex-start;justify-items: flex-start;    text-align: left;">
             <i-col span="24">
-              本日净收费 <span class="input">￥{{day.earned}}</span>
-            </i-col>
-            <i-col span="24">
-              本周净收费 <span class="input">￥{{week.earned}}</span>
-            </i-col>
-            <i-col span="24">
-              本月净收费 <span class="input">￥{{month.earned}}</span>
+              本周  <span>课时费 <span class="input">￥{{week.incoming}}</span></span>
+             场地费 <span class="output">￥{{week.courtSpend}}</span>
+             教练费 <span class="output">￥{{week.coachSpend}}</span>
+             净收费 <span class="input">￥{{week.earned}}</span>
             </i-col>
           </i-row>
         </i-col>
-        <i-col span="12" i-class="i-cell  ">
-          <i-row i-class="i-static">
+        <i-col span="24" i-class="i-cell  ">
+          <i-row i-class="i-static" style="justify-content: flex-start;justify-items: flex-start;    text-align: left;">
             <i-col span="24">
-              本日场地费 <span class="output">￥{{day.courtSpend}}</span>
-            </i-col>
-            <i-col span="24">
-              本周场地费 <span class="output">￥{{week.courtSpend}}</span>
-            </i-col>
-            <i-col span="24">
-              本月场地费 <span class="output">￥{{month.courtSpend}}</span>
-            </i-col>
-          </i-row>
-        </i-col>
-        <!-- <i-col span="8" i-class="i-cell">
-        </i-col> -->
-        <i-col span="12" i-class="i-cell">
-          <i-row i-class="i-static">
-            <i-col span="24">
-              本日教练费 <span class="output">￥{{day.coachSpend}}</span>
-            </i-col>
-            <i-col span="24">
-              本周教练费 <span class="output">￥{{week.coachSpend}}</span>
-            </i-col>
-            <i-col span="24">
-              本月教练费 <span class="output">￥{{month.coachSpend}}</span>
+              本月  <span>课时费 <span class="input">￥{{month.incoming}}</span></span>
+             场地费 <span class="output">￥{{month.courtSpend}}</span>
+             教练费 <span class="output">￥{{month.coachSpend}}</span>
+             净收费 <span class="input">￥{{month.earned}}</span>
+ 
             </i-col>
           </i-row>
         </i-col>

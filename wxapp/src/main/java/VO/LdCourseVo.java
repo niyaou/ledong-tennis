@@ -59,6 +59,10 @@ public class LdCourseVo implements Serializable {
     private Integer incoming;
     public static final String INCOMING = "incoming";
     @NotEmpty
+    @ApiModelProperty(value = "course incoming  ")
+    private Integer incomingTimes;
+    public static final String INCOMINGTIMES = "incomingTimes";
+    @NotEmpty
     @ApiModelProperty(value = "experience course  1:yes ,0: no  ")
     private Integer experience;
     public static final String EXPERIENCE = "experience";
@@ -191,5 +195,15 @@ public class LdCourseVo implements Serializable {
     public void setDescript(String descript) {
         this.descript = descript;
     }
+
+
+    public Integer getIncomingTimes() {
+        return incomingTimes;
+    }
+
+    public void setIncomingTimes(Integer incomingTimes) {
+        this.incomingTimes = incomingTimes;
+    }
+
 
 }

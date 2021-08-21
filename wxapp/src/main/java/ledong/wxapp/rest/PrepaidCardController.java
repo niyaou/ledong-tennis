@@ -97,6 +97,7 @@ public class PrepaidCardController {
             @ApiImplicitParam(name = "openId", value = "openId ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "time", value = "time ", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "amount", value = "amount ", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "times", value = "times ", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "coachId", value = "coachId ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "courseId", value = "courseId ", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "description ", required = false, dataType = "string", paramType = "query"), })
@@ -105,6 +106,7 @@ public class PrepaidCardController {
             @RequestParam(value = "openId", required = true) String openId,
             @RequestParam(value = "time", required = false) String time,
             @RequestParam(value = "amount", required = true) Integer amount,
+                                              @RequestParam(value = "times", required = true) Integer times,
             @RequestParam(value = "coachId", required = true) String coachId,
             @RequestParam(value = "courseId", required = false) String courseId,
             @RequestParam(value = "description", required = false) String description) throws AuthenticationException {
@@ -124,7 +126,7 @@ public class PrepaidCardController {
         String temp_s =temp.toString();
         return new ResponseEntity<Object>(
                 CommonResponse.success(prepaidCardService.chargeAnnotation(cardId, openId,
-                        temp_s, time, amount, coachId, courseId, description)),
+                        temp_s, time, amount,times, coachId, courseId, description)),
                 HttpStatus.OK);
     }
 

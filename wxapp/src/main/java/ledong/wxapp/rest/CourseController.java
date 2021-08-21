@@ -2,6 +2,7 @@ package ledong.wxapp.rest;
 
 import VO.LdRankInfoVo;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -87,7 +88,7 @@ public class CourseController {
         if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
-        HashMap<String,Integer> obj= JSON.parseObject(membersObj,HashMap.class);
+        HashMap<String, JSONArray> obj= JSON.parseObject(membersObj,HashMap.class);
         return new ResponseEntity<Object>(
                 CommonResponse.success(courseService.addCourse(startTime, endTime,  coach,  isExperience,  isDealing,  spendingTime,
                          courtSpend,  coachSpend,  court,grade, descript, obj)), HttpStatus.OK);

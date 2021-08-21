@@ -1,8 +1,9 @@
 {
   "pages": [
-
     "pages/index/index",
+    "pages/master/financial",
     "pages/course/masterCourse",
+    "pages/master/charge",
     "pages/schedule/schedule",
     "pages/teenage/create",
     "pages/create/create",
@@ -15,8 +16,7 @@
     "pages/master/score",
     "pages/master/create",
     "pages/prepaidCard/masterCard",
-    "pages/master/charge",
-    "pages/master/financial",
+
     "pages/prepaidCard/cardLog"
 
   ],

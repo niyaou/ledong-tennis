@@ -36,11 +36,17 @@ Page({
     startTime: 'N/A',
     endTime: 'N/A',
     coursFee:'',
+    coursTimes:'',
     array: ['音乐花园', '雅居乐', '英郡', '银泰城', '一品天下', '其他'],
   },
   coursFeeChange(e) {
     this.setData({
       coursFee: e.detail.detail.value
+    })
+  },
+  coursTimesChange(e) {
+    this.setData({
+      coursTimes: e.detail.detail.value
     })
   },
   descriptChange(e) {
@@ -220,17 +226,11 @@ Page({
     let url = 'prepaidCard/ld/chargeAnnotation'
   
     http.postReq(`${url}`, app.globalData.jwt, {
-      // startTime: this.data.startTime,
-      // endTime: this.data.endTime,
       coachId: this.data.coach[this.data.index].openId,
-      // isExperience: this.data.experinced?1:0,
-      // isDealing: this.data.isDealing?1:0,
-      // spendingTime: this.data.courseTime,
-      // courtSpend: this.data.coursFee,
-      // coachSpend: this.data.coachSpend,
       cardId: this.data.prepaidCard,
       openId: this.data.id,
-      amount:this.data.coursFee,
+      amount:this.data.coursFee===''?0:this.data.coursFee,
+      times:this.data.coursTimes===''?0:this.data.coursTimes,
       description:this.data.descript,
     }, (res) => {
       console.log(res)

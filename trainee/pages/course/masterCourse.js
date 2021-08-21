@@ -36,7 +36,7 @@ Page({
     timePoint: 0, //0 :start time ,  1: end time
     startTime: 'N/A',
     endTime: 'N/A',
-    array: ['音乐花园', '雅居乐', '英郡', '银泰城', '一品天下', '其他'],
+    array: ['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '天府环宇坊校区', '其他'],
     gradeArray: ['红球','橙球','绿球','标球'],
     timeArray: [1,1.5,2,2.5,3],
     timeIndex:0,
@@ -66,6 +66,20 @@ Page({
       visible: false
     })
   },
+pCourse(e){
+  console.log('pCourse', e.currentTarget.dataset.id)
+  let arr = this.data.selectPlayers.map(s => {
+    if (s.openId === e.currentTarget.dataset.id.openId) {
+      s.courseSpend = 0
+      s.courseTimes = (typeof s.courseTimes !=='undefined' && s.courseTimes ===1)? 0:1
+    }
+    return s
+  })
+  this.setData({
+    selectPlayers: arr
+  })
+
+},
   pRemove(e) {
     console.log('ptap', e, this.data.selectPlayers)
     let item = e.target.dataset.id
@@ -76,7 +90,6 @@ Page({
     this.setData({
       selectPlayers: arr,
     })
-
   },
   pTap(e) {
     let item = e.target.dataset.id
@@ -106,6 +119,7 @@ Page({
     let arr = this.data.selectPlayers.map(s => {
       if (s.openId === e.currentTarget.dataset.id.openId) {
         s.courseSpend = parseInt(e.detail.detail.value)
+        s.courseTimes = 0
       }
       return s
     })
@@ -247,13 +261,10 @@ Page({
     this.data.selectPlayers.map(s => {
 
      Object.assign(membobj, {
-        [s.openId]: s.courseSpend
+        [s.openId]: [s.courseSpend,s.courseTimes]
       })
-    })
-    // console.log('handleCreate', 'index', this.data.index,this.data.coach[this.data.index].openId, 'coachSpend', this.data.coachSpend, 'startTime', this.data.startTime, 'endTime', this.data.endTime, 'courseTime',
-    //   this.data.courseTime, 'descript', this.data.descript, 'courtIndex', this.data.array[this.data.courtIndex], 'coursFee', this.data.coursFee,
-    //   'selectPlayers', this.data.selectPlayers, 'membobj', membobj, 'experinced',  this.data.experinced, 'isDealing',  this.data.isDealing)
 
+    })
 
     http.postReq(`${url}`, app.globalData.jwt, {
       startTime: this.data.startTime,

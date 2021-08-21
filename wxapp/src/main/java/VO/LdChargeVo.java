@@ -26,11 +26,22 @@ public class LdChargeVo {
     private Integer amount;
     public static final String AMOUNT = "amount";
 
+    private Integer times;
+    public static final String TIMES = "times";
+
     private String owner;
     public static final String OWNER = "owner";
 
     private String course;
     public static final String COURSE = "course";
+
+    public Integer getTimes() {
+        return times;
+    }
+
+    public void setTimes(Integer times) {
+        this.times = times;
+    }
 
     public String getOpenId() {
         return openId;

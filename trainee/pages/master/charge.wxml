@@ -26,6 +26,11 @@
       </i-switch> 
       </i-col>
       </i-row>
+      <i-row>
+        <i-col span="24" i-class="i-cell i-input alignSwitch">
+      <i-input value="{{coursTimes}}" title="充值次数" type="number" placeholder="充值次数"  bindchange="coursTimesChange" ></i-input>
+      </i-col>
+      </i-row>
     </i-panel>
     <i-button class="fullw" bind:click="handleCreate" type="default" shape="circle">充值</i-button>
  

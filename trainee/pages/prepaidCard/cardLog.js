@@ -17,6 +17,7 @@ Page({
     visible: false,
     currentIndex: 0,
     balance: 0,
+    balanceTimes:0,
     prepaidCard:'',
     current: '没参加比赛',
     selectCharge:{},
@@ -127,10 +128,15 @@ getCardLogs(){
       result.forEach(r=>{
         if(typeof r.balance!=='undefined'){
           this.setData({balance:r.balance})
-        }else if(typeof r.amount!=='undefined'){
+        }
+        if(typeof r.balanceTimes!=='undefined'){
+          this.setData({balanceTimes:r.balanceTimes})
+        }
+         if(typeof r.amount!=='undefined'){
           this.data.chargeLogs.unshift(r)
           this.setData({chargeLogs: this.data.chargeLogs})
-        }else if(typeof r.spend!=='undefined'){
+        }
+         if(typeof r.spend!=='undefined'){
           this.data.spendLogs.unshift(r)
           this.setData({spendLogs: this.data.spendLogs})
         }

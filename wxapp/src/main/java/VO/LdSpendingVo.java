@@ -34,8 +34,20 @@ public class LdSpendingVo   {
     public static final String CHARGE = "charge";
 
 
+    private Integer timesCharge;
+    public static final String TIMESCHARGE = "timesCharge";
+
+
     private String course;
     public static final String COURSE = "course";
+
+    public Integer getTimesCharge() {
+        return timesCharge;
+    }
+
+    public void setTimesCharge(Integer timesCharge) {
+        this.timesCharge = timesCharge;
+    }
 
     public String getOpenId() {
         return openId;

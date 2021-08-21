@@ -2,6 +2,7 @@ package ledong.wxapp.service.impl;
 
 import VO.*;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.io.Files;
 import ledong.wxapp.auth.JwtToken;
@@ -125,10 +126,10 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
     @Override
     public String settleAccount(String courseId, String startTime, Double spendTime,
-                                HashMap<String, Integer> membersObj) {
+                                HashMap<String, JSONArray> membersObj) {
         // log each spend
         ArrayList<String> members = new ArrayList<>();
-        HashMap<String, Integer> cardCharge = new HashMap<>();
+        HashMap<String, Integer[]> cardCharge = new HashMap<>();
         for (String m : membersObj.keySet()) {
             members.add(m);
             HashMap<String, Object> memberVo = userService.getLDUserInfo(m);
@@ -136,8 +137,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             if (TextUtils.isEmpty(cardId)) {
                 continue;
             }
-            int temp = cardCharge.get(cardId) == null ? 0 : cardCharge.get(cardId);
-            cardCharge.put(cardId, temp + membersObj.get(m));
+            int tempCharge = cardCharge.get(cardId) == null ? 0 : cardCharge.get(cardId)[0];
+            int tempTimeCharge = cardCharge.get(cardId) == null ? 0 : cardCharge.get(cardId)[1];
+            cardCharge.put(cardId,new Integer[]{tempCharge + (int)membersObj.get(m).get(0),tempTimeCharge+  (int)membersObj.get(m).get(1)});
             LdSpendingVo spendVo = new LdSpendingVo();
             spendVo.setOpenId(m);
             try {
@@ -147,7 +149,8 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
             }
             spendVo.setSpend(spendTime);
-            spendVo.setCharge(membersObj.get(m));
+            spendVo.setCharge( (int)membersObj.get(m).get(0));
+            spendVo.setTimesCharge( (int)membersObj.get(m).get(1));
             spendVo.setCourse(courseId);
             SearchApi.appendNestedFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.SPENDING,
                     JSON.parseObject(JSON.toJSONString(spendVo), HashMap.class), cardId);
@@ -157,13 +160,16 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             HashMap<String, Object> cardVo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, card);
             int temp = (int) cardVo.get(LdPrePaidCardVo.BALANCE);
             SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.BALANCE,
-                    temp - cardCharge.get(card), card);
+                    temp - cardCharge.get(card)[0], card);
+            int tempTimes = (int) cardVo.get(LdPrePaidCardVo.BALANCETIMES);
+            SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.BALANCETIMES,
+                    tempTimes - cardCharge.get(card)[1], card);
         }
         return courseId;
     }
 
     @Override
-    public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,
+    public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,Integer times,
                                    String coachId, String courseId, String description) {
         LdChargeVo vo = new LdChargeVo();
         String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
@@ -171,6 +177,8 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         vo.setTime(date);
         vo.setOpenId(openId);
         vo.setOwner(coachId);
+        vo.setTimes(times);
+
         if (!TextUtils.isEmpty(courseId)) {
             vo.setCourse(courseId);
         }
@@ -183,8 +191,13 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             int current = (int) card.get(LdPrePaidCardVo.BALANCE);
             current += amount;
             card.put(LdPrePaidCardVo.BALANCE, current);
+
+            int currentTimes = (int) card.get(LdPrePaidCardVo.BALANCETIMES);
+            currentTimes += times;
+
             LdChargeVo chargLog = new LdChargeVo();
             chargLog.setAmount(amount);
+            chargLog.setTimes(times);
             if (!TextUtils.isEmpty(description)) {
                 chargLog.setDescription(description);
             }
@@ -193,6 +206,8 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
             String id = SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,
                     LdPrePaidCardVo.BALANCE, current, cardId);
+             id = SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,
+                    LdPrePaidCardVo.BALANCETIMES, currentTimes, cardId);
             if (TextUtils.isEmpty(id)) {
                 return null;
             }
@@ -208,6 +223,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         if (card == null) {
             return null;
         }
+        if(card.get(LdPrePaidCardVo.BALANCETIMES)==null){
+            card.put(LdPrePaidCardVo.BALANCETIMES,0);
+        }
         return card;
 
     }
@@ -216,9 +234,11 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     public Object finacialLogs(String cardId, String startTime, String endTime) {
         HashMap<String, Object> vo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
         Integer balance = (Integer) vo.get(LdPrePaidCardVo.BALANCE);
+        Integer balanceTime = (Integer) vo.get(LdPrePaidCardVo.BALANCETIMES);
         List<HashMap<String, Object>> spend = (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.SPENDING);
         HashMap<String, Object> bm = new HashMap<String, Object>();
         bm.put(LdPrePaidCardVo.BALANCE, balance);
+        bm.put(LdPrePaidCardVo.BALANCETIMES, balanceTime);
         if (spend.size() > 0) {
             spend.stream().forEach(s -> {
 

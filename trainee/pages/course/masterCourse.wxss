@@ -18,6 +18,13 @@ width:auto
   /* text-align: center; */
   line-height: 45px;
 }
+.i-cell-background {
+height:100%;
+line-height: 100%;
+  background: #fff;
+  align-items: center;
+  overflow: hidden
+}
 
 .i-cell {
   position: relative;

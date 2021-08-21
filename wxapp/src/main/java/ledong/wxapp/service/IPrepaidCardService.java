@@ -1,6 +1,7 @@
 package ledong.wxapp.service;
 
 import VO.UserVo;
+import com.alibaba.fastjson.JSONArray;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.BadPaddingException;
@@ -42,7 +43,7 @@ public interface IPrepaidCardService {
          * @return
          */
         public String settleAccount(String courseId, String startTime, Double spendTime,
-                        HashMap<String, Integer> membersObj);
+                        HashMap<String, JSONArray> membersObj);
 
         /**
          * user charge log
@@ -50,7 +51,7 @@ public interface IPrepaidCardService {
          * 
          * 
          */
-        public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,
+        public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,Integer times,
                         String coachId, String courseId, String description);
 
         /**

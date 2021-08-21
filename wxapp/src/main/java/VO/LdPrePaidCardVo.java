@@ -37,6 +37,18 @@ public class LdPrePaidCardVo implements Serializable {
     private Integer balance =0;
     public static final String BALANCE = "balance";
 
+    @ApiModelProperty(value = "card balance times")
+    private Integer balanceTimes =0;
+    public static final String BALANCETIMES = "balanceTimes";
+
+    public Integer getBalanceTimes() {
+        return balanceTimes;
+    }
+
+    public void setBalanceTimes(Integer balanceTimes) {
+        this.balanceTimes = balanceTimes;
+    }
+
     @NotEmpty
     @ApiModelProperty(value = "spending list  ,spend means course time, charge means fee ")
     private List<HashMap<String, Object>> spending= new LinkedList<HashMap<String, Object>> ();
