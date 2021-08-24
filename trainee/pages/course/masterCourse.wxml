@@ -113,7 +113,7 @@
             <view slot="close">失败</view>
         </i-switch>
     </i-cell>
-    <i-button class="fullw" bind:click="handleCreate" type="default" shape="circle">记录课程</i-button>
+    <i-button class="fullw" bind:click="handleCreate" type="default" shape="circle" disabled="{{isFetching}}">记录课程</i-button>
     </i-panel>
 
  </scroll-view>

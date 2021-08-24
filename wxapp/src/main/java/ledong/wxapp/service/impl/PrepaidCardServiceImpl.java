@@ -129,7 +129,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                                 HashMap<String, JSONArray> membersObj) {
         // log each spend
         ArrayList<String> members = new ArrayList<>();
-        HashMap<String, Integer[]> cardCharge = new HashMap<>();
+        HashMap<String, Integer[]> cardSpend = new HashMap<>();
         for (String m : membersObj.keySet()) {
             members.add(m);
             HashMap<String, Object> memberVo = userService.getLDUserInfo(m);
@@ -137,9 +137,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             if (TextUtils.isEmpty(cardId)) {
                 continue;
             }
-            int tempCharge = cardCharge.get(cardId) == null ? 0 : cardCharge.get(cardId)[0];
-            int tempTimeCharge = cardCharge.get(cardId) == null ? 0 : cardCharge.get(cardId)[1];
-            cardCharge.put(cardId,new Integer[]{tempCharge + (int)membersObj.get(m).get(0),tempTimeCharge+  (int)membersObj.get(m).get(1)});
+            int tempSpend = cardSpend.get(cardId) == null ? 0 : cardSpend.get(cardId)[0];
+            int tempTimeSpend = cardSpend.get(cardId) == null ? 0 : cardSpend.get(cardId)[1];
+            cardSpend.put(cardId,new Integer[]{tempSpend + (int)membersObj.get(m).get(0),tempTimeSpend + (int)membersObj.get(m).get(1)});
             LdSpendingVo spendVo = new LdSpendingVo();
             spendVo.setOpenId(m);
             try {
@@ -156,14 +156,16 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                     JSON.parseObject(JSON.toJSONString(spendVo), HashMap.class), cardId);
         }
         // update total spend
-        for (String card : cardCharge.keySet()) {
+        for (String card : cardSpend.keySet()) {
             HashMap<String, Object> cardVo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, card);
             int temp = (int) cardVo.get(LdPrePaidCardVo.BALANCE);
-            SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.BALANCE,
-                    temp - cardCharge.get(card)[0], card);
-            int tempTimes = (int) cardVo.get(LdPrePaidCardVo.BALANCETIMES);
-            SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.BALANCETIMES,
-                    tempTimes - cardCharge.get(card)[1], card);
+            int tempTimes = cardVo.get(LdPrePaidCardVo.BALANCETIMES)==null?0:(int) cardVo.get(LdPrePaidCardVo.BALANCETIMES);
+            HashMap <String,Object >valueMap = new HashMap <String,Object >();
+            valueMap.put(LdPrePaidCardVo.BALANCE,
+                    temp - (cardSpend.get(card)[0]));
+            valueMap.put(LdPrePaidCardVo.BALANCETIMES,
+                    (tempTimes - cardSpend.get(card)[1]));
+            SearchApi.updateFieldMapValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, valueMap, card);
         }
         return courseId;
     }

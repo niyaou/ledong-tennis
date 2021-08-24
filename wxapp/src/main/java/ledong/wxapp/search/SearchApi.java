@@ -1237,6 +1237,37 @@ public class SearchApi {
         }
     }
 
+    /**
+     * 更新指定字段
+     *
+     * @param indexName
+     * @param valueMap
+     * @param id
+     * @return
+     */
+    public static String updateFieldMapValueById(String indexName,HashMap <String,Object >valueMap, String id) {
+
+        try {
+            XContentBuilder builder = XContentFactory.jsonBuilder();
+            builder.startObject();
+            {
+                for (String field : valueMap.keySet()){
+                    builder.field(field, valueMap.get(field));
+                }
+            }
+            builder.endObject();
+            // return client.update(updateRequest, RequestOptions.DEFAULT);
+            UpdateRequest updateRequest = new UpdateRequest(indexName, id).doc(builder);
+
+            DocWriteResponse res = client.update(updateRequest, RequestOptions.DEFAULT);
+            return res.getResult().equals(Result.UPDATED) ? res.getId() : null;
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+
     public static DocWriteResponse removeDocumentSource(String indexName, String type, String doc, String id,
             String... fields) {
         try {

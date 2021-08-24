@@ -40,6 +40,7 @@ Page({
     gradeArray: ['红球','橙球','绿球','标球'],
     timeArray: [1,1.5,2,2.5,3],
     timeIndex:0,
+    isFetching:false,
   },
   coursFeeChange(e) {
     this.setData({
@@ -258,6 +259,7 @@ pCourse(e){
   handleCreate(e) {
     let url = 'course/ld/createCourse'
     let membobj={}
+    let that = this
     this.data.selectPlayers.map(s => {
 
      Object.assign(membobj, {
@@ -265,7 +267,7 @@ pCourse(e){
       })
 
     })
-
+    this.setData({isFetching:true})
     http.postReq(`${url}`, app.globalData.jwt, {
       startTime: this.data.startTime,
       endTime: this.data.endTime,
@@ -288,6 +290,7 @@ pCourse(e){
           title: '处理中...',
         })
         setTimeout(() => {
+          that.setData({isFetching:false})
           wx.hideLoading();
           wx.navigateBack({
             delta: 0,
@@ -295,6 +298,7 @@ pCourse(e){
         }, 1500)
 
       } else {
+        that.setData({isFetching:false})
         $Toast({
           content: '失败，请重试',
           type: 'error'
