@@ -36,7 +36,7 @@ Page({
     timePoint: 0, //0 :start time ,  1: end time
     startTime: 'N/A',
     endTime: 'N/A',
-    array: ['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '天府环宇坊校区', '其他'],
+    array: ['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区','麓坊校区','一品天下校区', '天府环宇坊校区', '其他'],
     gradeArray: ['红球','橙球','绿球','标球'],
     timeArray: [1,1.5,2,2.5,3],
     timeIndex:0,
