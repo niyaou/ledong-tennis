@@ -229,6 +229,20 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/ldAdminLogin", method = RequestMethod.POST)
+    @ApiOperation(value = "认证管理-用户登录", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "keycode", value = "keycode", required = true, dataType = "string", paramType = "form") })
+    public ResponseEntity<?> registerLDAdmin(@RequestParam(value = "keycode", required = true) String keycode) {
+
+        String info = userService.adminLogin(keycode);
+        if (null == info) {
+            return new ResponseEntity<Object>(CommonResponse.failure(ResultCodeEnum.USER_LOGIN_ERROR), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Object>(CommonResponse.success(info), HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(value = "/ldRealName", method = RequestMethod.POST)
     @ApiOperation(value = "用户管理--设置本名", notes = "")
     @ApiImplicitParams({

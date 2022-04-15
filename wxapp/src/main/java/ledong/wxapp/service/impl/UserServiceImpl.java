@@ -55,6 +55,8 @@ public class UserServiceImpl implements IUserService {
     private static Logger logger = Logger.getLogger(UserServiceImpl.class);
     private static String KEY_NAME = "AES";
     public static final String CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
+
+    public static final String ADMIN_KEY_CODE = "LDTENNISADMINISTRATORKEYCODE2022";
     @Value("${file.upload.url}")
     private String uploadFilePath;
     @Value("${wxapp.appid}")
@@ -155,7 +157,7 @@ public class UserServiceImpl implements IUserService {
         Optional.ofNullable(openId).ifPresent(id -> {
             rankService.createLDTeenageRankInfo(parent, openId);
         });
-        logger.info("after create tennage   2" + userId);
+        logger.info("after create tennage 2" + userId);
         return userId;
     }
 
@@ -218,6 +220,14 @@ public class UserServiceImpl implements IUserService {
             SearchApi.updateDocument(DataSetConstant.LD_USER_INFORMATION, JSON.toJSONString(loginUser.getFirst()),
                     openId);
             return jwtToken.generateToken(openId);
+        }
+        return null;
+    }
+
+    @Override
+    public String adminLogin(String keycode) {
+        if (keycode.equals(ADMIN_KEY_CODE)) {
+            return jwtToken.generateToken(keycode);
         }
         return null;
     }
@@ -432,7 +442,9 @@ public class UserServiceImpl implements IUserService {
             userlist.sort((HashMap<String, Object> o1, HashMap<String, Object> o2) -> {
                 return Collator.getInstance(Locale.CHINESE).compare(o1.get(UserVo.REALNAME), o2.get(UserVo.REALNAME));
             });
-            userlist= (LinkedList<HashMap<String, Object>>) userlist.stream().filter((HashMap<String, Object> u)->{return u.get(UserVo.PREPAIDCARD)!=null;}).collect(Collectors.toCollection(LinkedList::new));
+            userlist = (LinkedList<HashMap<String, Object>>) userlist.stream().filter((HashMap<String, Object> u) -> {
+                return u.get(UserVo.PREPAIDCARD) != null;
+            }).collect(Collectors.toCollection(LinkedList::new));
             return userlist;
         }
         return null;

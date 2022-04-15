@@ -105,6 +105,13 @@ public interface IUserService {
     public String ldLogin(String openId, String nickName, String avator, String gps);
 
     /**
+     *
+     * @param keycode
+     * @return
+     */
+    public String adminLogin(String keycode);
+
+    /**
      * set real name
      * 
      * @param openId
