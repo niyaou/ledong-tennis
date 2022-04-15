@@ -21,6 +21,10 @@ const HeaderStyle = styled('header')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function LogoOnlyLayout() {
+
+
+  let key = localStorage.getItem('jwt')
+
   return (
     <>
       <HeaderStyle>

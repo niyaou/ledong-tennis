@@ -9,14 +9,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint --ext .js,.jsx ./src",
-    "lint:fix": "eslint --fix --ext .js,.jsx ./src"
+    "lint": "npm run lint:js",
+    "lint:fix": "eslint --fix --ext .js,.jsx ./src",
+    "lint:js":"eslint --fix --ext .js,.vue --ignore-path .gitignore ."
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": "react-app",
+    "rules":{"no-undef":"off","no-restricted-globals":"off","no-unused-vars":"off"}
   },
   "babel": {
     "presets": [
