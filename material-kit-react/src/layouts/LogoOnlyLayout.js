@@ -1,11 +1,11 @@
-import { Outlet } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
+import { useEffect } from 'react';
 // components
+import { Outlet,Link as RouterLink, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
 
 // ----------------------------------------------------------------------
-
 const HeaderStyle = styled('header')(({ theme }) => ({
   top: 0,
   left: 0,
@@ -21,9 +21,16 @@ const HeaderStyle = styled('header')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function LogoOnlyLayout() {
+  const navigate = useNavigate();
 
 
-  let key = localStorage.getItem('jwt')
+  useEffect(() => {
+    const key = localStorage.getItem('jwt');
+  console.log(key)
+  if (!key) {
+    navigate('/login');
+  }
+  }, [])
 
   return (
     <>
