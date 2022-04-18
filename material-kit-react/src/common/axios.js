@@ -7,12 +7,13 @@
  * @LastEditTime: 2022-04-18 12:05:49
  * @content: edit your page content
  */
+/* eslint-disable */
 import axios from 'axios';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Backdrop, CircularProgress } from '@mui/material';
-import { USER_INFO_KEY } from '../../store/actions/usersActions'
-import { logOut } from '../../store/actions/usersActions';
+import { USER_INFO_KEY } from '../store/actions/usersActions'
+import { logOut } from '../store/actions/usersActions';
 
 const Axios = axios.create({
     timeout: 12000, // 设置超时时长

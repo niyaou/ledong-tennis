@@ -16,11 +16,12 @@ import {
 import { LoadingButton } from '@mui/lab';
 // component
 import Iconify from '../../../components/Iconify';
-import {login} from '../../../actions/loginAction';
+import { useSelector } from "../../../redux/hooks";
 
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
+  const {publickey} =  useSelector((state)=>state.users)
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -67,7 +68,7 @@ export default function LoginForm() {
             fullWidth
             autoComplete="current-password"
             type='text' 
-            label="验证码"
+            label={`验证码${publickey}`}
             {...getFieldProps('password')}
 
             error={Boolean(touched.password && errors.password)}

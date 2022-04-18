@@ -24,6 +24,7 @@
       "impliedStrict": true
     }
   },
+  "settings": {"import/resolver":{"node":{"paths":["src"]}}},
   "rules": {
     "import": 0,
     "max-len": 0,

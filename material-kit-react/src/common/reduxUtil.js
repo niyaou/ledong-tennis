@@ -3,6 +3,7 @@
  * @param action 
  * @returns 
  */
+/* eslint-disable */
 export function getErrorMsg(action) {
     if (action.payload) {
         let payload = action.payload

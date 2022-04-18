@@ -7,12 +7,13 @@
  * @LastEditTime: 2021-12-02 10:08:12
  * @content: edit your page content
  */
-
+/* eslint-disable */
 import {createStore, applyMiddleware} from 'redux'
 import thunk from 'redux-thunk'
-import rootReducer from './reducers'
 import {composeWithDevTools} from 'redux-devtools-extension'
 import createLogger from 'redux-logger';
+import rootReducer from './reducers'
+
 const initalState = {
 }
 

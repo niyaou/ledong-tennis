@@ -7,11 +7,10 @@
  * @LastEditTime: 2022-04-15 10:48:26
  * @content: edit your page content
  */
+/* eslint-disable */
 import { JSEncrypt } from 'jsencrypt'
-import Axios from '../../common/axios/axios'
-import { dateTime } from '../../common/utils/dateUtils'
+import Axios from '../../common/axios'
 import { UserActionTypes } from '../types'
-import { UserFormValues } from '../common/interface'
 export const USER_INFO_KEY = 'USER_INFO_KEY'
 
 
@@ -48,53 +47,6 @@ export const logOut = () => async dispatch => {
 }
 
 
-export const login = (auth: UserFormValues) => async dispatch => {
-    dispatch({
-        type: UserActionTypes.GET_USERS,
-    })
-    try {
-     
-        const url = process.env.HTTP_ZUUL
-        const clientId = 'DataSet20211202'
-        const res = await Axios.get(`/api/pangoo-usersystem-v2/publicKey`)
-
-        const jSEncrypt = new JSEncrypt()
-        const code = res.data.data
-        jSEncrypt.setPublicKey(code)
-        // 获取公钥对密码进行加密：本地系统时间yyyyMMddHHmmss+明文密码
-
-        const username = jSEncrypt.encrypt(dateTime() + auth.username)
-        const password = jSEncrypt.encrypt(dateTime() + auth.password)
-        let loginParams = { type: 0, password, username, clientId }
-
-        // const user = await Axios.post(`/api/pangoo-usersystem-v2/auth/account`, loginParams)
-        const user = await Axios.post(`/api/pangoo-data-set/auth/account`, loginParams)
-        // if(user.data.code !== 200){
-        if (user.data.code !== 200 && user.data.code !== 0) {
-            dispatch({
-                type: UserActionTypes.USERS_ERROR,
-                payload: user.data.msg||'Login failed',
-            })
-            return
-        }
-        if(user.data.data.nickName === null){
-            user.data.data.nickName = user.data.data.login
-        }
-        localStorage.setItem(USER_INFO_KEY, JSON.stringify(user.data.data))
-        dispatch({
-            type: UserActionTypes.GET_USERS_SUCCESS,
-            payload: user.data.data
-        })
-    }
-    catch (e) {
-        dispatch({
-            type: UserActionTypes.USERS_ERROR,
-            payload: e,
-        })
-
-    }
-
-}
 
 
 
