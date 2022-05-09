@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-12-17 11:19:45
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-03-25 14:57:29
+ * @LastEditTime: 2022-05-09 13:48:19
  * @content: edit your page content
  */
 import { Box, Button, Pagination, CardContent, List, Grow, Select, Stack, TextField, Typography, Accordion, AccordionDetails, AccordionSummary, ListItem, ListItemAvatar, ListItemText, Divider } from '@mui/material';
@@ -499,7 +499,7 @@ function DsDiscussionTab(props: any) {
     <Box sx={{ minWidth: 1200, width: '100%' }} >
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

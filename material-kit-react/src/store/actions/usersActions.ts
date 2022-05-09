@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-12-01 16:10:54
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-04-18 10:36:49
+ * @LastEditTime: 2022-05-09 14:22:40
  * @content: edit your page content
  */
 import { JSEncrypt } from 'jsencrypt'
@@ -19,10 +19,9 @@ export const USER_INFO_KEY = 'USER_INFO_KEY'
 export const initUser = () => async dispatch => {
     const userStr = localStorage.getItem(USER_INFO_KEY)
     if (userStr && userStr !== 'null') {
-        const user = JSON.parse(userStr)
         dispatch({
             type: UserActionTypes.GET_USERS_SUCCESS,
-            payload: user
+            payload: userStr
         })
     }
 }
@@ -54,40 +53,54 @@ export const login = (auth: UserFormValues) => async dispatch => {
     })
     try {
 
-        const url = process.env.HTTP_ZUUL
-        const clientId = 'DataSet20211202'
-        const res = await Axios.get(`/api/pangoo-usersystem-v2/publicKey`)
+        // const url = process.env.HTTP_ZUUL
+        // const clientId = 'DataSet20211202'
+        // const res = await Axios.get(`/api/pangoo-usersystem-v2/publicKey`)
 
-        const jSEncrypt = new JSEncrypt()
-        const code = res.data.data
-        jSEncrypt.setPublicKey(code)
-        // 获取公钥对密码进行加密：本地系统时间yyyyMMddHHmmss+明文密码
+        // const jSEncrypt = new JSEncrypt()
+        // const code = res.data.data
+        // jSEncrypt.setPublicKey(code)
+        // // 获取公钥对密码进行加密：本地系统时间yyyyMMddHHmmss+明文密码
 
-        const username = jSEncrypt.encrypt(dateTime() + auth.username)
-        const password = jSEncrypt.encrypt(dateTime() + auth.password)
-        let loginParams = { type: 0, password, username, clientId }
+        // const username = jSEncrypt.encrypt(dateTime() + auth.username)
+        // const password = jSEncrypt.encrypt(dateTime() + auth.password)
+        // let loginParams = { type: 0, password, username, clientId }
+        let formdata = new FormData()
+    
+            formdata.append("keycode",  auth.password)
+        const user = await Axios.post(`/api/user/ldAdminLogin`, formdata)
+        // const user = await Axios.post(`/api/pangoo-data-set/auth/account`, loginParams)
 
-        // const user = await Axios.post(`/api/pangoo-usersystem-v2/auth/account`, loginParams)
-        const user = await Axios.post(`/api/pangoo-data-set/auth/account`, loginParams)
+        // const user ={data:{code:-1,data:{token:'',login:'',nickName:''}},msg:''}
+        // if(auth.username!=='ledong'||auth.password!=='ledong123'){
+        //     dispatch({
+        //         type: UserActionTypes.USERS_ERROR,
+        //         payload:'登陆失败',
+        //     })
+        //     return
+        // }
         // if(user.data.code !== 200){
         if (user.data.code !== 200 && user.data.code !== 0) {
+            localStorage.removeItem(USER_INFO_KEY)
             dispatch({
                 type: UserActionTypes.USERS_ERROR,
-                payload: user.data.msg,
+                payload: user.data.message,
             })
             return
         }
 
-        localStorage.setItem(USER_INFO_KEY, JSON.stringify(user.data.data))
+        console.log("🚀 ~ file: usersActions.ts ~ line 92 ~ user.data.data", user.data.data)
+        localStorage.setItem(USER_INFO_KEY, user.data.data)
         dispatch({
             type: UserActionTypes.GET_USERS_SUCCESS,
             payload: user.data.data
         })
     }
     catch (e) {
+        localStorage.removeItem(USER_INFO_KEY)
         dispatch({
             type: UserActionTypes.USERS_ERROR,
-            payload: e,
+            payload: e.response.data.message,
         })
 
     }

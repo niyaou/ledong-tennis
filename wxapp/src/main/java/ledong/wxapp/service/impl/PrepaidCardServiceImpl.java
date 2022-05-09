@@ -291,5 +291,17 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         return null;
     }
 
+    @Override
+    public Object recentCourse(Integer page, Integer num) {
+        try{
+        LinkedList<HashMap<String, Object>> recent =  SearchApi.searchByFieldSorted(DataSetConstant.LD_COURSE_INFORMATION,
+                LdCourseVo.START,SortOrder.DESC,num);
+            return recent;
+        }catch(Exception e){
+            return null;
+        }
+
+    }
+
 
 }

@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-04-11 11:16:23
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-07 17:55:40
+ * @LastEditTime: 2022-05-09 11:03:52
  * @content: edit your page content
  */
 /*
@@ -137,7 +137,7 @@ function SideMenu(props) {
                             // dispatch(clearDatasetFilesCache())
                             // navigate(`/explore`)
                         }}>
-                            搜索任务
+                            修改
                         </Typography>
                     </Stack>
                 </Stack>

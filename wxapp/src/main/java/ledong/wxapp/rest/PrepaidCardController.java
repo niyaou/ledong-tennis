@@ -18,6 +18,7 @@ import ledong.wxapp.service.IUserService;
 
 import java.util.HashMap;
 
+import ledong.wxapp.service.impl.UserServiceImpl;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,6 +175,32 @@ public class PrepaidCardController {
         }
         return new ResponseEntity<Object>(
                 CommonResponse.success(prepaidCardService.chargeLogRetreat(cardId, time)), HttpStatus.OK);
+    }
+
+
+
+    @RequestMapping(value = "/ld/recentCourse", method = RequestMethod.GET)
+    @ApiOperation(value = "recentCourse ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "page ", required = true, dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "num", value = "num ", required = true, dataType = "int", paramType = "query"),
+    })
+    public ResponseEntity<?> recentCourse(@RequestHeader("Authorization") String authHeader,
+                                              @RequestParam(value = "page", required = true) Integer page,
+                                              @RequestParam(value = "num", required = true) Integer num) throws AuthenticationException {
+
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+        String keycode = claims.getSubject();
+
+        if (!UserServiceImpl.ADMIN_KEY_CODE.equals(keycode )) {
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(prepaidCardService.recentCourse(page, num)), HttpStatus.OK);
     }
 
 }

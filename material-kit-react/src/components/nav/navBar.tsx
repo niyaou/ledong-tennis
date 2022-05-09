@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-12-02 15:55:55
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-03-23 14:16:30
+ * @LastEditTime: 2022-05-09 11:34:47
  * @content: edit your page content
  */
 
@@ -92,7 +92,7 @@ function NavBar() {
                 login
             </Button>)
             }
-            {user.userInfo && Object.keys(user.userInfo).length > 0 ? <Avatar   {...stringAvatar(user.userInfo.nickName)} /> : null}
+            {user.userInfo && Object.keys(user.userInfo).length > 0 ? <Avatar   {...stringAvatar('管理员')} /> : null}
         </Stack>)}
 
         <Outlet />

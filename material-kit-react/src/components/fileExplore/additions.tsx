@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-04-12 13:28:41
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-07 14:40:54
+ * @LastEditTime: 2022-05-09 14:58:12
  * @content: edit your page content
  */
 /*
@@ -631,162 +631,23 @@ function Additions(props) {
       justifyContent="flex-start"
       alignItems="flex-start"
       spacing={5}
-      sx={{ height: '100%', width: '15%', minWidth: '300px', paddingTop: 2, overflowY: 'auto', }}
+      sx={{ height: '100%', width: '15%', minWidth: '300px',paddingRight:'30px', paddingLeft:'30px',paddingTop: 5, overflowY: 'auto',background: '#f5f6fa'  }}
     >
+         <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
+       记录课程
+      </Typography>
+      {/* sx={{ height: '100%', width: '95%', paddingTop: 2, paddingLeft: '10px !important', overflowY: 'auto', }}> */}
 
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        alignItems="center"
-        spacing={5}
-        sx={{ width: '100%', }}
-      >
-        {searchActive && (<IconButton sx={{}} aria-label="search" size="small"
-          onClick={
-            (e) => {
-              dispatch(searchDeActiveAction())
-            }
-          }
-        >
-          <ReplyAllIcon />
-        </IconButton>)}
-
-        <Paper
-          variant="outlined"
-          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '70%', borderRadius: '30px', height: 24 }}
-        >
-          <InputBase
-            disabled={mergeActive||exploreMode}
-            sx={{ ml: 1, flex: 1 }}
-            value={searchContent}
-            onKeyDown={(event: any) => {
-              if (event.keyCode === 13) {
-
-              }
-            }}
-            onChange={(event: any) => {
-              setSearchContent(event.target.value)
-            }}
-            onFocus={(event: any) => {
-              dispatch(searchActiveAction())
-            }}
-            onBlur={(event: any) => { }}
-            placeholder="   Search For DataSets Which You Need"
-            inputProps={{ 'aria-label': 'Search For DataSets Which You Need' }}
-          />
-          <IconButton sx={{ p: '10px' }} aria-label="search"
-            disabled={mergeActive || !searchActive||exploreMode}
-            onClick={
-              (e) => {
-                // click for search
-                dispatch(selectedByParams(queryParams, 50))
-                // let params = qs.parse(location.search.substring(1, location.search.length))
-              }
-            }
-          >
-            <SearchIcon />
-          </IconButton>
-        </Paper>
-      </Stack>
 
       {/* {searchActive ? */}
-      {searchActive && <Grow in={searchActive}
+       <Grow in={true}
         style={{ transformOrigin: '0 0 0' }}
         {...(searchActive ? { timeout: 1000 } : {})}
 
-      >{searchForm}</Grow>}
+      >{searchForm}</Grow>
 
 
-      <Grow in={!searchActive}
-        style={{ transformOrigin: '0 0 0', }}
-        {...(!searchActive ? { timeout: 1000 } : {})}>
-        <Stack
-          direction="column"
-          justifyContent={currentNodeSelected ? "flex-start" : "center"}
-          alignItems={currentNodeSelected ? "flex-start" : "center"}
-          spacing={2}
-          sx={{ height: '100%', width: '95%', paddingTop: 2, paddingLeft: '10px !important', overflowY: 'auto', background: '#f5f6fa' }}>
-          <img src={currentNodeSelected ? parseIconUrl(currentNodeSelected.fileName.split('.'), currentNodeSelected.isDir) : BlankFolderIconUrl} />
-          <Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: currentNodeSelected ? '90%' : 'auto', color: 'rgba(0, 0, 0, 0.6)' }} >
-            {currentNodeSelected ? currentNodeSelected.fileName : " 选中文件，查看详情"}
-          </Typography>
-          {currentNodeSelected && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-            文件路径：  {currentNodeSelected.filePath}
-          </Typography>)}
-          {currentNodeSelected && currentNodeSelected.length && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-            大小： {fileLengthFormat(currentNodeSelected.length)}
-          </Typography>)}
-          {currentNodeSelected && currentNodeSelected.attsArray && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-            标签：{currentNodeSelected.attsArray.join(',')}
-          </Typography>)}
-          {currentNodeSelected && currentNodeSelected.senceAttsArray && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-            场景：{currentNodeSelected.senceAttsArray.join(',')}
-          </Typography>)}
-          {currentNodeSelected && currentNodeSelected.labelFilePath && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-            标注文件：{currentNodeSelected.labelFilePath}
-          </Typography>)}
-          {currentNodeSelected && currentNodeSelected.indexSync && !mergeActive && (<Button variant="outlined" size="small" startIcon={<AutoAwesomeMotionIcon />}
-            onClick={() => {
-              setOpen(true)
-            }}>
-            更新标签
-          </Button>)}
-          {currentNodeSelected && currentNodeSelected.indexSync && currentNodeSelected.isDir && !mergeActive && !currentNodeSelected.labelFilePath && (<Button variant="outlined" size="small" startIcon={<ExtensionIcon />}
-            onClick={() => {
-              dispatch(mergeActiveAction())
-              setRawNode(currentNodeSelected)
-            }}>
-            关联标注文件
-          </Button>)}
-          {currentNodeSelected && currentNodeSelected.indexSync && currentNodeSelected.isDir && !mergeActive && !currentNodeSelected.labelFilePath && (<Button variant="outlined" size="small"
-            startIcon={<AccountTreeIcon />}
-            onClick={() => {
-              setOpenStandard(true)
-            }}>
-            上传标定文件
-          </Button>)}
-
-
-          {labelNode && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-            标注文件目录： {labelNode.filePath}
-          </Typography>)}
-
-
-
-          {currentNodeSelected && mergeActive && (<Button variant="outlined" size="small" 
-          disabled={!labelNode}
-          startIcon={<DoneIcon />}
-            onClick={() => {
-              dispatch(mergeDeActiveAction())
-              console.log(rawNode.filePath, labelNode.filePath)
-              dispatch(mergeIndexAction(rawNode.filePath, labelNode.filePath))
-              setRawNode(undefined)
-            }}>
-            提交关联
-          </Button>)}
-
-          {currentNodeSelected && mergeActive && (<Button variant="outlined" size="small" startIcon={<NotInterestedIcon />}
-            onClick={() => {
-              setRawNode(undefined)
-              setLabelNode(undefined)
-              dispatch(mergeDeActiveAction())
-            }}>
-            取消关联
-          </Button>)}
-
-
-
-
-
-          {currentNodeSelected && !currentNodeSelected.indexSync && (<Button variant="outlined" size="small" startIcon={<InsightsIcon />}
-            onClick={() => {
-              dispatch(uploadFileFolderIndexAction(currentNodeSelected.filePath))
-            }}>
-            创建索引
-          </Button>)}
-        </Stack></Grow>
-      {/* } */}
-
+  
     </Stack>
   </>
   )

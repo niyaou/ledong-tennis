@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:47:48
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-03-29 13:47:50
+ * @LastEditTime: 2022-05-09 13:48:43
  * @content: 数据集详情页面
  */
 
@@ -222,7 +222,7 @@ const SpecificationDataSet = () => {
     <ThemeProvider theme={dsTheme}>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

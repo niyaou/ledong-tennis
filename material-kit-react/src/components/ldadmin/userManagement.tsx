@@ -4,14 +4,14 @@
  * @Author: uidq1343
  * @Date: 2021-12-17 11:19:45
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 13:39:20
+ * @LastEditTime: 2022-05-09 15:19:11
  * @content: edit your page content
  */
 
 import CachedIcon from '@mui/icons-material/Cached';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { TreeItemProps } from '@mui/lab/TreeItem';
-import { Box, Checkbox, Grid, Paper, Stack, Typography, Button } from '@mui/material';
+import { Box, Checkbox, Grid, Paper, Stack, Typography, Button, Avatar } from '@mui/material';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -34,14 +34,9 @@ import useStyles from '../../common/styles';
 import { useSelector } from "../../redux/hooks";
 import {
   fileSelectedViews, folderContentStatistic, labelsStatisticAction, nodeSelected, selectedByParams,
-  pathConfig, rootProjects, selectedFolderContent,selectedAndMoveByParams,exploreModeAction,updateSelectedParams,
+  pathConfig, rootProjects, selectedFolderContent, selectedAndMoveByParams, exploreModeAction, updateSelectedParams,
 } from '../../store/actions/filesAndFoldersActions';
-//  import {
-//   rootProjects, selectedFolderContent
-//   , toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig, searchActiveAction, searchDeActiveAction, selectedByParams, updateSelectedParams,
-//   mergeActiveAction, mergeDeActiveAction, mergeIndexAction
-// } from '../../store/actions/filesAndFoldersActions';
-import FileViewerComponent from "./fileviewer";
+import RecentCourse from './recentCourse'
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
   color?: string;
@@ -86,7 +81,8 @@ function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
 }
 
 
-function IdsFileTree(props) {
+function UserManagement(props) {
+  const { users } = useSelector((state) => state.domination)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(true);
   const [treeSets, setTreeSets] = React.useState({ path: '', raw: '' });
@@ -96,7 +92,7 @@ function IdsFileTree(props) {
   const user = useSelector((state) => state.users)
   const classes = useStyles();
   const dispatch = useDispatch()
-  const { files, folders, rootPath, restNodes, currentIndex, searchActive, mergeActive, fileStatistic, searchParams,exploreMode } = useSelector((state) => state.filesAndFolders)
+  const { files, folders, rootPath, restNodes, currentIndex, searchActive, mergeActive, fileStatistic, searchParams, exploreMode } = useSelector((state) => state.filesAndFolders)
   const { cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
   const [element, setElement] = React.useState([])
   const [pageParams, setPageParams] = React.useState({ num: 1, size: 50 })
@@ -123,10 +119,10 @@ function IdsFileTree(props) {
     //   if(Object.keys(searchParams).length===0){
     //     dispatch(selectedByParams({...searchParams,filePath:treeSets.raw,  pageNo: 1, pageSize: 50, queryType: 0},pageParams.size))
     //   }else{
-        dispatch(updateSelectedParams({...searchParams,filePath:treeSets.raw}))
+    dispatch(updateSelectedParams({ ...searchParams, filePath: treeSets.raw }))
     //   }
     // }
-    console.log("🚀 ~ file: idsFileTree.tsx ~ line 124 ~ IdsFileTree ~ treeSets", treeSets,searchParams)
+    console.log("🚀 ~ file: idsFileTree.tsx ~ line 124 ~ IdsFileTree ~ treeSets", treeSets, searchParams)
   }, [treeSets])
 
   useEffect(() => {
@@ -161,9 +157,9 @@ function IdsFileTree(props) {
 
 
 
-const parsePathList=()=>{
-  return element.map(e=>{return e.filePath})
-}
+  const parsePathList = () => {
+    return element.map(e => { return e.filePath })
+  }
 
 
 
@@ -258,14 +254,14 @@ const parsePathList=()=>{
               if (navType === -1) {
                 //上一页
                 if (searchActive) {
-                  dispatch(selectedByParams({...searchParams,queryType:-1,pageNo:currentIndex - 1,sortValues:element[0]},  pageParams.size))
+                  dispatch(selectedByParams({ ...searchParams, queryType: -1, pageNo: currentIndex - 1, sortValues: element[0] }, pageParams.size))
                 } else {
                   dispatch(selectedFolderContent(treeSets.raw, currentIndex - 1, pageParams.size))
                 }
               } else {
                 // 下一页
                 if (searchActive) {
-                  dispatch(selectedByParams({...searchParams,queryType:1,pageNo:currentIndex + 1,sortValues:element[element.length-1]},  pageParams.size))
+                  dispatch(selectedByParams({ ...searchParams, queryType: 1, pageNo: currentIndex + 1, sortValues: element[element.length - 1] }, pageParams.size))
                 } else {
                   dispatch(selectedFolderContent(treeSets.raw, currentIndex + 1, pageParams.size))
                 }
@@ -297,61 +293,39 @@ const parsePathList=()=>{
 
 
 
-  const fileItem = (folder, index) => {
-    return (<Grid item xs={1} key={index}>
-      <Paper elevation={0} sx={{ background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
-        <Tooltip title={folder.fileName} placement="top">
-          <Stack
-            direction="column"
-            justifyContent="center"
-            alignItems=""
-            spacing={0}
-            sx={{ cursor: !folder.isDir ? 'auto' : 'pointer', '& :hover': { background: 'transparent' } }}
-            onMouseEnter={() => {
-              setFileIndex(index)
-            }}
-            onMouseLeave={() => {
-              setFileIndex(-1)
-            }}
-            onClick={(event) => {
+  const fileItem = (user, index) => {
+    return (<Grid item xs={1} key={index} space={1}>
+      <Paper elevation={1} sx={{ background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
 
-            }}>
-            {index === fileIndex || index === fileIndexChecked ? (<Checkbox {...label}
-              disabled={mergeActive && !folder.isDir}
-              checked={fileIndexChecked === index}
-              onChange={handleChange}
-              sx={{ alignSelf: 'flex-start !important' }} size="small" />)
-              : (<Box sx={{ height: '38px', width: '100%' }}></Box>)}
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              spacing={0}
-              sx={{ cursor: !folder.isDir ? 'auto' : 'pointer', '& :hover': { background: 'transparent' } }}
-              onClick={(event) => {
-                if (folder.isDir) {
-                  handleClick(event, folder)
-                } else {
-                  // setExploreMode(true)
-                  dispatch(exploreModeAction(true))
-                  // 点击设置文件
-                  dispatch(fileSelectedViews({ root: { path: folder.filePath, fileType: folder.filePath.split('.').reverse()[0] }, leaf: [] }))
-                  setFileIndexChecked(fileIndex)
-                  setSelectedNode(element[fileIndex])
-                }
-              }}>
-              <img src={parseIconUrl(folder.filePath.split('.'), folder.isDir)} />
-              <Typography gutterBottom variant="body2"
-                sx={{
-                  color: 'rgba(0, 0, 0, 0.6)',
-                  whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
-                }} >
-                {folder.fileName}
-              </Typography>
-            </Stack>
-          </Stack>
+        <Stack
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          spacing={0}
+          sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
+          onMouseEnter={() => {
 
-        </Tooltip>
+          }}
+          onMouseLeave={() => {
+
+          }}
+          onClick={(event) => {
+
+          }}>
+          <Avatar alt="Remy Sharp" src={user.avator} />
+
+
+          <Typography gutterBottom variant="body2"
+            sx={{
+              color: 'rgba(0, 0, 0, 0.6)',
+              whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
+            }} >
+            {user.realName||user.nickName}
+          </Typography>
+
+        </Stack>
+
+
       </Paper>
     </Grid>
     )
@@ -364,7 +338,7 @@ const parsePathList=()=>{
     alignItems="flex-start"
     spacing={0}
     sx={{ height: '100%', width: '85%', paddingTop: 2, overflowY: 'auto' }}  >
-    {exploreMode ? (<> <FileViewerComponent exploreMode={exploreMode} sx={{ width: '100%', height: '800px' }} back={() => { dispatch(exploreModeAction(false)) }} /></>) : (<>
+    {exploreMode ? null : (<>
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -375,10 +349,10 @@ const parsePathList=()=>{
           separator={<NavigateNextIcon fontSize="small" />}
           aria-label="breadcrumb">
           {treeSets && treeSets.path !== '' ? (<Typography gutterBottom variant="body2"
-            sx={{ cursor: searchActive?'auto': 'pointer' }}
+            sx={{ cursor: searchActive ? 'auto' : 'pointer' }}
             color="inherit"
             onClick={() => {
-              if(searchActive){
+              if (searchActive) {
                 return
               }
               let rawPath = rootPath.rootPath
@@ -398,10 +372,10 @@ const parsePathList=()=>{
           {treeSets.path && treeSets.path.map((tree, index) => {
             return (
               <Typography gutterBottom variant="body2" key={index}
-                sx={{ cursor: index === (treeSets.path.length - 1) ? 'auto' :searchActive?'auto':  'pointer' }}
+                sx={{ cursor: index === (treeSets.path.length - 1) ? 'auto' : searchActive ? 'auto' : 'pointer' }}
                 color="inherit"
                 onClick={() => {
-                  if(searchActive){
+                  if (searchActive) {
                     return
                   }
                   let rawPath = rootPath.rootPath + '/' + treeSets.path.slice(0, index + 1).join('/')
@@ -422,19 +396,19 @@ const parsePathList=()=>{
           spacing={5}
         >
           <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
-            {currentSelectFolderTree &&currentSelectFolderTree.root.filePath &&`目标文件夹：${currentSelectFolderTree.root.filePath}`}
+            {currentSelectFolderTree && currentSelectFolderTree.root.filePath && `目标文件夹：${currentSelectFolderTree.root.filePath}`}
           </Typography>
 
 
           {currentSelectFolderTree && searchActive && (
             <Button variant="outlined" disabled={!element || element.length === 0} size="small" onClick={() => {
               // parsePathList()
-              dispatch(selectedAndMoveByParams({filePaths:parsePathList(),destFilePath:currentSelectFolderTree.root.filePath})) 
-             }}>添加当前页结果</Button>
+              dispatch(selectedAndMoveByParams({ filePaths: parsePathList(), destFilePath: currentSelectFolderTree.root.filePath }))
+            }}>添加当前页结果</Button>
           )}
-          {currentSelectFolderTree && searchActive&&(
-            <Button variant="outlined" disabled={!element || element.length === 0} size="small" onClick={() => { 
-              dispatch(selectedAndMoveByParams({...searchParams,destFilePath:currentSelectFolderTree.root.filePath}))       
+          {currentSelectFolderTree && searchActive && (
+            <Button variant="outlined" disabled={!element || element.length === 0} size="small" onClick={() => {
+              dispatch(selectedAndMoveByParams({ ...searchParams, destFilePath: currentSelectFolderTree.root.filePath }))
             }}>添加全部结果</Button>
           )}
 
@@ -456,21 +430,20 @@ const parsePathList=()=>{
         </Stack>
 
       </Stack>
-      <Grid
+      {/* <Grid
         container
         direction="row"
         justifyContent="flex-start"
         alignItems="flex-start"
-        spacing={0}
+        spacing={1}
         sx={{ height: 'auto', width: '100%', paddingTop: 0, overflowY: 'auto' }}>
-        {/* {folders && folders.map((folder, index) => fileItem(folder, index))}
-        {files && files.map((file, index) => fileItem(file, index))} */}
-        {currentIndex > 1 && fileNav(-1)}
-        {element && element.map((file, index) => fileItem(file, index))}
-        {restNodes > 0 && fileNav(1)}
-      </Grid>
+   
+        {users && users.map((file, index) => fileItem(file, index))}
+   
+      </Grid> */}
+      <RecentCourse />
     </>)}
   </Stack>
   )
 }
-export default IdsFileTree
+export default UserManagement

@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:46:34
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-03-31 14:01:11
+ * @LastEditTime: 2022-05-09 13:48:22
  * @content: 数据集栏目列表以及搜索列表页面
  */
 import { ArrowBackIosSharp, ArrowForwardIosSharp } from '@mui/icons-material';
@@ -93,7 +93,7 @@ function AuditDataSet() {
     }>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

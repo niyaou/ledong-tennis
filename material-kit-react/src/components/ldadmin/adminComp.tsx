@@ -4,16 +4,15 @@
  * @Author: uidq1343
  * @Date: 2021-12-17 11:19:45
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 13:48:15
+ * @LastEditTime: 2022-05-09 14:54:30
  * @content: edit your page content
  */
 import { Backdrop,CircularProgress,Button, Card,Grow, CardHeader, Checkbox, Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText ,Box} from '@mui/material';
 import React,{useEffect} from 'react';
 import { useDispatch } from 'react-redux';
-import IdsFileTree from '../fileExplore/idsFileTree'
+import UserManagement from './userManagement'
 import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
-import DsFolderTree from '../fileExplore/dsFolderTree'
 import { tagsInfoAction ,scenceInfoAction} from '../../store/slices/tagsSlice'
 import { rootProjects, selectedFolderContent
   ,toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig, searchActiveAction, searchDeActiveAction,selectedByParams,labelsStatisticAction } from '../../store/actions/filesAndFoldersActions';
@@ -30,7 +29,7 @@ function union(a: readonly number[], b: readonly number[]) {
   return [...a, ...not(b, a)];
 }
 
-function FsResourceManagement(props) {
+function AdminComp(props) {
   const datasetId = props.datasetId
   const index = props.index
   const { loading ,searchActive,mergeActive} = useSelector((state) => state.filesAndFolders)
@@ -101,11 +100,12 @@ function FsResourceManagement(props) {
         alignItems="center"
         sx={{ height: '100%', width: '100%' }}>
         
-        <IdsFileTree datasetId={datasetId} />
-        <Additions />
+        <UserManagement />
+        <Additions 
+        sx={{marginRight:30,}}/>
         {/* <Grid item><DsFolderTree  datasetId={datasetId} editType={true} /></Grid> */}
       </Stack>
     </Box>
   );
 }
-export default FsResourceManagement
+export default AdminComp

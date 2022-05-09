@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:48:11
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-04-22 14:23:13
+ * @LastEditTime: 2022-05-09 13:48:40
  * @content: 首页列表编辑页面
  */
 import AddCommentIcon from '@mui/icons-material/AddComment';
@@ -275,7 +275,7 @@ const PermissionApply = () => {
     }>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 2 }}
-        open={loading}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

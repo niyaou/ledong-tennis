@@ -72,4 +72,12 @@ public interface IPrepaidCardService {
          * @return
          */
         public Object chargeLogRetreat(String cardId,String chargedTime);
+
+        /**
+         *
+         * @param page
+         * @param Num
+         * @return
+         */
+        public Object recentCourse(Integer page,Integer Num);
 }

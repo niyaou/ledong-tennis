@@ -8,7 +8,7 @@
  * @content: edit your page content
  */
 /**
- * 配合reudx tool的createAsyncThunk rejectWithValue和exploreDataSetAction.rejected使用
+ * 配合reudx tool的createAsyncThunk rejectWithValue和exploreUsersAction.rejected使用
  * @param action 
  * @returns 
  */

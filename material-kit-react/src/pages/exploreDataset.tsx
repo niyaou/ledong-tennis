@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:46:34
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-03-21 15:27:53
+ * @LastEditTime: 2022-05-09 13:48:31
  * @content: 数据集栏目列表以及搜索列表页面
  */
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -90,7 +90,7 @@ function ExploreDataSet() {
     }>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>

@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:34:34
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-04-29 13:58:50
+ * @LastEditTime: 2022-05-09 13:51:26
  * @content:数据集网站首页
  */
 import { Backdrop, CircularProgress, Typography, Stack, Avatar, Card, CardMedia, Box, Divider, Button, Grid, CardContent, CardActions } from '@mui/material'
@@ -16,7 +16,7 @@ import { connect, useDispatch } from 'react-redux'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { logOut } from '../store/actions/usersActions'
 import { useSelector } from "../redux/hooks"
-import { exploreDataSetAction } from '../store/slices/dominationSlice'
+import { exploreUsersAction } from '../store/slices/dominationSlice'
 import { searchDeActiveAction } from '../store/actions/filesAndFoldersActions'
 import bottomURL from '../assert/logo_white.png'
 import contentImgURL from '../assert/content.png';
@@ -39,7 +39,6 @@ function DominationPage() {
   const dominationData = useSelector((state) => state.domination)
   const loading = useSelector((state) => state.domination.loading)
   const loadError = useSelector((state) => state.domination.loadError)
-  const { searchActive,mergeActive } = useSelector((state) => state.filesAndFolders)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   let navigate = useNavigate()
   const dispatch = useDispatch()
@@ -47,7 +46,7 @@ function DominationPage() {
 
   const [index, setIndex] = React.useState<number>(0);
   useEffect(() => {
-    dispatch(exploreDataSetAction())
+    dispatch(exploreUsersAction())
   }, [])
 
   useEffect(() => {
@@ -82,8 +81,7 @@ function DominationPage() {
             setIndex(current)
             dispatch(searchDeActiveAction())
           }} />
-          {searchActive && (
-            <DsFolderTree datasetId={1} editType={true} />)}
+ 
           <IndexContainer index={index} />
         </Stack>
       </Stack>

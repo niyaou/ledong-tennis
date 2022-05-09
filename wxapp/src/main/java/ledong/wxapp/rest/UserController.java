@@ -232,7 +232,7 @@ public class UserController {
     @RequestMapping(value = "/ldAdminLogin", method = RequestMethod.POST)
     @ApiOperation(value = "认证管理-用户登录", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "keycode", value = "keycode", required = true, dataType = "string", paramType = "form") })
+            @ApiImplicitParam(name = "keycode", value = "keycode", required = true, dataType = "string", paramType = "query") })
     public ResponseEntity<?> registerLDAdmin(@RequestParam(value = "keycode", required = true) String keycode) {
 
         String info = userService.adminLogin(keycode);

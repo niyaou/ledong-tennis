@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-23 14:48:09
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-03-22 11:40:47
+ * @LastEditTime: 2022-05-09 14:22:23
  * @content: edit your page content
  */
 import * as React from "react";
@@ -17,9 +17,8 @@ import { useSelector } from "../redux/hooks";
  const RequireAuth = ( {children} )=>  {
   const user =  useSelector((state)=>state.users)
   let location = useLocation();
-  const params = useParams()
   
-  if (user.userInfo && Object.keys(user.userInfo).length > 0) {
+  if (user.userInfo ) {
     return children;
   }
 

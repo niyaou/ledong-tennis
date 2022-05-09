@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:48:11
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-02-24 10:52:02
+ * @LastEditTime: 2022-05-09 10:38:48
  * @content: 数据集创建页面
  */
 import { AccountCircle } from '@mui/icons-material';
@@ -100,7 +100,6 @@ const LoginPage = () => {
   let from = location.state?.from?.pathname || "/";
   const dispatch = useDispatch()
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 
   const onSubmit = (auth: UserFormValues) => {
@@ -138,7 +137,7 @@ const LoginPage = () => {
         spacing={3}
       >
         <Link to='/'>
-          <img src={imgURL} className={classes.img} />
+          {/* <img src={imgURL} className={classes.img} /> */}
         </Link>
         <Card sx={{ display: 'flex' }}>
           <Form
@@ -158,7 +157,7 @@ const LoginPage = () => {
                     <Typography variant="caption" display="block" gutterBottom>
                       welcom to
                       <Typography variant="button" display="block" gutterBottom>
-                        Pangoo DM
+                        Ledong Tennis
                       </Typography>
                     </Typography >
                     <Field

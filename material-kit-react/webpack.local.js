@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-23 11:44:46
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-04-13 18:16:22
+ * @LastEditTime: 2022-05-09 11:19:42
  * @content: edit your page content
  */
 const { merge } = require('webpack-merge');
@@ -72,13 +72,13 @@ module.exports = env => {
         // },
         // env dev
         '/api': {
-          target: 'http://10.217.2.232:31007',
+          target: 'http://127.0.0.1:8081',
           pathRewrite: { '^/api': '' },
           changeOrigin: true,
           secure: false,
           headers: {
-            host: "http://10.217.2.232:31007",
-            origin: "http://10.217.2.232:31007"
+            host: "http://127.0.0.1:8081",
+            origin: "http://127.0.0.1:8081"
           }
         },
         //env test

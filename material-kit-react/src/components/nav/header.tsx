@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-12-23 15:42:53
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-04-12 15:59:54
+ * @LastEditTime: 2022-05-09 11:34:35
  * @content: edit your page content
  */
 import { Avatar, Box, Stack, Typography,Paper } from '@mui/material';
@@ -136,7 +136,7 @@ function Header(props) {
 
 
                     </Box>
-                </React.Fragment>} ><Avatar   {...stringAvatar(user.userInfo.nickName)} /></HtmlTooltip> : null}
+                </React.Fragment>} ><Avatar   {...stringAvatar('管理员')} /></HtmlTooltip> : null}
             </Stack>
         </Box>
     )
