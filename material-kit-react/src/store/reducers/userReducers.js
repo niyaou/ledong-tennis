@@ -7,14 +7,15 @@
  * @LastEditTime: 2022-03-28 16:48:05
  * @content: user reducer
  */
-/* eslint-disable */
 import { UserActionTypes } from '../types'
+import { fetching } from '../../common/interface'
 const initialState = {
     userInfo: {},
     appliesList: [],
-    publickey: '123132',
+    publickey: '',
     isDirectToDomanitaion: false,
     success:false,
+    ...fetching,
 }
 
 export default function (state = initialState, action) {

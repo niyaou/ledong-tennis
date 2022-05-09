@@ -1,0 +1,200 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {APP_ENV}
+  name: {APP_NAME}
+  labels:
+    app: {APP_NAME}
+spec:
+  replicas: {REPLICAS}
+  selector:
+    matchLabels:
+      app: {APP_NAME}
+  template:
+    metadata:
+      labels:
+        app: {APP_NAME}
+    spec:
+      spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: zone
+                    operator: In
+                    values:
+                      - {SERVER_ZONE}
+      containers:
+        - name: {APP_NAME}
+          image: {IMAGE}
+          resources:
+            requests:
+              memory: {MEM_REQUEST}
+            limits:
+              memory: {MEM_LIMIT}
+          volumeMounts:
+            - name: app-logs
+              mountPath: /var/log/nginx
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 15
+        - name: logger
+          image: 10.217.2.231:8888/ops/logger:1.0
+          resources:
+            requests:
+              memory: 500M
+            limits:
+              memory: 500M
+          volumeMounts:
+            - name: app-logs
+              mountPath: /logs
+            - name: filebeat-config
+              mountPath: /usr/share/filebeat/filebeat.yml
+              subPath: filebeat.yml
+            - name: clean-config
+              mountPath: /usr/share/filebeat/log_clean/config.yml
+              subPath: config.yml
+      volumes:
+        - name: app-logs
+          emptyDir: {}
+        - name: filebeat-config
+          configMap:
+            name: filebeat-config-{APP_NAME}
+        - name: clean-config
+          configMap:
+            name: clean-config-{APP_NAME}
+      imagePullSecrets:
+        - name: harbor-secret
+      hostAliases:
+        - ip: 10.217.2.52
+          hostnames:
+            - dev2.desay.com
+        - ip: 10.217.2.53
+          hostnames:
+            - dev3.desay.com
+        - ip: 10.217.2.54
+          hostnames:
+            - dev4.desay.com
+        - ip: 10.133.34.21
+          hostnames:
+            - desay.hadoop1.com
+        - ip: 10.133.34.22
+          hostnames:
+            - desay.hadoop2.com
+        - ip: 10.133.34.23
+          hostnames:
+            - desay.hadoop3.com
+        - ip: 10.133.34.114
+          hostnames:
+            - das-2.desay.com
+        - ip: 10.133.34.115
+          hostnames:
+            - das-3.desay.com
+        - ip: 10.133.34.116
+          hostnames:
+            - das-4.desay.com
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {APP_ENV}
+  name: filebeat-config-{APP_NAME}
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+    - type: log
+      enabled: true
+      paths:
+        - /logs/service.log
+      fields:
+        log_source: service_{APP_NAME}
+        log_env: {APP_ENV}
+        log_topic: elk_log
+        log_level: ERROR
+      include_lines:
+        - '^\s[45]\d{2}\s'
+
+    output.kafka:
+      hosts: [{ELK_KAFKA}]
+      version: 1.0.0
+      topic: '%{[fields.log_topic]}'
+      partition.round_robin:
+        reachable_only: true
+      required_acks: 1
+      compression: gzip
+      max_message_bytes: 1000000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {APP_ENV}
+  name: clean-config-{APP_NAME}
+data:
+  config.yml: |
+    src_host: localhost
+    log_list:
+      - log_path: /logs
+        process:
+          - clean_rule:
+              filename_match: service.log
+              modify_before: 1
+              max_size: 0
+            clean_action: truncate
+            archive_before_clean: false
+            archive_params:
+              archive_name: ~
+              host: ~
+              destnation: ~
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {APP_ENV}
+  name: {APP_NAME}
+  labels:
+    app: {APP_NAME}
+  annotations:
+    prometheus.io/tcp_probe: 'true'
+    prometheus.io/tcp_probe_port: '80'
+spec:
+  type: NodePort
+  selector:
+    app: {APP_NAME}
+  ports:
+    - name: {APP_NAME}
+      port: 80
+      targetPort: 80
+      nodePort: {NODEPORT1}
+# ---
+# apiVersion: networking.k8s.io/v1beta1
+# kind: Ingress
+# metadata:
+#   namespace: {APP_ENV}
+#   name: {APP_NAME}
+#   annotations:
+#     kubernetes.io/ingress.class: "nginx"
+#     nginx.ingress.kubernetes.io/proxy-connect-timeout: "5"
+#     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+#     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+# spec:
+#   rules:
+#   # - host: service.desay.com
+#     - http:
+#         paths:
+#         - path: /{APP_NAME}
+#           backend:
+#             serviceName: {APP_NAME}
+#             servicePort: {APP_NAME}
