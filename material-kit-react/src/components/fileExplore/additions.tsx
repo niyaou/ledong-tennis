@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-04-12 13:28:41
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-10 16:47:31
+ * @LastEditTime: 2022-05-10 22:02:00
  * @content: edit your page content
  */
 /*
@@ -77,7 +77,7 @@ import qs from 'qs'
 import {
   CardHeader, Checkbox, Divider, Box, Button, Modal, Grid,
   Card, Tabs, Tab, Fade, CardMedia, Paper, Stack, Backdrop, Grow,
-  CircularProgress, TextField, Typography, Select, MenuItem, FormControl, InputLabel, Input, FormControlLabel, Switch
+  CircularProgress, TextField, Autocomplete, Typography, Select, MenuItem, FormControl, InputLabel, Input, FormControlLabel, Switch
 } from '@mui/material';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
@@ -91,8 +91,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import LowCascader from './lowCascader'
 import ExtensionIcon from '@mui/icons-material/Extension';
-import { findIndex } from 'lodash';
-
+import { findIndex,find } from 'lodash';
 
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
@@ -132,7 +131,7 @@ function Additions(props) {
 
   const [dataSetInfo, setDataSetInfo] = React.useState(null)
   const { datasets } = useSelector((state) => state.dsExplore)
-  const user = useSelector((state) => state.users)
+
   const classes = useStyles();
   const dispatch = useDispatch()
   const { folders, cacheTree, rootPath, searchActive, nodeSelected, searchParams,
@@ -145,6 +144,24 @@ function Additions(props) {
 
   const [currentNodeSelected, setCurrentNodeSelected] = React.useState();
   const [restLabelItem, setRestLabelItem] = React.useState(labelStatistic || []);
+
+  const [userOptions, setUserOptions] = React.useState( []);
+
+  const [memberValue, setMemberValue] = React.useState<string | null>('');
+  const [inputValue, setInputValue] = React.useState('');
+
+  useEffect(() => {
+
+    if (users && users.length > 0) {
+    let r=  users.filter(u=>u.prepaidCard).map(user => { return user.prepaidCard  })
+    console.log("🚀 ~ file: additions.tsx ~ line 154 ~ useEffect ~ r", r)
+    setUserOptions(r)
+    }
+
+  }, [users])
+
+  // users.map(user => { return { ...user, label: user.prepaidCard } })
+
 
   const [rawNode, setRawNode] = React.useState();
   const [labelNode, setLabelNode] = React.useState();
@@ -434,38 +451,27 @@ function Additions(props) {
   )
 
 
+const memberItem=(m,idx)=>{
+  let mi = find(users, { 'prepaidCard': m })
+return (<Stack
+  direction="column"
+  justifyContent="center"
+  alignItems="flex-start"
+  spacing={2}
+  key={`member-${idx}`}
+  sx={{ color: 'rgb(0,0,0,0.6)' }}>
+  <Typography gutterBottom variant="body2"
+              sx={{
+                color: 'rgba(0, 0, 0, 0.6)',
+                minWidth: '80px',
+              }} >
+              {mi.prepaidCard}
+            </Typography>
+  </Stack>)
+}
 
 
 
-
-
-  const parseIconUrl = (path, isFolder) => {
-
-    path = path[path.length - 1]
-    if (isFolder) {
-      return FolderIconUrl
-    } else
-
-      if (['jpg', 'jpeg', 'gif', 'bmp', 'png'].indexOf(path) > -1) {
-        return ImageIconUrl
-      } else
-
-
-        if (['csv', 'xlsx', 'js', 'txt', 'json'].indexOf(path) > -1) {
-          return TextGreenIconUrl
-        } else
-          if (['mp3',].indexOf(path) > -1) {
-            return AudioIconUrl
-          } else
-            if (['mp4', 'avi'].indexOf(path) > -1) {
-              return VideoIconUrl
-            } else
-              if (['zip'].indexOf(path) > -1) {
-                return ZipIconUrl
-              } else {
-                return TextIconUrl
-              }
-  }
 
   const [age, setAge] = React.useState('');
 
@@ -477,8 +483,8 @@ function Additions(props) {
   );
   // new Date(),
 
-  const appendArr = () => {
-    labelArr.push(labelArr.length + 1)
+  const appendArr = (item) => {
+    labelArr.push(item)
     let a = labelArr.concat()
     setLabelArr(a)
   }
@@ -489,13 +495,13 @@ function Additions(props) {
     alignItems="center"
     spacing={2}
     sx={{ color: 'rgb(0,0,0,0.6)' }}>
-   
 
-    <FormControl sx={{  width: 300, }}>
+
+    <FormControl sx={{ width: 300, }}>
       <InputLabel id="demo-controlled-open-select-label1">校区</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
-        
+
         onChange={() => { }}
         value={['1']}>
         {areas.map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
@@ -508,7 +514,7 @@ function Additions(props) {
         name='FileTypes'
         onChange={() => { }}
         value={['班课']}>
-        {['班课','私教'].map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
+        {['班课', '私教'].map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
       </Select>
     </FormControl>
 
@@ -518,7 +524,7 @@ function Additions(props) {
         name='FileTypes'
         onChange={() => { }}
         value={['']}>
-        {users&&users.filter((user) => user.coach===1||user.clubId===3).map((dict, index) => { return (<MenuItem key={index} value={dict.realName}>{dict.realName}</MenuItem>) })}
+        {users && users.filter((user) => user.coach === 1 || user.clubId === 3).map((dict, index) => { return (<MenuItem key={index} value={dict.realName}>{dict.realName}</MenuItem>) })}
       </Select>
     </FormControl>
 
@@ -554,13 +560,29 @@ function Additions(props) {
       </FormControl>
     </LocalizationProvider>
     <FormControl sx={{ m: 1, width: '100%' }} >
-      <Button variant="outlined" size="small" startIcon={<AutoAwesomeMotionIcon />}
+      {/* <Button variant="outlined" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
           setOpenSearch(true)
         }}>
         增加学员
-      </Button>
-
+      </Button> */}
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        value={memberValue}
+        inputValue={inputValue}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+        }}
+        onChange={(event: any, newValue: string | null) => {
+          console.log("🚀 ~ file: additions.tsx ~ line 589 ~ Additions ~ newValue", newValue)
+          // appendArr( find(users, { 'prepaidCard': newValue }))
+          appendArr(  newValue)
+        }}
+        options={userOptions}
+        sx={{ width: 300 }}
+        renderInput={(params) => <TextField {...params} label="添加学员" />}
+      />
     </FormControl>
 
     <FormControl sx={{ m: 1, width: '100%' }} >
@@ -568,12 +590,12 @@ function Additions(props) {
         onClick={() => {
           setOpenSearch(true)
         }}>
-       确认添加
+        确认添加
       </Button>
 
     </FormControl>
-
-    {labelArr.map((value, i) => {
+    {labelArr.map((value, index) => memberItem(value, index))}
+    {/* {labelArr.map((value, i) => {
       return (<RangeTextField modified={true} key={i} sx={{ width: '100%' }} title={value}
         minCallBack={(minValue) => {
           let labelArray = queryParams.labelArray || []
@@ -603,49 +625,9 @@ function Additions(props) {
           let a = labelArr.concat()
           setLabelArr(a)
         }} />)
-    })}
+    })} */}
 
-    {/* <Button variant="outlined" startIcon={<AddBoxIcon />} color={'inherit'} sx={{ width: '100%' }}
-      onClick={
-        (e) => {
-          appendArr()
-        }
-      }
-    >
-      添加标注类型筛选
-    </Button> */}
-
-    {/* <FormControl sx={{ m: 1, width: '100%' }}>
-      <InputLabel >添加标注类型筛选 </InputLabel>
-      <Select label="添加标注类型筛选" labelId="demo-controlled-open-select-label2"
-        name='添加标注类型筛选'
-
-        onChange={(event) => {
-          const {
-            target: { value, name },
-          } = event;
-          labelArr.push(value)
-          let a = labelArr.concat()
-          setLabelArr(a)
-        }}
-        value={''} >
-        {restLabelItem ? restLabelItem.map((dict, index) => { return (<MenuItem key={index} value={dict.label}>{dict.label}</MenuItem>) }) : null}
-      </Select>
-    </FormControl> */}
-
-
-
-    {/* <IconButton sx={{ p: '10px' }} aria-label="search" 
-        onClick={
-          (e) => {
-          }
-        }
-      >
-         <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
-       添加标注类型筛选
-      </Typography>
-        <AddBoxIcon />
-      </IconButton> */}
+  
   </Stack>)
 
 

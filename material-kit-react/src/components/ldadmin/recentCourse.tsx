@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-12-17 11:19:45
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-10 16:05:24
+ * @LastEditTime: 2022-05-10 21:05:26
  * @content: edit your page content
  */
 import {
@@ -80,9 +80,9 @@ function RecentCourse(props) {
 
   const courseItem = (item, index) => {
     return (
-      <Paper elevation={1} sx={{minWidth:'850px', background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
+      <Paper  key={`item-${index}`} elevation={1} sx={{minWidth:'850px', background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
         <Stack
-           key={`${index}`}
+          
           spacing={2}
           direction="row"
           justifyContent="flex-start"
@@ -90,7 +90,7 @@ function RecentCourse(props) {
           sx={{ background: 'transparent', '& :hover': { background: 'transparent' }}}
         >
           <Stack
-            key={`a-${index}`}
+           
             spacing={2}
             direction="column"
             justifyContent="flex-start"
@@ -116,7 +116,7 @@ function RecentCourse(props) {
 
 
           <Stack
-            key={`2-${index}`}
+           
             spacing={2}
             direction="column"
             justifyContent="flex-start"
@@ -148,7 +148,7 @@ function RecentCourse(props) {
           </Stack>
 
           <Stack
-          key={`3-${index}`}
+       
             spacing={2}
             direction="column"
             justifyContent="flex-start"
@@ -164,7 +164,7 @@ function RecentCourse(props) {
               {findCoach(item.coach)}
             </Typography>
             <Stack
-             key={`4-${index}`}
+           
             spacing={2}
             direction="row"
             justifyContent="flex-start"
@@ -175,7 +175,7 @@ function RecentCourse(props) {
           >
             {item.member.map((m,idx) =>(
                 <Typography gutterBottom variant="body2"
-                key={`a5-${index}`}
+                key={`${m}a5-${index}`}
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
                 }} >
@@ -185,7 +185,7 @@ function RecentCourse(props) {
             </Stack>
           </Stack>
           <Stack
-            key={`6-${index}`}
+          
             spacing={2}
             direction="column"
             justifyContent="flex-start"
