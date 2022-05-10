@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:34:34
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 13:51:26
+ * @LastEditTime: 2022-05-10 14:43:46
  * @content:数据集网站首页
  */
 import { Backdrop, CircularProgress, Typography, Stack, Avatar, Card, CardMedia, Box, Divider, Button, Grid, CardContent, CardActions } from '@mui/material'
@@ -38,7 +38,7 @@ function DominationPage() {
 
   const dominationData = useSelector((state) => state.domination)
   const loading = useSelector((state) => state.domination.loading)
-  const loadError = useSelector((state) => state.domination.loadError)
+  const {loadError,errorMsg} = useSelector((state) => state.domination)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   let navigate = useNavigate()
   const dispatch = useDispatch()
@@ -47,7 +47,19 @@ function DominationPage() {
   const [index, setIndex] = React.useState<number>(0);
   useEffect(() => {
     dispatch(exploreUsersAction())
-  }, [])
+  }, []) 
+  
+  useEffect(() => {
+  if(errorMsg==='登录失败'){
+    navigate('/login')
+    return
+  }
+  if(errorMsg){
+    navigate('/login')
+    return
+  }
+
+  }, [errorMsg])
 
   useEffect(() => {
     if (loadError) {

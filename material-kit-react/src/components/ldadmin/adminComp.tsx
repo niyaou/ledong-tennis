@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-12-17 11:19:45
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 14:54:30
+ * @LastEditTime: 2022-05-10 15:48:44
  * @content: edit your page content
  */
 import { Backdrop,CircularProgress,Button, Card,Grow, CardHeader, Checkbox, Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText ,Box} from '@mui/material';
@@ -94,13 +94,14 @@ function AdminComp(props) {
         <CircularProgress color="inherit" />
       </Backdrop>
       <Stack
-        spacing={2}
+        spacing={5}
         direction="row"
         justifyContent="flex-start"
         alignItems="center"
         sx={{ height: '100%', width: '100%' }}>
         
         <UserManagement />
+      
         <Additions 
         sx={{marginRight:30,}}/>
         {/* <Grid item><DsFolderTree  datasetId={datasetId} editType={true} /></Grid> */}

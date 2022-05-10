@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 17:48:11
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 10:38:48
+ * @LastEditTime: 2022-05-10 14:48:47
  * @content: 数据集创建页面
  */
 import { AccountCircle } from '@mui/icons-material';
@@ -108,9 +108,10 @@ const LoginPage = () => {
   const user = useSelector((state) => state.users)
 
   useEffect(() => {
-    if (!user.isDirectToDomanitaion && user.userInfo && user.userInfo.token && user.userInfo.token.length > 0) {
-      dispatch(directToPage())
-      navigate(from, { replace: true });
+    console.log("🚀 ~ file: loginPage.tsx ~ line 124 ~ LoginPage ~ user", user)
+    
+    if ( user.userInfo ) {
+      navigate('/');
     }
     if(user.loadError){
       enqueueSnackbar(user.errorMsg,{ 

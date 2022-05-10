@@ -4,14 +4,14 @@
  * @Author: uidq1343
  * @Date: 2021-12-17 11:19:45
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 15:19:11
+ * @LastEditTime: 2022-05-10 16:14:10
  * @content: edit your page content
  */
 
 import CachedIcon from '@mui/icons-material/Cached';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { TreeItemProps } from '@mui/lab/TreeItem';
-import { Box, Checkbox, Grid, Paper, Stack, Typography, Button, Avatar } from '@mui/material';
+import { Box, Checkbox, Grid, Paper, Stack, Typography, Button, Avatar ,Divider} from '@mui/material';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -82,7 +82,8 @@ function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
 
 
 function UserManagement(props) {
-  const { users } = useSelector((state) => state.domination)
+  const CircleButton = styled(Button)({ borderRadius: '20px', })
+  const {areas, users } = useSelector((state) => state.domination)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(true);
   const [treeSets, setTreeSets] = React.useState({ path: '', raw: '' });
@@ -98,6 +99,7 @@ function UserManagement(props) {
   const [pageParams, setPageParams] = React.useState({ num: 1, size: 50 })
 
   const [selectedNode, setSelectedNode] = React.useState(null)
+
 
   useEffect(() => {
     let ele = folders.concat(files)
@@ -142,7 +144,6 @@ function UserManagement(props) {
       console.log("🚀 ~ file: idsFileTree.tsx ~ line 127 ~ useEffect ~ pageParams", pageParams)
       dispatch(selectedFolderContent(treeSets.raw || rootPath.rootPath, currentIndex, pageParams.size))
       dispatch(folderContentStatistic(treeSets.raw || rootPath.rootPath))
-
     }
   }, [searchActive])
 
@@ -320,7 +321,7 @@ function UserManagement(props) {
               color: 'rgba(0, 0, 0, 0.6)',
               whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
             }} >
-            {user.realName||user.nickName}
+            {user.realName || user.nickName}
           </Typography>
 
         </Stack>
@@ -337,57 +338,40 @@ function UserManagement(props) {
     justifyContent="flex-start"
     alignItems="flex-start"
     spacing={0}
-    sx={{ height: '100%', width: '85%', paddingTop: 2, overflowY: 'auto' }}  >
-    {exploreMode ? null : (<>
+    sx={{ height: '100%', width: '85%', paddingTop: 2, overflowY: 'auto' ,
+}}  >
+   
       <Stack
         direction="row"
         justifyContent="space-between"
         alignItems="center"
         spacing={0}
-        sx={{ width: '100%' }}    >
-        <Breadcrumbs
-          separator={<NavigateNextIcon fontSize="small" />}
-          aria-label="breadcrumb">
-          {treeSets && treeSets.path !== '' ? (<Typography gutterBottom variant="body2"
-            sx={{ cursor: searchActive ? 'auto' : 'pointer' }}
-            color="inherit"
-            onClick={() => {
-              if (searchActive) {
-                return
+        sx={{ width: '100%' ,    marginBottom:5}}    >
+        {areas.map((a, ids) => {return (
+          <CircleButton
+            key={ids}
+            value={a}
+            size="small"
+            variant={1 === 1 ? "contained" : "outlined"}
+            sx={{ margin: '5px' }}
+            onClick={
+              (e) => {
+                // if (!values.includes(e.target.value)) {
+                //   values.push(e.target.value)
+                // } else {
+                //   values = values.filter(value => e.target.value !== value)
+                // }
+                // params[props.searchType] = values
+                // delete params["topic"];
+                // navigate(`/explore?${qs.stringify(params, { arrayFormat: 'brackets' })}`)
               }
-              let rawPath = rootPath.rootPath
-              setTreeSets({ path: '', raw: '' })
-              dispatch(selectedFolderContent(rawPath, pageParams.num, pageParams.size))
-              dispatch(folderContentStatistic(rawPath))
-            }}
+            }
           >
-            全部文件
-          </Typography>) : (<Typography gutterBottom variant="body2"
-            color="inherit"
-            sx={{}}
-          >
-            全部文件
-          </Typography>)}
+            {a}
+          </CircleButton>
+        )})}
 
-          {treeSets.path && treeSets.path.map((tree, index) => {
-            return (
-              <Typography gutterBottom variant="body2" key={index}
-                sx={{ cursor: index === (treeSets.path.length - 1) ? 'auto' : searchActive ? 'auto' : 'pointer' }}
-                color="inherit"
-                onClick={() => {
-                  if (searchActive) {
-                    return
-                  }
-                  let rawPath = rootPath.rootPath + '/' + treeSets.path.slice(0, index + 1).join('/')
-                  setTreePath(rawPath)
-                  dispatch(selectedFolderContent(rawPath, pageParams.num, pageParams.size))
-                  dispatch(folderContentStatistic(rawPath))
-                }}
-              >
-                {tree}
-              </Typography>)
-          })}
-        </Breadcrumbs>
+
 
         <Stack
           direction="row"
@@ -398,37 +382,9 @@ function UserManagement(props) {
           <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
             {currentSelectFolderTree && currentSelectFolderTree.root.filePath && `目标文件夹：${currentSelectFolderTree.root.filePath}`}
           </Typography>
-
-
-          {currentSelectFolderTree && searchActive && (
-            <Button variant="outlined" disabled={!element || element.length === 0} size="small" onClick={() => {
-              // parsePathList()
-              dispatch(selectedAndMoveByParams({ filePaths: parsePathList(), destFilePath: currentSelectFolderTree.root.filePath }))
-            }}>添加当前页结果</Button>
-          )}
-          {currentSelectFolderTree && searchActive && (
-            <Button variant="outlined" disabled={!element || element.length === 0} size="small" onClick={() => {
-              dispatch(selectedAndMoveByParams({ ...searchParams, destFilePath: currentSelectFolderTree.root.filePath }))
-            }}>添加全部结果</Button>
-          )}
-
-          <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
-            {!searchActive && <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={async () => {
-
-                dispatch(selectedFolderContent(treeSets.raw || rootPath.rootPath, currentIndex, pageParams.size))
-                dispatch(labelsStatisticAction())
-                dispatch(folderContentStatistic(treeSets.raw || rootPath.rootPath))
-              }}
-            >
-              <CachedIcon />
-            </IconButton>}
-
-            已全部加载,共{element.length}个</Typography>
+         
         </Stack>
-
+     
       </Stack>
       {/* <Grid
         container
@@ -442,7 +398,7 @@ function UserManagement(props) {
    
       </Grid> */}
       <RecentCourse />
-    </>)}
+  
   </Stack>
   )
 }

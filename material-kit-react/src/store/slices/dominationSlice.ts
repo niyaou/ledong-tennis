@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-03-08 17:35:13
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 15:40:26
+ * @LastEditTime: 2022-05-10 16:14:08
  * @content: edit your page content
  */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
@@ -16,6 +16,7 @@ export interface DominationState extends Fetching {
     hot: any[];
     recommend: any[];
     trending: any[];
+    areas:any[];
 }
 
 const initialState = {
@@ -23,7 +24,7 @@ const initialState = {
     loading: false,
     users: [],
     course: [],
-
+     areas :['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '麓坊校区', '领馆国际城校区', '一品天下校区', '天府环宇坊校区', '其他'],
   
 }
 // The function below is called a thunk and allows us to perform async logic. It
@@ -37,6 +38,10 @@ export const exploreUsersAction = createAsyncThunk(
         try {
             // throw new Error('Something bad happened');
             const response = await Axios.get(`/api/user/ldUserList`)
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 40 ~ response", response)
+            if(response.data.code!==0){
+               return rejectWithValue(response.data.message)
+            }
             return response.data;
         } catch (err) {
             return rejectWithValue(err)

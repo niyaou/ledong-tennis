@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-04-12 13:28:41
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 14:58:12
+ * @LastEditTime: 2022-05-10 16:47:31
  * @content: edit your page content
  */
 /*
@@ -83,6 +83,7 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -119,7 +120,7 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 function Additions(props) {
   const [tagsValue, setTagsValue] = React.useState([]);
 
-
+  const { areas, users } = useSelector((state) => state.domination)
   const [scenesValue, setScenesValue] = React.useState([]);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(false);
@@ -136,7 +137,7 @@ function Additions(props) {
   const dispatch = useDispatch()
   const { folders, cacheTree, rootPath, searchActive, nodeSelected, searchParams,
     mergeActive, currentIndex, labelStatistic, successed, errorMsg: indexErrorMsg,
-    searchMoveStatus,exploreMode } = useSelector((state) => state.filesAndFolders)
+    searchMoveStatus, exploreMode } = useSelector((state) => state.filesAndFolders)
   const { tags, scenes } = useSelector((state) => state.tagsInfo)
   const { errorMsg, isSuccess } = useSelector((state) => state.uploadFiles)
   const [folderList, setFolderList] = React.useState<FileTree[]>([]);
@@ -171,7 +172,7 @@ function Additions(props) {
   useEffect(() => {
     if (mergeActive) {
       setLabelNode(currentNodeSelected)
-    }else{
+    } else {
       setLabelNode(null)
     }
   }, [mergeActive])
@@ -215,12 +216,12 @@ function Additions(props) {
   const [tagsArr, setTagsArr] = React.useState([]);
   const [scenesArr, setScenesArr] = React.useState([]);
   const [queryParams, setQueryParams] = React.useState({ ...searchParams, pageNo: 1, pageSize: 50, queryType: 0 });
-  const [uploadFiles, setUploadFiles] =React.useState([])
+  const [uploadFiles, setUploadFiles] = React.useState([])
   const [openStandard, setOpenStandard] = React.useState(false);
   const Input = styled('input')({
     display: 'none',
   });
-  
+
 
   useEffect(() => {
     console.log("🚀 ~ file: additions.tsx ~ line 228 ~ useEffect ~ uploadFiles", uploadFiles)
@@ -234,17 +235,17 @@ function Additions(props) {
     }
     let totalSize = files.reduce((totalSize, file) => {
       return totalSize + file.size
-    },0)
+    }, 0)
 
-   
-    if (totalSize > 100*1024*1024) {
+
+    if (totalSize > 100 * 1024 * 1024) {
       enqueueSnackbar(`upload files total size must be less than ${Math.floor(100)}MB`, {
         variant: 'warning',
         autoHideDuration: 3000,
       })
       return
     }
-    
+
     setUploadFiles(e.target.files)
   }
 
@@ -263,7 +264,7 @@ function Additions(props) {
       sx={{ '& .MuiDialog-paper': { width: '100%', maxHeight: '600px' } }}
       onClose={() => { setOpenStandard(false) }}
     >
-      <DialogTitle>向{folderPath.replace(rootPath&&rootPath.rootPath||'','')}文件夹添加标定文件</DialogTitle>
+      <DialogTitle>向{folderPath.replace(rootPath && rootPath.rootPath || '', '')}文件夹添加标定文件</DialogTitle>
       <DialogContent>
         <Stack
           direction="column"
@@ -271,33 +272,33 @@ function Additions(props) {
           alignItems="flex-start"
           spacing={2}
           sx={{ color: 'rgb(0,0,0,0.6)' }}>
-         
-         {uploadFiles&&uploadFiles[0]&&(
-           <Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-           标定文件：{uploadFiles[0].name}
-         </Typography>
-         )}     
-           {uploadFiles&&uploadFiles[0]&&(
-             <LocalizationProvider dateAdapter={AdapterMoment}>
-           <DatePicker
-           label="标定日期"
-           value={standardDateValue}
-           onChange={(newValue) => {
-            setStandardDateValue(newValue);
-           }}
-           renderInput={(params) => <TextField {...params} />}
-         />
-           </LocalizationProvider>
-         )} 
+
+          {uploadFiles && uploadFiles[0] && (
+            <Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
+              标定文件：{uploadFiles[0].name}
+            </Typography>
+          )}
+          {uploadFiles && uploadFiles[0] && (
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DatePicker
+                label="标定日期"
+                value={standardDateValue}
+                onChange={(newValue) => {
+                  setStandardDateValue(newValue);
+                }}
+                renderInput={(params) => <TextField {...params} />}
+              />
+            </LocalizationProvider>
+          )}
           <label htmlFor="contained-button-file">
-            <Input accept="*/*" id="contained-button-file" type="file" 
-            onChange={choiceFiles}
+            <Input accept="*/*" id="contained-button-file" type="file"
+              onChange={choiceFiles}
             />
             <Button variant="contained" component="span">
               Upload
             </Button>
           </label>
-          
+
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -306,7 +307,7 @@ function Additions(props) {
 
             // setQueryParams({ ...queryParams, senceAttArray: scenesArr.join(',').replace('&', '%26'), attArray: tagsArr.join(',').replace('&', '%26') })
             // setOpenSearch(false)
-            console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles",  standardDateValue,uploadFiles)
+            console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", standardDateValue, uploadFiles)
             setOpenStandard(false)
           }
         }>提交</Button>
@@ -350,11 +351,11 @@ function Additions(props) {
 
   useEffect(() => {
     // if (searchActive) {
-      if(searchParams&&searchParams.filePath ){
-        setQueryParams({ pageNo: 1, pageSize: 50, queryType: 0 ,filePath:searchParams.filePath })
-      }else{
-        setQueryParams({ pageNo: 1, pageSize: 50, queryType: 0 , })
-      }
+    if (searchParams && searchParams.filePath) {
+      setQueryParams({ pageNo: 1, pageSize: 50, queryType: 0, filePath: searchParams.filePath })
+    } else {
+      setQueryParams({ pageNo: 1, pageSize: 50, queryType: 0, })
+    }
     setTagsArr([])
     setScenesArr([])
     setSearchContent('')
@@ -488,26 +489,44 @@ function Additions(props) {
     alignItems="center"
     spacing={2}
     sx={{ color: 'rgb(0,0,0,0.6)' }}>
-    <FormControl sx={{ m: 1, width: '100%' }} >
-      <Button variant="outlined" size="small" startIcon={<AutoAwesomeMotionIcon />}
-        onClick={() => {
-          setOpenSearch(true)
-        }}>
-        选择标签和场景
-      </Button>
+   
 
+    <FormControl sx={{  width: 300, }}>
+      <InputLabel id="demo-controlled-open-select-label1">校区</InputLabel>
+      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+        name='FileTypes'
+        
+        onChange={() => { }}
+        value={['1']}>
+        {areas.map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
+      </Select>
     </FormControl>
-    {tagsArr && tagsArr.length > 0 && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-      标签：{tagsArr.join(',')}
-    </Typography>)}
-    {scenesArr && scenesArr.length > 0 && (<Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-      场景：{scenesArr.join(',')}
-    </Typography>)}
+
+    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
+      <InputLabel id="demo-controlled-open-select-label1">课程类型</InputLabel>
+      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+        name='FileTypes'
+        onChange={() => { }}
+        value={['班课']}>
+        {['班课','私教'].map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
+      </Select>
+    </FormControl>
+
+    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
+      <InputLabel id="demo-controlled-open-select-label1">教练</InputLabel>
+      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+        name='FileTypes'
+        onChange={() => { }}
+        value={['']}>
+        {users&&users.filter((user) => user.coach===1||user.clubId===3).map((dict, index) => { return (<MenuItem key={index} value={dict.realName}>{dict.realName}</MenuItem>) })}
+      </Select>
+    </FormControl>
+
 
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }} size="small">
-        <DatePicker
-          label="创建时间晚于"
+        <DateTimePicker
+          label="开始时间"
           value={value}
           onChange={(newValue) => {
             setValue(newValue);
@@ -520,8 +539,8 @@ function Additions(props) {
     </LocalizationProvider>
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }} size="small">
-        <DatePicker
-          label="创建时间早于"
+        <DateTimePicker
+          label="结束时间"
           value={value}
           onChange={(newValue) => {
             setValue(newValue);
@@ -534,16 +553,26 @@ function Additions(props) {
 
       </FormControl>
     </LocalizationProvider>
-    <RangeTextField sx={{ width: '100%' }} title={'文件'} modified={false}
-      minCallBack={(value) => {
-        setQueryParams({ ...queryParams, minLength: value })
-      }}
-      maxCallBack={(value) => {
-        setQueryParams({ ...queryParams, maxLength: value })
+    <FormControl sx={{ m: 1, width: '100%' }} >
+      <Button variant="outlined" size="small" startIcon={<AutoAwesomeMotionIcon />}
+        onClick={() => {
+          setOpenSearch(true)
+        }}>
+        增加学员
+      </Button>
 
-      }}
+    </FormControl>
 
-    />
+    <FormControl sx={{ m: 1, width: '100%' }} >
+      <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
+        onClick={() => {
+          setOpenSearch(true)
+        }}>
+       确认添加
+      </Button>
+
+    </FormControl>
+
     {labelArr.map((value, i) => {
       return (<RangeTextField modified={true} key={i} sx={{ width: '100%' }} title={value}
         minCallBack={(minValue) => {
@@ -586,11 +615,11 @@ function Additions(props) {
       添加标注类型筛选
     </Button> */}
 
-    <FormControl sx={{ m: 1, width: '100%' }}>
+    {/* <FormControl sx={{ m: 1, width: '100%' }}>
       <InputLabel >添加标注类型筛选 </InputLabel>
       <Select label="添加标注类型筛选" labelId="demo-controlled-open-select-label2"
         name='添加标注类型筛选'
-     
+
         onChange={(event) => {
           const {
             target: { value, name },
@@ -602,7 +631,7 @@ function Additions(props) {
         value={''} >
         {restLabelItem ? restLabelItem.map((dict, index) => { return (<MenuItem key={index} value={dict.label}>{dict.label}</MenuItem>) }) : null}
       </Select>
-    </FormControl>
+    </FormControl> */}
 
 
 
@@ -623,7 +652,7 @@ function Additions(props) {
 
   //  {scenseSetDialog}
   return (<>
-    {standardSetDialog(currentNodeSelected&&currentNodeSelected.filePath||'')}
+    {standardSetDialog(currentNodeSelected && currentNodeSelected.filePath || '')}
     {tagSetDialog('set')}
     {tagSetDialog('search')}
     <Stack
@@ -631,23 +660,23 @@ function Additions(props) {
       justifyContent="flex-start"
       alignItems="flex-start"
       spacing={5}
-      sx={{ height: '100%', width: '15%', minWidth: '300px',paddingRight:'30px', paddingLeft:'30px',paddingTop: 5, overflowY: 'auto',background: '#f5f6fa'  }}
+      sx={{ height: '100%', width: '15%', minWidth: '300px', paddingRight: '30px', paddingLeft: '30px', paddingTop: 5, overflowY: 'auto', background: '#f5f6fa' }}
     >
-         <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
-       记录课程
+      <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
+        记录课程
       </Typography>
       {/* sx={{ height: '100%', width: '95%', paddingTop: 2, paddingLeft: '10px !important', overflowY: 'auto', }}> */}
 
 
       {/* {searchActive ? */}
-       <Grow in={true}
+      <Grow in={true}
         style={{ transformOrigin: '0 0 0' }}
         {...(searchActive ? { timeout: 1000 } : {})}
 
       >{searchForm}</Grow>
 
 
-  
+
     </Stack>
   </>
   )

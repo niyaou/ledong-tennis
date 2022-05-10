@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-11-29 16:42:01
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-09 11:18:19
+ * @LastEditTime: 2022-05-10 14:39:35
  * @content: 数据集项目工程页，用于构建应用框架，搭建路由，管理全局状态
  */
 
@@ -33,10 +33,13 @@ const useStyles = makeStyles({
 function PangooDMApplication() {
     const classes = useStyles();
     const dispatch = useDispatch()
+    
     useEffect(() => {
         Axios.dispatch = dispatch;
         dispatch(initUser())
       }, [])
+
+
     return (
         <SnackbarProvider className={classes.app}  maxSnack={3}    anchorOrigin={{
             vertical: 'top',
