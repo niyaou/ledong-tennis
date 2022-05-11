@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2021-12-17 11:19:45
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-10 21:05:26
+ * @LastEditTime: 2022-05-11 09:55:59
  * @content: edit your page content
  */
 import {
@@ -85,10 +85,19 @@ function RecentCourse(props) {
           
           spacing={2}
           direction="row"
-          justifyContent="flex-start"
+          justifyContent="space-between"
           alignItems="center"
-          sx={{ background: 'transparent', '& :hover': { background: 'transparent' }}}
+          sx={{ padding:1,background: 'transparent', '& :hover': { background: 'transparent' }}}
         >
+             <Stack
+           
+           spacing={2}
+           direction="row"
+           justifyContent="flex-start"
+           alignItems="flex-start"
+           sx={{ background: 'transparent', '& :hover': { background: 'transparent' }}}
+         >
+       
           <Stack
            
             spacing={2}
@@ -97,7 +106,6 @@ function RecentCourse(props) {
             alignItems="flex-start"
             sx={{ background: 'transparent', '& :hover': { background: 'transparent' }}}
           >
-
             <Typography gutterBottom variant="body2"
               sx={{
                 color: 'rgba(0, 0, 0, 0.6)',
@@ -183,6 +191,7 @@ function RecentCourse(props) {
               </Typography>
             ))}
             </Stack>
+          </Stack>
           </Stack>
           <Stack
           

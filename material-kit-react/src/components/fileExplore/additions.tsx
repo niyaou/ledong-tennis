@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-04-12 13:28:41
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-10 22:02:00
+ * @LastEditTime: 2022-05-11 11:20:26
  * @content: edit your page content
  */
 /*
@@ -35,6 +35,8 @@ import { FileTree } from '../../common/interface';
 import { fileLengthFormat } from '../../common/utils/dateUtils';
 import useStyles from '../../common/styles';
 import { useSelector } from "../../redux/hooks";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import {
   rootProjects, selectedFolderContent
   , toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig, searchActiveAction, searchDeActiveAction, selectedByParams, updateSelectedParams,
@@ -47,6 +49,8 @@ import { uploadFileTagsAndScenesAction, uploadFileFolderIndexAction } from '../.
 import HorizontalRuleSharpIcon from '@mui/icons-material/HorizontalRuleSharp';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import IconButton from '@mui/material/IconButton';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+
 import CommentIcon from '@mui/icons-material/Comment';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -73,6 +77,7 @@ import { useSnackbar } from 'notistack';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import SearchIcon from '@mui/icons-material/Search';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import ArticleIcon from '@mui/icons-material/Article';
 import qs from 'qs'
 import {
   CardHeader, Checkbox, Divider, Box, Button, Modal, Grid,
@@ -91,7 +96,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import LowCascader from './lowCascader'
 import ExtensionIcon from '@mui/icons-material/Extension';
-import { findIndex,find } from 'lodash';
+import { findIndex, find } from 'lodash';
 
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
@@ -145,7 +150,7 @@ function Additions(props) {
   const [currentNodeSelected, setCurrentNodeSelected] = React.useState();
   const [restLabelItem, setRestLabelItem] = React.useState(labelStatistic || []);
 
-  const [userOptions, setUserOptions] = React.useState( []);
+  const [userOptions, setUserOptions] = React.useState([]);
 
   const [memberValue, setMemberValue] = React.useState<string | null>('');
   const [inputValue, setInputValue] = React.useState('');
@@ -153,9 +158,9 @@ function Additions(props) {
   useEffect(() => {
 
     if (users && users.length > 0) {
-    let r=  users.filter(u=>u.prepaidCard).map(user => { return user.prepaidCard  })
-    console.log("🚀 ~ file: additions.tsx ~ line 154 ~ useEffect ~ r", r)
-    setUserOptions(r)
+      let r = users.filter(u => u.prepaidCard).map(user => { return user.prepaidCard })
+      console.log("🚀 ~ file: additions.tsx ~ line 154 ~ useEffect ~ r", r)
+      setUserOptions(r)
     }
 
   }, [users])
@@ -451,24 +456,105 @@ function Additions(props) {
   )
 
 
-const memberItem=(m,idx)=>{
-  let mi = find(users, { 'prepaidCard': m })
-return (<Stack
-  direction="column"
-  justifyContent="center"
-  alignItems="flex-start"
-  spacing={2}
-  key={`member-${idx}`}
-  sx={{ color: 'rgb(0,0,0,0.6)' }}>
-  <Typography gutterBottom variant="body2"
-              sx={{
-                color: 'rgba(0, 0, 0, 0.6)',
-                minWidth: '80px',
-              }} >
-              {mi.prepaidCard}
-            </Typography>
-  </Stack>)
-}
+  const memberItem = (m, idx) => {
+    let mi = find(users, { 'prepaidCard': m.name })
+    return (<Stack
+      direction="row"
+      justifyContent="flex-start"
+      alignItems="center"
+      spacing={1}
+
+      key={`member-${idx}`}
+      sx={{ color: 'rgb(0,0,0,0.6)', width: '100%' }}>
+      <Typography variant="subtitle1"
+        sx={{
+          color: 'rgba(0, 0, 0, 0.6)',
+          minWidth: '50px',
+        }} >
+        {mi.prepaidCard}
+      </Typography>
+      {m.type !== 1 && <Typography variant="subtitle1"
+        id="outlined-password-input"
+        color='secondary'
+      >
+        {m.type === 2 ? '扣次卡一次' : '年卡'}
+      </Typography>}
+
+      {m.type === 1 && <TextField
+        id="outlined-password-input"
+        label="课时费"
+        size="small"
+        sx={{ width: '100px' }}
+        value={''}
+        onChange={(e) => {
+          console.log(e.target.value);
+        }}
+      />}
+      {m.type !== 1 && <Tooltip title={'课时费'} placement="top">
+
+        <IconButton
+          aria-label="expand row"
+          size="small"
+          onClick={async () => {
+            let pos = labelArr.findIndex(e => e.name === m.name)
+
+            labelArr[pos].type = 1
+            let a = labelArr.concat()
+            setLabelArr(a)
+          }}
+        >
+          <ArticleIcon />
+        </IconButton>
+      </Tooltip>
+      }
+      {m.type !== 2 && <Tooltip title={'次卡'} placement="top">
+        <IconButton
+          aria-label="expand row"
+          size="small"
+          onClick={async () => {
+            let pos = labelArr.findIndex(e => e.name === m.name)
+
+            labelArr[pos].type = 2
+            let a = labelArr.concat()
+            setLabelArr(a)
+          }}
+        >
+          <CalendarMonthIcon />
+        </IconButton>
+      </Tooltip>
+      }
+      {m.type !== 3 && <Tooltip title={'年卡'} placement="top">
+        <IconButton
+          aria-label="expand row"
+          size="small"
+          onClick={async () => {
+            let pos = labelArr.findIndex(e => e.name === m.name)
+
+            labelArr[pos].type = 3
+            let a = labelArr.concat()
+            setLabelArr(a)
+          }}
+        >
+          <MonetizationOnIcon />
+        </IconButton>
+      </Tooltip>
+      }
+      <IconButton
+        aria-label="expand row"
+        size="small"
+        onClick={async () => {
+
+
+          let pos = labelArr.findIndex(e => e.name === m.name)
+          labelArr.splice(pos, 1)
+          let a = labelArr.concat()
+          setLabelArr(a)
+        }}
+      >
+        <HighlightOffIcon />
+      </IconButton>
+    </Stack>)
+  }
 
 
 
@@ -484,7 +570,11 @@ return (<Stack
   // new Date(),
 
   const appendArr = (item) => {
-    labelArr.push(item)
+    let ids = labelArr.findIndex(e => e.name === item)
+    if (ids >= 0) {
+      return
+    }
+    labelArr.push({ name: item, type: 1 })
     let a = labelArr.concat()
     setLabelArr(a)
   }
@@ -497,11 +587,11 @@ return (<Stack
     sx={{ color: 'rgb(0,0,0,0.6)' }}>
 
 
-    <FormControl sx={{ width: 300, }}>
+    <FormControl sx={{ width: 350, }}>
       <InputLabel id="demo-controlled-open-select-label1">校区</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
-
+        size="small"
         onChange={() => { }}
         value={['1']}>
         {areas.map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
@@ -512,6 +602,7 @@ return (<Stack
       <InputLabel id="demo-controlled-open-select-label1">课程类型</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
+        size="small"
         onChange={() => { }}
         value={['班课']}>
         {['班课', '私教'].map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
@@ -522,16 +613,30 @@ return (<Stack
       <InputLabel id="demo-controlled-open-select-label1">教练</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
+        size="small"
         onChange={() => { }}
         value={['']}>
         {users && users.filter((user) => user.coach === 1 || user.clubId === 3).map((dict, index) => { return (<MenuItem key={index} value={dict.realName}>{dict.realName}</MenuItem>) })}
       </Select>
     </FormControl>
 
+    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
+      <TextField
+        id="outlined-password-input"
+        label="备注"
+        size="small"
+        value={''}
+        onChange={(e) => {
+
+        }}
+      />
+    </FormControl>
+
 
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }} size="small">
         <DateTimePicker
+
           label="开始时间"
           value={value}
           onChange={(newValue) => {
@@ -546,6 +651,7 @@ return (<Stack
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }} size="small">
         <DateTimePicker
+
           label="结束时间"
           value={value}
           onChange={(newValue) => {
@@ -559,7 +665,7 @@ return (<Stack
 
       </FormControl>
     </LocalizationProvider>
-    <FormControl sx={{ m: 1, width: '100%' }} >
+    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}  >
       {/* <Button variant="outlined" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
           setOpenSearch(true)
@@ -567,7 +673,9 @@ return (<Stack
         增加学员
       </Button> */}
       <Autocomplete
+        sx={{ width: 350, }}
         disablePortal
+        size="small"
         id="combo-box-demo"
         value={memberValue}
         inputValue={inputValue}
@@ -577,10 +685,12 @@ return (<Stack
         onChange={(event: any, newValue: string | null) => {
           console.log("🚀 ~ file: additions.tsx ~ line 589 ~ Additions ~ newValue", newValue)
           // appendArr( find(users, { 'prepaidCard': newValue }))
-          appendArr(  newValue)
+          if (newValue) {
+            appendArr(newValue)
+          }
         }}
         options={userOptions}
-        sx={{ width: 300 }}
+
         renderInput={(params) => <TextField {...params} label="添加学员" />}
       />
     </FormControl>
@@ -595,54 +705,23 @@ return (<Stack
 
     </FormControl>
     {labelArr.map((value, index) => memberItem(value, index))}
-    {/* {labelArr.map((value, i) => {
-      return (<RangeTextField modified={true} key={i} sx={{ width: '100%' }} title={value}
-        minCallBack={(minValue) => {
-          let labelArray = queryParams.labelArray || []
-          const index = labelArray.findIndex(e => e.label === value);
-          if (index > -1) {
-            labelArray[index]['min'] = minValue
-          } else {
-            labelArray.push({ label: value, min: minValue })
-          }
-          setQueryParams({ ...queryParams, labelArray: labelArray })
-        }}
-        maxCallBack={(maxValue) => {
-          let labelArray = queryParams.labelArray || []
-          const index = labelArray.findIndex(e => e.label === value);
-          if (index > -1) {
-            labelArray[index]['max'] = maxValue
-          } else {
-            labelArray.push({ label: value, max: maxValue })
-          }
-          setQueryParams({ ...queryParams, labelArray: labelArray })
 
-        }}
 
-        pop={(textKey) => {
-          let pos = labelArr.indexOf(textKey)
-          let removedItem = labelArr.splice(pos, 1)
-          let a = labelArr.concat()
-          setLabelArr(a)
-        }} />)
-    })} */}
 
-  
   </Stack>)
 
 
 
   //  {scenseSetDialog}
   return (<>
-    {standardSetDialog(currentNodeSelected && currentNodeSelected.filePath || '')}
-    {tagSetDialog('set')}
-    {tagSetDialog('search')}
+
+
     <Stack
       direction="column"
       justifyContent="flex-start"
       alignItems="flex-start"
       spacing={5}
-      sx={{ height: '100%', width: '15%', minWidth: '300px', paddingRight: '30px', paddingLeft: '30px', paddingTop: 5, overflowY: 'auto', background: '#f5f6fa' }}
+      sx={{ height: '100%', width: '15%', minWidth: '400px', paddingRight: '30px', paddingLeft: '30px', paddingTop: 5, overflowY: 'auto', background: '#f5f6fa' }}
     >
       <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
         记录课程
