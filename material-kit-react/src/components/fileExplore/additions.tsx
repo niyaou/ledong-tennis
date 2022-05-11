@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-04-12 13:28:41
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-11 11:20:26
+ * @LastEditTime: 2022-05-11 15:42:33
  * @content: edit your page content
  */
 /*
@@ -97,7 +97,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import LowCascader from './lowCascader'
 import ExtensionIcon from '@mui/icons-material/Extension';
 import { findIndex, find } from 'lodash';
-
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction } from '../../store/slices/dominationSlice'
+import moment from 'moment'
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
   color?: string;
@@ -124,13 +126,22 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 function Additions(props) {
   const [tagsValue, setTagsValue] = React.useState([]);
 
-  const { areas, users } = useSelector((state) => state.domination)
+  const { areas, users, selectCourse } = useSelector((state) => state.domination)
   const [scenesValue, setScenesValue] = React.useState([]);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(false);
   const [openSearch, setOpenSearch] = React.useState(false);
-  const [treeSets, setTreeSets] = React.useState({ path: '', raw: '' });
+  const [startTime, setStartTime] = React.useState(new Date());
+  const [endTime, setEndTime] = React.useState(new Date);
 
+  const [courseEdit, setCourseEdit] = React.useState({
+    startTime: new Date(), endTime: new Date(), coach: '', spendingTime: 0, courtSpend: 0, coachSpend: 0, descript: '',
+    court: '', grade: '', membersObj: null
+  });
+
+  // Object.assign(membobj, {
+  //   [s.openId]: [s.courseSpend,s.courseTimes]
+  // })
   const datasetId = props.datasetId
   let eventPup = false
 
@@ -164,6 +175,24 @@ function Additions(props) {
     }
 
   }, [users])
+
+  useEffect(() => {
+    console.log("🚀 ~ file: additions.tsx ~ line 182 ~ useEffect ~ courseEdit", courseEdit)
+  }, [courseEdit])
+
+  useEffect(() => {
+
+    if (selectCourse) {
+      let after = { ...courseEdit, startTime: new Date(selectCourse.start),endTime: new Date(selectCourse.end),
+        court:courseEdit.court,coach:courseEdit.coach
+      }
+
+      setStartTime(after.startTime)
+      setEndTime(after.endTime)
+      setCourseEdit(after)
+    }
+
+  }, [selectCourse])
 
   // users.map(user => { return { ...user, label: user.prepaidCard } })
 
@@ -485,9 +514,23 @@ function Additions(props) {
         label="课时费"
         size="small"
         sx={{ width: '100px' }}
-        value={''}
+        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        value={m.spendFee}
         onChange={(e) => {
-          console.log(e.target.value);
+          labelArr[idx].spendFee = e.target.value
+          let a = labelArr.concat()
+          setLabelArr(a)
+          let member = courseEdit.membersObj
+          member[mi.id] = [e.target.value, 0]
+          let after = { ...courseEdit, membersObj: member }
+          // spendFee:0,times:0 
+          // console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
+          //   let after= {...courseEdit ,startTime: newValue }
+          //   setStartTime(newValue)
+          //   let diff= moment(after.endTime,'YYYY-MM-DD HH:mm').diff( moment(after.startTime,'YYYY-MM-DD HH:mm'),'minutes')
+          //   after= {...courseEdit , spendingTime:diff}
+          //   console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff)
+          setCourseEdit(after)
         }}
       />}
       {m.type !== 1 && <Tooltip title={'课时费'} placement="top">
@@ -499,8 +542,13 @@ function Additions(props) {
             let pos = labelArr.findIndex(e => e.name === m.name)
 
             labelArr[pos].type = 1
+            // labelArr[pos].spendFee = 0
+            // let member = courseEdit.membersObj
+            // member[mi.id] = [0, 1]
+            // let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
+            // setCourseEdit(after)
           }}
         >
           <ArticleIcon />
@@ -513,10 +561,14 @@ function Additions(props) {
           size="small"
           onClick={async () => {
             let pos = labelArr.findIndex(e => e.name === m.name)
-
             labelArr[pos].type = 2
+            labelArr[pos].spendFee = 0
+            let member = courseEdit.membersObj
+            member[mi.id] = [0, 1]
+            let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
+            setCourseEdit(after)
           }}
         >
           <CalendarMonthIcon />
@@ -529,10 +581,14 @@ function Additions(props) {
           size="small"
           onClick={async () => {
             let pos = labelArr.findIndex(e => e.name === m.name)
-
             labelArr[pos].type = 3
+            labelArr[pos].spendFee = 0
+            let member = courseEdit.membersObj
+            member[mi.id] = [0, 0]
+            let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
+            setCourseEdit(after)
           }}
         >
           <MonetizationOnIcon />
@@ -574,9 +630,27 @@ function Additions(props) {
     if (ids >= 0) {
       return
     }
-    labelArr.push({ name: item, type: 1 })
+    let member = users.find(u => u.prepaidCard === item)
+    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0 })
     let a = labelArr.concat()
+    let temp = {}
+    temp = Object.assign(temp, {
+      [member.id]: [0, courseEdit.spendingTime]
+    })
+    let after = { ...courseEdit, membersObj: { ...courseEdit.membersObj, ...temp } }
+
+    // const [courseEdit, setCourseEdit] = React.useState({ startTime: new Date(),endTime: new Date(),coach:'',spendingTime:0 ,courtSpend:0,coachSpend:0,descript:'',
+    // court:'',grade:'',membersObj:{}});
+
+    setCourseEdit(after)
+
     setLabelArr(a)
+    {/* const [courseEdit, setCourseEdit] = React.useState({ startTime:'',endTime:'',coach:'',spendingTime:'' ,courtSpend:0,coachSpend:0,descript:'',
+  court:'',grade:'',membersObj:{}}); */}
+
+    // Object.assign(membobj, {
+    //   [s.openId]: [s.courseSpend,s.courseTimes]
+    // })
   }
 
   const searchForm = (<Stack
@@ -586,92 +660,93 @@ function Additions(props) {
     spacing={2}
     sx={{ color: 'rgb(0,0,0,0.6)' }}>
 
-
-    <FormControl sx={{ width: 350, }}>
+{selectCourse &&(  <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
+        {selectCourse.court}
+      </Typography>)}
+{!selectCourse && <FormControl sx={{ width: 350, }}>
       <InputLabel id="demo-controlled-open-select-label1">校区</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
         size="small"
-        onChange={() => { }}
-        value={['1']}>
+        onChange={(e) => {
+          let after = { ...courseEdit, court: e.target.value }
+          setCourseEdit(after)
+        }}
+        value={[courseEdit.court]}>
         {areas.map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
       </Select>
-    </FormControl>
+    </FormControl>}
 
-    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
-      <InputLabel id="demo-controlled-open-select-label1">课程类型</InputLabel>
-      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
-        name='FileTypes'
-        size="small"
-        onChange={() => { }}
-        value={['班课']}>
-        {['班课', '私教'].map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
-      </Select>
-    </FormControl>
 
-    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
+
+{!selectCourse && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
       <InputLabel id="demo-controlled-open-select-label1">教练</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
         size="small"
-        onChange={() => { }}
-        value={['']}>
-        {users && users.filter((user) => user.coach === 1 || user.clubId === 3).map((dict, index) => { return (<MenuItem key={index} value={dict.realName}>{dict.realName}</MenuItem>) })}
+        onChange={(e) => {
+          let after = { ...courseEdit, coach: e.target.value }
+          setCourseEdit(after)
+        }}
+        value={[courseEdit.coach]}>
+        {users && users.filter((user) => user.coach === 1 || user.clubId === 3).map((dict, index) => { return (<MenuItem key={index} value={dict.id}>{dict.realName}</MenuItem>) })}
       </Select>
-    </FormControl>
+    </FormControl>}
 
-    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
+    {!selectCourse &&<FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
       <TextField
         id="outlined-password-input"
         label="备注"
         size="small"
-        value={''}
+        value={courseEdit.descript}
         onChange={(e) => {
-
+          let after = { ...courseEdit, descript: e.target.value }
+          setCourseEdit(after)
         }}
       />
-    </FormControl>
+    </FormControl>}
 
 
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }} size="small">
         <DateTimePicker
-
           label="开始时间"
-          value={value}
+          value={startTime}
           onChange={(newValue) => {
-            setValue(newValue);
-            setQueryParams({ ...queryParams, startTimeCreateTime: newValue.format('YYYY-MM-DD') })
+            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
+            let after = { ...courseEdit, startTime: newValue }
+            setStartTime(newValue)
+            let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
+            after = { ...courseEdit, spendingTime: diff }
+            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff)
+            setCourseEdit(after)
           }}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => {
+            return (<TextField {...params} />)
+          }}
         />
-
       </FormControl>
     </LocalizationProvider>
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }} size="small">
         <DateTimePicker
-
           label="结束时间"
-          value={value}
+          value={endTime}
           onChange={(newValue) => {
-            setValue(newValue);
-
-            setQueryParams({ ...queryParams, endTimeCreateTime: newValue.format('YYYY-MM-DD') })
-
+            let after = { ...courseEdit, endTime: newValue }
+            let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
+            setEndTime(newValue)
+            console.log("🚀 ~ file: additions.tsx ~ line 678 ~ Additions ~ diff", diff)
+            after = { ...courseEdit, spendingTime: diff }
+            setCourseEdit(after)
           }}
           renderInput={(params) => <TextField {...params} />}
         />
 
       </FormControl>
     </LocalizationProvider>
-    <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}  >
-      {/* <Button variant="outlined" size="small" startIcon={<AutoAwesomeMotionIcon />}
-        onClick={() => {
-          setOpenSearch(true)
-        }}>
-        增加学员
-      </Button> */}
+    {!selectCourse && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}  >
       <Autocomplete
         sx={{ width: 350, }}
         disablePortal
@@ -693,18 +768,38 @@ function Additions(props) {
 
         renderInput={(params) => <TextField {...params} label="添加学员" />}
       />
-    </FormControl>
+    </FormControl>}
 
-    <FormControl sx={{ m: 1, width: '100%' }} >
+    {labelArr.map((value, index) => memberItem(value, index))}
+
+    {!selectCourse && <FormControl sx={{ m: 1, width: '100%' }} >
       <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
-          setOpenSearch(true)
         }}>
         确认添加
       </Button>
 
-    </FormControl>
-    {labelArr.map((value, index) => memberItem(value, index))}
+    </FormControl>}
+
+    {selectCourse && (<FormControl sx={{ m: 1, width: '100%' }} >
+      <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
+        onClick={() => {
+        }}>
+        确认修改
+      </Button>
+
+    </FormControl>)}
+    {selectCourse && (<FormControl sx={{ m: 1, width: '100%' }} >
+      <Button variant="outlined" size="small" startIcon={<HighlightOffIcon />}
+        onClick={() => {
+          dispatch(selectCourseAction(null))
+        }}>
+        取消
+      </Button>
+
+    </FormControl>)}
+
+
 
 
 

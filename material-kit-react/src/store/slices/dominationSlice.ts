@@ -4,7 +4,7 @@
  * @Author: uidq1343
  * @Date: 2022-03-08 17:35:13
  * @LastEditors: uidq1343
- * @LastEditTime: 2022-05-10 16:14:08
+ * @LastEditTime: 2022-05-11 15:08:51
  * @content: edit your page content
  */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
@@ -25,6 +25,7 @@ const initialState = {
     users: [],
     course: [],
      areas :['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '麓坊校区', '领馆国际城校区', '一品天下校区', '天府环宇坊校区', '其他'],
+     selectCourse:null,
   
 }
 // The function below is called a thunk and allows us to perform async logic. It
@@ -56,6 +57,20 @@ export const exploreRecentCourse = createAsyncThunk(
             // throw new Error('Something bad happened');
             const response = await Axios.get(`/api/prepaidCard/ld/recentCourse?page=${params.page}&num=${params.num}`)
             return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+export const selectCourse = createAsyncThunk(
+    'lduser/course/select',
+    async (params, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+           
+            return params;
         } catch (err) {
             return rejectWithValue(err)
         }
@@ -105,6 +120,22 @@ export const exploreSlice = createSlice({
             .addCase(exploreRecentCourse.fulfilled, (state, action) => {
                 state.loading = false
                 state.course = action.payload.data
+         
+            });
+            builder
+            .addCase(selectCourse.pending, (state) => {
+                state.loading = true
+                
+            })
+            .addCase(selectCourse.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(selectCourse.fulfilled, (state, action) => {
+                state.loading = false
+                state.selectCourse = action.payload
          
             });
     },
