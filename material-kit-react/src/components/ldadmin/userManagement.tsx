@@ -75,12 +75,6 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 
 
 
-function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-  event.preventDefault();
-  console.info('You clicked a breadcrumb.');
-}
-
-
 function UserManagement(props) {
   const CircleButton = styled(Button)({ borderRadius: '20px', })
   const {areas, users } = useSelector((state) => state.domination)
@@ -158,14 +152,6 @@ function UserManagement(props) {
 
 
 
-  const parsePathList = () => {
-    return element.map(e => { return e.filePath })
-  }
-
-
-
-
-
 
   const setTreePath = (filePath) => {
     let path = filePath.replace(rootPath.rootPath, '')
@@ -187,42 +173,6 @@ function UserManagement(props) {
 
 
 
-  const parseIconUrl = (path, isFolder) => {
-    path = path[path.length - 1]
-    if (isFolder) {
-      return FolderIconUrl
-    } else
-
-      if (['jpg', 'jpeg', 'gif', 'bmp', 'png'].indexOf(path) > -1) {
-        return ImageIconUrl
-      } else
-
-
-        if (['csv', 'xlsx', 'js', 'txt', 'json'].indexOf(path) > -1) {
-          return TextGreenIconUrl
-        } else
-          if (['mp3',].indexOf(path) > -1) {
-            return AudioIconUrl
-          } else
-            if (['mp4', 'avi'].indexOf(path) > -1) {
-              return VideoIconUrl
-            } else
-              if (['zip'].indexOf(path) > -1) {
-                return ZipIconUrl
-              } else {
-                return TextIconUrl
-              }
-  }
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setFileIndexChecked(fileIndex)
-      setSelectedNode(element[fileIndex])
-    } else {
-      setFileIndexChecked(-1)
-      setSelectedNode(null)
-    }
-  };
 
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 

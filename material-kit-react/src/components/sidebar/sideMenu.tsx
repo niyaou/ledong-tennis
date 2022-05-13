@@ -137,7 +137,7 @@ function SideMenu(props) {
                             // dispatch(clearDatasetFilesCache())
                             // navigate(`/explore`)
                         }}>
-                            修改
+                         会员
                         </Typography>
                     </Stack>
                 </Stack>

@@ -29,7 +29,7 @@ import { useDispatch } from 'react-redux';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import {
-    selectedAndMoveTaskAction,deleteSelectedAndMoveTaskAction
+    selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     height: 10,
@@ -46,220 +46,58 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 function SearchTask(props) {
     const dispatch = useDispatch()
     const index = props.index
-
+    const CircleButton = styled(Button)({ borderRadius: '20px', })
     const [checked, setChecked] = React.useState<readonly number[]>([]);
     const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3]);
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
-    const { taskQueue, deleteTaskSuccess,cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
+    const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const [tasks, setTasks] = React.useState([{
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    },
-    {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '排队', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }, {
-        id: 1, target: '/pangoo/ids/tast/123', status: '进行中', processing: 42, total: 100,
-        percent: 43, params: { name: '124', attr: ['123', 'gfd'] }, path: ['/pangoo/ids/task/1.a', '/pangoo/ids/task/2.a', '/pangoo/ids/task/3.a', '/pangoo/ids/task/4.a']
-    }]);
+    const { areas, users, sortValue } = useSelector((state) => state.domination)
 
     useEffect(() => {
-        dispatch(selectedAndMoveTaskAction())
 
     }, [])
 
-    useEffect(() => {
-        if(deleteTaskSuccess){
-            dispatch(selectedAndMoveTaskAction())
-            enqueueSnackbar('删除成功', {
-                variant: 'success',
-                autoHideDuration: 3000,
-              })
-        }
-  
 
-    }, [deleteTaskSuccess])
+    const fileItem = (user, index) => {
+        return (<Grid item xs={1} key={index} space={1}>
+            <Paper elevation={1} sx={{ background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
 
-
-
-    const taskCard = (taskInfo, index) => {
-        return (<Grid item xs={2} key={index}
-
-            sx={{ height: 150, marginTop: 4 }}>
-            <Paper elevation={1} >
                 <Stack
-                    spacing={2}
                     direction="row"
                     justifyContent="center"
                     alignItems="center"
-                    sx={{ height: 160 }}
-                >
-                    <img src={FolderIconUrl} />
-                    <Stack
-                        spacing={1}
-                        direction="column"
-                        justifyContent="flex-start"
-                        alignItems="flex-start">
-                        <Tooltip title={taskInfo.filePath} placement="top">
-                            <Typography gutterBottom variant="subtitle2"
-                                sx={{
-                                    color: 'rgb(0,0,0,0.8)',
-                                    maxWidth: 150,
-                                    overflow: 'hidden',
-                                    whiteSpace: 'nowrap',
-                                    textOverflow: 'ellipsis',
-                                }}
-                                color="inherit"
-                            >
-                                {taskInfo.filePath}
-                            </Typography>
-                        </Tooltip>
+                    spacing={0}
+                    sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
+                    onMouseEnter={() => {
 
-                        <Typography gutterBottom variant="subtitle2"
-                            sx={{ color: 'rgb(0,0,0,0.9)' }}
-                            color="inherit"
-                        >
-                            {taskInfo.destFilePath ? '通过文件列表添加' : '通过搜索条件添加'}
-                        </Typography>
-                        <Typography gutterBottom variant="subtitle2"
-                            sx={{ color: 'rgb(0,0,0,0.9)' }}
-                            color="inherit"
-                        >
-                            {taskInfo.processMsg} &nbsp; {`${taskInfo.total - taskInfo.queueList}/${taskInfo.total}`}
-                        </Typography>
-                        {(parseInt(taskInfo.processCode) === 0 || taskInfo.queueList === taskInfo.total) && (<Button variant="outlined" size="small"
-                            onClick={() => {
-                                dispatch(deleteSelectedAndMoveTaskAction(taskInfo.taskId))
-                             }}
-                        >
-                            删除
-                        </Button>)}
-                        {parseInt(taskInfo.processCode) === 1 && taskInfo.total !== taskInfo.queueList&&
-                            (<BorderLinearProgress variant="determinate" value={(taskInfo.total - taskInfo.queueList) * 100 / taskInfo.total} sx={{ width: 150 }} />)}
+                    }}
+                    onMouseLeave={() => {
 
-                    </Stack>
+                    }}
+                    onClick={(event) => {
+
+                    }}>
+                    <Avatar alt="Remy Sharp" src={user.avator} />
+
+
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
+                        }} >
+                        {user.realName || user.nickName}
+                    </Typography>
+
                 </Stack>
-            </Paper></Grid>)
+
+
+            </Paper>
+        </Grid>
+        )
     }
+
+
 
     return (
         <Stack justifyContent="flex-start"
@@ -271,14 +109,31 @@ function SearchTask(props) {
                 spacing={2}
                 direction="row"
             >
-                <Typography gutterBottom variant="body2"
-                    sx={{ color: 'rgb(0,0,0,0.6)' }}
-                    color="inherit"
-                    onClick={() => {
-                    }}
-                >
-                    搜索结果添加任务
-                </Typography>
+                {sortValue.map((a, ids) => {
+                    return (
+                        <CircleButton
+                            key={ids}
+                            value={a}
+                            size="small"
+                            variant={1 === 1 ? "contained" : "outlined"}
+                            sx={{ margin: '5px' }}
+                            onClick={
+                                (e) => {
+                                    // if (!values.includes(e.target.value)) {
+                                    //   values.push(e.target.value)
+                                    // } else {
+                                    //   values = values.filter(value => e.target.value !== value)
+                                    // }
+                                    // params[props.searchType] = values
+                                    // delete params["topic"];
+                                    // navigate(`/explore?${qs.stringify(params, { arrayFormat: 'brackets' })}`)
+                                }
+                            }
+                        >
+                            {a}
+                        </CircleButton>
+                    )
+                })}
                 <IconButton
                     aria-label="expand row"
                     size="small"
@@ -299,7 +154,7 @@ function SearchTask(props) {
                 alignItems="flex-start"
                 spacing={4}
                 sx={{ height: '10%', width: '100%' }}>
-                {taskQueue.map((taskInfo, index) => taskCard(taskInfo, index))}
+                {users && users.map((file, index) => fileItem(file, index))}
             </Grid>
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
         </Stack>

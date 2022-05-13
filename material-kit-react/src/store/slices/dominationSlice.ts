@@ -25,6 +25,7 @@ const initialState = {
     users: [],
     course: [],
      areas :['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '麓坊校区', '领馆国际城校区', '一品天下校区', '天府环宇坊校区', '其他'],
+     sortValue :['年卡', '次卡', '充值卡'],
      selectCourse:null,
   
 }
