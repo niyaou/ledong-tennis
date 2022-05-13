@@ -50,15 +50,11 @@ function DominationPage() {
   }, []) 
   
   useEffect(() => {
-  if(errorMsg==='登录失败'){
-    navigate('/login')
-    return
-  }
+
   if(errorMsg){
     navigate('/login')
     return
   }
-
   }, [errorMsg])
 
   useEffect(() => {

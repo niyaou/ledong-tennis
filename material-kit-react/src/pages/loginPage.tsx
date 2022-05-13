@@ -21,7 +21,7 @@ import loginImgURL from '../assert/ios.jpg';
 import imgURL from '../assert/logo2.png';
 import { useSelector } from "../redux/hooks";
 import { directToPage, login } from '../store/actions/usersActions';
-import { UserFormValues} from '../common/interface'
+import { UserFormValues } from '../common/interface'
 
 import { useSnackbar } from 'notistack';
 
@@ -67,13 +67,13 @@ const baseTheme = createTheme({
 // const { Form } = withTypes<FormValues>();
 
 const TextFieldAdapter = ({ input, meta, ...rest }) => {
-  
+
   return (
     <TextField
       {...input}
       {...rest}
-      />)
-    }
+    />)
+}
 
 
 const renderInput = ({
@@ -108,16 +108,16 @@ const LoginPage = () => {
   const user = useSelector((state) => state.users)
 
   useEffect(() => {
-    console.log("🚀 ~ file: loginPage.tsx ~ line 124 ~ LoginPage ~ user", user)
     
-    if ( user.userInfo ) {
+    if (user.userInfo&& Object.keys(user.userInfo).length>0) {
+      console.log("🚀 ~ file: loginPage.tsx ~ line 124 ~ LoginPage ~ user", user.userInfo)
       navigate('/');
     }
-    if(user.loadError){
-      enqueueSnackbar(user.errorMsg,{ 
+    if (user.loadError) {
+      enqueueSnackbar(user.errorMsg, {
         variant: 'warning',
-        autoHideDuration:3000,
-    });
+        autoHideDuration: 3000,
+      });
     }
 
   }, [user])
@@ -191,7 +191,7 @@ const LoginPage = () => {
                         ),
                       }}
                     >
-      
+
                     </Field>
                     <Button variant="contained" type="submit" >Login</Button>
                   </Stack>
