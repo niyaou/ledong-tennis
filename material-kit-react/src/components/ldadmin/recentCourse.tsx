@@ -208,7 +208,7 @@ function RecentCourse(props) {
           >
             <Button variant="outlined" size="small" onClick={() => {
               dispatch(selectCourse(item))
-            }}>会员</Button>
+            }}>编辑</Button>
             <Button variant="outlined" size="small">删除</Button>
           </Stack>
         </Stack>

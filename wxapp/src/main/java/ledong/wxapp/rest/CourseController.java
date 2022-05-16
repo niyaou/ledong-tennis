@@ -16,6 +16,7 @@ import ledong.wxapp.entity.CommonResponse;
 import ledong.wxapp.service.ICourseService;
 import ledong.wxapp.service.IRankService;
 import ledong.wxapp.service.IUserService;
+import ledong.wxapp.service.impl.UserServiceImpl;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +84,13 @@ public class CourseController {
             logger.info("----token 不可用----");
             throw new AuthenticationException("token 不可用");
         }
+//        String userId = claims.getSubject();
+//        LdRankInfoVo vo= rankService.getLDUserRank(userId);
+//        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
+//            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+//        }
         String userId = claims.getSubject();
-        LdRankInfoVo vo= rankService.getLDUserRank(userId);
-        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
+        if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
             throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
         }
         HashMap<String, JSONArray> obj= JSON.parseObject(membersObj,HashMap.class);
@@ -93,6 +98,43 @@ public class CourseController {
                 CommonResponse.success(courseService.addCourse(startTime, endTime,  coach,  isExperience,  isDealing,  spendingTime,
                          courtSpend,  coachSpend,  court,grade, descript, obj)), HttpStatus.OK);
     }
+
+
+    @RequestMapping(value = "/ld/uploadCourse", method = RequestMethod.POST)
+    @ApiOperation(value = "uploadCourse ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "startTime ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "endTime", value = "endTime ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "courseId", value = "courseId ", required = true, dataType = "string", paramType = "query")
+       ,
+    })
+    public ResponseEntity<?> uploadCourse(@RequestHeader("Authorization") String authHeader,
+                                          @RequestParam(value = "startTime", required = true) String startTime,
+                                          @RequestParam(value = "endTime", required = true) String endTime,
+                                          @RequestParam(value = "courseId", required = true) String courseId
+
+
+    ) throws AuthenticationException {
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+
+        String userId = claims.getSubject();
+        if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+
+//        LdRankInfoVo vo= rankService.getLDUserRank(userId);
+//        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
+//            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+//        }
+
+        return new ResponseEntity<Object>(
+                CommonResponse.success(courseService.uploadCourse(startTime, endTime, courseId)), HttpStatus.OK);
+    }
+
 
 
 

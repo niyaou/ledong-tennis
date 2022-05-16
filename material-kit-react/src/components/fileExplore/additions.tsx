@@ -98,7 +98,7 @@ import LowCascader from './lowCascader'
 import ExtensionIcon from '@mui/icons-material/Extension';
 import { findIndex, find } from 'lodash';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction,createCard } from '../../store/slices/dominationSlice'
 import moment from 'moment'
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
@@ -201,32 +201,24 @@ function Additions(props) {
   const [labelNode, setLabelNode] = React.useState();
 
 
-  useEffect(() => {
-
-    if (labelStatistic && labelStatistic.length > 0) {
-      setRestLabelItem(labelStatistic)
-    }
-
-  }, [labelStatistic])
+ 
 
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (mergeActive) {
+  //     setLabelNode(nodeSelected)
+  //   } else {
+  //     setCurrentNodeSelected(nodeSelected)
+  //   }
+  // }, [nodeSelected])
 
-    if (mergeActive) {
-      setLabelNode(nodeSelected)
-    } else {
-      setCurrentNodeSelected(nodeSelected)
-    }
-
-  }, [nodeSelected])
-
-  useEffect(() => {
-    if (mergeActive) {
-      setLabelNode(currentNodeSelected)
-    } else {
-      setLabelNode(null)
-    }
-  }, [mergeActive])
+  // useEffect(() => {
+  //   if (mergeActive) {
+  //     setLabelNode(currentNodeSelected)
+  //   } else {
+  //     setLabelNode(null)
+  //   }
+  // }, [mergeActive])
 
   useEffect(() => {
     if (searchMoveStatus) {
@@ -358,8 +350,8 @@ function Additions(props) {
 
             // setQueryParams({ ...queryParams, senceAttArray: scenesArr.join(',').replace('&', '%26'), attArray: tagsArr.join(',').replace('&', '%26') })
             // setOpenSearch(false)
-            console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", standardDateValue, uploadFiles)
-            setOpenStandard(false)
+            console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles",courseEdit, standardDateValue, uploadFiles)
+            dispatch(createCard(courseEdit))
           }
         }>提交</Button>
 
@@ -775,6 +767,8 @@ function Additions(props) {
     {!selectCourse && <FormControl sx={{ m: 1, width: '100%' }} >
       <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
+          console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles",courseEdit)
+          dispatch(createCard(courseEdit))
         }}>
         确认添加
       </Button>

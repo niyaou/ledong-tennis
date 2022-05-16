@@ -16,7 +16,7 @@ export interface DominationState extends Fetching {
     hot: any[];
     recommend: any[];
     trending: any[];
-    areas:any[];
+    areas: any[];
 }
 
 const initialState = {
@@ -24,10 +24,12 @@ const initialState = {
     loading: false,
     users: [],
     course: [],
-     areas :['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '麓坊校区', '领馆国际城校区', '一品天下校区', '天府环宇坊校区', '其他'],
-     sortValue :['年卡', '次卡', '充值卡'],
-     selectCourse:null,
-  
+    areas: ['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '麓坊校区', '领馆国际城校区', '一品天下校区', '天府环宇坊校区', '其他'],
+    sortValue: ['年卡', '次卡', '充值卡'],
+    selectCourse: null,
+    recentPrepayedCard: null,
+    createSuccess:false,
+
 }
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -41,8 +43,8 @@ export const exploreUsersAction = createAsyncThunk(
             // throw new Error('Something bad happened');
             const response = await Axios.get(`/api/user/ldUserList`)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 40 ~ response", response)
-            if(response.data.code!==0){
-               return rejectWithValue(response.data.message)
+            if (response.data.code !== 0) {
+                return rejectWithValue(response.data.message)
             }
             return response.data;
         } catch (err) {
@@ -64,13 +66,67 @@ export const exploreRecentCourse = createAsyncThunk(
     }
 );
 
+export const exploreRecentCard = createAsyncThunk(
+    'lduser/cardLog',
+    async (cardId, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+            const response = await Axios.get(`/api/prepaidCard/ld/finacialLogs?cardId=${cardId}`)
+            if (response.data.code !== 0) {
+                return rejectWithValue(response.data.message)
+            }
+            return response.data.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+
+export const createCard = createAsyncThunk(
+    'lduser/createCard',
+    async (payload, { rejectWithValue }) => {
+        try {
+            // let payload={ 
+                // startTime: this.data.startTime,
+                // endTime: this.data.endTime,
+                // coach: this.data.coach[this.data.index].openId,
+                // isExperience: this.data.experinced?1:0,
+                // isDealing: this.data.isDealing?1:0,
+                // spendingTime:  this.data.timeArray[this.data.timeIndex] ,
+                // courtSpend: this.data.coursFee,
+                // coachSpend: this.data.coachSpend,
+                // descript:this.data.descript,
+                // court: this.data.array[this.data.courtIndex],
+                // grade: this.data.gradeArray[this.data.gradeIndex],
+                // membersObj: JSON.stringify( membobj),
+            // }
+      
+
+            // throw new Error('Something bad happened');
+            const response = await Axios.post(`/api/course/ld/createCourse`,payload)
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
+            if (response.data.code !== 0) {
+                return rejectWithValue(response.data.message)
+            }
+            return response.data.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+
+
 
 export const selectCourse = createAsyncThunk(
     'lduser/course/select',
     async (params, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
-           
+
             return params;
         } catch (err) {
             return rejectWithValue(err)
@@ -108,36 +164,69 @@ export const exploreSlice = createSlice({
                 // state.recommend = action.payload.data.recommend
                 // state.trending = action.payload.data.trending
             });
-            builder
+        builder
             .addCase(exploreRecentCourse.pending, (state) => {
                 state.loading = true
             })
             .addCase(exploreRecentCourse.rejected, (state, action) => {
                 state.loadError = true
                 state.loading = false
-                
+
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(exploreRecentCourse.fulfilled, (state, action) => {
                 state.loading = false
                 state.course = action.payload.data
-         
+
             });
-            builder
+        builder
             .addCase(selectCourse.pending, (state) => {
                 state.loading = true
-                
+
             })
             .addCase(selectCourse.rejected, (state, action) => {
                 state.loadError = true
                 state.loading = false
-                
+
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(selectCourse.fulfilled, (state, action) => {
                 state.loading = false
                 state.selectCourse = action.payload
-         
+
+            });
+        builder
+            .addCase(exploreRecentCard.pending, (state) => {
+                state.loading = true
+                state.recentPrepayedCard = null
+
+            })
+            .addCase(exploreRecentCard.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(exploreRecentCard.fulfilled, (state, action) => {
+                state.loading = false
+                state.recentPrepayedCard = JSON.parse( action.payload)
+
+            });
+        builder
+            .addCase(createCard.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(createCard.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(createCard.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
             });
     },
 });

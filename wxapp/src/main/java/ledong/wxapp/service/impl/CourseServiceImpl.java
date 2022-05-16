@@ -77,6 +77,22 @@ public class CourseServiceImpl implements ICourseService {
     }
 
     @Override
+    public String uploadCourse(String courseId,String startTime, String endTime) {
+       try{
+           LdCourseVo course=  JSON.parseObject(JSON.toJSONString(SearchApi.searchById(DataSetConstant.LD_COURSE_INFORMATION,courseId)),
+                   LdCourseVo.class);
+           course.setStart(startTime);
+           course.setEnd(endTime);
+           SearchApi.updateDocument(DataSetConstant.LD_COURSE_INFORMATION, JSON.toJSONString(course),courseId);
+
+           return courseId;
+       }catch(Exception e){
+           return null;
+       }
+
+    }
+
+    @Override
     public String courseLogs(String cardId, String startTime, String endTime) {
 
         return null;

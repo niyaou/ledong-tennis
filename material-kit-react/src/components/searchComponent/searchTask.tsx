@@ -31,6 +31,9 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard } from '../../store/slices/dominationSlice'
+var pinyin = require('../../common/utils/pinyinUtil.js')
+
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     height: 10,
     borderRadius: 5,
@@ -43,6 +46,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     },
 }));
 
+
 function SearchTask(props) {
     const dispatch = useDispatch()
     const index = props.index
@@ -52,11 +56,72 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { areas, users, sortValue } = useSelector((state) => state.domination)
+    const { areas, users, sortValue, recentPrepayedCard } = useSelector((state) => state.domination)
+    const [prepaidCard, setPrepaidCard] = React.useState({ balance: 0, balanceTimes: 0, expiredTime: null });
+    const [detailMode, setDetailMode] = React.useState(false);
+    const [userSort, setUserSort] = React.useState(false);
 
     useEffect(() => {
 
-    }, [])
+        if (users) {
+            let sorts = users.concat()
+            sorts.sort((a, b) => {
+                return pinyin.pinyinUtil.getFirstLetter((a.realName || a.nickName).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.realName || b.nickName).substring(0, 1)).toUpperCase() ? 1 : -1
+            })
+            setUserSort(sorts)
+        }
+        else { 
+            setUserSort([])
+        }
+    }, [users])
+
+    useEffect(() => {
+
+        if (prepaidCard) {
+            setDetailMode(true)
+            console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
+        }
+    }, [prepaidCard])
+
+    useEffect(() => {
+
+        if (recentPrepayedCard) {
+            let card = recentPrepayedCard.filter(card => typeof card.balance !== 'undefined')[0]
+            setDetailMode(true)
+            setPrepaidCard(card)
+        }
+    }, [recentPrepayedCard])
+
+
+
+
+    const finacialItem =
+        (<Stack
+            justifyContent="flex-start"
+            alignItems="center"
+            spacing={2}
+            direction="row"
+        >
+            <Typography gutterBottom variant="body2"
+                sx={{
+                    color: 'rgba(0, 0, 0, 0.6)',
+
+                }} >
+                充值卡余额：{prepaidCard.balance}
+            </Typography>
+            <Typography gutterBottom variant="body2"
+                sx={{
+                    color: 'rgba(0, 0, 0, 0.6)',
+                }} >
+                次卡余额：  {prepaidCard.balanceTimes}
+            </Typography>
+            <Typography gutterBottom variant="body2"
+                sx={{
+                    color: 'rgba(0, 0, 0, 0.6)',
+                }} >
+                年卡到期时间  {prepaidCard.expiredTime}
+            </Typography>
+        </Stack>)
 
 
     const fileItem = (user, index) => {
@@ -76,7 +141,9 @@ function SearchTask(props) {
 
                     }}
                     onClick={(event) => {
-
+                        if (user.prepaidCard) {
+                            dispatch(exploreRecentCard(user.prepaidCard))
+                        }
                     }}>
                     <Avatar alt="Remy Sharp" src={user.avator} />
 
@@ -138,7 +205,7 @@ function SearchTask(props) {
                     aria-label="expand row"
                     size="small"
                     onClick={async () => {
-                        dispatch(selectedAndMoveTaskAction())
+                        setDetailMode(!detailMode)
 
 
                     }}
@@ -146,16 +213,17 @@ function SearchTask(props) {
                     <CachedIcon />
                 </IconButton>
             </Stack>
-
-            <Grid
+            {!detailMode && (<Grid
                 container
                 direction="row"
                 justifyContent="flex-start"
                 alignItems="flex-start"
                 spacing={4}
                 sx={{ height: '10%', width: '100%' }}>
-                {users && users.map((file, index) => fileItem(file, index))}
-            </Grid>
+                {userSort && userSort.map((file, index) => fileItem(file, index))}
+            </Grid>)}
+
+            {detailMode && finacialItem}
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
         </Stack>
     );

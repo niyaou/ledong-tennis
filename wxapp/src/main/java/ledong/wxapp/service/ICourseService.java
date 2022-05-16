@@ -26,6 +26,15 @@ public interface ICourseService {
             Double spendingTime, Integer courtSpend, Integer coachSpend, String court,String grade,String descript,
             HashMap<String, JSONArray> membersObj);
 
+
+    /**
+     * upload course time
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public String uploadCourse(String courseId,String startTime, String endTime);
+
     /**
      * get course log by card id
      * 
