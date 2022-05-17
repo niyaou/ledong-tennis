@@ -18,6 +18,7 @@ import { logOut } from '../store/actions/usersActions'
 import { useSelector } from "../redux/hooks"
 import { exploreUsersAction } from '../store/slices/dominationSlice'
 import { searchDeActiveAction } from '../store/actions/filesAndFoldersActions'
+import { userAction } from '../store/actions/usersActions'
 import bottomURL from '../assert/logo_white.png'
 import contentImgURL from '../assert/content.png';
 import { makeStyles } from '@mui/styles';
@@ -42,20 +43,25 @@ function DominationPage() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   let navigate = useNavigate()
   const dispatch = useDispatch()
-  const user = useSelector((state) => state.users)
+  const {loginError} = useSelector((state) => state.users)
 
   const [index, setIndex] = React.useState<number>(0);
+
+
+
   useEffect(() => {
-    dispatch(exploreUsersAction())
+   
+      dispatch(userAction())
+  
   }, []) 
   
-  useEffect(() => {
 
-  if(errorMsg){
+  useEffect(() => {
+  if(loginError){
     navigate('/login')
     return
   }
-  }, [errorMsg])
+  }, [loginError])
 
   useEffect(() => {
     if (loadError) {

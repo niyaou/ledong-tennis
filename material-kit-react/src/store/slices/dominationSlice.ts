@@ -11,6 +11,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { fetching, Fetching } from '../../common/interface'
 import Axios from '../../common/axios/axios'
 import { getErrorMsg } from '../../common/utils/reduxUtil'
+import moment from 'moment'
 export interface DominationState extends Fetching {
     favourite: any[];
     hot: any[];
@@ -29,6 +30,7 @@ const initialState = {
     selectCourse: null,
     recentPrepayedCard: null,
     createSuccess:false,
+
 
 }
 // The function below is called a thunk and allows us to perform async logic. It
@@ -88,6 +90,11 @@ export const createCard = createAsyncThunk(
     'lduser/createCard',
     async (payload, { rejectWithValue }) => {
         try {
+            payload.isExperience=0
+            payload.isDealing=0
+            payload.startTime=moment(payload.startTime).format('YYYY-MM-DD HH:mm')
+            payload.endTime=moment(payload.endTime).format('YYYY-MM-DD HH:mm')
+            payload.spendingTime=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
             // let payload={ 
                 // startTime: this.data.startTime,
                 // endTime: this.data.endTime,
@@ -105,7 +112,7 @@ export const createCard = createAsyncThunk(
       
 
             // throw new Error('Something bad happened');
-            const response = await Axios.post(`/api/course/ld/createCourse`,payload)
+            const response = await Axios.request({method:'post',url:`/api/course/ld/createCourse`,params:payload})
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
             if (response.data.code !== 0) {
                 return rejectWithValue(response.data.message)

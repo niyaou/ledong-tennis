@@ -105,22 +105,24 @@ const LoginPage = () => {
   const onSubmit = (auth: UserFormValues) => {
     dispatch(login(auth))
   }
-  const user = useSelector((state) => state.users)
+  
+  const {userInfo,loadError,errorMsg} = useSelector((state) => state.users)
 
   useEffect(() => {
     
-    if (user.userInfo&& Object.keys(user.userInfo).length>0) {
-      console.log("🚀 ~ file: loginPage.tsx ~ line 124 ~ LoginPage ~ user", user.userInfo)
+    if (userInfo&& Object.keys(userInfo).length>0) {
+      console.log("🚀 ~ file: loginPage.tsx ~ line 124 ~ LoginPage ~ user", userInfo)
       navigate('/');
     }
-    if (user.loadError) {
-      enqueueSnackbar(user.errorMsg, {
+
+    if (loadError) {
+      enqueueSnackbar(errorMsg, {
         variant: 'warning',
         autoHideDuration: 3000,
       });
     }
 
-  }, [user])
+  }, [userInfo,loadError,errorMsg])
 
 
   return (

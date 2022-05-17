@@ -109,6 +109,38 @@ export const login = (auth: UserFormValues) => async dispatch => {
 
 
 
+export const userAction = (key ) => async dispatch => {
+    dispatch({
+        type: UserActionTypes.GET_USERS_INFO,
+    })
+    try {
+        const user = await Axios.get(`/api/user/ldUserinfo`)
+        if (user.data.code !== 200 && user.data.code !== 0) {
+            localStorage.removeItem(USER_INFO_KEY)
+            dispatch({
+                type: UserActionTypes.GET_USERS_INFO_ERROR,
+                payload: user.data.message,
+            })
+            return
+        }
+
+        dispatch({
+            type: UserActionTypes.GET_USERS_INFO_SUCCESS,
+            payload: user.data.data
+        })
+    }
+    catch (e) {
+        localStorage.removeItem(USER_INFO_KEY)
+        dispatch({
+            type: UserActionTypes.GET_USERS_INFO_ERROR,
+            payload: e.response.data.message,
+        })
+
+    }
+
+}
+
+
 
 export const applyPermission = (type, effectiveDayNum) => async dispatch => {
     dispatch({

@@ -15,6 +15,7 @@ const initialState = {
     publickey: '',
     isDirectToDomanitaion: false,
     success:false,
+    loginError:false,
     ...fetching,
 }
 
@@ -23,6 +24,7 @@ export default function (state = initialState, action) {
     state.errorMsg = ''
     state.loadError = false
     state.success = false
+    console.log("🚀 ~ file: userReducers.js ~ line 27 ~ state", state)
     switch (action.type) {
         case UserActionTypes.GET_USERS:
             return {
@@ -37,15 +39,45 @@ export default function (state = initialState, action) {
                 userInfo: action.payload,
                 loadError: false,
                 errorMsg: '',
-                loading: false
+                loading: false,
+                loginError: false,
             }
         case UserActionTypes.USERS_ERROR:
             return {
                 ...state,
                 loadError: true,
                 errorMsg: action.payload,
-                loading: false
+                loading: false,
+                loginError: true,
             }
+
+
+
+            case UserActionTypes.GET_USERS_INFO:
+                return {
+                    ...state,
+                    loading: true,
+                    loadError: false,
+                    errorMsg: '',
+                }
+            case UserActionTypes.GET_USERS_INFO_SUCCESS:
+                return {
+                    ...state,
+                    loadError: false,
+                    errorMsg: '',
+                    loading: false,
+                    loginError: false,
+                }
+            case UserActionTypes.GET_USERS_INFO_ERROR:
+                return {
+                    ...state,
+                    loadError: true,
+                    errorMsg: action.payload,
+                    loading: false,
+                    loginError: true,
+                }
+
+
 
 
             case UserActionTypes.APPLY_PERMISSION:

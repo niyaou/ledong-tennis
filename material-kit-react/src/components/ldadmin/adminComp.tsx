@@ -15,8 +15,9 @@ import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
 import { tagsInfoAction ,scenceInfoAction} from '../../store/slices/tagsSlice'
 import { rootProjects, selectedFolderContent
-  ,toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig, searchActiveAction, searchDeActiveAction,selectedByParams,labelsStatisticAction } from '../../store/actions/filesAndFoldersActions';
-
+  ,toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig,
+   searchActiveAction, searchDeActiveAction,selectedByParams,labelsStatisticAction } from '../../store/actions/filesAndFoldersActions';
+   import { exploreUsersAction } from '../../store/slices/dominationSlice'
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -53,11 +54,12 @@ function AdminComp(props) {
   };
 
 
-// useEffect(() => {
+useEffect(() => {
+        dispatch(exploreUsersAction())
   // dispatch(tagsInfoAction())
   // dispatch(scenceInfoAction())
   // dispatch(labelsStatisticAction())
-// },[])
+},[])
 
 
   const numberOfChecked = (items: readonly number[]) =>
