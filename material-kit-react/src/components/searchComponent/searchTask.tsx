@@ -91,7 +91,8 @@ function SearchTask(props) {
 
         if (recentPrepayedCard) {
             let card = recentPrepayedCard.filter(card => typeof card.balance !== 'undefined')[0]
-            let courselist = recentPrepayedCard.filter(card => typeof card.description !== 'undefined')
+            // let courselist = recentPrepayedCard.filter(card => typeof card.description !== 'undefined')
+            let courselist = recentPrepayedCard.filter(card => typeof card.balance === 'undefined')
             // setDetailMode(true)
             setPrepaidCard(card)
             setCourseList(courselist)
@@ -140,7 +141,7 @@ function SearchTask(props) {
 
     const fileItem = (user, index) => {
         return (<Grid item xs={1} key={index} space={1}>
-            <Paper elevation={1} sx={{ background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
+            <Paper elevation={1} sx={{ background: user.prepaidCard?'transparent':'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
 
                 <Stack
                     direction="row"
@@ -165,6 +166,8 @@ function SearchTask(props) {
 
                     <Typography gutterBottom variant="body2"
                         sx={{
+                            background:'transparent',
+                            '& :hover': { background: 'transparent' },
                             color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
                         }} >
@@ -216,6 +219,14 @@ function SearchTask(props) {
                     }} >
                     {course.description}
                 </Typography>
+                { typeof course.amount!=='undefined'&& (<Typography gutterBottom variant="body2"
+                    sx={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        minWidth: '80px',
+                    }} >
+                    充值{course.amount}
+                </Typography>)}
+                
             </Stack>
         </Paper>)
     }

@@ -9,7 +9,7 @@
  */
 import {
   Paper, Typography, Backdrop, CircularProgress, Button, Card, Grow, CardHeader, Checkbox,
-  Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box
+  Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box,IconButton,
 } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -18,6 +18,8 @@ import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
 import { exploreUsersAction, exploreRecentCourse, selectCourse } from '../../store/slices/dominationSlice'
 import { tagsInfoAction, scenceInfoAction } from '../../store/slices/tagsSlice'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CachedIcon from '@mui/icons-material/Cached';
 import {
   rootProjects, selectedFolderContent
   , toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig, searchActiveAction, searchDeActiveAction, selectedByParams, labelsStatisticAction
@@ -209,11 +211,11 @@ function RecentCourse(props) {
             <Button variant="outlined" size="small" onClick={() => {
               dispatch(selectCourse(item))
             }}>编辑</Button>
-            <Button variant="outlined" size="small"
+            {/* <Button variant="outlined" size="small"
              onClick={() => {
               // dispatch(selectCourse(item))
             }}
-            >删除</Button>
+            >删除</Button> */}
           </Stack>
         </Stack>
       </Paper>)
@@ -227,6 +229,21 @@ function RecentCourse(props) {
         justifyContent="flex-start"
         alignItems="flex-start"
       >
+         <IconButton
+                    aria-label="expand row"
+                    size="small"
+                    onClick={async () => {
+                        // if(detailMode){
+                        //     setDetailMode(!detailMode)
+                        //     setCustomerName('')
+                        // }
+                        dispatch(exploreRecentCourse({ page: 0, num: 50 }))
+
+                    }}
+                >
+                   <CachedIcon />
+                </IconButton>
+
         {course && course.map((c, i) => courseItem(c, i))}
         {/* <Grid item><DsFolderTree  datasetId={datasetId} editType={true} /></Grid> */}
       </Stack>
