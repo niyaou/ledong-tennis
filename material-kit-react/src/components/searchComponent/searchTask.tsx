@@ -32,6 +32,7 @@ import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
 import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard } from '../../store/slices/dominationSlice'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -58,26 +59,29 @@ function SearchTask(props) {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const { areas, users, sortValue, recentPrepayedCard } = useSelector((state) => state.domination)
     const [prepaidCard, setPrepaidCard] = React.useState({ balance: 0, balanceTimes: 0, expiredTime: null });
+    const [courseList, setCourseList] = React.useState([]);
     const [detailMode, setDetailMode] = React.useState(false);
     const [userSort, setUserSort] = React.useState(false);
+    const [customerName, setCustomerName] = React.useState('');
 
     useEffect(() => {
 
         if (users) {
+            setDetailMode(false)
             let sorts = users.concat()
             sorts.sort((a, b) => {
                 return pinyin.pinyinUtil.getFirstLetter((a.realName || a.nickName).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.realName || b.nickName).substring(0, 1)).toUpperCase() ? 1 : -1
             })
             setUserSort(sorts)
         }
-        else { 
+        else {
             setUserSort([])
         }
     }, [users])
 
     useEffect(() => {
 
-        if (prepaidCard) {
+        if (prepaidCard&& customerName ) {
             setDetailMode(true)
             console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
         }
@@ -87,8 +91,11 @@ function SearchTask(props) {
 
         if (recentPrepayedCard) {
             let card = recentPrepayedCard.filter(card => typeof card.balance !== 'undefined')[0]
-            setDetailMode(true)
+            let courselist = recentPrepayedCard.filter(card => typeof card.description !== 'undefined')
+            // setDetailMode(true)
             setPrepaidCard(card)
+            setCourseList(courselist)
+            console.log("🚀 ~ file: searchTask.tsx ~ line 733 ~ SearchTask ~ prepaidCard", card, courselist)
         }
     }, [recentPrepayedCard])
 
@@ -102,6 +109,13 @@ function SearchTask(props) {
             spacing={2}
             direction="row"
         >
+            <Typography gutterBottom variant="body2"
+                sx={{
+                    color: 'rgba(0, 0, 0, 0.6)',
+
+                }} >
+                会员名称：{customerName}
+            </Typography>
             <Typography gutterBottom variant="body2"
                 sx={{
                     color: 'rgba(0, 0, 0, 0.6)',
@@ -142,6 +156,7 @@ function SearchTask(props) {
                     }}
                     onClick={(event) => {
                         if (user.prepaidCard) {
+                            setCustomerName(user.prepaidCard)
                             dispatch(exploreRecentCard(user.prepaidCard))
                         }
                     }}>
@@ -164,19 +179,61 @@ function SearchTask(props) {
         )
     }
 
+    const courseItem = (course, index) => {
+
+
+        return (<Paper key={`course-item-${index}`} elevation={1} sx={{
+            minWidth: '850px',
+            background: 'transparent',
+            '& :hover': { background: 'rgb(0,0,0,0.1)' }
+        }}>
+            <Stack
+
+                spacing={2}
+                direction="row"
+                justifyContent="flex-start"
+                alignItems="center"
+                sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
+            >
+                <Typography gutterBottom variant="body2"
+                    sx={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        minWidth: '80px',
+                    }} >
+                    {course.openId}
+                </Typography>
+                <Typography gutterBottom variant="body2"
+                    sx={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        minWidth: '80px',
+                    }} >
+                    {course.time}
+                </Typography>
+                <Typography gutterBottom variant="body2"
+                    sx={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        minWidth: '80px',
+                    }} >
+                    {course.description}
+                </Typography>
+            </Stack>
+        </Paper>)
+    }
 
 
     return (
         <Stack justifyContent="flex-start"
             alignItems="flex-start"
             sx={{ marginLeft: 2, overflowY: 'auto', height: '100%', paddingBottom: -2 }}
+
+            spacing={2}
         >
             <Stack justifyContent="flex-start"
                 alignItems="center"
                 spacing={2}
                 direction="row"
             >
-                {sortValue.map((a, ids) => {
+                {!detailMode && sortValue.map((a, ids) => {
                     return (
                         <CircleButton
                             key={ids}
@@ -205,12 +262,15 @@ function SearchTask(props) {
                     aria-label="expand row"
                     size="small"
                     onClick={async () => {
-                        setDetailMode(!detailMode)
-
+                        if(detailMode){
+                            setDetailMode(!detailMode)
+                            setCustomerName('')
+                        }
+                
 
                     }}
                 >
-                    <CachedIcon />
+                    {detailMode ? <ArrowBackIcon /> : <CachedIcon />}
                 </IconButton>
             </Stack>
             {!detailMode && (<Grid
@@ -224,6 +284,8 @@ function SearchTask(props) {
             </Grid>)}
 
             {detailMode && finacialItem}
+            {detailMode && courseList&& courseList.map((c,i)=> courseItem(c,i)           )}
+
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
         </Stack>
     );

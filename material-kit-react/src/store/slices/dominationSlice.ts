@@ -217,7 +217,7 @@ export const exploreSlice = createSlice({
             .addCase(exploreRecentCard.fulfilled, (state, action) => {
                 state.loading = false
                 state.recentPrepayedCard = JSON.parse( action.payload)
-
+                
             });
         builder
             .addCase(createCard.pending, (state) => {
