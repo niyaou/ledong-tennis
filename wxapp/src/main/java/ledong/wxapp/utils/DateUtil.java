@@ -157,6 +157,19 @@ public final class DateUtil {
                         : new SimpleDateFormat(fomart).format(date));
     }
 
+    /**
+     * 日期转换为字符串
+     *
+     * @param date 日期对象
+     * @param fomart 日期格式
+     * @return String 日期字符串，默认格式为（yyyy-MM-dd）
+     * @throws ParseException
+     */
+    public static String getDateString(Date date, String fomart) throws ParseException {
+        return date == null ? ""
+                : (StringUtil.isEmpty(fomart) ? new SimpleDateFormat(FORMAT_DATE).format(date)
+                : new SimpleDateFormat(fomart).format(date));
+    }
 
     /**
      * 日期格式转换
@@ -400,6 +413,46 @@ public final class DateUtil {
         c.add(Calendar.DATE, -dayofweek + 7);
         String d = DateUtil.getDate(c.getTime()) + " 23:59:59";
         return DateUtil.getDate(d, DateUtil.FORMAT_DATE_TIME);
+    }
+
+    public static Long dateDiff(String startTime, String endTime, String format, String str) {
+        // 按照传入的格式生成一个simpledateformate对象
+        SimpleDateFormat sd = new SimpleDateFormat(format);
+        long nd = 1000 * 24 * 60 * 60;// 一天的毫秒数
+        long nh = 1000 * 60 * 60;// 一小时的毫秒数
+        long nm = 1000 * 60;// 一分钟的毫秒数
+        long ns = 1000;// 一秒钟的毫秒数
+        long diff;
+        long day = 0;
+        long hour = 0;
+        long min = 0;
+        long sec = 0;
+        String result = "0";
+        // 获得两个时间的毫秒时间差异
+        try {
+            diff = sd.parse(endTime).getTime() - sd.parse(startTime).getTime();
+            day = diff / nd;// 计算差多少天
+            hour = diff % nd / nh + day * 24;// 计算差多少小时
+            min = diff % nd % nh / nm + day * 24 * 60;// 计算差多少分钟
+            sec = diff % nd % nh % nm / ns;// 计算差多少秒
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        System.out.println("时间相差：" + day + "天" + (hour - day * 24) + "小时"
+                + (min - day * 24 * 60) + "分钟" + sec + "秒。");
+
+        if ("d".equalsIgnoreCase(str)){
+            return day;
+        } else if ("h".equalsIgnoreCase(str)) {
+            return hour;
+        } else if ("m".equalsIgnoreCase(str)){
+            return min;
+        } else {
+            return 0L;
+        }
+
     }
 
     public static String getDateDiff(Long diff) throws Exception {

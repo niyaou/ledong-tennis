@@ -235,6 +235,8 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     @Override
     public Object finacialLogs(String cardId, String startTime, String endTime) {
         HashMap<String, Object> vo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
+//        HashMap<String, HashMap<String, Object>> vo = SearchApi.searchByFieldSortedInMap(
+//                DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdCourseVo, null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
         Integer balance = (Integer) vo.get(LdPrePaidCardVo.BALANCE);
         Integer balanceTime = (Integer) vo.get(LdPrePaidCardVo.BALANCETIMES);
         List<HashMap<String, Object>> spend = (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.SPENDING);
@@ -242,19 +244,29 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         bm.put(LdPrePaidCardVo.BALANCE, balance);
         bm.put(LdPrePaidCardVo.BALANCETIMES, balanceTime);
         if (spend.size() > 0) {
+            spend.removeIf(s->{
+                LdSpendingVo stemp = JSON.parseObject(JSON.toJSONString(s), LdSpendingVo.class);
+                LdCourseVo course = courseService.getCourseById(stemp.getCourse());
+                long diff=  DateUtil.  dateDiff( stemp.getTime(), DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME),DateUtil.FORMAT_DATE_TIME, "d");
+                // if(diff<31){
+                // System.out.println(stemp.getTime()+"current date diff "+diff);
+                // }
+                return diff>30;
+            });
+
             spend.stream().forEach(s -> {
 
                 LdSpendingVo stemp = JSON.parseObject(JSON.toJSONString(s), LdSpendingVo.class);
                 LdCourseVo course = courseService.getCourseById(stemp.getCourse());
-                if (course != null) {
-                    HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
-                    String trainee = (String) ld.get(UserVo.REALNAME);
-                    String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
-                    String desript = TextUtils.isEmpty(course.getDescript()) ? "" : course.getDescript();
-                    stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
-                            + course.getSpendingTime() + " 小时, 备注 " + desript);
-                    s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
-                }
+                    if (course != null) {
+                        HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
+                        String trainee = (String) ld.get(UserVo.REALNAME);
+                        String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
+                        String desript = TextUtils.isEmpty(course.getDescript()) ? "" : course.getDescript();
+                        stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
+                                + course.getSpendingTime() + " 小时, 备注 " + desript);
+                        s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
+                    }
             });
         }
         if (vo.get(LdPrePaidCardVo.CHARGE) != null) {
