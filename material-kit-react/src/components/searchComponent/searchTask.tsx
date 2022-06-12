@@ -11,11 +11,13 @@ import React, { useEffect } from 'react';
 import DsFolderTree from '../fileExplore/dsFolderTree'
 import DataFolderExplore from '../fileExplore/folderExploreComponent'
 import FsResourceManagement from '../createDs/fsResourseManagement'
-import { Button, Card, Stack, NoSsr, Paper, Box, Typography, AvatarGroup, Avatar, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Button, Card, Stack, NoSsr, Paper, Box, Typography, AvatarGroup,TextField, Avatar,FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import IdsFileTree from '../fileExplore/idsFileTree'
 import { makeStyles, createStyles } from '@mui/styles';
 import FolderIcon from '@mui/icons-material/Folder';
 import { styled } from '@mui/material/styles';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FolderIconUrl from '../../assert/folderIcon.png'
 import CircularProgress, {
     circularProgressClasses,
@@ -33,6 +35,9 @@ import {
 } from '../../store/actions/inSensitiveActions';
 import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard } from '../../store/slices/dominationSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -63,6 +68,7 @@ function SearchTask(props) {
     const [detailMode, setDetailMode] = React.useState(false);
     const [userSort, setUserSort] = React.useState(false);
     const [customerName, setCustomerName] = React.useState('');
+    const [expiredTime, setExpiredTime] = React.useState(prepaidCard.expiredTime||'');
 
     useEffect(() => {
 
@@ -136,6 +142,30 @@ function SearchTask(props) {
                 }} >
                 年卡到期时间  {prepaidCard.expiredTime}
             </Typography>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <FormControl sx={{ m: 1, minWidth: 120, }} size="small">
+        <DatePicker
+          label="年卡到期时间"
+          value={expiredTime}
+          onChange={(newValue) => {
+            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
+            // let after = { ...courseEdit, startTime: newValue }
+            // setStartTime(newValue)
+            // let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
+            // after = { ...courseEdit, spendingTime: diff }
+            // console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff)
+            setExpiredTime(newValue)
+          }}
+          renderInput={(params) => {
+            return (<TextField {...params} />)
+          }}
+        />
+      </FormControl>
+    </LocalizationProvider>
+            <Button variant="contained" size="small"  onClick={() => {
+             
+            }}>修改时间</Button>
+          
         </Stack>)
 
 
