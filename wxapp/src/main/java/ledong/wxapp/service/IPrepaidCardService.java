@@ -54,6 +54,17 @@ public interface IPrepaidCardService {
         public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,Integer times,
                         String coachId, String courseId, String description);
 
+
+        /**
+         *
+         * @param cardId
+         * @param time
+         * @return
+         */
+        public String setExpiredTime(String cardId,String time);
+
+
+
         /**
          * get spending and charge logs
          * 

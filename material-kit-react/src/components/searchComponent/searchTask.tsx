@@ -33,11 +33,12 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard,updateExpiredTime } from '../../store/slices/dominationSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import moment from 'moment';
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -62,7 +63,7 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { areas, users, sortValue, recentPrepayedCard } = useSelector((state) => state.domination)
+    const { areas, users, sortValue, recentPrepayedCard ,createSuccess} = useSelector((state) => state.domination)
     const [prepaidCard, setPrepaidCard] = React.useState({ balance: 0, balanceTimes: 0, expiredTime: null });
     const [courseList, setCourseList] = React.useState([]);
     const [detailMode, setDetailMode] = React.useState(false);
@@ -85,22 +86,31 @@ function SearchTask(props) {
         }
     }, [users])
 
-    useEffect(() => {
 
+    useEffect(() => {
         if (prepaidCard&& customerName ) {
             setDetailMode(true)
             console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
         }
     }, [prepaidCard])
 
-    useEffect(() => {
+    // useEffect(() => {
+    //     if (prepaidCard&& customerName ) {
+    //         setDetailMode(true)
+    //         console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
+    //     }
+    // }, [createSuccess])
 
+
+
+    useEffect(() => {
         if (recentPrepayedCard) {
             let card = recentPrepayedCard.filter(card => typeof card.balance !== 'undefined')[0]
             // let courselist = recentPrepayedCard.filter(card => typeof card.description !== 'undefined')
             let courselist = recentPrepayedCard.filter(card => typeof card.balance === 'undefined')
             // setDetailMode(true)
             setPrepaidCard(card)
+            setExpiredTime(card.expiredTime||'')
             setCourseList(courselist)
             console.log("🚀 ~ file: searchTask.tsx ~ line 733 ~ SearchTask ~ prepaidCard", card, courselist)
         }
@@ -163,7 +173,8 @@ function SearchTask(props) {
       </FormControl>
     </LocalizationProvider>
             <Button variant="contained" size="small"  onClick={() => {
-             
+
+             dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD')}))
             }}>修改时间</Button>
           
         </Stack>)

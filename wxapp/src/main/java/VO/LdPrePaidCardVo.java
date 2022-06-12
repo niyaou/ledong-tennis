@@ -28,6 +28,10 @@ public class LdPrePaidCardVo implements Serializable {
     public static final String CREATETIME = "createTime";
 
 
+    @ApiModelProperty(value = "title card name ")
+    private String expiredTime;
+    public static final String EXPIREDTIME = "expiredTime";
+
     @ApiModelProperty(value = "member list ")
     private String[] member;
     public static final String MEMBER = "member";

@@ -220,6 +220,18 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         return null;
     }
 
+    @Override
+    public String setExpiredTime(String cardId, String time) {
+        HashMap<String, Object> card = getInstance(cardId);
+
+
+        if (card != null) {
+            card.put(LdPrePaidCardVo.EXPIREDTIME,time);
+            return  SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdPrePaidCardVo.EXPIREDTIME, time,cardId);
+        }
+        return null;
+    }
+
     private HashMap<String, Object> getInstance(String cardId) {
         HashMap<String, Object> card = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, cardId);
         if (card == null) {
@@ -239,10 +251,12 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 //                DataSetConstant.LD_PREPAID_CARD_INFORMATION, LdCourseVo, null, RankInfoVo.SCORE, SortOrder.DESC, 0, count);
         Integer balance = (Integer) vo.get(LdPrePaidCardVo.BALANCE);
         Integer balanceTime = (Integer) vo.get(LdPrePaidCardVo.BALANCETIMES);
+        String time = (String) vo.get(LdPrePaidCardVo.EXPIREDTIME);
         List<HashMap<String, Object>> spend = (List<HashMap<String, Object>>) vo.get(LdPrePaidCardVo.SPENDING);
         HashMap<String, Object> bm = new HashMap<String, Object>();
         bm.put(LdPrePaidCardVo.BALANCE, balance);
         bm.put(LdPrePaidCardVo.BALANCETIMES, balanceTime);
+        bm.put(LdPrePaidCardVo.EXPIREDTIME, time);
         if (spend.size() > 0) {
             spend.removeIf(s->{
                 LdSpendingVo stemp = JSON.parseObject(JSON.toJSONString(s), LdSpendingVo.class);

@@ -131,6 +131,48 @@ public class PrepaidCardController {
                 HttpStatus.OK);
     }
 
+
+
+
+    @RequestMapping(value = "/ld/updateExpireTime", method = RequestMethod.POST)
+    @ApiOperation(value = "updateExpireTime ", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "time", value = "time ", required = false, dataType = "string", paramType = "query")
+          })
+    public ResponseEntity<?> updateExpireTime(@RequestHeader("Authorization") String authHeader,
+                                              @RequestParam(value = "cardId", required = true) String cardId,
+                                              @RequestParam(value = "time", required = false) String time) throws AuthenticationException {
+
+        Claims claims = tokenService.getClaimByToken(authHeader);
+        if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
+            logger.info("----token 不可用----");
+            throw new AuthenticationException("token 不可用");
+        }
+//        String userId = claims.getSubject();
+//        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+//        HashMap<String, Object> user = userService.getLDUserInfo(userId);
+//        if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+//            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+//        }
+//        Object temp=   user.get(UserVo.REALNAME);
+//        String temp_s =temp.toString();
+
+        String userId = claims.getSubject();
+        if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        }
+        return new ResponseEntity<Object>(
+                CommonResponse.success(prepaidCardService.setExpiredTime(cardId,time)),
+                HttpStatus.OK);
+    }
+
+
+
+
+
+
+
     @RequestMapping(value = "/ld/finacialLogs", method = RequestMethod.GET)
     @ApiOperation(value = "finacialLogs ", notes = "")
     @ApiImplicitParams({
