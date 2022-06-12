@@ -61,9 +61,19 @@ public class PrepaidCardController {
         }
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
-        if ( vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        if(vo==null){
+            userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+
         }
+
         return new ResponseEntity<Object>(CommonResponse.success(prepaidCardService.addCard(name, openId)),
                 HttpStatus.OK);
     }
@@ -84,9 +94,19 @@ public class PrepaidCardController {
         }
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
-        if ( vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        if(vo==null){
+            userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+
         }
+
         return new ResponseEntity<Object>(CommonResponse.success(prepaidCardService.assignMember(name, openId)),
                 HttpStatus.OK);
     }
@@ -149,19 +169,23 @@ public class PrepaidCardController {
             logger.info("----token 不可用----");
             throw new AuthenticationException("token 不可用");
         }
-//        String userId = claims.getSubject();
-//        LdRankInfoVo vo = rankService.getLDUserRank(userId);
-//        HashMap<String, Object> user = userService.getLDUserInfo(userId);
-//        if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
-//            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
-//        }
-//        Object temp=   user.get(UserVo.REALNAME);
-//        String temp_s =temp.toString();
-
         String userId = claims.getSubject();
-        if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        if(vo==null){
+             userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+
         }
+
+
+
         return new ResponseEntity<Object>(
                 CommonResponse.success(prepaidCardService.setExpiredTime(cardId,time)),
                 HttpStatus.OK);
@@ -211,10 +235,19 @@ public class PrepaidCardController {
         }
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
-        HashMap<String, Object> user = userService.getLDUserInfo(userId);
-        if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        if(vo==null){
+            userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+
         }
+
         return new ResponseEntity<Object>(
                 CommonResponse.success(prepaidCardService.chargeLogRetreat(cardId, time)), HttpStatus.OK);
     }

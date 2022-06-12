@@ -84,15 +84,21 @@ public class CourseController {
             logger.info("----token 不可用----");
             throw new AuthenticationException("token 不可用");
         }
-//        String userId = claims.getSubject();
-//        LdRankInfoVo vo= rankService.getLDUserRank(userId);
-//        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
-//            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
-//        }
         String userId = claims.getSubject();
-        if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        if(vo==null){
+            userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+
         }
+
         HashMap<String, JSONArray> obj= JSON.parseObject(membersObj,HashMap.class);
         return new ResponseEntity<Object>(
                 CommonResponse.success(courseService.addCourse(startTime, endTime,  coach,  isExperience,  isDealing,  spendingTime,
@@ -122,14 +128,20 @@ public class CourseController {
         }
 
         String userId = claims.getSubject();
-        if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        if(vo==null){
+            userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+
         }
 
-//        LdRankInfoVo vo= rankService.getLDUserRank(userId);
-//        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
-//            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
-//        }
 
         return new ResponseEntity<Object>(
                 CommonResponse.success(courseService.uploadCourse(startTime, endTime, courseId)), HttpStatus.OK);
@@ -149,10 +161,20 @@ public class CourseController {
             throw new AuthenticationException("token 不可用");
         }
         String userId = claims.getSubject();
-        LdRankInfoVo vo= rankService.getLDUserRank(userId);
-        if (vo.getClubId()!= LdRankInfoVo.SUPER_MASTER) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        LdRankInfoVo vo = rankService.getLDUserRank(userId);
+        if(vo==null){
+            userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+
         }
+
         return new ResponseEntity<Object>(
                 CommonResponse.success(courseService.dailyStatistics()), HttpStatus.OK);
     }

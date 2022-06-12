@@ -71,14 +71,24 @@ module.exports = env => {
         //   }
         // },
         // env dev
+        // '/api': {
+        //   target: 'http://127.0.0.1:8081',
+        //   pathRewrite: { '^/api': '' },
+        //   changeOrigin: true,
+        //   secure: false,
+        //   headers: {
+        //     host: "http://127.0.0.1:8081",
+        //     origin: "http://127.0.0.1:8081"
+        //   }
+        // },
         '/api': {
-          target: 'http://127.0.0.1:8081',
+          target: 'https://www.ledongtennis.cn:8081',
           pathRewrite: { '^/api': '' },
           changeOrigin: true,
           secure: false,
           headers: {
-            host: "http://127.0.0.1:8081",
-            origin: "http://127.0.0.1:8081"
+            host: "https://www.ledongtennis.cn:8081",
+            origin: "https://www.ledongtennis.cn:8081"
           }
         },
         //env test
