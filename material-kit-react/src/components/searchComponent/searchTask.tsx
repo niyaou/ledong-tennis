@@ -17,6 +17,11 @@ import { makeStyles, createStyles } from '@mui/styles';
 import FolderIcon from '@mui/icons-material/Folder';
 import { styled } from '@mui/material/styles';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import {
+    MuiPickersUtilsProvider,
+    KeyboardTimePicker,
+    KeyboardDatePicker,
+} from '@material-ui/pickers';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import FolderIconUrl from '../../assert/folderIcon.png'
 import CircularProgress, {
@@ -33,7 +38,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard, updateExpiredTime ,updateChargeAnnotation} from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard, updateExpiredTime, updateChargeAnnotation } from '../../store/slices/dominationSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -102,18 +107,19 @@ function SearchTask(props) {
     }, [prepaidCard])
 
     useEffect(() => {
-        if (open!==0 ) {
-            setTimeout(()=>{
+        if (open !== 0 || expiredTime!=='') {
+            setTimeout(() => {
                 dispatch(exploreRecentCard(customerName))
-            },1500)
-        //     setDetailMode(true)
-        //     console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
+            }, 2200)
+            //     setDetailMode(true)
+            //     console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
         }
         setOpen(0)
         setChangeFee(0)
         setChangeCount(0)
         setChangeDesc('')
-       
+        setExpiredTime('')
+
     }, [createSuccess])
 
 
@@ -188,22 +194,30 @@ function SearchTask(props) {
 
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <FormControl sx={{ m: 1, minWidth: 120, }} size="small">
-                    <DatePicker
+                    <TextField
+                        id="date"
+                        label="Birthday"
+                        type="date"
+                        value={expiredTime}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        onChange={(newValue) => {
+                            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
+                            setExpiredTime(newValue.currentTarget.value)
+                        }}
+                    />
+                    {/* <DatePicker
                         label="年卡到期时间"
                         value={expiredTime}
                         onChange={(newValue) => {
                             console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
-                            // let after = { ...courseEdit, startTime: newValue }
-                            // setStartTime(newValue)
-                            // let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
-                            // after = { ...courseEdit, spendingTime: diff }
-                            // console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff)
                             setExpiredTime(newValue)
                         }}
                         renderInput={(params) => {
                             return (<TextField {...params} />)
                         }}
-                    />
+                    /> */}
                 </FormControl>
             </LocalizationProvider>
             <TextField
@@ -222,8 +236,9 @@ function SearchTask(props) {
 
                 onClick={() => {
 
-                    dispatch(updateExpiredTime({cardId: customerName, time: moment(expiredTime).format('YYYY-MM-DD'), rest: parseInt(annualTimes) }))
-                }}>修改年卡时间次数</Button>
+                    dispatch(updateExpiredTime({ cardId: customerName, time: moment(expiredTime).format('YYYY-MM-DD'), rest: parseInt(annualTimes) }))
+               
+               }}>修改年卡时间次数</Button>
 
         </Stack>)
 
@@ -273,15 +288,15 @@ function SearchTask(props) {
         )
     }
     const style = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
+        position: 'absolute' as 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
 
-    boxShadow: 0,
-    p: 4,
+        boxShadow: 0,
+        p: 4,
     };
 
 
@@ -314,7 +329,7 @@ function SearchTask(props) {
                             setChangeCount(e.target.value);
                         }}
                     />
-                          <TextField
+                    <TextField
                         id="outlined-password-input3"
                         label="备注"
                         value={changeDesc}
@@ -322,12 +337,12 @@ function SearchTask(props) {
                             setChangeDesc(e.target.value);
                         }}
                     />
-                          <Button variant="contained" size="small"
-               
+                    <Button variant="contained" size="small"
 
-                onClick={() => {
-                    dispatch(updateChargeAnnotation({ openId:customerOpenId,coachId: '13551226924',cardId: customerName,amount: parseInt(changeFee), time: moment(expiredTime).format('YYYY-MM-DD'), times: parseInt(changeCount) ,description:changeDesc}))
-                }}>确定充值</Button>
+
+                        onClick={() => {
+                            dispatch(updateChargeAnnotation({ openId: customerOpenId, coachId: '13551226924', cardId: customerName, amount: parseInt(changeFee), time: moment(expiredTime).format('YYYY-MM-DD'), times: parseInt(changeCount), description: changeDesc }))
+                        }}>确定充值</Button>
                 </Stack>
             </Box>
         </Modal>
