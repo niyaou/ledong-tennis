@@ -11,7 +11,7 @@ import React, { useEffect } from 'react';
 import DsFolderTree from '../fileExplore/dsFolderTree'
 import DataFolderExplore from '../fileExplore/folderExploreComponent'
 import FsResourceManagement from '../createDs/fsResourseManagement'
-import { Button, Card, Stack, NoSsr, Paper, Box, Typography, AvatarGroup,TextField, Avatar,FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Button, Card, Stack, NoSsr, Paper, Box, Typography, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
 import IdsFileTree from '../fileExplore/idsFileTree'
 import { makeStyles, createStyles } from '@mui/styles';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -33,12 +33,13 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard,updateExpiredTime } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard, updateExpiredTime ,updateChargeAnnotation} from '../../store/slices/dominationSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import moment from 'moment';
+import { classNames } from 'cascader/helpers';
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -63,14 +64,20 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { areas, users, sortValue, recentPrepayedCard ,createSuccess} = useSelector((state) => state.domination)
-    const [prepaidCard, setPrepaidCard] = React.useState({ balance: 0, balanceTimes: 0, expiredTime: null });
+    const { areas, users, sortValue, recentPrepayedCard, createSuccess } = useSelector((state) => state.domination)
+    const [prepaidCard, setPrepaidCard] = React.useState({ balance: 0, balanceTimes: 0, expiredTime: null, restCount: 0 });
     const [courseList, setCourseList] = React.useState([]);
     const [detailMode, setDetailMode] = React.useState(false);
     const [userSort, setUserSort] = React.useState(false);
     const [customerName, setCustomerName] = React.useState('');
-    const [expiredTime, setExpiredTime] = React.useState(prepaidCard.expiredTime||'');
+    const [customerOpenId, setCustomerOpenId] = React.useState('');
+    const [annualTimes, setAnnualTimes] = React.useState(prepaidCard.restCount || 0);
+    const [expiredTime, setExpiredTime] = React.useState(prepaidCard.expiredTime || '');
+    const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
+    const [changeFee, setChangeFee] = React.useState(0);//0 关；  1 金额  ；  2   次数
+    const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
+    const [changeDesc, setChangeDesc] = React.useState('');
     useEffect(() => {
 
         if (users) {
@@ -88,18 +95,26 @@ function SearchTask(props) {
 
 
     useEffect(() => {
-        if (prepaidCard&& customerName ) {
+        if (prepaidCard && customerName) {
             setDetailMode(true)
             console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
         }
     }, [prepaidCard])
 
-    // useEffect(() => {
-    //     if (prepaidCard&& customerName ) {
-    //         setDetailMode(true)
-    //         console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
-    //     }
-    // }, [createSuccess])
+    useEffect(() => {
+        if (open!==0 ) {
+            setTimeout(()=>{
+                dispatch(exploreRecentCard(customerName))
+            },1500)
+        //     setDetailMode(true)
+        //     console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
+        }
+        setOpen(0)
+        setChangeFee(0)
+        setChangeCount(0)
+        setChangeDesc('')
+       
+    }, [createSuccess])
 
 
 
@@ -110,7 +125,8 @@ function SearchTask(props) {
             let courselist = recentPrepayedCard.filter(card => typeof card.balance === 'undefined')
             // setDetailMode(true)
             setPrepaidCard(card)
-            setExpiredTime(card.expiredTime||'')
+            setExpiredTime(card.expiredTime || '')
+            setAnnualTimes(card.restCount || 0)
             setCourseList(courselist)
             console.log("🚀 ~ file: searchTask.tsx ~ line 733 ~ SearchTask ~ prepaidCard", card, courselist)
         }
@@ -135,15 +151,26 @@ function SearchTask(props) {
             </Typography>
             <Typography gutterBottom variant="body2"
                 sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
-
-                }} >
+                    color: 'rgba(0, 0, 0, 0.6)', cursor: 'pointer',
+                }}
+                onClick={() => {
+                    setOpen(1)
+                    console.log('---------------------11--------')
+                    // dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
+                }}
+            >
                 充值卡余额：{prepaidCard.balance}
             </Typography>
             <Typography gutterBottom variant="body2"
                 sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
-                }} >
+                    color: 'rgba(0, 0, 0, 0.6)', cursor: 'pointer',
+                }}
+                onClick={() => {
+                    console.log('---------------------2222--------')
+                    setOpen(2)
+                    // dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
+                }}
+            >
                 次卡余额：  {prepaidCard.balanceTimes}
             </Typography>
             <Typography gutterBottom variant="body2"
@@ -152,37 +179,59 @@ function SearchTask(props) {
                 }} >
                 年卡到期时间  {prepaidCard.expiredTime}
             </Typography>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <FormControl sx={{ m: 1, minWidth: 120, }} size="small">
-        <DatePicker
-          label="年卡到期时间"
-          value={expiredTime}
-          onChange={(newValue) => {
-            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
-            // let after = { ...courseEdit, startTime: newValue }
-            // setStartTime(newValue)
-            // let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
-            // after = { ...courseEdit, spendingTime: diff }
-            // console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff)
-            setExpiredTime(newValue)
-          }}
-          renderInput={(params) => {
-            return (<TextField {...params} />)
-          }}
-        />
-      </FormControl>
-    </LocalizationProvider>
-            <Button variant="contained" size="small"  onClick={() => {
+            <Typography gutterBottom variant="body2"
+                sx={{
+                    color: 'rgba(0, 0, 0, 0.6)',
+                }} >
+                剩余年卡次数  {prepaidCard.restCount}
+            </Typography>
 
-             dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD')}))
-            }}>修改时间</Button>
-          
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <FormControl sx={{ m: 1, minWidth: 120, }} size="small">
+                    <DatePicker
+                        label="年卡到期时间"
+                        value={expiredTime}
+                        onChange={(newValue) => {
+                            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
+                            // let after = { ...courseEdit, startTime: newValue }
+                            // setStartTime(newValue)
+                            // let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
+                            // after = { ...courseEdit, spendingTime: diff }
+                            // console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff)
+                            setExpiredTime(newValue)
+                        }}
+                        renderInput={(params) => {
+                            return (<TextField {...params} />)
+                        }}
+                    />
+                </FormControl>
+            </LocalizationProvider>
+            <TextField
+                label="年卡次数"
+                // label="Content(reply visable scale as the same as topic.)"
+                required
+                value={annualTimes}
+                onChange={(event: any) => {
+                    setAnnualTimes(event.target.value)
+                }}
+
+            />
+
+            <Button variant="contained" size="small"
+                disabled={!expiredTime && !annualTimes}
+
+                onClick={() => {
+
+                    dispatch(updateExpiredTime({cardId: customerName, time: moment(expiredTime).format('YYYY-MM-DD'), rest: parseInt(annualTimes) }))
+                }}>修改年卡时间次数</Button>
+
         </Stack>)
 
 
     const fileItem = (user, index) => {
-        return (<Grid item xs={1} key={index} space={1}>
-            <Paper elevation={1} sx={{ background: user.prepaidCard?'transparent':'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
+        // console.log(user)
+        return (<Grid item xs={3} key={index} space={1}>
+            <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
 
                 <Stack
                     direction="row"
@@ -199,6 +248,7 @@ function SearchTask(props) {
                     onClick={(event) => {
                         if (user.prepaidCard) {
                             setCustomerName(user.prepaidCard)
+                            setCustomerOpenId(user.openId)
                             dispatch(exploreRecentCard(user.prepaidCard))
                         }
                     }}>
@@ -207,9 +257,9 @@ function SearchTask(props) {
 
                     <Typography gutterBottom variant="body2"
                         sx={{
-                            background:'transparent',
-                            '& :hover': { background: 'transparent' },
-                            color: 'rgba(0, 0, 0, 0.6)',
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
                         }} >
                         {user.realName || user.nickName}
@@ -222,6 +272,68 @@ function SearchTask(props) {
         </Grid>
         )
     }
+    const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+
+    boxShadow: 0,
+    p: 4,
+    };
+
+
+    const uploadWaitingModal = (
+        <Modal
+            open={open !== 0}
+            onClose={() => { setOpen(0) }}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style} >
+                <Stack
+                    direction="column"
+                    justifyContent="space-around"
+                    alignItems="center"
+                    spacing={1}>
+                    <TextField
+                        id="outlined-password-input"
+                        label="充值余额"
+                        value={changeFee}
+                        onChange={(e) => {
+                            setChangeFee(e.target.value);
+                        }}
+                    />
+                    <TextField
+                        id="outlined-password-input2"
+                        label="充值次数"
+                        value={changeCount}
+                        onChange={(e) => {
+                            setChangeCount(e.target.value);
+                        }}
+                    />
+                          <TextField
+                        id="outlined-password-input3"
+                        label="备注"
+                        value={changeDesc}
+                        onChange={(e) => {
+                            setChangeDesc(e.target.value);
+                        }}
+                    />
+                          <Button variant="contained" size="small"
+               
+
+                onClick={() => {
+                    dispatch(updateChargeAnnotation({ openId:customerOpenId,coachId: '13551226924',cardId: customerName,amount: parseInt(changeFee), time: moment(expiredTime).format('YYYY-MM-DD'), times: parseInt(changeCount) ,description:changeDesc}))
+                }}>确定充值</Button>
+                </Stack>
+            </Box>
+        </Modal>
+    )
+
+
 
     const courseItem = (course, index) => {
 
@@ -260,14 +372,21 @@ function SearchTask(props) {
                     }} >
                     {course.description}
                 </Typography>
-                { typeof course.amount!=='undefined'&& (<Typography gutterBottom variant="body2"
+                {typeof course.amount !== 'undefined' && (<Typography gutterBottom variant="body2"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
                     }} >
-                    充值{course.amount}
+                    充值{course.amount}元，次数{course.times}
                 </Typography>)}
-                
+                {typeof course.annualTimes !== 'undefined' && (<Typography gutterBottom variant="body2"
+                    sx={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        minWidth: '80px',
+                    }} >
+                    充值年卡，次数{course.annualTimes}，到期时间{course.expiredTime}
+                </Typography>)}
+
             </Stack>
         </Paper>)
     }
@@ -314,11 +433,11 @@ function SearchTask(props) {
                     aria-label="expand row"
                     size="small"
                     onClick={async () => {
-                        if(detailMode){
+                        if (detailMode) {
                             setDetailMode(!detailMode)
                             setCustomerName('')
                         }
-                
+
 
                     }}
                 >
@@ -336,9 +455,10 @@ function SearchTask(props) {
             </Grid>)}
 
             {detailMode && finacialItem}
-            {detailMode && courseList&& courseList.map((c,i)=> courseItem(c,i)           )}
+            {detailMode && courseList && courseList.map((c, i) => courseItem(c, i))}
 
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
+            {uploadWaitingModal}
         </Stack>
     );
 }

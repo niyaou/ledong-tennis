@@ -61,7 +61,7 @@ public interface IPrepaidCardService {
          * @param time
          * @return
          */
-        public String setExpiredTime(String cardId,String time);
+        public String setExpiredTime(String cardId,String time,Integer rest);
 
 
 

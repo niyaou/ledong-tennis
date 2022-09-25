@@ -139,12 +139,24 @@ public class PrepaidCardController {
         }
         String userId = claims.getSubject();
         LdRankInfoVo vo = rankService.getLDUserRank(userId);
-        HashMap<String, Object> user = userService.getLDUserInfo(userId);
-        if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
-            throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+        Object temp;
+        String temp_s="";
+        if(vo==null){
+            userId = claims.getSubject();
+            if (!UserServiceImpl.ADMIN_KEY_CODE.equals(userId )) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+        }else{
+            HashMap<String, Object> user = userService.getLDUserInfo(userId);
+
+            if (vo.getClubId() != LdRankInfoVo.SUPER_MASTER) {
+                throw new CustomException(ResultCodeEnum.MASTER_ALLOWED_ONLY);
+            }
+            temp=   user.get(UserVo.REALNAME);
+            temp_s =temp.toString();
+
         }
-        Object temp=   user.get(UserVo.REALNAME);
-        String temp_s =temp.toString();
+
         return new ResponseEntity<Object>(
                 CommonResponse.success(prepaidCardService.chargeAnnotation(cardId, openId,
                         temp_s, time, amount,times, coachId, courseId, description)),
@@ -158,11 +170,12 @@ public class PrepaidCardController {
     @ApiOperation(value = "updateExpireTime ", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "time", value = "time ", required = false, dataType = "string", paramType = "query")
+            @ApiImplicitParam(name = "time", value = "time ", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "rest", value = "rest ", required = true, dataType = "int", paramType = "query")
           })
     public ResponseEntity<?> updateExpireTime(@RequestHeader("Authorization") String authHeader,
                                               @RequestParam(value = "cardId", required = true) String cardId,
-                                              @RequestParam(value = "time", required = false) String time) throws AuthenticationException {
+                                              @RequestParam(value = "time", required = true) String time, @RequestParam(value = "rest", required = true) Integer rest) throws AuthenticationException {
 
         Claims claims = tokenService.getClaimByToken(authHeader);
         if (claims == null || JwtToken.isTokenExpired(claims.getExpiration())) {
@@ -187,7 +200,7 @@ public class PrepaidCardController {
 
 
         return new ResponseEntity<Object>(
-                CommonResponse.success(prepaidCardService.setExpiredTime(cardId,time)),
+                CommonResponse.success(prepaidCardService.setExpiredTime(cardId,time,rest)),
                 HttpStatus.OK);
     }
 

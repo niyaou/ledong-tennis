@@ -68,7 +68,7 @@ export const login = (auth: UserFormValues) => async dispatch => {
         let formdata = new FormData()
     
         formdata.append("keycode",  auth.password)
-        const user = await Axios.post(`/api/user/ldAdminLogin`, formdata)
+        const user = await Axios.post(`/api/user/ldAdminLogin?keycode=${auth.password}`)
         // const user = await Axios.post(`/api/pangoo-data-set/auth/account`, loginParams)
 
         // const user ={data:{code:-1,data:{token:'',login:'',nickName:''}},msg:''}

@@ -1223,7 +1223,6 @@ public class SearchApi {
             builder.startObject();
             {
                 builder.field(field, value);
-
             }
             builder.endObject();
             // return client.update(updateRequest, RequestOptions.DEFAULT);

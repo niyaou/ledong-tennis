@@ -161,6 +161,41 @@ export const updateExpiredTime = createAsyncThunk(
 );
 
 
+export const updateChargeAnnotation = createAsyncThunk(
+    'lduser/chargeAnnotation',
+    async (payload, { rejectWithValue }) => {
+        try {
+
+            // payload.time=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
+            // let payload={ 
+                // startTime: this.data.startTime,
+                // endTime: this.data.endTime,
+                // coach: this.data.coach[this.data.index].openId,
+                // isExperience: this.data.experinced?1:0,
+                // isDealing: this.data.isDealing?1:0,
+                // spendingTime:  this.data.timeArray[this.data.timeIndex] ,
+                // courtSpend: this.data.coursFee,
+                // coachSpend: this.data.coachSpend,
+                // descript:this.data.descript,
+                // court: this.data.array[this.data.courtIndex],
+                // grade: this.data.gradeArray[this.data.gradeIndex],
+                // membersObj: JSON.stringify( membobj),
+            // }
+      
+
+            // throw new Error('Something bad happened');
+            const response = await Axios.request({method:'post',url:`/api/prepaidCard/ld/chargeAnnotation`,params:payload})
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
+            if (response.data.code !== 0) {
+                return rejectWithValue(response.data.message)
+            }
+            return response.data.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
 
 
 
@@ -210,11 +245,11 @@ export const exploreSlice = createSlice({
         builder
             .addCase(exploreRecentCourse.pending, (state) => {
                 state.loading = true
+                state.loadError = false
             })
             .addCase(exploreRecentCourse.rejected, (state, action) => {
                 state.loadError = true
                 state.loading = false
-
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(exploreRecentCourse.fulfilled, (state, action) => {
@@ -252,6 +287,7 @@ export const exploreSlice = createSlice({
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(exploreRecentCard.fulfilled, (state, action) => {
+                console.log(  state.recentPrepayedCard )
                 state.loading = false
                 state.recentPrepayedCard = JSON.parse( action.payload)
                 
@@ -285,6 +321,22 @@ export const exploreSlice = createSlice({
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(updateExpiredTime.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
+            });
+        builder
+            .addCase(updateChargeAnnotation.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(updateChargeAnnotation.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(updateChargeAnnotation.fulfilled, (state, action) => {
                 state.loading = false
                 state.createSuccess = true
             });

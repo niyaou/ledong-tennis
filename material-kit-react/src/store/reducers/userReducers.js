@@ -24,7 +24,7 @@ export default function (state = initialState, action) {
     state.errorMsg = ''
     state.loadError = false
     state.success = false
-    console.log("🚀 ~ file: userReducers.js ~ line 27 ~ state", state)
+    // console.log("🚀 ~ file: userReducers.js ~ line 27 ~ state", state)
     switch (action.type) {
         case UserActionTypes.GET_USERS:
             return {

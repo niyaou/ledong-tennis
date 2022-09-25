@@ -98,7 +98,7 @@ import LowCascader from './lowCascader'
 import ExtensionIcon from '@mui/icons-material/Extension';
 import { findIndex, find } from 'lodash';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction,createCard } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, createCard } from '../../store/slices/dominationSlice'
 import moment from 'moment'
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
@@ -126,7 +126,7 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 function Additions(props) {
   const [tagsValue, setTagsValue] = React.useState([]);
 
-  const { areas, users, selectCourse } = useSelector((state) => state.domination)
+  const { areas, users, selectCourse ,createSuccess} = useSelector((state) => state.domination)
   const [scenesValue, setScenesValue] = React.useState([]);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(false);
@@ -135,7 +135,7 @@ function Additions(props) {
   const [endTime, setEndTime] = React.useState(new Date);
 
   const [courseEdit, setCourseEdit] = React.useState({
-    startTime: new Date(), endTime: new Date(), coach: '', spendingTime: 0, courtSpend: 0, coachSpend: 0, descript: '',
+    startTime: new Date(), endTime: new Date(), coach: '', spendingTime: 1, courtSpend: 0, coachSpend: 0, descript: '',
     court: '', grade: '', membersObj: null
   });
 
@@ -177,14 +177,21 @@ function Additions(props) {
   }, [users])
 
   useEffect(() => {
+    if (createSuccess) {
+      enqueueSnackbar(`课程添加成功`, {
+        variant: 'success',
+        autoHideDuration: 3000,
+      })
+    }
     console.log("🚀 ~ file: additions.tsx ~ line 182 ~ useEffect ~ courseEdit", courseEdit)
-  }, [courseEdit])
+  }, [courseEdit,createSuccess])
 
   useEffect(() => {
 
     if (selectCourse) {
-      let after = { ...courseEdit, startTime: new Date(selectCourse.start),endTime: new Date(selectCourse.end),
-        court:courseEdit.court,coach:courseEdit.coach
+      let after = {
+        ...courseEdit, startTime: new Date(selectCourse.start), endTime: new Date(selectCourse.end),
+        court: courseEdit.court, coach: courseEdit.coach
       }
 
       setStartTime(after.startTime)
@@ -201,7 +208,7 @@ function Additions(props) {
   const [labelNode, setLabelNode] = React.useState();
 
 
- 
+
 
 
   // useEffect(() => {
@@ -350,7 +357,7 @@ function Additions(props) {
 
             // setQueryParams({ ...queryParams, senceAttArray: scenesArr.join(',').replace('&', '%26'), attArray: tagsArr.join(',').replace('&', '%26') })
             // setOpenSearch(false)
-            console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles",courseEdit, standardDateValue, uploadFiles)
+            console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit, standardDateValue, uploadFiles)
             dispatch(createCard(courseEdit))
           }
         }>提交</Button>
@@ -509,11 +516,11 @@ function Additions(props) {
         inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
         value={m.spendFee}
         onChange={(e) => {
-          labelArr[idx].spendFee = e.target.value
+          labelArr[idx].spendFee = parseInt(e.target.value)
           let a = labelArr.concat()
           setLabelArr(a)
           let member = courseEdit.membersObj
-          member[mi.id] = [e.target.value, 0]
+          member[mi.id] = [parseInt(e.target.value), 0,0]
           let after = { ...courseEdit, membersObj: member }
           // spendFee:0,times:0 
           // console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
@@ -556,7 +563,7 @@ function Additions(props) {
             labelArr[pos].type = 2
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.id] = [0, 1]
+            member[mi.id] = [0, 1,0]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -576,7 +583,7 @@ function Additions(props) {
             labelArr[pos].type = 3
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.id] = [0, 0]
+            member[mi.id] = [0, 0,1]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -652,10 +659,10 @@ function Additions(props) {
     spacing={2}
     sx={{ color: 'rgb(0,0,0,0.6)' }}>
 
-{selectCourse &&(  <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
-        {selectCourse.court}
-      </Typography>)}
-{!selectCourse && <FormControl sx={{ width: 350, }}>
+    {selectCourse && (<Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
+      {selectCourse.court}
+    </Typography>)}
+    {!selectCourse && <FormControl sx={{ width: 350, }}>
       <InputLabel id="demo-controlled-open-select-label1">校区</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
@@ -671,7 +678,7 @@ function Additions(props) {
 
 
 
-{!selectCourse && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
+    {!selectCourse && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
       <InputLabel id="demo-controlled-open-select-label1">教练</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
@@ -685,7 +692,7 @@ function Additions(props) {
       </Select>
     </FormControl>}
 
-    {!selectCourse &&<FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
+    {!selectCourse && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
       <TextField
         id="outlined-password-input"
         label="备注"
@@ -709,6 +716,15 @@ function Additions(props) {
             let after = { ...courseEdit, startTime: newValue }
             setStartTime(newValue)
             let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
+            if(diff<=60){
+              diff=1
+            }else if(diff<=90){
+              diff=1.5
+            }else if(diff<=120){
+              diff=2
+            }      else if(diff<=180){
+              diff=2.5
+            }
             after = { ...courseEdit, spendingTime: diff }
             console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff)
             setCourseEdit(after)
@@ -730,6 +746,15 @@ function Additions(props) {
             let diff = moment(after.endTime, 'YYYY-MM-DD HH:mm').diff(moment(after.startTime, 'YYYY-MM-DD HH:mm'), 'minutes')
             setEndTime(newValue)
             console.log("🚀 ~ file: additions.tsx ~ line 678 ~ Additions ~ diff", diff)
+            if(diff<=60){
+              diff=1
+            }else if(diff<=90){
+              diff=1.5
+            }else if(diff<=120){
+              diff=2
+            }      else if(diff<=180){
+              diff=2.5
+            }
             after = { ...courseEdit, spendingTime: diff }
             setCourseEdit(after)
           }}
@@ -767,7 +792,7 @@ function Additions(props) {
     {!selectCourse && <FormControl sx={{ m: 1, width: '100%' }} >
       <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
-          console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles",courseEdit)
+          console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit)
           dispatch(createCard(courseEdit))
         }}>
         确认添加

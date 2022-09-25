@@ -26,6 +26,15 @@ public class LdChargeVo {
     private Integer amount;
     public static final String AMOUNT = "amount";
 
+
+    private String expiredTime;
+    public static final String EXPIREDTIME = "expiredTime";
+
+
+
+    private Integer annualTimes;
+    public static final String ANNUALTIMES = "annualTimes";
+
     private Integer times;
     public static final String TIMES = "times";
 
@@ -89,6 +98,21 @@ public class LdChargeVo {
 
     public void setCourse(String course) {
         this.course = course;
+    }
+    public Integer getAnnualTimes() {
+        return annualTimes;
+    }
+
+    public void setAnnualTimes(Integer annualTimes) {
+        this.annualTimes = annualTimes;
+    }
+
+    public String getExpiredTime() {
+        return expiredTime;
+    }
+
+    public void setExpiredTime(String expiredTime) {
+        this.expiredTime = expiredTime;
     }
 
 }

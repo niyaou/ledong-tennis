@@ -37,6 +37,17 @@ public class LdSpendingVo   {
     private Integer timesCharge;
     public static final String TIMESCHARGE = "timesCharge";
 
+    public Integer getAnnualTimesCharge() {
+        return annualTimesCharge;
+    }
+
+    public void setAnnualTimesCharge(Integer annualTimesCharge) {
+        this.annualTimesCharge = annualTimesCharge;
+    }
+
+    private Integer annualTimesCharge;
+    public static final String ANNUALTIMESCHARGE = "annualTimesCharge";
+
 
     private String course;
     public static final String COURSE = "course";

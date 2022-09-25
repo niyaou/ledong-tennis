@@ -32,6 +32,10 @@ public class LdPrePaidCardVo implements Serializable {
     private String expiredTime;
     public static final String EXPIREDTIME = "expiredTime";
 
+    @ApiModelProperty(value = " card rest count ")
+    private String restCount;
+    public static final String RESTCOUNT = "restCount";
+
     @ApiModelProperty(value = "member list ")
     private String[] member;
     public static final String MEMBER = "member";

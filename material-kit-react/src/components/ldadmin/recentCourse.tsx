@@ -9,13 +9,14 @@
  */
 import {
   Paper, Typography, Backdrop, CircularProgress, Button, Card, Grow, CardHeader, Checkbox,
-  Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box,IconButton,
+  Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box, IconButton,TextField
 } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import UserManagement from './userManagement'
 import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
+import { useNavigate } from 'react-router-dom';
 import { exploreUsersAction, exploreRecentCourse, selectCourse } from '../../store/slices/dominationSlice'
 import { tagsInfoAction, scenceInfoAction } from '../../store/slices/tagsSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -40,14 +41,14 @@ function union(a: readonly number[], b: readonly number[]) {
 function RecentCourse(props) {
   const datasetId = props.datasetId
   const index = props.index
-  const { users, course,selectCourse : selectCourseItem } = useSelector((state) => state.domination)
+  const { users, course, selectCourse: selectCourseItem, loadError } = useSelector((state) => state.domination)
   const [checked, setChecked] = React.useState<readonly number[]>([]);
   const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3]);
   const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
   const dispatch = useDispatch()
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
-
+  let navigate = useNavigate();
   const findName = (id) => {
     let item = find(users, { 'id': id }) || {}
     return item.prepaidCard || id
@@ -79,13 +80,21 @@ function RecentCourse(props) {
     dispatch(exploreRecentCourse({ page: 0, num: 50 }))
   }, [])
 
+  useEffect(() => {
+    if (loadError) {
+      navigate('/login')
+    }
+  }, [loadError])
+
 
   const courseItem = (item, index) => {
-    
+
     return (
-      <Paper key={`item-${index}`} elevation={1} sx={{ minWidth: '850px',
-       background: selectCourseItem&&selectCourseItem.coach===item.coach&&selectCourseItem.start===item.start?'rgb(0,0,0,0.05)': 'transparent', 
-       '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
+      <Paper key={`item-${index}`} elevation={1} sx={{
+        minWidth: '850px',
+        background: selectCourseItem && selectCourseItem.coach === item.coach && selectCourseItem.start === item.start ? 'rgb(0,0,0,0.05)' : 'transparent',
+        '& :hover': { background: 'rgb(0,0,0,0.1)' }
+      }}>
         <Stack
 
           spacing={2}
@@ -229,20 +238,20 @@ function RecentCourse(props) {
         justifyContent="flex-start"
         alignItems="flex-start"
       >
-         <IconButton
-                    aria-label="expand row"
-                    size="small"
-                    onClick={async () => {
-                        // if(detailMode){
-                        //     setDetailMode(!detailMode)
-                        //     setCustomerName('')
-                        // }
-                        dispatch(exploreRecentCourse({ page: 0, num: 50 }))
+        <IconButton
+          aria-label="expand row"
+          size="small"
+          onClick={async () => {
+            // if(detailMode){
+            //     setDetailMode(!detailMode)
+            //     setCustomerName('')
+            // }
+            dispatch(exploreRecentCourse({ page: 0, num: 50 }))
 
-                    }}
-                >
-                   <CachedIcon />
-                </IconButton>
+          }}
+        >
+          <CachedIcon />
+        </IconButton>
 
         {course && course.map((c, i) => courseItem(c, i))}
         {/* <Grid item><DsFolderTree  datasetId={datasetId} editType={true} /></Grid> */}
