@@ -303,7 +303,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                 // if(diff<31){
                 // System.out.println(stemp.getTime()+"current date diff "+diff);
                 // }
-                return diff>30;
+                return diff>90;
             });
 
             spend.stream().forEach(s -> {
