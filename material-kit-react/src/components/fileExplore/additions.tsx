@@ -98,7 +98,7 @@ import LowCascader from './lowCascader'
 import ExtensionIcon from '@mui/icons-material/Extension';
 import { findIndex, find } from 'lodash';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, createCard } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, createCard ,updateCourese} from '../../store/slices/dominationSlice'
 import moment from 'moment'
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
@@ -139,27 +139,17 @@ function Additions(props) {
     court: '', grade: '', membersObj: null
   });
 
-  // Object.assign(membobj, {
-  //   [s.openId]: [s.courseSpend,s.courseTimes]
-  // })
-  const datasetId = props.datasetId
-  let eventPup = false
 
-  const [dataSetInfo, setDataSetInfo] = React.useState(null)
-  const { datasets } = useSelector((state) => state.dsExplore)
 
-  const classes = useStyles();
   const dispatch = useDispatch()
   const { folders, cacheTree, rootPath, searchActive, nodeSelected, searchParams,
     mergeActive, currentIndex, labelStatistic, successed, errorMsg: indexErrorMsg,
     searchMoveStatus, exploreMode } = useSelector((state) => state.filesAndFolders)
   const { tags, scenes } = useSelector((state) => state.tagsInfo)
   const { errorMsg, isSuccess } = useSelector((state) => state.uploadFiles)
-  const [folderList, setFolderList] = React.useState<FileTree[]>([]);
 
 
   const [currentNodeSelected, setCurrentNodeSelected] = React.useState();
-  const [restLabelItem, setRestLabelItem] = React.useState(labelStatistic || []);
 
   const [userOptions, setUserOptions] = React.useState([]);
 
@@ -178,12 +168,13 @@ function Additions(props) {
 
   useEffect(() => {
     if (createSuccess) {
-      enqueueSnackbar(`课程添加成功`, {
+      enqueueSnackbar(`课程操作成功`, {
         variant: 'success',
         autoHideDuration: 3000,
       })
     }
     console.log("🚀 ~ file: additions.tsx ~ line 182 ~ useEffect ~ courseEdit", courseEdit)
+    dispatch(exploreRecentCourse({ page: 0, num: 50 }))
   }, [courseEdit,createSuccess])
 
   useEffect(() => {
@@ -201,31 +192,12 @@ function Additions(props) {
 
   }, [selectCourse])
 
-  // users.map(user => { return { ...user, label: user.prepaidCard } })
-
-
-  const [rawNode, setRawNode] = React.useState();
-  const [labelNode, setLabelNode] = React.useState();
 
 
 
 
 
-  // useEffect(() => {
-  //   if (mergeActive) {
-  //     setLabelNode(nodeSelected)
-  //   } else {
-  //     setCurrentNodeSelected(nodeSelected)
-  //   }
-  // }, [nodeSelected])
 
-  // useEffect(() => {
-  //   if (mergeActive) {
-  //     setLabelNode(currentNodeSelected)
-  //   } else {
-  //     setLabelNode(null)
-  //   }
-  // }, [mergeActive])
 
   useEffect(() => {
     if (searchMoveStatus) {
@@ -238,23 +210,7 @@ function Additions(props) {
   }, [searchMoveStatus])
 
 
-  useEffect(() => {
-    if (successed) {
-      enqueueSnackbar('开始关联标注文件,请稍后刷新页面查看', {
-        variant: 'warning',
-        autoHideDuration: 3000,
-      })
-      setLabelNode(undefined)
-    }
-    if (indexErrorMsg) {
-      enqueueSnackbar(`开始关联标注文件失败,${indexErrorMsg}`, {
-        variant: 'error',
-        autoHideDuration: 3000,
-      })
-    }
-
-  }, [successed, indexErrorMsg])
-
+ 
 
 
   const location = useLocation();
@@ -273,9 +229,6 @@ function Additions(props) {
   });
 
 
-  useEffect(() => {
-    console.log("🚀 ~ file: additions.tsx ~ line 228 ~ useEffect ~ uploadFiles", uploadFiles)
-  }, [uploadFiles])
 
 
   const choiceFiles = (e) => {
@@ -306,68 +259,6 @@ function Additions(props) {
 
 
 
-  const standardSetDialog = (folderPath) => (
-    <Dialog
-      open={openStandard}
-      fullWidth={fullWidth}
-      maxWidth='md'
-      sx={{ '& .MuiDialog-paper': { width: '100%', maxHeight: '600px' } }}
-      onClose={() => { setOpenStandard(false) }}
-    >
-      <DialogTitle>向{folderPath.replace(rootPath && rootPath.rootPath || '', '')}文件夹添加标定文件</DialogTitle>
-      <DialogContent>
-        <Stack
-          direction="column"
-          justifyContent="center"
-          alignItems="flex-start"
-          spacing={2}
-          sx={{ color: 'rgb(0,0,0,0.6)' }}>
-
-          {uploadFiles && uploadFiles[0] && (
-            <Typography gutterBottom variant="body2" sx={{ wordBreak: 'break-all', maxWidth: '90%', width: '90%', color: 'rgba(0, 0, 0, 0.6)' }} >
-              标定文件：{uploadFiles[0].name}
-            </Typography>
-          )}
-          {uploadFiles && uploadFiles[0] && (
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DatePicker
-                label="标定日期"
-                value={standardDateValue}
-                onChange={(newValue) => {
-                  setStandardDateValue(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-          )}
-          <label htmlFor="contained-button-file">
-            <Input accept="*/*" id="contained-button-file" type="file"
-              onChange={choiceFiles}
-            />
-            <Button variant="contained" component="span">
-              Upload
-            </Button>
-          </label>
-
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={
-          (e) => {
-
-            // setQueryParams({ ...queryParams, senceAttArray: scenesArr.join(',').replace('&', '%26'), attArray: tagsArr.join(',').replace('&', '%26') })
-            // setOpenSearch(false)
-            console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit, standardDateValue, uploadFiles)
-            dispatch(createCard(courseEdit))
-          }
-        }>提交</Button>
-
-        <Button onClick={() => { setOpenStandard(false) }}>关闭</Button>
-      </DialogActions>
-    </Dialog>
-  )
-
-
 
   const handleClose = () => {
     setOpen(false);
@@ -393,9 +284,7 @@ function Additions(props) {
 
 
 
-  useEffect(() => {
-    setQueryParams({ ...queryParams, fileName: searchContent })
-  }, [searchContent])
+
 
 
 
@@ -414,11 +303,7 @@ function Additions(props) {
   }, [searchActive])
 
 
-  useEffect(() => {
-    if (folders && folders.length > 0) {
-      setFolderList(folders.map((folder) => { return { root: folder, leaf: [] } }))
-    }
-  }, [cacheTree])
+
 
   useEffect(() => {
     if (errorMsg) {
@@ -438,50 +323,6 @@ function Additions(props) {
 
 
 
-
-  const tagSetDialog = (dialogType) => (
-    <Dialog
-      fullWidth={fullWidth}
-      maxWidth={maxWidth}
-      open={dialogType === 'set' ? open : openSearch}
-      sx={{ '& .MuiDialog-paper': { width: '100%', maxHeight: '600px' } }}
-      onClose={handleClose}
-    >
-      <DialogTitle>设置标签和场景</DialogTitle>
-      <DialogContent>
-        <Stack
-          direction="column"
-          justifyContent="center"
-          alignItems="flex-start"
-          spacing={2}
-          sx={{ color: 'rgb(0,0,0,0.6)' }}>
-          <LowCascader items={transformTags(tags)} title={'设置标签'} tagsAndScenes={!searchActive && currentNodeSelected && currentNodeSelected.attsArray || []} callBack={(arr) => {
-            setTagsArr(arr)
-          }} />
-          <LowCascader items={transformTags(scenes)} title={'设置场景'} tagsAndScenes={!searchActive && currentNodeSelected && currentNodeSelected.senceAttsArray || []}
-            callBack={(arr) => {
-              // callBack(arr)
-              setScenesArr(arr)
-
-
-            }} />
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={
-          (e) => {
-            if (dialogType === 'set') { handleTagSubmit() }
-            if (dialogType === 'search') {
-              setQueryParams({ ...queryParams, senceAttArray: scenesArr.join(',').replace('&', '%26'), attArray: tagsArr.join(',').replace('&', '%26') })
-              setOpenSearch(false)
-            }
-          }
-        }>提交</Button>
-
-        <Button onClick={handleClose}>关闭</Button>
-      </DialogActions>
-    </Dialog>
-  )
 
 
   const memberItem = (m, idx) => {
@@ -638,18 +479,10 @@ function Additions(props) {
     })
     let after = { ...courseEdit, membersObj: { ...courseEdit.membersObj, ...temp } }
 
-    // const [courseEdit, setCourseEdit] = React.useState({ startTime: new Date(),endTime: new Date(),coach:'',spendingTime:0 ,courtSpend:0,coachSpend:0,descript:'',
-    // court:'',grade:'',membersObj:{}});
-
     setCourseEdit(after)
 
     setLabelArr(a)
-    {/* const [courseEdit, setCourseEdit] = React.useState({ startTime:'',endTime:'',coach:'',spendingTime:'' ,courtSpend:0,coachSpend:0,descript:'',
-  court:'',grade:'',membersObj:{}}); */}
 
-    // Object.assign(membobj, {
-    //   [s.openId]: [s.courseSpend,s.courseTimes]
-    // })
   }
 
   const searchForm = (<Stack
@@ -803,6 +636,9 @@ function Additions(props) {
     {selectCourse && (<FormControl sx={{ m: 1, width: '100%' }} >
       <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
+          
+          console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", selectCourse,startTime,endTime)
+          dispatch(updateCourese({courseId:selectCourse.id,startTime: startTime,endTime:endTime}))
         }}>
         确认修改
       </Button>

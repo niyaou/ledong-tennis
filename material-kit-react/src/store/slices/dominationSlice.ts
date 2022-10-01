@@ -86,6 +86,22 @@ export const exploreRecentCard = createAsyncThunk(
 
 
 
+export const retreatRecentCourse = createAsyncThunk(
+    'lduser/course/retreat',
+    async (params, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+            const response = await Axios.post(`/api/prepaidCard/ld/chargeLogRetreat?cardId=${params.cardId}&time=${params.time}`)
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+
+
 export const createCard = createAsyncThunk(
     'lduser/createCard',
     async (payload, { rejectWithValue }) => {
@@ -123,6 +139,46 @@ export const createCard = createAsyncThunk(
         }
     }
 );
+
+
+export const updateCourese= createAsyncThunk(
+    'lduser/updateCourse',
+    async (payload, { rejectWithValue }) => {
+        try {
+            // payload.isExperience=0
+            // payload.isDealing=0
+            payload.startTime=moment(payload.startTime).format('YYYY-MM-DD HH:mm')
+            payload.endTime=moment(payload.endTime).format('YYYY-MM-DD HH:mm')
+            // payload.spendingTime=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
+            // let payload={ 
+                // startTime: this.data.startTime,
+                // endTime: this.data.endTime,
+                // coach: this.data.coach[this.data.index].openId,
+                // isExperience: this.data.experinced?1:0,
+                // isDealing: this.data.isDealing?1:0,
+                // spendingTime:  this.data.timeArray[this.data.timeIndex] ,
+                // courtSpend: this.data.coursFee,
+                // coachSpend: this.data.coachSpend,
+                // descript:this.data.descript,
+                // court: this.data.array[this.data.courtIndex],
+                // grade: this.data.gradeArray[this.data.gradeIndex],
+                // membersObj: JSON.stringify( membobj),
+            // }
+      
+            // throw new Error('Something bad happened');
+            const response = await Axios.request({method:'post',url:`/api/course/ld/uploadCourse`,params:payload})
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
+            if (response.data.code !== 0) {
+                return rejectWithValue(response.data.message)
+            }
+            return response.data.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
 
 
 export const updateExpiredTime = createAsyncThunk(
@@ -337,6 +393,39 @@ export const exploreSlice = createSlice({
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(updateChargeAnnotation.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
+            });
+        builder
+            .addCase(updateCourese.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(updateCourese.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(updateCourese.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
+            });
+    
+        builder
+            .addCase(retreatRecentCourse.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(retreatRecentCourse.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(retreatRecentCourse.fulfilled, (state, action) => {
                 state.loading = false
                 state.createSuccess = true
             });

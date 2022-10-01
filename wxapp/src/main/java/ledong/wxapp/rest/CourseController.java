@@ -141,10 +141,8 @@ public class CourseController {
             }
 
         }
-
-
         return new ResponseEntity<Object>(
-                CommonResponse.success(courseService.uploadCourse(startTime, endTime, courseId)), HttpStatus.OK);
+                CommonResponse.success(courseService.uploadCourse(courseId,startTime, endTime)), HttpStatus.OK);
     }
 
 

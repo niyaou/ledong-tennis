@@ -311,13 +311,18 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                 LdSpendingVo stemp = JSON.parseObject(JSON.toJSONString(s), LdSpendingVo.class);
                 LdCourseVo course = courseService.getCourseById(stemp.getCourse());
                     if (course != null) {
-                        HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
-                        String trainee = (String) ld.get(UserVo.REALNAME);
-                        String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
-                        String desript = TextUtils.isEmpty(course.getDescript()) ? "" : course.getDescript();
-                        stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
-                                + course.getSpendingTime() + " 小时, 备注 " + desript);
-                        s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
+                        try{
+                            HashMap<String, Object> ld = userService.getLDUserInfo(s.get(LdSpendingVo.OPENID).toString());
+                            String trainee = (String) ld.get(UserVo.REALNAME);
+                            String coachName = userService.getLDUserInfo(course.getCoach()).get(UserVo.REALNAME).toString();
+                            String desript = TextUtils.isEmpty(course.getDescript()) ? "" : course.getDescript();
+                            stemp.setDescription(course.getStart() + "  " + trainee + " 在 " + course.getCourt() + " 上课 "
+                                    + course.getSpendingTime() + " 小时, 备注 " + desript);
+                            s.put(LdSpendingVo.DESCRIPTION, stemp.getDescription());
+                        }catch (Exception e){
+
+                        }
+
                     }
             });
         }
@@ -340,8 +345,13 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
                 List<HashMap<String, Object>> charge = (List<HashMap<String, Object>>) card.get(LdPrePaidCardVo.CHARGE);
                 List<HashMap<String, Object>> found=    charge.stream().filter(c->c.get(LdChargeVo.TIME).equals(chargedTime)).collect(Collectors.toList());
                 if(found!=null){
-                  Integer retreatAmount= (Integer) found.get(0).get(LdChargeVo.AMOUNT);
-                  balance -=retreatAmount;
+                    try{
+                        Integer retreatAmount= (Integer) found.get(0).get(LdChargeVo.AMOUNT);
+                        balance -=retreatAmount;
+                    }catch(Exception e){
+
+                    }
+
                 }
             }
 

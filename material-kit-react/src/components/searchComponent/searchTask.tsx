@@ -38,7 +38,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard, updateExpiredTime, updateChargeAnnotation } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard, updateExpiredTime ,updateChargeAnnotation,retreatRecentCourse} from '../../store/slices/dominationSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -402,6 +402,19 @@ function SearchTask(props) {
                     充值年卡，次数{course.annualTimes}，到期时间{course.expiredTime}
                 </Typography>)}
 
+                {typeof course.course === 'undefined'&&(<Button  color="primary"
+                    sx={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        minWidth: '80px',
+                    }}
+                    onClick={()=>{
+                        console.log(course,customerName)
+                        dispatch(retreatRecentCourse({cardId:customerName,time:course.time}))
+                    }}
+                     >
+
+                   删除
+                </Button>)}
             </Stack>
         </Paper>)
     }
