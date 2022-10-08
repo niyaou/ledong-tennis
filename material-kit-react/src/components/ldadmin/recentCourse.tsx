@@ -153,7 +153,7 @@ function RecentCourse(props) {
                 }} >
                 {item.start}
               </Typography>
-              <Typography gutterBottom variant="body2"
+            <Typography gutterBottom variant="body2"
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
