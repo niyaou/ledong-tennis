@@ -124,13 +124,9 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 
 
 function Additions(props) {
-  const [tagsValue, setTagsValue] = React.useState([]);
 
   const { areas, users, selectCourse, createSuccess } = useSelector((state) => state.domination)
-  const [scenesValue, setScenesValue] = React.useState([]);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const [open, setOpen] = React.useState(false);
-  const [openSearch, setOpenSearch] = React.useState(false);
   const [startTime, setStartTime] = React.useState(new Date());
   const [endTime, setEndTime] = React.useState(new Date);
 
@@ -260,10 +256,7 @@ function Additions(props) {
 
 
 
-  const handleClose = () => {
-    setOpen(false);
-    setOpenSearch(false)
-  };
+
 
 
   const handleTagSubmit = () => {
@@ -318,7 +311,6 @@ function Additions(props) {
         autoHideDuration: 3000,
       })
     }
-    setOpen(false);
   }, [errorMsg, isSuccess])
 
 
@@ -327,6 +319,7 @@ function Additions(props) {
 
   const memberItem = (m, idx) => {
     let mi = find(users, { 'prepaidCard': m.name })
+    console.log('------memberItem----',m)
     return (<Stack
       direction="row"
       justifyContent="flex-start"
@@ -342,12 +335,12 @@ function Additions(props) {
         }} >
         {mi.prepaidCard}
       </Typography>
-      {m.type !== 1 && <Typography variant="subtitle1"
+      {/* {m.type !== 1 && <Typography variant="subtitle1"
         id="outlined-password-input"
         color='secondary'
       >
         {m.type === 2 ? '扣次卡一次' : '年卡'}
-      </Typography>}
+      </Typography>} */}
 
       {m.type === 1 && <TextField
         id="outlined-password-input"
@@ -367,6 +360,55 @@ function Additions(props) {
           setCourseEdit(after)
         }}
       />}
+
+
+{m.type === 2 && <TextField
+        id="outlined-password-input"
+        label="扣次卡"
+        size="small"
+        sx={{ width: '100px' }}
+        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        value={m.times}
+        onChange={(e) => {
+          let pos = labelArr.findIndex(e => e.name === m.name)
+          labelArr[pos].type = 2
+          labelArr[pos].spendFee = 0
+          labelArr[pos].times = parseInt(e.target.value)
+
+          let member = courseEdit.membersObj
+          member[mi.id] = [0, parseInt(e.target.value), 0]
+          let after = { ...courseEdit, membersObj: member }
+          let a = labelArr.concat()
+          setLabelArr(a)
+          setCourseEdit(after)
+        }}
+      />}
+
+{m.type === 3 && <TextField
+        id="outlined-password-input"
+        label="扣年
+        卡"
+        size="small"
+        sx={{ width: '100px' }}
+        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        value={m.annualTimes}
+        onChange={(e) => {
+          let pos = labelArr.findIndex(e => e.name === m.name)
+          labelArr[pos].type = 3
+          labelArr[pos].spendFee = 0
+          labelArr[pos].times = 0
+          labelArr[pos].annualTimes = parseInt(e.target.value)
+
+          let member = courseEdit.membersObj
+          member[mi.id] = [0, 0,parseInt(e.target.value)]
+          let after = { ...courseEdit, membersObj: member }
+          let a = labelArr.concat()
+          setLabelArr(a)
+          setCourseEdit(after)
+        }}
+      />}
+
+
       {m.type !== 1 && <Tooltip title={'课时费'} placement="top">
 
         <IconButton
@@ -376,13 +418,10 @@ function Additions(props) {
             let pos = labelArr.findIndex(e => e.name === m.name)
 
             labelArr[pos].type = 1
-            // labelArr[pos].spendFee = 0
-            // let member = courseEdit.membersObj
-            // member[mi.id] = [0, 1]
-            // let after = { ...courseEdit, membersObj: member }
+           
             let a = labelArr.concat()
             setLabelArr(a)
-            // setCourseEdit(after)
+       
           }}
         >
           <ArticleIcon />
@@ -465,7 +504,7 @@ function Additions(props) {
       return
     }
     let member = users.find(u => u.prepaidCard === item)
-    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0 })
+    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0 ,annualTimes:0})
     let a = labelArr.concat()
     let temp = {}
     temp = Object.assign(temp, {
@@ -499,7 +538,7 @@ function Additions(props) {
           setCourseEdit(after)
         }}
         value={[courseEdit.court]}>
-        {areas.map((dict, index) => { return (<MenuItem key={index} value={dict}>{dict}</MenuItem>) })}
+        {areas.map((dict, index) => { return (<MenuItem key={`select2-${index}`} value={dict}>{dict}</MenuItem>) })}
       </Select>
     </FormControl>}
 
@@ -515,7 +554,7 @@ function Additions(props) {
           setCourseEdit(after)
         }}
         value={[courseEdit.coach]}>
-        {users && users.filter((user) => user.coach === 1 || user.clubId === 3).map((dict, index) => { return (<MenuItem key={index} value={dict.id}>{dict.realName}</MenuItem>) })}
+        {users && users.filter((user) => user.coach === 1 || user.clubId === 3).map((dict, index) => { return (<MenuItem key={`select-${index}`} value={dict.id}>{dict.realName}</MenuItem>) })}
       </Select>
     </FormControl>}
 
@@ -551,6 +590,8 @@ function Additions(props) {
               diff = 2
             } else if (diff <= 180) {
               diff = 2.5
+            }else{
+              diff=3
             }
             after = { ...courseEdit, spendingTime: diff, startTime: newValue}
             console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff,after)
@@ -581,11 +622,12 @@ function Additions(props) {
               diff = 2
             } else if (diff <= 180) {
               diff = 2.5
+            }else{
+              diff=3
             }
-            // after = { ...courseEdit, spendingTime: diff }
             after = { ...courseEdit, spendingTime: diff, endTime: newValue}
-            setCourseEdit(after)
             console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff,after)
+            setCourseEdit(after)
           }}
           renderInput={(params) => <TextField {...params} />}
         />
@@ -621,7 +663,23 @@ function Additions(props) {
     {!selectCourse && <FormControl sx={{ m: 1, width: '100%' }} >
       <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
+          let diff =courseEdit.spendingTime
+          if(diff>3){
+            if (diff <= 60) {
+              diff = 1
+            } else if (diff <= 90) {
+              diff = 1.5
+            } else if (diff <= 120) {
+              diff = 2
+            } else if (diff <= 180) {
+              diff = 2.5
+            }else{
+              diff =   3
+            }
+            courseEdit.spendingTime=diff
+          }
           console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit,startTime,endTime)
+
           dispatch(createCard(courseEdit))
         }}>
         确认添加

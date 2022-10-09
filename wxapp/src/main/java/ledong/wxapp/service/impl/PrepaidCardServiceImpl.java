@@ -162,9 +162,12 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
         // update total spend
         for (String card : cardSpend.keySet()) {
             HashMap<String, Object> cardVo = SearchApi.searchById(DataSetConstant.LD_PREPAID_CARD_INFORMATION, card);
+            if(cardVo.get(LdPrePaidCardVo.RESTCOUNT)==null){
+                cardVo.put(LdPrePaidCardVo.RESTCOUNT,0);
+            }
             int temp = (int) cardVo.get(LdPrePaidCardVo.BALANCE);
             int tempTimes = cardVo.get(LdPrePaidCardVo.BALANCETIMES)==null?0:(int) cardVo.get(LdPrePaidCardVo.BALANCETIMES);
-            int annualTimes = cardVo.get(LdPrePaidCardVo.BALANCETIMES)==null?0:(int) cardVo.get(LdPrePaidCardVo.RESTCOUNT);
+            int annualTimes = cardVo.get(LdPrePaidCardVo.RESTCOUNT)==null?0:(int) cardVo.get(LdPrePaidCardVo.RESTCOUNT);
             HashMap <String,Object >valueMap = new HashMap <String,Object >();
             valueMap.put(LdPrePaidCardVo.BALANCE,
                     temp - (cardSpend.get(card)[0]));

@@ -91,6 +91,20 @@ export const retreatRecentCourse = createAsyncThunk(
     async (params, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
+           if(params.spendingTime>3){
+      
+            if (params.spendingTime <= 60) {
+                params.spendingTime = 1
+              } else if (params.spendingTime <= 90) {
+                params.spendingTime = 1.5
+              } else if (params.spendingTime <= 120) {
+                params.spendingTime = 2
+              } else if (params.spendingTime <= 180) {
+                params.spendingTime = 2.5
+              }else{
+                params.spendingTime=3
+              }
+            }
             const response = await Axios.post(`/api/prepaidCard/ld/chargeLogRetreat?cardId=${params.cardId}&time=${params.time}`)
             return response.data;
         } catch (err) {
@@ -110,7 +124,7 @@ export const createCard = createAsyncThunk(
             payload.isDealing=0
             payload.startTime=moment(payload.startTime).format('YYYY-MM-DD HH:mm')
             payload.endTime=moment(payload.endTime).format('YYYY-MM-DD HH:mm')
-            payload.spendingTime=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
+            // payload.spendingTime=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
             // let payload={ 
                 // startTime: this.data.startTime,
                 // endTime: this.data.endTime,
@@ -128,12 +142,16 @@ export const createCard = createAsyncThunk(
       
 
             // throw new Error('Something bad happened');
+
+
+
             const response = await Axios.request({method:'post',url:`/api/course/ld/createCourse`,params:payload})
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
             if (response.data.code !== 0) {
                 return rejectWithValue(response.data.message)
             }
             return response.data.data;
+            // return {};
         } catch (err) {
             return rejectWithValue(err)
         }
