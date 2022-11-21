@@ -1,0 +1,7 @@
+server:
+  port: 9968
+  shutdown: graceful
+
+spring:
+  application:
+    name: ledong-workship
