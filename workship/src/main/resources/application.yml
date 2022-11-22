@@ -5,3 +5,15 @@ server:
 spring:
   application:
     name: ledong-workship
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:mysql://10.217.2.51:3307/workship
+    username: root
+    password: desay_12345
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  main:
+    allow-bean-definition-overriding: true
+
