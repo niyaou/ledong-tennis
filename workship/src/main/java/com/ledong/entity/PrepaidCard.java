@@ -1,6 +1,10 @@
 package com.ledong.entity;
 
+import com.ledong.bo.PrepaidCardBo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -9,8 +13,11 @@ import java.sql.Date;
 import java.util.List;
 
 @Data
+@Builder
 @Accessors(chain = true)
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class PrepaidCard implements Serializable {
 
     @Id
@@ -42,5 +49,13 @@ public class PrepaidCard implements Serializable {
 
     @OneToMany(mappedBy = "prepaidCard",cascade = {CascadeType.REMOVE})
      private List<Spend> spends;
+
+    public static PrepaidCard fromBO(PrepaidCardBo bo) {
+        return PrepaidCard.builder()
+                .id(bo.getId())
+                .name(bo.getName())
+                .number(bo.getNumber())
+                .build();
+    }
 
 }

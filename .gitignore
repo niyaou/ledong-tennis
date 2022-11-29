@@ -9,6 +9,10 @@ material-kit-react/package-lock.json
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+workship/target/*
+workship/target/**
+workship/target
+workship/target/
 workship/target/workship-1.0-SNAPSHOT.jar
 workship/target/workship-1.0-SNAPSHOT.jar.original
 workship/target/classes/application.yml
@@ -25,3 +29,5 @@ workship.iml
 HELP.md
 .idea/.gitignore
 .idea/.name
+workship/target/classes/com/ledong/dao/CourtDao.class
+workship/target/classes/com/ledong/entity/PrepaidCard.class
