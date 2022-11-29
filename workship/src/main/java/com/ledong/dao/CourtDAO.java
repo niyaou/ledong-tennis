@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.io.Serializable;
 
-public interface CourtDao extends JpaRepository<Court, Serializable>,JpaSpecificationExecutor<Court> {
+public interface CourtDAO extends JpaRepository<Court, Serializable>,JpaSpecificationExecutor<Court> {
 }

@@ -1,6 +1,7 @@
 package com.ledong.entity;
 
 
+import com.ledong.bo.PrepaidCardBo;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -8,9 +9,12 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 
-@Entity
 @Data
+@Builder
 @Accessors(chain = true)
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Charge implements Serializable {
 
     @Serial
@@ -33,5 +37,11 @@ public class Charge implements Serializable {
     @Column(length =200,name = "description")
     private String description;
 
+    public static Charge fromBO(Charge bo) {
+        return Charge.builder()
+                .id(bo.getId())
+                .prepaidCard(bo.getPrepaidCard())
 
+                .build();
+    }
 }
