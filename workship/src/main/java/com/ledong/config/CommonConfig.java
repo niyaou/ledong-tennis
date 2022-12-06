@@ -2,6 +2,7 @@ package com.ledong.config;
 
 import com.ledong.service.CardCases;
 import com.ledong.service.UserCases;
+import com.ledong.service.WsHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -19,4 +20,7 @@ public class CommonConfig implements WebMvcConfigurer {
     public CardCases cardCases(){
         return new CardCases() ;
     }
+
+    @Bean
+    public WsHandler wsHandler(){return new WsHandler() ;   }
 }

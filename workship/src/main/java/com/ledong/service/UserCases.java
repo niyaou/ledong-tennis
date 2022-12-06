@@ -9,6 +9,8 @@ import com.ledong.util.DefaultConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+
 
 public class UserCases {
 
@@ -31,7 +33,7 @@ public class UserCases {
         return DefaultConverter.convert(user, PrepaidCardBo.class);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public PrepaidCardBo setRestChargeChange(String number,float changed){
         var user=    userDAO.findByNumber(number);
         if(user==null){
@@ -41,5 +43,54 @@ public class UserCases {
         userDAO.save(user);
         return DefaultConverter.convert( user,PrepaidCardBo.class);
     }
+
+
+//    @Transactional(rollbackFor = Exception.class)
+    public PrepaidCardBo setRestTimesChange(String number,float times){
+        var user=    userDAO.findByNumber(number);
+        if(user==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        user.setTimesCount(user.getTimesCount()+times);
+        userDAO.save(user);
+        return DefaultConverter.convert( user,PrepaidCardBo.class);
+    }
+
+
+//    @Transactional(rollbackFor = Exception.class)
+    public PrepaidCardBo setRestAnnualTimesChange(String number,float annualTimes){
+        var user=    userDAO.findByNumber(number);
+        if(user==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        user.setAnnualCount(user.getAnnualCount()+annualTimes);
+        userDAO.save(user);
+        return DefaultConverter.convert( user,PrepaidCardBo.class);
+    }
+
+
+//    @Transactional(rollbackFor = Exception.class)
+    public PrepaidCardBo setTimesExpired(String number, Date expiredTime){
+        var user=    userDAO.findByNumber(number);
+        if(user==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        user.setTimesExpireTime(expiredTime);
+        userDAO.save(user);
+        return DefaultConverter.convert( user,PrepaidCardBo.class);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public PrepaidCardBo setAnnualTimesExpired(String number, Date expiredTime){
+        var user=    userDAO.findByNumber(number);
+        if(user==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        user.setAnnualExpireTime(expiredTime);
+        userDAO.save(user);
+        return DefaultConverter.convert( user,PrepaidCardBo.class);
+    }
+
 
 }
