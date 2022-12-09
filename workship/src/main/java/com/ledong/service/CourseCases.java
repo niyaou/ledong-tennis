@@ -9,6 +9,7 @@ import com.ledong.bo.CourseBo;
 import com.ledong.bo.SpendBo;
 import com.ledong.dao.*;
 import com.ledong.entity.Course;
+import com.ledong.entity.Spend;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.temporal.Temporal;
@@ -47,15 +48,16 @@ public class CourseCases {
         var coach = coachDao.findByNumber(coachName);
         var court = courtDao.findByName(courtName);
         var _mObj = JSONUtil.parse(membersObj);
-        var courseBo = CourseBo.builder().court(court).coach(coach)
-                .startTime(DateUtil.parse(startTime).toSqlDate())
-                .endTime(DateUtil.parse(endTime).toSqlDate())
+        var courseBo = CourseBo.builder().court(court)
+                .coach(coach)
+                .startTime(DateUtil.parse(startTime).toLocalDateTime())
+                .endTime(DateUtil.parse(endTime).toLocalDateTime())
                 .duration(spendingTime)
                 .description(descript)
                 .member(new ArrayList<>())
                 .build();
         var course = Course.fromBO(courseBo);
-
+        courseDao.save(course);
         for (Map.Entry<String, Object> entry : ((JSONObject) _mObj).entrySet()) {
             var key = entry.getKey();
             var value = entry.getValue();
@@ -67,29 +69,25 @@ public class CourseCases {
             var times =((List<Integer>) value).get(1);
             var annualTimes =((List<Integer>) value).get(2);
             if (charge!= 0) {
-                member.setRestCharge(member.getRestCharge() +charge);
+                member.setRestCharge(member.getRestCharge() -charge);
                 spend.setCharge(charge);
             }
             if (times != 0) {
-                member.setTimesCount(member.getTimesCount() + times);
+                member.setTimesCount(member.getTimesCount() - times);
                 spend.setTimes(times);
             }
             if (annualTimes != 0) {
-                member.setAnnualCount(member.getAnnualCount() +annualTimes);
+                member.setAnnualCount(member.getAnnualCount() -annualTimes);
                 spend.setAnnualTimes(annualTimes);
             }
-
-
-//            var spend = SpendBo.builder().course(course).build();
-//        var a =    _mObj.get(m);
-//
-////            members.add(m);
-////            incoming += (int)membersObj.get(m).get(0);
-////            incomingTimes += (int)membersObj.get(m).get(1);
-//
-//
+            userDao.save(member);
+            spendDao.save(Spend.fromBO(spend));
+            var members = course.getMember();
+            members.add(member);
+            course.setMember(members);
         }
-        return null;
+        courseDao.save(course);
+        return courseBo;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ledong.bo;
 
+import cn.hutool.core.date.DateTime;
 import com.ledong.entity.PrepaidCard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -20,6 +22,6 @@ public class ChargeBo {
     private float times;
     private float annualTimes;
     private String description;
-    private Date chargedTime;
+    private LocalDateTime chargedTime;
     private int notified;
 }

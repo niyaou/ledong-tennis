@@ -29,7 +29,7 @@ public class Spend  implements Serializable {
 
 
     @ManyToOne
-    @JoinColumn(name = "prepaid_card_id")
+    @JoinColumn(name = "prepaidCard_id")
     private PrepaidCard prepaidCard;
 
     private float charge;
@@ -45,6 +45,12 @@ public class Spend  implements Serializable {
     public static Spend fromBO(SpendBo bo) {
         return Spend.builder()
                 .id(bo.getId())
+                .charge(bo.getCharge())
+                .times(bo.getTimes())
+                .annualTimes(bo.getAnnualTimes())
+                .description(bo.getDescription())
+                .course(bo.getCourse())
+                .prepaidCard(bo.getPrepaidCard())
                 .build();
     }
 

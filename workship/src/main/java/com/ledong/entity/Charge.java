@@ -1,7 +1,9 @@
 package com.ledong.entity;
 
 
+import cn.hutool.core.date.DateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ledong.bo.ChargeBo;
 import com.ledong.bo.PrepaidCardBo;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -35,7 +37,7 @@ public class Charge implements Serializable {
 
 
     @ManyToOne
-    @JoinColumn(name = "prepaid_card_id")
+    @JoinColumn(name = "prepaidCard_id")
     private PrepaidCard prepaidCard;
 
     private float charge;
@@ -51,9 +53,13 @@ public class Charge implements Serializable {
     @Column(length =200,name = "description")
     private String description;
 
-    public static Charge fromBO(Charge bo) {
+    public static Charge fromBO(ChargeBo bo) {
         return Charge.builder()
                 .id(bo.getId())
+                .charge(bo.getCharge())
+                .times(bo.getTimes())
+                .annualTimes(bo.getAnnualTimes())
+                .chargedTime(bo.getChargedTime())
                 .prepaidCard(bo.getPrepaidCard())
                 .build();
     }

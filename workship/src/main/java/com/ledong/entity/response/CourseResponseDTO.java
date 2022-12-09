@@ -1,5 +1,6 @@
 package com.ledong.entity.response;
 
+import cn.hutool.core.date.DateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ledong.entity.Coach;
 import com.ledong.entity.Court;
@@ -10,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,8 +19,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseResponseDTO {
-    private Date startTime;
-    private Date endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private float duration;
     private int courseTime;
     private Court court;

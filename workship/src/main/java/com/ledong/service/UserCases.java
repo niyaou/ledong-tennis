@@ -1,6 +1,8 @@
 package com.ledong.service;
 
 import com.ledong.bo.PrepaidCardBo;
+import com.ledong.bo.SpendBo;
+import com.ledong.dao.SpendDAO;
 import com.ledong.dao.UserDAO;
 import com.ledong.entity.PrepaidCard;
 import com.ledong.exception.CustomException;
@@ -16,6 +18,9 @@ public class UserCases {
 
     @Autowired
     private UserDAO userDAO;
+
+    @Autowired
+    private SpendDAO spendDAO;
 
 
     public PrepaidCardBo create(String name, String number) {
@@ -91,6 +96,7 @@ public class UserCases {
         userDAO.save(user);
         return DefaultConverter.convert( user,PrepaidCardBo.class);
     }
+
 
 
 }

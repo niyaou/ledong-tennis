@@ -40,7 +40,7 @@ public class PrepaidCard implements Serializable {
     private Date timesExpireTime;
 
     @ManyToMany
-    @JoinColumn(name="court_id")
+    @JoinColumn(name="course_id")
     private List<Course> courses;
 
 

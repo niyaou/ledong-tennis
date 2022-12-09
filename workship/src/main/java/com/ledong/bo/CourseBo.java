@@ -1,5 +1,6 @@
 package com.ledong.bo;
 
+import cn.hutool.core.date.DateTime;
 import com.ledong.entity.Coach;
 import com.ledong.entity.Court;
 import com.ledong.entity.PrepaidCard;
@@ -8,8 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -19,8 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class CourseBo {
     private long id;
-    private Date startTime;
-    private Date endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private float duration;
     private int courseType;
     private Court court;

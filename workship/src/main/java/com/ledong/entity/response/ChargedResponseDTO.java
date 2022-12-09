@@ -1,5 +1,6 @@
 package com.ledong.entity.response;
 
+import cn.hutool.core.date.DateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ledong.entity.PrepaidCard;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -22,6 +24,6 @@ public class ChargedResponseDTO {
     private float annualTimes;
     private String description;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date chargedTime;
+    private LocalDateTime chargedTime;
     private int notified;
 }
