@@ -1,12 +1,18 @@
 package com.ledong.service;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.ledong.bo.CourseBo;
+import com.ledong.bo.SpendBo;
 import com.ledong.dao.*;
+import com.ledong.entity.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
+import java.time.temporal.Temporal;
+import java.util.*;
 
 public class CourseCases {
 
@@ -28,24 +34,60 @@ public class CourseCases {
     @Autowired
     private CoachDAO chargeDao;
 
+
     public CourseBo createCourse(
             String startTime,
             String endTime,
             String coachName,
-            Double spendingTime,
+            float spendingTime,
             String courtName,
             String descript,
             String membersObj
     ) {
         var coach = coachDao.findByNumber(coachName);
         var court = courtDao.findByName(courtName);
-        HashMap<String, Object> _mObj= (HashMap<String, Object>) JSONUtil.parse(membersObj);
-        for (String m : _mObj.keySet()) {
-//            members.add(m);
-//            incoming += (int)membersObj.get(m).get(0);
-//            incomingTimes += (int)membersObj.get(m).get(1);
+        var _mObj = JSONUtil.parse(membersObj);
+        var courseBo = CourseBo.builder().court(court).coach(coach)
+                .startTime(DateUtil.parse(startTime).toSqlDate())
+                .endTime(DateUtil.parse(endTime).toSqlDate())
+                .duration(spendingTime)
+                .description(descript)
+                .member(new ArrayList<>())
+                .build();
+        var course = Course.fromBO(courseBo);
+
+        for (Map.Entry<String, Object> entry : ((JSONObject) _mObj).entrySet()) {
+            var key = entry.getKey();
+            var value = entry.getValue();
+            var member = userDao.findByNumber(key);
+            var spend = SpendBo.builder().course(course).prepaidCard(member)
+                    .description(course.getDescription())
+                    .build();
+            var charge =((List<Integer>) value).get(0);
+            var times =((List<Integer>) value).get(1);
+            var annualTimes =((List<Integer>) value).get(2);
+            if (charge!= 0) {
+                member.setRestCharge(member.getRestCharge() +charge);
+                spend.setCharge(charge);
+            }
+            if (times != 0) {
+                member.setTimesCount(member.getTimesCount() + times);
+                spend.setTimes(times);
+            }
+            if (annualTimes != 0) {
+                member.setAnnualCount(member.getAnnualCount() +annualTimes);
+                spend.setAnnualTimes(annualTimes);
+            }
 
 
+//            var spend = SpendBo.builder().course(course).build();
+//        var a =    _mObj.get(m);
+//
+////            members.add(m);
+////            incoming += (int)membersObj.get(m).get(0);
+////            incomingTimes += (int)membersObj.get(m).get(1);
+//
+//
         }
         return null;
     }

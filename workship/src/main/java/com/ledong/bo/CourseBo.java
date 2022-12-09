@@ -22,7 +22,7 @@ public class CourseBo {
     private Date startTime;
     private Date endTime;
     private float duration;
-    private int courseTime;
+    private int courseType;
     private Court court;
     private Coach coach;
     private List<PrepaidCard> member;

@@ -1,6 +1,11 @@
 package com.ledong.entity;
 
+import com.ledong.bo.CourseBo;
+import com.ledong.bo.PrepaidCardBo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -11,6 +16,9 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Course implements Serializable {
 
     @Id
@@ -22,8 +30,8 @@ public class Course implements Serializable {
 
     private float duration;
 
-    @Column(name = "courseTime", columnDefinition = "int COMMENT '处理结果:1，班课；2，私教'")
-    private int courseTime;
+    @Column(name = "courseTime", columnDefinition = "int COMMENT '类型:1，班课；2，私教'")
+    private int courseType;
 
 
     @ManyToOne
@@ -40,5 +48,18 @@ public class Course implements Serializable {
 
 
     private String description;
+
+    public static Course fromBO(CourseBo bo) {
+        return Course.builder()
+                .id(bo.getId())
+                .description(bo.getDescription())
+                .coach(bo.getCoach())
+                .court(bo.getCourt())
+                .duration(bo.getDuration())
+                .startTime(bo.getStartTime())
+                .endTime(bo.getEndTime())
+                .member(bo.getMember())
+                .build();
+    }
 
 }

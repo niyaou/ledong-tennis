@@ -1,6 +1,7 @@
 package com.ledong.config;
 
 import com.ledong.service.CardCases;
+import com.ledong.service.CourseCases;
 import com.ledong.service.UserCases;
 import com.ledong.service.WsHandler;
 import org.springframework.context.annotation.Bean;
@@ -23,4 +24,7 @@ public class CommonConfig implements WebMvcConfigurer {
 
     @Bean
     public WsHandler wsHandler(){return new WsHandler() ;   }
+
+    @Bean
+    public CourseCases courseCases(){return new CourseCases() ;   }
 }
