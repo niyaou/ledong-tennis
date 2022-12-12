@@ -1,25 +1,45 @@
 package com.ledong.entity;
 
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 import lombok.experimental.Accessors;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
-@Data
-@Accessors(chain = true)
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Entity
-public class Court  implements Serializable {
+@JsonIgnoreProperties({"courses"})
+public class Court    {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long id;
+   private Long id;
 
    private String name;
+
 
    @OneToMany(mappedBy="court",cascade = {CascadeType.REMOVE})
    private List<Course> courses;
 
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+      Court court = (Court) o;
+      return id != null && Objects.equals(id, court.id);
+   }
+
+   @Override
+   public int hashCode() {
+      return getClass().hashCode();
+   }
 }

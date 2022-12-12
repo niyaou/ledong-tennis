@@ -1,39 +1,34 @@
 package com.ledong.entity;
 
 
-import cn.hutool.core.date.DateTime;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ledong.bo.ChargeBo;
-import com.ledong.bo.PrepaidCardBo;
 import lombok.*;
-import lombok.experimental.Accessors;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.Hibernate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.data.jpa.repository.Temporal;
 
 import javax.persistence.*;
-import java.io.Serial;
-import java.io.Serializable;
-import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Builder
-@Accessors(chain = true)
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Charge implements Serializable {
+@AllArgsConstructor
+@JsonIgnoreProperties({"prepaidCard"})
+public class Charge   {
 
-    @Serial
-    private static final long serialVersionUID = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
 
     @ManyToOne
@@ -62,5 +57,20 @@ public class Charge implements Serializable {
                 .chargedTime(bo.getChargedTime())
                 .prepaidCard(bo.getPrepaidCard())
                 .build();
+    }
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Charge charge = (Charge) o;
+        return id != null && Objects.equals(id, charge.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

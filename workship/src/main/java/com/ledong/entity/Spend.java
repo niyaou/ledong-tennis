@@ -1,31 +1,27 @@
 package com.ledong.entity;
 
-import com.ledong.bo.CourseBo;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ledong.bo.SpendBo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.io.Serial;
-import java.io.Serializable;
+import java.util.Objects;
 
-@Data
-@Accessors(chain = true)
+
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor // 无参构造方法
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Spend  implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1;
+@JsonIgnoreProperties({"prepaidCard"})
+public class Spend  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
+    private Long id;
 
 
     @ManyToOne
@@ -40,6 +36,7 @@ public class Spend  implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @OrderBy("startTime desc")
     private Course course;
 
     public static Spend fromBO(SpendBo bo) {
@@ -53,5 +50,20 @@ public class Spend  implements Serializable {
                 .prepaidCard(bo.getPrepaidCard())
                 .build();
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Spend spend = (Spend) o;
+        return id != null && Objects.equals(id, spend.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
 
 }

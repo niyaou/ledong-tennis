@@ -5,6 +5,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.ledong.entity.Course;
 import com.ledong.entity.PrepaidCard;
+import com.ledong.entity.Spend;
 import com.ledong.entity.response.CourseResponseDTO;
 import com.ledong.entity.response.SpendResponseDTO;
 import com.ledong.entity.response.UserResponseDTO;
@@ -13,12 +14,12 @@ import com.ledong.service.CourseCases;
 import com.ledong.service.UserCases;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/prepaidCard")
-@Validated
 @Slf4j
 public class PrepaidCardController {
 
@@ -43,10 +44,14 @@ public class PrepaidCardController {
 
 
     @GetMapping("/spend/{number}")
+    @ResponseBody
     public Object spend(@PathVariable("number")  String number ){
-        var spend= cardCases.getSpend(number);
+//        var spend= cardCases.getSpend(number);
+//        System.out.println(spend);
+//       var rres= JSONUtil.toJsonStr(spend);
+        return  cardCases.getSpend(number,1,10);
 //       var json= JSONUtil.parseArray(spend);
-        return spend;
+//        return spend;
     }
 
 

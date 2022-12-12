@@ -12,6 +12,10 @@ import com.ledong.exception.CustomException;
 import com.ledong.exception.UseCaseCode;
 import com.ledong.util.DefaultConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
@@ -57,14 +61,28 @@ public class CardCases {
         return DefaultConverter.convert(charge,ChargeBo.class);
     }
 
-    public List<Spend> getSpend(String number){
+
+    public Page<Spend> getSpend(String number,Integer pageNum,Integer pageSize){
         var user=    userDAO.findByNumber(number);
         if(user==null){
             throw new CustomException(UseCaseCode.NOT_FOUND);
         }
-        return spendDAO.findByPrepaidCard_Id(user.getId());
+        var sort = Sort.by(Sort.Direction.DESC,"course.startTime");
+        Pageable pageReq = PageRequest.of(pageNum - 1, pageSize,sort);
+
+        return spendDAO.findByPrepaidCard_Id(user.getId(),pageReq);
 //        return DefaultConverter.convert( spend,SpendBo.class);
     }
 
+    public Spend getSpend(String number){
+        var user=    userDAO.findByNumber(number);
+        if(user==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+
+
+        return spendDAO.findByPrepaidCard_Id(user.getId());
+//        return DefaultConverter.convert( spend,SpendBo.class);
+    }
 
 }

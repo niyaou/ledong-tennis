@@ -57,7 +57,7 @@ public class CourseCases {
                 .member(new ArrayList<>())
                 .build();
         var course = Course.fromBO(courseBo);
-        courseDao.save(course);
+        course=  courseDao.save(course);
         for (Map.Entry<String, Object> entry : ((JSONObject) _mObj).entrySet()) {
             var key = entry.getKey();
             var value = entry.getValue();

@@ -1,33 +1,29 @@
 package com.ledong.entity;
 
-import cn.hutool.core.date.DateTime;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ledong.bo.CourseBo;
-import com.ledong.bo.PrepaidCardBo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
-@Data
-@Accessors(chain = true)
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Entity
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Course implements Serializable {
+public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column( columnDefinition = "datetime")
@@ -42,7 +38,6 @@ public class Course implements Serializable {
     @Column(name = "courseTime", columnDefinition = "int COMMENT '类型:1，班课；2，私教'")
     private int courseType;
 
-
     @ManyToOne
     @JoinColumn(name = "court_id")
     private Court court;
@@ -50,6 +45,7 @@ public class Course implements Serializable {
     @ManyToOne
     @JoinColumn(name = "coach_id")
     private Coach coach;
+
 
     @ManyToMany
     @JoinColumn(name = "prepaidCard_id")
@@ -71,4 +67,18 @@ public class Course implements Serializable {
                 .build();
     }
 
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Course course = (Course) o;
+        return id != null && Objects.equals(id, course.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

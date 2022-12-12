@@ -1,22 +1,27 @@
 package com.ledong.entity;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
-@Data
-@Accessors(chain = true)
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Entity
-public class Coach implements Serializable {
+@JsonIgnoreProperties({"courses"})
+public class Coach   {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="coach_id",columnDefinition = "bigint COMMENT '主键'")
-    private long id;
+    private Long id;
 
     private String name;
 
@@ -27,4 +32,16 @@ public class Coach implements Serializable {
     @OneToMany(mappedBy = "coach",cascade = {CascadeType.REMOVE})
     private List<Course> courses;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Coach coach = (Coach) o;
+        return id != null && Objects.equals(id, coach.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

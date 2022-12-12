@@ -1,28 +1,29 @@
 package com.ledong.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ledong.bo.PrepaidCardBo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Builder
-@Accessors(chain = true)
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
-public class PrepaidCard implements Serializable {
+@JsonIgnoreProperties({"courses","charges","spends"})
+public class PrepaidCard   {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
 
     private String name;
@@ -39,7 +40,7 @@ public class PrepaidCard implements Serializable {
     @Column
     private Date timesExpireTime;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="course_id")
     private List<Course> courses;
 
@@ -48,7 +49,7 @@ public class PrepaidCard implements Serializable {
     private List<Charge> charges;
 
     @OneToMany(mappedBy = "prepaidCard",cascade = {CascadeType.REMOVE})
-     private List<Spend> spends;
+    private List<Spend> spends;
 
     public static PrepaidCard fromBO(PrepaidCardBo bo) {
         return PrepaidCard.builder()
@@ -58,4 +59,18 @@ public class PrepaidCard implements Serializable {
                 .build();
     }
 
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        PrepaidCard that = (PrepaidCard) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
