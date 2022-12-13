@@ -17,6 +17,7 @@ public interface SpendDAO extends JpaRepository<Spend, Serializable>, JpaSpecifi
 
     public Spend findByPrepaidCard_Id(Long id);
 
-//    Pageable pageReq = PageRequest.of(pageNum - 1, pageSize, Sort.by(orders));
-//		return techProjectInfoRepository.findAll(c, pageReq);
+    public Spend findByPrepaidCard_NumberAndCourse_Id(String number,Long Cid);
+
+
 }

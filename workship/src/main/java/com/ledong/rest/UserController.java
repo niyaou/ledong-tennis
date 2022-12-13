@@ -9,10 +9,7 @@ import com.ledong.service.UserCases;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -38,6 +35,13 @@ public class UserController extends  BaseController{
     public ChargedResponseDTO charged(String number,float charged,float times,float annualTimes, String description){
        var chargedLog= cardCase.setRestCharge(number,charged,times,annualTimes,description);
         return  ChargedResponseDTO.builder().charge(charged).description(description).chargedTime(chargedLog.getChargedTime()).build();
+
+    }
+
+    @PostMapping("/charged/retreat/{id}")
+    public ChargedResponseDTO charged(@PathVariable("id")Long id){
+        var chargedLog= cardCase.retreatCharge(id);
+        return  ChargedResponseDTO.builder().build();
 
     }
 

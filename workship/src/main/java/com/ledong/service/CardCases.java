@@ -1,7 +1,6 @@
 package com.ledong.service;
 
 import com.ledong.bo.ChargeBo;
-import com.ledong.bo.SpendBo;
 import com.ledong.dao.ChargeDAO;
 import com.ledong.dao.SpendDAO;
 import com.ledong.dao.UserDAO;
@@ -18,9 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
-import java.util.List;
-
 
 public class CardCases {
     @Autowired
@@ -34,7 +30,7 @@ public class CardCases {
     @Autowired
     private SpendDAO spendDAO;
 
-//    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ChargeBo  setRestCharge(String number,float charged,float times,float annualTimes, String description){
        var user= userCases.findByNumber(number);
        if(user==null){
@@ -62,6 +58,22 @@ public class CardCases {
     }
 
 
+    @Transactional(rollbackFor = Exception.class)
+    public ChargeBo retreatCharge(Long id){
+      var _charge=  chargeDao.findById(id);
+      if(_charge.isPresent()){
+         var charge= _charge.get();
+          var number =charge.getPrepaidCard().getNumber();
+          userCases.setRestChargeChange(number,charge.getCharge());
+          userCases.setRestTimesChange(number,charge.getTimes());
+          userCases.setRestAnnualTimesChange(number,charge.getAnnualTimes());
+          chargeDao.delete(charge);
+          return  DefaultConverter.convert(charge,ChargeBo.class);
+      }else{
+          throw new CustomException(UseCaseCode.NOT_FOUND);
+      }
+    }
+
     public Page<Spend> getSpend(String number,Integer pageNum,Integer pageSize){
         var user=    userDAO.findByNumber(number);
         if(user==null){
@@ -79,8 +91,6 @@ public class CardCases {
         if(user==null){
             throw new CustomException(UseCaseCode.NOT_FOUND);
         }
-
-
         return spendDAO.findByPrepaidCard_Id(user.getId());
 //        return DefaultConverter.convert( spend,SpendBo.class);
     }
