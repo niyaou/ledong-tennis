@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/prepaidCard")
 @Slf4j
@@ -44,16 +45,16 @@ public class PrepaidCardController {
     }
 
 
-    @GetMapping("/spend/{number}")
+    @GetMapping("/spend")
     @ResponseBody
-    public Object spend(@PathVariable("number")  String number ){
-        return  cardCases.getSpend(number,1,10);
+    public Object spend(@RequestParam(required = false)  String number ){
+        return  cardCases.getSpend(number,1,1000);
 
     }
 
     @DeleteMapping("/course/{id}/{member}")
     public CourseResponseDTO removeMember(@PathVariable("id")Long courseId,@PathVariable("member")String number
-                                  ){
+                              ){
        var bo= courseCases.removeCourseMember(courseId,number);
         return CourseResponseDTO.builder()
                 .build();
@@ -68,11 +69,14 @@ public class PrepaidCardController {
     }
 
     @GetMapping("/course/total")
-    public Object totalCourse(@RequestParam  String startTime,String number){
+    public Object totalCourse(@RequestParam  String startTime,@RequestParam(required = false) String number,@RequestParam(required = false) Integer pageNum){
         if(StringUtils.hasText(number)){
-            return courseCases.memberCourse(startTime,number,1,10);
+            return courseCases.memberCourse(startTime,number,1,100);
         }else{
-            return courseCases.totalCourse(startTime,1,10);
+            if(pageNum==null ||pageNum<1){
+                pageNum=1;
+            }
+            return courseCases.totalCourse(startTime,pageNum,1000);
         }
 
     }

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.util.List;
 
 
 public class UserCases {
@@ -97,6 +98,19 @@ public class UserCases {
         return DefaultConverter.convert( user,PrepaidCardBo.class);
     }
 
+    public List<PrepaidCard> getMembers(){
+        return userDAO.findAll();
+    }
+
+
+
+    public PrepaidCard getMember(String number){
+        var member= userDAO.findByNumber(number);
+        if (member==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        return member;
+    }
 
 
 }

@@ -16,7 +16,7 @@ import java.util.Objects;
 @NoArgsConstructor // 无参构造方法
 @Builder
 @AllArgsConstructor
-@JsonIgnoreProperties({"prepaidCard"})
+@JsonIgnoreProperties({"prepaidCard","course"})
 public class Spend  {
 
     @Id
@@ -35,7 +35,7 @@ public class Spend  {
 
 
     @ManyToOne
-    @JoinColumn(name = "course_id")
+    @JoinColumn(name ="course_id")
     @OrderBy("startTime desc")
     private Course course;
 

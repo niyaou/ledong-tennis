@@ -40,6 +40,10 @@ public class Charge   {
     private float annualTimes;
     private int notified;
 
+    @ManyToOne
+    @JoinColumn(name = "coach_id")
+    private Coach coach;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @CreatedDate
     @Column( columnDefinition = "datetime")

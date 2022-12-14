@@ -178,4 +178,25 @@ public class CourseCases {
 //        return  courseDao.findMemberWithStartTimeAfter(DateUtil.parseDateTime(startTime).toLocalDateTime(),number,pageReq);
     }
 
+
+    public Object notify(Long id){
+        var sort = Sort.by(Sort.Direction.DESC,"startTime");
+        Pageable pageReq = PageRequest.of(1, 1000,sort);
+        Specification<Course> spec=new Specification<Course>() {
+            @Override
+            public Predicate toPredicate(Root<Course> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Root<PrepaidCard> members = query.from(PrepaidCard.class);
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add( cb.equal(root.get("notified"),0)); // AB两表的关联条件，就是sql join 中的on条件
+                if(id!=null){
+                    predicates.add( cb.equal(root.get("id"),id));
+                }
+
+                query.distinct(true);
+                return cb.and(predicates.toArray(new Predicate[0]));
+            }
+        };
+
+        return courseDao.findAll(spec);
+    }
 }

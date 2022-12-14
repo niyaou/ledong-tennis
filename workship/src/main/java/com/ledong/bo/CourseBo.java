@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import com.ledong.entity.Coach;
 import com.ledong.entity.Court;
 import com.ledong.entity.PrepaidCard;
+import com.ledong.entity.Spend;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,4 +28,6 @@ public class CourseBo {
     private Coach coach;
     private List<PrepaidCard> member;
     private String description;
+    private int notified;
+    private List<Spend>  spend;
 }

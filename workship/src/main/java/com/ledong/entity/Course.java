@@ -46,11 +46,14 @@ public class Course {
     @JoinColumn(name = "coach_id")
     private Coach coach;
 
+    @OneToMany(mappedBy = "course",cascade = {CascadeType.REMOVE})
+    private List<Spend>  spend;
 
     @ManyToMany
     @JoinColumn(name = "prepaidCard_id")
     private List<PrepaidCard> member;
 
+    private int notified;
 
     private String description;
 
@@ -64,6 +67,8 @@ public class Course {
                 .startTime(bo.getStartTime())
                 .endTime(bo.getEndTime())
                 .member(bo.getMember())
+                .notified(bo.getNotified())
+                .spend(bo.getSpend())
                 .build();
     }
 

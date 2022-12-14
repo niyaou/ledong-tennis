@@ -1,6 +1,7 @@
 package com.ledong.bo;
 
 import cn.hutool.core.date.DateTime;
+import com.ledong.entity.Coach;
 import com.ledong.entity.PrepaidCard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,5 @@ public class ChargeBo {
     private String description;
     private LocalDateTime chargedTime;
     private int notified;
+    private Coach coach;
 }

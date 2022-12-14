@@ -14,7 +14,7 @@ import java.util.Objects;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@JsonIgnoreProperties({"courses"})
+@JsonIgnoreProperties({"courses","charge"})
 public class Coach   {
 
 
@@ -31,6 +31,13 @@ public class Coach   {
 
     @OneToMany(mappedBy = "coach",cascade = {CascadeType.REMOVE})
     private List<Course> courses;
+
+    @OneToMany(mappedBy = "coach",cascade = {CascadeType.REMOVE})
+    private List<Charge> charge;
+
+
+
+
 
     @Override
     public boolean equals(Object o) {
