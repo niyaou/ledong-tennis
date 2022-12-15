@@ -82,8 +82,8 @@ public class PrepaidCardController {
 
     @PostMapping("/course/sm")
     public Object courseSm(@RequestParam String number) throws TencentCloudSDKException {
-        var id="AKID8nCP3S9bPJ3YrwvOp1f7JJ4almdLjT3U";
-        var key="pQmnumcFylJdniOoxyrYym6DE6b9UZQN";
+        var id="1";
+        var key="2";
         Credential cred = new Credential(id, key);
         HttpProfile httpProfile = new HttpProfile();
         httpProfile.setReqMethod("POST");
