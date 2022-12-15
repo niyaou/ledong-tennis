@@ -1,22 +1,21 @@
 package com.ledong.rest;
 
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
 import com.ledong.entity.Course;
-import com.ledong.entity.PrepaidCard;
-import com.ledong.entity.Spend;
 import com.ledong.entity.response.CourseResponseDTO;
-import com.ledong.entity.response.SpendResponseDTO;
-import com.ledong.entity.response.UserResponseDTO;
 import com.ledong.service.CardCases;
 import com.ledong.service.CourseCases;
-import com.ledong.service.UserCases;
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.common.profile.ClientProfile;
+import com.tencentcloudapi.common.profile.HttpProfile;
+import com.tencentcloudapi.sms.v20190711.SmsClient;
+
+import com.tencentcloudapi.sms.v20190711.models.SendSmsRequest;
+import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -78,6 +77,38 @@ public class PrepaidCardController {
             }
             return courseCases.totalCourse(startTime,pageNum,1000);
         }
+
+    }
+
+    @PostMapping("/course/sm")
+    public Object courseSm(@RequestParam String number) throws TencentCloudSDKException {
+        var id="AKID8nCP3S9bPJ3YrwvOp1f7JJ4almdLjT3U";
+        var key="pQmnumcFylJdniOoxyrYym6DE6b9UZQN";
+        Credential cred = new Credential(id, key);
+        HttpProfile httpProfile = new HttpProfile();
+        httpProfile.setReqMethod("POST");
+        httpProfile.setConnTimeout(60);
+        httpProfile.setEndpoint("sms.tencentcloudapi.com");
+        ClientProfile clientProfile = new ClientProfile();
+        /* SDK默认用TC3-HMAC-SHA256进行签名
+         * 非必要请不要修改这个字段 */
+        clientProfile.setSignMethod("HmacSHA256");
+        clientProfile.setHttpProfile(httpProfile);
+        SmsClient client = new SmsClient(cred, "ap-guangzhou",clientProfile);
+        SendSmsRequest req = new SendSmsRequest();
+        String sdkAppId = "1400779674";
+        req.setSmsSdkAppid(sdkAppId);
+        String signName = "成都乐动精灵体育";
+        req.setSign(signName);
+        String templateId = "1639069";
+        req.setTemplateID(templateId);
+        String[] templateParamSet = {"12月14日麓坊校区","次卡5次","50元次卡30年卡100"};
+        req.setTemplateParamSet(templateParamSet);
+        String[] phoneNumberSet = {"+86"+number };
+        req.setPhoneNumberSet(phoneNumberSet);
+        SendSmsResponse res = client.SendSms(req);
+        System.out.println(SendSmsResponse.toJsonString(res));
+       return null;
 
     }
 
