@@ -14,6 +14,7 @@ import com.ledong.entity.Spend;
 import com.ledong.exception.CustomException;
 import com.ledong.exception.UseCaseCode;
 import com.ledong.util.DefaultConverter;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,6 +51,9 @@ public class CourseCases {
 
     @Autowired
     private UserCases useCase;
+
+    @Autowired
+    private SmsCases smsCase;
 
     @Transactional(rollbackFor = Exception.class)
     public CourseBo createCourse(
@@ -197,6 +201,14 @@ public class CourseCases {
             }
         };
 
-        return courseDao.findAll(spec);
+       var courses=  courseDao.findAll(spec);
+       courses.forEach(course -> {
+           try {
+               smsCase.notifyCourse(course);
+           } catch (TencentCloudSDKException e) {
+               e.printStackTrace();
+           }
+       });
+       return null;
     }
 }

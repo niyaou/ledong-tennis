@@ -5,6 +5,7 @@ import com.ledong.entity.Course;
 import com.ledong.entity.response.CourseResponseDTO;
 import com.ledong.service.CardCases;
 import com.ledong.service.CourseCases;
+import com.ledong.service.SmsCases;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
@@ -28,6 +29,9 @@ public class PrepaidCardController {
     private CourseCases courseCases;
     @Autowired
     private CardCases cardCases;
+    @Autowired
+    private SmsCases smsdCases;
+
 
 
     @PostMapping("/course/create")
@@ -81,35 +85,16 @@ public class PrepaidCardController {
     }
 
     @PostMapping("/course/sm")
-    public Object courseSm(@RequestParam String number) throws TencentCloudSDKException {
-        var id="1";
-        var key="2";
-        Credential cred = new Credential(id, key);
-        HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setReqMethod("POST");
-        httpProfile.setConnTimeout(60);
-        httpProfile.setEndpoint("sms.tencentcloudapi.com");
-        ClientProfile clientProfile = new ClientProfile();
-        /* SDK默认用TC3-HMAC-SHA256进行签名
-         * 非必要请不要修改这个字段 */
-        clientProfile.setSignMethod("HmacSHA256");
-        clientProfile.setHttpProfile(httpProfile);
-        SmsClient client = new SmsClient(cred, "ap-guangzhou",clientProfile);
-        SendSmsRequest req = new SendSmsRequest();
-        String sdkAppId = "1400779674";
-        req.setSmsSdkAppid(sdkAppId);
-        String signName = "成都乐动精灵体育";
-        req.setSign(signName);
-        String templateId = "1639069";
-        req.setTemplateID(templateId);
-        String[] templateParamSet = {"12月14日麓坊校区","次卡5次","50元次卡30年卡100"};
-        req.setTemplateParamSet(templateParamSet);
-        String[] phoneNumberSet = {"+86"+number };
-        req.setPhoneNumberSet(phoneNumberSet);
-        SendSmsResponse res = client.SendSms(req);
-        System.out.println(SendSmsResponse.toJsonString(res));
-       return null;
+    public Object courseSm(@RequestParam String number,@RequestParam String[] params) throws TencentCloudSDKException {
+       return smsdCases.sendSms(number,params);
 
     }
+
+    @PostMapping("/course/notify")
+    public Object courseNotify(@RequestParam Long courseId) throws TencentCloudSDKException {
+        return courseCases.notify(courseId);
+
+    }
+
 
 }
