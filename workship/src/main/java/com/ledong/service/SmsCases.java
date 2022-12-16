@@ -22,8 +22,8 @@ public class SmsCases {
     private CourseDAO courseDao;
 
 
-    private final String ID="AKIDBSWQAi8Vq4bUbcYZWIxVqyvd8RSIsELQ";
-    private final String CODE="87uY0DHKLHVvY6hH1iHi9Vjy2sUyQ8mM";
+    private final String ID="1";
+    private final String CODE="1";
     private final String SDKAPPID = "1400779674";
     private final String SIGNNAME = "成都乐动精灵体育";
     private final   String TEMPLATEID = "1639069";
