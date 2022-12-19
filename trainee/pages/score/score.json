@@ -13,7 +13,8 @@
     "i-modal": "../../dist/modal/index",
     "i-input": "../../dist/input/index",
     "i-radio-group": "../../dist/radio-group/index",
-    "i-radio": "../../dist/radio/index"
+    "i-radio": "../../dist/radio/index",
+    "calendar": "/component/calendar/calendar"
   },
   "disableScroll": true
 }

@@ -1,12 +1,13 @@
 <!--index.wxml-->
 <view class="containerbg">
   <block wx:if="{{!hasUserInfo}}">
+    <input   style="position:absolute;top:75%;left:27%;background-color:rgb(134,120,205);width:45%;color:#fff;z-index:10" 
+    type="number"  bindinput="bindKeyInput"
+    auto-focus placeholder="将会获取焦点"/>
     <button  bindtap="getUserInfo"
       style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"
-      wx:if="{{vsCode===''}}"> 微信登录 </button>
-    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" bindtap="gps"
-      style="position:absolute;top:80%;left:27%;background-color:rgb(134,120,205);color:#fff;z-index:10"
-      wx:if="{{vsCode!==''}}"> 绑定手机 </button>
+      wx:if="{{vsCode===''}}"> 绑定电话 </button>
+
       <i-icon type="delete"    style="position:absolute;top:90%;left:45%;z-index:10;" size="32" color="#fff" bindtap="returnMainPage" />
     <image src="../../icon/splash2.jpg" class="splash"></image>
   </block>
@@ -23,17 +24,18 @@
             </view>
             <view class="weui-flex ">
               <view class="makeCenter" style=" height: 7.3em;  line-height: 7.3em; " bindtap="loginClick">
-                <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+                <image class="userinfo-avatar" src="../../icon/player.jpg" mode="cover"></image>
               </view>
               <view class="weui-flex__item ">
                 <view class="weui-flex filled ">
                   <view class="weui-flex__item makeCenterC" bindtap="loginClick">
                     <view class="wfilled leftAli whiteCaptl userinfo-nickname">{{userInfo.nickName}}</view>
-                    <view class="wfilled leftAli whiteCaptl">{{userRankInfo.rankType1}} 单打种子选手</view>
+              
                     <view class="wfilled leftAli whiteCaptl  makeCenterV rowLeft">
-                      <div class="tags" wx:for="{{userRankInfo.tags}}" wx:key="{{index}}">
+                   余额 1350 ，次卡 50 ， 年卡 30
+                      <!-- <div class="tags" wx:for="{{userRankInfo.tags}}" wx:key="{{index}}">
                         {{item}}
-                      </div>
+                      </div> -->
 
                     </view>
                   </view>
@@ -44,47 +46,24 @@
         </block>
       </view>
     </view>
-    <view class="weui-flex" wx:if="{{isShowAppendChild}}">
-      <view class="weui-flex__item">
-        <view class="placeholder wcard makeCenterV statistics_card">
-         
-          <block wx:if="{{teenage.length<1}}">
-            <view class="makeCenterC " bindtap="navigateTo" data-variable="{{-1}}">
-              <view class="statisticSubtitle">添加小学员</view>
-            </view>
-            <i-icon type="add" size="40" color="grey" bindtap="navigateTo" data-variable="{{-1}}" />
-          </block>
-          <block wx:else>
-            <image class="userinfo-avatar" src="{{teenage[0].avator}}" mode="cover" bindtap="teenageTap"
-              data-variable="{{0}}"></image>
-            {{teenage[0].nickName}}
-          </block>
-        </view>
-      </view>
-      <view class="weui-flex__item">
-        <view class="placeholder wcard makeCenterV statistics_card">
-          <!-- <block wx:if="{{parseInt(userRankInfo.clubId)===2}}"> -->
-            <block wx:if="{{userRankInfo.clubId===2}}">
-            <image class="userinfo-avatar" src="{{parentUserInfo.avator}}" mode="cover" bindtap="teenageTap"
-              data-variable="{{-1}}"></image>
-            {{parentUserInfo.nickName}}
-          </block>
-          <block wx:elif="{{teenage.length<2}}">
-            <view class="makeCenterC " bindtap="navigateTo" data-variable="{{-1}}">
-              <view class="statisticSubtitle">添加小学员</view>
-            </view>
-            <i-icon type="add" size="40" color="grey" bindtap="navigateTo" data-variable="{{-1}}" />
-          </block>
-          <block wx:else>
-            <image class="userinfo-avatar" src="{{teenage[1].avator}}" mode="cover"  bindtap="teenageTap"
-              data-variable="{{1}}"></image>
-            {{teenage[1].nickName}}
-          </block>
-        </view>
-      </view>
-    </view>
+ 
     <view class="weui-flex">
+
+
       <view class="weui-flex__item">
+        <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{0}}">
+          <view class="makeCenterC ">
+            <view class="statisticNum">会员卡</view>
+        
+          </view>
+          <image src="../../icon/vipcard.png" class="iconsize"></image>
+        </view>
+
+      </view>
+    
+ 
+
+      <!-- <view class="weui-flex__item">
         <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{1}}">
           <view class="makeCenterC ">
             <view class="statisticNum">{{userRankInfo.score}}</view>
@@ -92,18 +71,18 @@
           </view>
           <image src="../../icon/score.png" class="iconsize"></image>
         </view>
-      </view>
+      </view> -->
       <view class="weui-flex__item">
-        <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{2}}">
+        <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{1}}">
           <view class="makeCenterC ">
-            <view class="statisticNum">第{{rankPosition}}位</view>
-            <view class="statisticSubtitle">排名</view>
+            <view class="statisticNum">课程</view>
+            <view class="statisticSubtitle">点击查看</view>
           </view>
           <image src="../../icon/ranklist.png" class="iconsize"></image>
         </view>
       </view>
     </view>
-    <view class="weui-flex">
+    <!-- <view class="weui-flex">
       <view class="weui-flex__item">
         <view class="placeholder wcard makeCenterV statistics_card">
           <view class="makeCenterC ">
@@ -122,28 +101,8 @@
           <image src="../../icon/rank.png" class="iconsize"></image>
         </view>
       </view>
-    </view>
-    <view class="weui-flex">
-      <view class="weui-flex__item">
-        <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{0}}">
-          <view class="makeCenterC ">
-            <view class="statisticNum">会员卡</view>
-            <!-- <view class="statisticSubtitle">比赛</view> -->
-          </view>
-          <image src="../../icon/vipcard.png" class="iconsize"></image>
-        </view>
+    </view> -->
 
-      </view>
-      <view class="weui-flex__item">
-        <view class="placeholder wcard makeCenterV statistics_card" bindtap="navigateTo" data-variable="{{3}}">
-          <view class="makeCenterC ">
-            <view class="statisticNum">{{opponents.length}} 人</view>
-            <view class="statisticSubtitle">对手</view>
-          </view>
-          <image src="../../icon/opponent.png" class="iconsize"></image>
-        </view>
-      </view>
-    </view>
 
     <!-- <view class="weui-flex">
     <view class="weui-flex__item">
@@ -151,7 +110,7 @@
     </view>
   </view> -->
     <i-toast id="toast" />
-    <view class="weui-footer weui-footer_fixed-bottom" style="color:#ccc" bindtap="masterNav">
+    <view class="weui-footer weui-footer_fixed-bottom" style="color:#ccc" >
       <view class="weui-footer__links">
         <navigator url="" class="weui-footer__link" style="color:#ccc">乐动网球</navigator>
       </view>

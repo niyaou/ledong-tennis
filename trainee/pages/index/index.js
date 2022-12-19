@@ -2,41 +2,38 @@
 //获取应用实例
 const app = getApp()
 var http = require('../../utils/http.js')
-const chooseLocation = requirePlugin('chooseLocation');
 const {
   $Toast
 } = require('../../dist/base/index');
 Page({
   data: {
     version: '1.1.8',
-    motto: 'Hello World',
+
+    number:getApp().globalData.number,
     userInfo: {
       nickName: "请登录",
       avatarUrl: "../../icon/user2.png"
     },
-    userLocation: {},
-    userRankInfo: {
-      rankType0: '暂无'
-    },
-    isShowAppendChild: false,
+
     vsCode: '',
-    matchCount: 0,
-    nearByUser: [],
-    rankPosition: 0,
-    opponents: [],
-    parentUserInfo: getApp().globalData.parentInfo,
-    parentRankInfo: getApp().globalData.parentRankInfo,
-    teenage: [],
-    nearByCourt: [],
-    tags: [],
+
+
     isSingle: true,
     hasUserInfo: true,
-    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     ratio: getApp().globalData.ratio,
     tabBarStatus: 1, // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯,
-    userList: []
+
+  },
+  bindKeyInput: function (e) {
+    this.setData({
+      number: e.detail.value
+    })
+    wx.setStorageSync('number', e.detail.value)
+    console.log('--------setStorageSync------',e.detail.value)
+    console.log('--------get------',wx.getStorageSync('number'))
   },
   //事件处理函数
   bindViewTap: function () {
@@ -48,29 +45,17 @@ Page({
   },
 
   initPlayerInfo() {
-    this.getUserInfoByJwt(app.globalData.jwt)
-    this.getUserRankInfo(app.globalData.jwt)
-    this.gps()
   },
   onLoad: function () {
     wx.showShareMenu({
       withShareTicket: true
     })
-    let updateManager = wx.getUpdateManager()
-    updateManager.onCheckForUpdate((e) => {
-      if (e.hasUpdate) {
-        updateManager.applyUpdate()
-      }
-    })
-    let that = this
     if (app.globalData.jwt) {
       this.initPlayerInfo()
-
     }
-
   },
   onShow: function () {
-    let that = this
+console.log('------number',this.data.number)
     if (app.globalData.jwt) {
       this.initPlayerInfo()
     }
@@ -102,45 +87,22 @@ Page({
     }
   },
   onConfirmEmitted() { },
-  onLocationTapped(e) {
-    const key = 'YIGBZ-BKCRF-JI5JV-NZ6JF-A5ANT-LSF2T'; //使用在腾讯位置服务申请的key
-    const referer = 'dd'; //调用插件的app的名称
 
-    const location = JSON.stringify({
-      latitude: e.detail[0].courtGPS ? e.detail[0].courtGPS.split(',')[0] : app.globalData.gps.split(',')[0],
-      longitude: e.detail[0].courtGPS ? e.detail[0].courtGPS.split(',')[1] : app.globalData.gps.split(',')[1],
-    });
-    const category = '体育户外,体育场馆,';
-    wx.navigateTo({
-      url: `plugin://chooseLocation/index?key=${key}&referer=${referer}&location=${location}&category=${category}`,
-      success: function (res) {
-        res.eventChannel.emit('acceptDataFromOpenerPage', {
-          data: res
-        })
-      }
-    })
-  },
-  getTotalGames(jwt) {
-    http.getReq('match/ld/matchedGames/count', jwt, (e) => {
-      this.setData({
-        matchCount: e.data
-      })
-    })
-  },
+
   getUserInfo: function (e) {
-    wx.getUserProfile({
-      desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
-      success: (res) => {
-        app.globalData.userInfo = res.userInfo
-        this.setData({
-          userInfo: res.userInfo,
-        })
-        wx.setStorageSync('parentUserInfo', res.userInfo)
-        wx.setStorageSync('hasUserInfo',true)
-        this.verified()
-        this.gps()
-      }
-    })
+    // wx.getUserProfile({
+    //   desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+    //   success: (res) => {
+    //     app.globalData.userInfo = res.userInfo
+    //     this.setData({
+    //       userInfo: res.userInfo,
+    //     })
+    //     wx.setStorageSync('parentUserInfo', res.userInfo)
+    //     wx.setStorageSync('hasUserInfo',true)
+    //     this.verified()
+    //     this.gps()
+    //   }
+    // })
 
   },
   verified() {
@@ -182,24 +144,7 @@ Page({
       }
     })
   },
-  getPhoneNumber(e) {
-    let that = this
-    http.postReq('user/phone', '', {
-      vscode: this.data.vsCode,
-      iv: e.detail.iv,
-      data: e.detail.encryptedData,
-    }, function (e) {
-      let jsonData = JSON.parse(e.data)
-      if (e.code == 0) {
-        that.setData({
-          openId: jsonData.purePhoneNumber,
-        })
-        wx.setStorageSync('parentOpenId', that.data.openId)
-        app.globalData.parentOpenId = that.data.openId
-        that.login()
-      }
-    })
-  },
+
   getUserInfoByJwt(jwt) {
     http.getReq('user/ldUserinfo', jwt, (e) => {
       this.setData({
@@ -225,235 +170,59 @@ Page({
       }
     })
   },
-  getTeenage(jwt) {
-    if (this.data.userRankInfo.clubId === 2) {
 
-      this.setData({
-        teenage: app.globalData.childRankInfo.filter(i => { return i.openId !== this.data.userRankInfo.openId })
-      })
-    } else if (this.data.userRankInfo.clubId === 1) {
-      http.getReq('user/ld/exploreTeenage', jwt, (e) => {
-        if (e.code === 0 && e.data.length > 0) {
-          this.setData({
-            teenage: e.data !== null ? e.data.filter(t => {
-              return t.parent.indexOf(app.globalData.openId) > -1
-            }) : []
-          })
-          app.globalData.childRankInfo = this.data.teenage
-          wx.setStorageSync('children', this.data.teenage)
-        }
-      })
-    }
 
-  },
-  getOpponentCount(jwt) {
-    http.getReq('match/ld/matchedGames/h2h/opponent', jwt, (e) => {
-      this.setData({
-        opponents: e.data !== null ? e.data : []
-      })
-    })
-  },
-  getRankPosition(jwt) {
-    http.getReq('rank/ldRankPosition', jwt, (e) => {
-      this.setData({
-        rankPosition: e.data
-      })
-    })
-  },
-  getUserRankInfo(jwt) {
-    let that = this
-    http.getReq('rank/ldRankInfo', jwt, (e) => {
-      let tags = []
-      if (typeof e.data.polygen !== 'undefined' && e.data.polygen !== null) {
-        tags = e.data.polygen.split(',')
-      }
-      if (tags[0] === '') {
-        tags = tags.splice(1, tags.length)
-      }
-      this.setData({
-        userRankInfo: {
-          openId: e.data.openId,
-          rankType1: e.data.rankType1,
-          rankType0: e.data.rankType0,
-          doubleRankType1: e.data.doubleRankType1,
-          doubleRankType0: e.data.doubleRankType0,
-          winRate: e.data.winRate,
-          score: e.data.score,
-          doubleRankPosition: e.data.doublePosition,
-          doubleWinRate: e.data.doubleWinRate,
-          doubleScore: e.data.doubleScore,
-          tags: tags,
-          parent: e.data.parent,
-          clubId: e.data.clubId
-        },
-        rankPosition: e.data.position
-      })
-      console.log('-------get user rank info ', this.data.userRankInfo)
-      app.globalData.userRankInfo = this.data.userRankInfo
-      app.globalData.openId = e.data.openId
-      if (parseInt(that.data.userRankInfo.clubId) === 1) {
-        app.globalData.parentRankInfo = this.data.userRankInfo
-        wx.setStorageSync('parentRankInfo', app.globalData.userRankInfo)
-        that.setData({
-          parentRankInfo: app.globalData.userRankInfo
-        })
-      } else if (parseInt(that.data.userRankInfo.clubId) === 2) {
-        app.globalData.parentRankInfo = wx.getStorageSync('parentRankInfo') || {}
-        that.setData({
-          parentRankInfo: app.globalData.parentRankInfo
-        })
-      }
-      this.getTeenage(app.globalData.jwt)
-      this.checkChild()
-      this.getTotalGames(jwt)
-      this.getOpponentCount(jwt)
-    })
-  },
   getNearByUser(jwt) {
-    // let that = this
-    // http.getReq(`user/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
-    //   that.setData({
-    //     nearByUser: e.data.filter(u => {
-    //       return u.id !== app.globalData.openId
-    //     })
-    //   })
-    // })
+
   },
   getNearByCourt(jwt) {
-    // let that = this
-    // http.getReq(`match/court/nearby?gps=${this.data.userLocation.latitude},${this.data.userLocation.longitude}`, jwt, (e) => {
-    //   that.setData({
-    //     nearByCourt: e.data
-    //   })
-    // })
-  },
-  gps() {
-    let that = this
-    wx.getLocation({
-      type: 'wgs84',
-      success(res) {
-        that.setData({
-          userLocation: {
-            latitude: res.latitude,
-            longitude: res.longitude
-          }
-        })
-        wx.setStorageSync('gps', `${res.latitude},${res.longitude}`)
-        app.globalData.gps = `${res.latitude},${res.longitude}`
-      }
-    })
 
   },
-  checkChild() {
-    this.setData({
-      isShowAppendChild: typeof this.data.userRankInfo.clubId !== 'undefiled' && parseInt(this.data.userRankInfo.clubId) !== 0
-    })
 
-  },
-  switchMode() {
-    this.setData({
-      isSingle: !this.data.isSingle
-    })
-    var ladderComp = this.selectComponent('#ladder');
-    if (ladderComp) {
-      ladderComp.switchMode(this.data.isSingle)
-    }
-    var matchComp = this.selectComponent('#match');
-    if (matchComp) {
-      matchComp.switchMode(this.data.isSingle)
-    }
-  },
-  masterNav(e) {
-    if (app.globalData.userRankInfo.clubId >= 3) {
-      wx.navigateTo({
-        url: '../../pages/master/player?clubId='+app.globalData.userRankInfo.clubId
-      })
-    }
-  },
-  teenageTap(event) {
-    if (event.currentTarget.dataset.variable !== -1) {
-      // let child = app.globalData.childRankInfo[event.currentTarget.dataset.variable]
-      let child = this.data.teenage[event.currentTarget.dataset.variable]
-      let user = {
-        token: child.id,
-        nickName: child.nickName,
-        avator: child.avator,
-        gps: app.globalData.parentInfo.gps
-      }
-      this.login(user)
-    } else {
-      let parent = app.globalData.parentInfo
-      let user = {
-        token: app.globalData.parentOpenId,
-        nickName: parent.nickName,
-        avator: parent.avatarUrl,
-        gps: parent.gps
-      }
-      this.login(user)
-    }
-  },
+
+
+
   navigateTo(event) {
-    if (!this.checkingLogin()) {
-      this.setData({
-        hasUserInfo: false
-      })
-      console.log('------navigateTo-----',this.data.hasUserInfo)
-      return
-    }
+    // if (!this.checkingLogin()) {
+    //   this.setData({
+    //     hasUserInfo: false
+    //   })
+    //   console.log('------navigateTo-----',this.data.hasUserInfo)
+    //   return
+    // }
+
     if (event.currentTarget.dataset.variable === -1) {
-      if (parseInt(this.data.userRankInfo.clubId) !== 1) {
-        $Toast({
-          content: '请切换到家长账号',
-          type: 'warning'
-        });
-      } else {
+      // if (parseInt(this.data.userRankInfo.clubId) !== 1) {
+      //   $Toast({
+      //     content: '请切换到家长账号',
+      //     type: 'warning'
+      //   });
+      // } else {
         wx.navigateTo({
           url: '../../pages/teenage/create'
         })
-      }
+ 
 
     } else
       if (event.currentTarget.dataset.variable === 0) {
-        if (this.data.userRankInfo.clubId === 0) {
-          $Toast({
-            content: '请联系俱乐部管理员进行会员验证',
-            type: 'warning'
-          });
-          return
-        }
-        if (typeof this.data.userInfo.prepaidCard==='undefined') {
-          $Toast({
-            content: '请联系俱乐部管理员绑定会员卡',
-            type: 'warning'
-          });
-          return
-        }
         wx.navigateTo({
           url: '../../pages/prepaidCard/cardLog?cardId='+this.data.userInfo.prepaidCard
         })
-      } else
-        if (event.currentTarget.dataset.variable === 1) {
+      } else        if (event.currentTarget.dataset.variable === 1) {
           wx.navigateTo({
             url: '../../pages/score/score'
           })
-        } else
-          if (event.currentTarget.dataset.variable === 2) {
-            if (this.data.userRankInfo.clubId === 0) {
-              $Toast({
-                content: '请联系俱乐部管理员进行会员验证',
-                type: 'warning'
-              });
-              return
-            }
-            wx.navigateTo({
-              url: '../../pages/player/player?rankPosition=' + this.data.rankPosition
-            })
-          } else
-            if (event.currentTarget.dataset.variable === 3) {
-              wx.navigateTo({
-                url: '../../pages/h2h/h2h?winRate=' + this.data.userRankInfo.winRate
-              })
-            }
-    // event.currentTarget.dataset.variable;
+        } 
+        // else         if (event.currentTarget.dataset.variable === 2) {
+   
+        //     wx.navigateTo({
+        //       url: '../../pages/player/player?rankPosition=' + this.data.rankPosition
+        //     })
+        //   } else            if (event.currentTarget.dataset.variable === 3) {
+        //       wx.navigateTo({
+        //         url: '../../pages/h2h/h2h?winRate=' + this.data.userRankInfo.winRate
+        //       })
+        //     }
+ 
   },
 })
