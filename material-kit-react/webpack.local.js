@@ -82,15 +82,25 @@ module.exports = env => {
         //   }
         // },
         '/api': {
-          target: 'https://www.ledongtennis.cn:9968',
+          target: 'http://www.ledongtennis.cn:9968',
           pathRewrite: { '^/api': '' },
           changeOrigin: true,
           secure: false,
           headers: {
-            host: "https://www.ledongtennis.cn:9968",
-            origin: "https://www.ledongtennis.cn:9968"
+            host: "http://www.ledongtennis.cn:9968",
+            origin: "http://www.ledongtennis.cn:9968"
           }
         },
+        // '/api': {
+        //   target: 'https://www.ledongtennis.cn:9968',
+        //   pathRewrite: { '^/api': '' },
+        //   changeOrigin: true,
+        //   secure: false,
+        //   headers: {
+        //     host: "https://www.ledongtennis.cn:9968",
+        //     origin: "https://www.ledongtennis.cn:9968"
+        //   }
+        // },
         //env test
         // '/api': {
         //   target: 'http://10.133.34.21:31107',
