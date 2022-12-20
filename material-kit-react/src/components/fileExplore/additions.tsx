@@ -125,7 +125,7 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 
 function Additions(props) {
 
-  const { areas, users, selectCourse, createSuccess } = useSelector((state) => state.domination)
+  const { areas, users, selectCourse, createSuccess,coach,court } = useSelector((state) => state.domination)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [startTime, setStartTime] = React.useState(new Date());
   const [endTime, setEndTime] = React.useState(new Date);
@@ -155,9 +155,7 @@ function Additions(props) {
   useEffect(() => {
 
     if (users && users.length > 0) {
-      let r = users.filter(u => u.prepaidCard).map(user => { return user.prepaidCard })
-      console.log("🚀 ~ file: additions.tsx ~ line 154 ~ useEffect ~ r", r)
-      setUserOptions(r)
+      setUserOptions(users.map(u=>u.name))
     }
 
   }, [users])
@@ -318,7 +316,7 @@ function Additions(props) {
 
 
   const memberItem = (m, idx) => {
-    let mi = find(users, { 'prepaidCard': m.name })
+    let mi = find(users, { 'name': m.name })
     console.log('------memberItem----',m)
     return (<Stack
       direction="row"
@@ -333,7 +331,7 @@ function Additions(props) {
           color: 'rgba(0, 0, 0, 0.6)',
           minWidth: '50px',
         }} >
-        {mi.prepaidCard}
+        {mi.name}
       </Typography>
       {/* {m.type !== 1 && <Typography variant="subtitle1"
         id="outlined-password-input"
@@ -354,7 +352,7 @@ function Additions(props) {
           let a = labelArr.concat()
           setLabelArr(a)
           let member = courseEdit.membersObj
-          member[mi.id] = [parseInt(e.target.value), 0, 0]
+          member[mi.number] = [parseInt(e.target.value), 0, 0]
           let after = { ...courseEdit, membersObj: member }
     
           setCourseEdit(after)
@@ -376,7 +374,7 @@ function Additions(props) {
           labelArr[pos].times = parseInt(e.target.value)
 
           let member = courseEdit.membersObj
-          member[mi.id] = [0, parseInt(e.target.value), 0]
+          member[mi.number] = [0, parseInt(e.target.value), 0]
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -400,7 +398,7 @@ function Additions(props) {
           labelArr[pos].annualTimes = parseInt(e.target.value)
 
           let member = courseEdit.membersObj
-          member[mi.id] = [0, 0,parseInt(e.target.value)]
+          member[mi.number] = [0, 0,parseInt(e.target.value)]
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -437,7 +435,7 @@ function Additions(props) {
             labelArr[pos].type = 2
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.id] = [0, 1, 0]
+            member[mi.number] = [0, 1, 0]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -457,7 +455,7 @@ function Additions(props) {
             labelArr[pos].type = 3
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.id] = [0, 0, 1]
+            member[mi.number] = [0, 0, 1]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -499,16 +497,17 @@ function Additions(props) {
   // new Date(),
 
   const appendArr = (item) => {
+    console.log('-------',item)
     let ids = labelArr.findIndex(e => e.name === item)
     if (ids >= 0) {
       return
     }
-    let member = users.find(u => u.prepaidCard === item)
+    let member = users.find(u => u.name === item)
     labelArr.push({ name: item, type: 1, spendFee: 0, times: 0 ,annualTimes:0})
     let a = labelArr.concat()
     let temp = {}
     temp = Object.assign(temp, {
-      [member.id]: [0, courseEdit.spendingTime]
+      [member.number]: [0, courseEdit.spendingTime]
     })
     let after = { ...courseEdit, membersObj: { ...courseEdit.membersObj, ...temp } }
 
@@ -538,7 +537,7 @@ function Additions(props) {
           setCourseEdit(after)
         }}
         value={[courseEdit.court]}>
-        {areas.map((dict, index) => { return (<MenuItem key={`select2-${index}`} value={dict}>{dict}</MenuItem>) })}
+        {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
       </Select>
     </FormControl>}
 
@@ -554,7 +553,7 @@ function Additions(props) {
           setCourseEdit(after)
         }}
         value={[courseEdit.coach]}>
-        {users && users.filter((user) => user.coach === 1 || user.clubId === 3).map((dict, index) => { return (<MenuItem key={`select-${index}`} value={dict.id}>{dict.realName}</MenuItem>) })}
+        {coach && coach.map((dict, index) => { return (<MenuItem key={`select-${dict.number}`} value={dict.number}>{dict.name}</MenuItem>) })}
       </Select>
     </FormControl>}
 
@@ -647,7 +646,6 @@ function Additions(props) {
         }}
         onChange={(event: any, newValue: string | null) => {
           console.log("🚀 ~ file: additions.tsx ~ line 589 ~ Additions ~ newValue", newValue)
-          // appendArr( find(users, { 'prepaidCard': newValue }))
           if (newValue) {
             appendArr(newValue)
           }

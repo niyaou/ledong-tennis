@@ -80,19 +80,19 @@ function RecentCourse(props) {
     dispatch(exploreRecentCourse({ page: 0, num: 50 }))
   }, [])
 
-  useEffect(() => {
-    if (loadError) {
-      navigate('/login')
-    }
-  }, [loadError])
+  // useEffect(() => {
+  //   if (loadError) {
+  //     navigate('/login')
+  //   }
+  // }, [loadError])
 
 
   const courseItem = (item, index) => {
 
     return (
-      <Paper key={`item-${index}`} elevation={1} sx={{
+      <Paper key={`item-course-${item.id}`} elevation={1} sx={{
         minWidth: '850px',
-        background: selectCourseItem && selectCourseItem.coach === item.coach && selectCourseItem.start === item.start ? 'rgb(0,0,0,0.05)' : 'transparent',
+        background: selectCourseItem && selectCourseItem.coach.number === item.coach.number && selectCourseItem.startTime === item.startTime ? 'rgb(0,0,0,0.05)' : 'transparent',
         '& :hover': { background: 'rgb(0,0,0,0.1)' }
       }}>
         <Stack
@@ -125,14 +125,14 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '80px',
                 }} >
-                {item.court}
+                {item.court.name}
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
 
                 }} >
-                {item.descript}
+                {item.description}
               </Typography>
             </Stack>
 
@@ -151,21 +151,21 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.start}
+                {item.startTime}
               </Typography>
             <Typography gutterBottom variant="body2"
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.spendingTime}
+                {item.duration}
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.end}
+                {item.endTime}
               </Typography>
             </Stack>
 
@@ -183,7 +183,7 @@ function RecentCourse(props) {
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
                 }} >
-                {findCoach(item.coach)}
+                {item.coach.name}
               </Typography>
               <Stack
 
@@ -196,13 +196,17 @@ function RecentCourse(props) {
                 }}
               >
                 {item.member.map((m, idx) => (
-                  <Typography gutterBottom variant="body2"
-                    key={`${m}a5-${index}`}
-                    sx={{
-                      color: 'rgba(0, 0, 0, 0.6)',
-                    }} >
-                    {findName(m)}
-                  </Typography>
+                  <Button variant="outlined" size="small"   key={`${m}a5-${m.number}`}
+                    onClick={() => {
+                    // dispatch(selectCourse(item))
+                  }}>   {m.name}</Button>
+                  // <Typography gutterBottom variant="body2"
+                  
+                  //   sx={{
+                  //     color: 'rgba(0, 0, 0, 0.6)',
+                  //   }} >
+                 
+                  // </Typography>
                 ))}
               </Stack>
             </Stack>
@@ -220,11 +224,11 @@ function RecentCourse(props) {
             <Button variant="outlined" size="small" onClick={() => {
               dispatch(selectCourse(item))
             }}>编辑</Button>
-            {/* <Button variant="outlined" size="small"
+            <Button variant="outlined" size="small"
              onClick={() => {
               // dispatch(selectCourse(item))
             }}
-            >删除</Button> */}
+            >删除</Button>
           </Stack>
         </Stack>
       </Paper>)

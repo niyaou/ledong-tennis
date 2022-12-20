@@ -77,7 +77,7 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 
 function UserManagement(props) {
   const CircleButton = styled(Button)({ borderRadius: '20px', })
-  const {areas, users } = useSelector((state) => state.domination)
+  const {areas, users,court } = useSelector((state) => state.domination)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(true);
   const [treeSets, setTreeSets] = React.useState({ path: '', raw: '' });
@@ -297,10 +297,10 @@ function UserManagement(props) {
         alignItems="center"
         spacing={0}
         sx={{ width: '100%' ,    marginBottom:5}}    >
-        {areas.map((a, ids) => {return (
+        {court.map((a, ids) => {return (
           <CircleButton
-            key={ids}
-            value={a}
+            key={a.name}
+            value={a.name}
             size="small"
             variant={1 === 1 ? "contained" : "outlined"}
             sx={{ margin: '5px' }}
@@ -317,7 +317,7 @@ function UserManagement(props) {
               }
             }
           >
-            {a}
+            {a.name}
           </CircleButton>
         )})}
 

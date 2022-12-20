@@ -51,17 +51,17 @@ function DominationPage() {
 
   useEffect(() => {
    
-      dispatch(userAction())
+      // dispatch(userAction())
   
   }, []) 
   
 
-  useEffect(() => {
-  if(loginError){
-    navigate('/login')
-    return
-  }
-  }, [loginError])
+  // useEffect(() => {
+  // if(loginError){
+  //   navigate('/login')
+  //   return
+  // }
+  // }, [loginError])
 
   useEffect(() => {
     if (loadError) {

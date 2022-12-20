@@ -53,33 +53,12 @@ export const login = (auth: UserFormValues) => async dispatch => {
     })
     try {
 
-        // const url = process.env.HTTP_ZUUL
-        // const clientId = 'DataSet20211202'
-        // const res = await Axios.get(`/api/pangoo-usersystem-v2/publicKey`)
 
-        // const jSEncrypt = new JSEncrypt()
-        // const code = res.data.data
-        // jSEncrypt.setPublicKey(code)
-        // // 获取公钥对密码进行加密：本地系统时间yyyyMMddHHmmss+明文密码
-
-        // const username = jSEncrypt.encrypt(dateTime() + auth.username)
-        // const password = jSEncrypt.encrypt(dateTime() + auth.password)
-        // let loginParams = { type: 0, password, username, clientId }
         let formdata = new FormData()
     
         formdata.append("keycode",  auth.password)
         const user = await Axios.post(`/api/user/ldAdminLogin?keycode=${auth.password}`)
-        // const user = await Axios.post(`/api/pangoo-data-set/auth/account`, loginParams)
-
-        // const user ={data:{code:-1,data:{token:'',login:'',nickName:''}},msg:''}
-        // if(auth.username!=='ledong'||auth.password!=='ledong123'){
-        //     dispatch({
-        //         type: UserActionTypes.USERS_ERROR,
-        //         payload:'登陆失败',
-        //     })
-        //     return
-        // }
-        // if(user.data.code !== 200){
+        
         if (user.data.code !== 200 && user.data.code !== 0) {
             localStorage.removeItem(USER_INFO_KEY)
             dispatch({
@@ -106,6 +85,49 @@ export const login = (auth: UserFormValues) => async dispatch => {
     }
 
 }
+
+
+
+
+export const createUserAccount = (name,number) => async dispatch => {
+    dispatch({
+        type: UserActionTypes.CREATE_USERS,
+    })
+    try {
+
+        let formdata = new FormData()
+    
+        formdata.append("name",  name)
+        formdata.append("number",  number)
+        const user = await Axios.post(`/api/user/register`,formdata)
+  
+        if (user.status!== 200 ) {
+          
+            dispatch({
+                type: UserActionTypes.CREATE_USERS_ERROR,
+                payload: user.data.message,
+            })
+            return
+        }
+
+       
+        dispatch({
+            type: UserActionTypes.CREATE_USERS_SUCCESS,
+            payload: user.data.user
+        })
+    }
+    catch (e) {
+       
+        dispatch({
+            type: UserActionTypes.CREATE_USERS_ERROR,
+            payload: e.response.data.message,
+        })
+
+    }
+
+}
+
+
 
 
 

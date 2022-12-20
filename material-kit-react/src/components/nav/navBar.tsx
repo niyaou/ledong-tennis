@@ -87,7 +87,7 @@ function NavBar() {
                 navigate("/")
                 dispatch(logOut())
             }}>logout</Button>) : (<Button variant="contained" onClick={() => {
-                navigate("/login")
+                // navigate("/login")
             }}>
                 login
             </Button>)

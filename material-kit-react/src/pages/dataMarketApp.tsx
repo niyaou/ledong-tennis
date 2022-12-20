@@ -51,62 +51,11 @@ function PangooDMApplication() {
                     <Routes>
                         <Route element={<NavBar />}>
                             <Route path="/" element={
-                                <RequireAuth>
                                     <DominationPage />
-                                </RequireAuth>
-                       
                             } />
-                             {/* <Route path="/audit" element={
-                                 <RequireAuth>
-                                <AuditDataSet />
-                                 </RequireAuth>
-                            } /> */}
-                            {/* <Route path="/explore" element={
-                                // <RequireAuth>
-                                    <ExploreDataSet />
-                                // </RequireAuth>
-                            } /> */}
-                            {/* <Route path="/explore/:classes" element={
-                                <RequireAuth>
-                                    <ExploreDataSet />
-                                </RequireAuth>
-                            } /> */}
-                            {/* <Route path="/editlist" element={
-                                <RequireAuth>
-                                    <ListEditor />
-                                </RequireAuth>
-                            } /> */}
-                             {/* <Route path="/permission" element={
-                                <RequireAuth>
-                                    <PermissionApply />
-                                </RequireAuth>
-                            } /> */}
-                            {/* <Route path="/dataset" element={
-                                <RequireAuth>
-                                    <DataSetDetailContainer />
-                                </RequireAuth>
-                            } > */}
-                                {/* <Route path=":datasetId" element={<RequireAuth>
-                                    <SpecificationDataSet />
-                                </RequireAuth>
-                                } />
-                            </Route> */}
-                            {/* <Route path="/create" element={
-                                <RequireAuth>
-                                    <CreateDataSet />
-                                </RequireAuth>
-                            } /> */}
-                            {/* <Route path="/create/:datasetId" element={
-                                <RequireAuth>
-                                    <CreateDataSet />
-                                </RequireAuth>
-                            } /> */}
-                            {/* <Route path="/edit/:datasetId" element={
-                                <RequireAuth>
-                                    <EditDatasetPage />
-                                </RequireAuth>
-                            } /> */}
-                            <Route path="/login" element={<LoginPage />} />
+                            
+                            
+                            {/* <Route path="/login" element={<LoginPage />} /> */}
                         </Route>
                     </Routes>
                 </BrowserRouter>

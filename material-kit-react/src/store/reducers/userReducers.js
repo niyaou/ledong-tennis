@@ -10,7 +10,7 @@
 import { UserActionTypes } from '../types'
 import { fetching } from '../../common/interface'
 const initialState = {
-    userInfo: {},
+    userInfo: {number:"15008292881",name:"席老师"},
     appliesList: [],
     publickey: '',
     isDirectToDomanitaion: false,
@@ -139,14 +139,14 @@ export default function (state = initialState, action) {
 
                 
 
-            case UserActionTypes.APPLY_PERMISSION_OPERATE:
+            case UserActionTypes.CREATE_USERS:
                 return {
                     ...state,
                     loading: true,
                     loadError: false,
                     errorMsg: '',
                 }
-            case UserActionTypes.APPLY_PERMISSION_OPERATE_SUCCESS:
+            case UserActionTypes.CREATE_USERS_SUCCESS:
                 return {
                     ...state,
                     loadError: false,
@@ -154,7 +154,7 @@ export default function (state = initialState, action) {
                     success:true,
                     loading: false
                 }
-            case UserActionTypes.APPLY_PERMISSION_OPERATE_ERROR:
+            case UserActionTypes.CREATE_USERS_ERROR:
                 return {
                     ...state,
                     loadError: true,

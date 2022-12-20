@@ -30,6 +30,8 @@ const initialState = {
     selectCourse: null,
     recentPrepayedCard: null,
     createSuccess:false,
+    coach:[],
+    court:[],
 
 
 }
@@ -43,9 +45,9 @@ export const exploreUsersAction = createAsyncThunk(
     async (params, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
-            const response = await Axios.get(`/api/user/ldUserList`)
+            const response = await Axios.get(`/api/user/`)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 40 ~ response", response)
-            if (response.data.code !== 0) {
+            if (response.status !== 200) {
                 return rejectWithValue(response.data.message)
             }
             return response.data;
@@ -55,12 +57,68 @@ export const exploreUsersAction = createAsyncThunk(
     }
 );
 
+
+
+
+
+
+
+export const exploreCoachAction = createAsyncThunk(
+    'lduser/coach',
+    async (params, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+            const response = await Axios.get(`/api/user/coach/`)
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 40 ~ response", response)
+            if (response.status !== 200) {
+                return rejectWithValue(response.data.message)
+            }
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+export const exploreCourtAction = createAsyncThunk(
+    'lduser/court',
+    async (params, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+            const response = await Axios.get(`/api/user/court/`)
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 40 ~ response", response)
+            if (response.status !== 200) {
+                return rejectWithValue(response.data.message)
+            }
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+
+
+
+
+
 export const exploreRecentCourse = createAsyncThunk(
     'lduser/course',
     async (params, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
-            const response = await Axios.get(`/api/prepaidCard/ld/recentCourse?page=${params.page}&num=${params.num}`)
+            let formdata = new FormData()
+    
+       
+
+
+            // payload.isExperience=0
+            // payload.isDealing=0
+            var startTime=moment().subtract(180,'days').format('YYYY-MM-DD HH:mm:ss')
+            formdata.append('startTime',startTime)
+
+            const response = await Axios.get(`/api/prepaidCard/course/total?startTime=${startTime}`)
             return response.data;
         } catch (err) {
             return rejectWithValue(err)
@@ -120,37 +178,32 @@ export const createCard = createAsyncThunk(
     'lduser/createCard',
     async (payload, { rejectWithValue }) => {
         try {
-            payload.isExperience=0
-            payload.isDealing=0
+
+            let formdata = new FormData()
+    
+       
+
+
+            // payload.isExperience=0
+            // payload.isDealing=0
             payload.startTime=moment(payload.startTime).format('YYYY-MM-DD HH:mm')
             payload.endTime=moment(payload.endTime).format('YYYY-MM-DD HH:mm')
-            // payload.spendingTime=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
-            // let payload={ 
-                // startTime: this.data.startTime,
-                // endTime: this.data.endTime,
-                // coach: this.data.coach[this.data.index].openId,
-                // isExperience: this.data.experinced?1:0,
-                // isDealing: this.data.isDealing?1:0,
-                // spendingTime:  this.data.timeArray[this.data.timeIndex] ,
-                // courtSpend: this.data.coursFee,
-                // coachSpend: this.data.coachSpend,
-                // descript:this.data.descript,
-                // court: this.data.array[this.data.courtIndex],
-                // grade: this.data.gradeArray[this.data.gradeIndex],
-                // membersObj: JSON.stringify( membobj),
-            // }
-      
 
-            // throw new Error('Something bad happened');
+            formdata.append("startTime",    payload.startTime)
+            formdata.append("endTime",    payload.endTime)
+            formdata.append("coachName",  payload.coach)
+            formdata.append("spendingTime", payload.spendingTime  )
+            formdata.append("courtName",  payload.court )
+            formdata.append("descript",  payload.descript )
+            formdata.append("membersObj", JSON.stringify( payload. membersObj))
 
 
-
-            const response = await Axios.request({method:'post',url:`/api/course/ld/createCourse`,params:payload})
+            const response = await Axios.post(`/api/prepaidCard/course/create`,formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
-            if (response.data.code !== 0) {
+            if (response.status !== 200) {
                 return rejectWithValue(response.data.message)
             }
-            return response.data.data;
+            return response.data;
             // return {};
         } catch (err) {
             return rejectWithValue(err)
@@ -167,21 +220,7 @@ export const updateCourese= createAsyncThunk(
             // payload.isDealing=0
             payload.startTime=moment(payload.startTime).format('YYYY-MM-DD HH:mm')
             payload.endTime=moment(payload.endTime).format('YYYY-MM-DD HH:mm')
-            // payload.spendingTime=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
-            // let payload={ 
-                // startTime: this.data.startTime,
-                // endTime: this.data.endTime,
-                // coach: this.data.coach[this.data.index].openId,
-                // isExperience: this.data.experinced?1:0,
-                // isDealing: this.data.isDealing?1:0,
-                // spendingTime:  this.data.timeArray[this.data.timeIndex] ,
-                // courtSpend: this.data.coursFee,
-                // coachSpend: this.data.coachSpend,
-                // descript:this.data.descript,
-                // court: this.data.array[this.data.courtIndex],
-                // grade: this.data.gradeArray[this.data.gradeIndex],
-                // membersObj: JSON.stringify( membobj),
-            // }
+
       
             // throw new Error('Something bad happened');
             const response = await Axios.request({method:'post',url:`/api/course/ld/uploadCourse`,params:payload})
@@ -204,22 +243,7 @@ export const updateExpiredTime = createAsyncThunk(
     async (payload, { rejectWithValue }) => {
         try {
 
-            // payload.time=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
-            // let payload={ 
-                // startTime: this.data.startTime,
-                // endTime: this.data.endTime,
-                // coach: this.data.coach[this.data.index].openId,
-                // isExperience: this.data.experinced?1:0,
-                // isDealing: this.data.isDealing?1:0,
-                // spendingTime:  this.data.timeArray[this.data.timeIndex] ,
-                // courtSpend: this.data.coursFee,
-                // coachSpend: this.data.coachSpend,
-                // descript:this.data.descript,
-                // court: this.data.array[this.data.courtIndex],
-                // grade: this.data.gradeArray[this.data.gradeIndex],
-                // membersObj: JSON.stringify( membobj),
-            // }
-      
+        
 
             // throw new Error('Something bad happened');
             const response = await Axios.request({method:'post',url:`/api/prepaidCard/ld/updateExpireTime`,params:payload})
@@ -240,21 +264,6 @@ export const updateChargeAnnotation = createAsyncThunk(
     async (payload, { rejectWithValue }) => {
         try {
 
-            // payload.time=moment(payload.endTime,'YYYY-MM-DD HH:mm').diff(moment(payload.startTime,'YYYY-MM-DD HH:mm'),'minutes')
-            // let payload={ 
-                // startTime: this.data.startTime,
-                // endTime: this.data.endTime,
-                // coach: this.data.coach[this.data.index].openId,
-                // isExperience: this.data.experinced?1:0,
-                // isDealing: this.data.isDealing?1:0,
-                // spendingTime:  this.data.timeArray[this.data.timeIndex] ,
-                // courtSpend: this.data.coursFee,
-                // coachSpend: this.data.coachSpend,
-                // descript:this.data.descript,
-                // court: this.data.array[this.data.courtIndex],
-                // grade: this.data.gradeArray[this.data.gradeIndex],
-                // membersObj: JSON.stringify( membobj),
-            // }
       
 
             // throw new Error('Something bad happened');
@@ -310,7 +319,7 @@ export const exploreSlice = createSlice({
             })
             .addCase(exploreUsersAction.fulfilled, (state, action) => {
                 state.loading = false
-                state.users = action.payload.data
+                state.users = action.payload
                 // state.favourite = action.payload.data.favourite
                 // state.hot = action.payload.data.hot
                 // state.recommend = action.payload.data.recommend
@@ -328,7 +337,7 @@ export const exploreSlice = createSlice({
             })
             .addCase(exploreRecentCourse.fulfilled, (state, action) => {
                 state.loading = false
-                state.course = action.payload.data
+                state.course = action.payload.content
 
             });
         builder
@@ -446,6 +455,40 @@ export const exploreSlice = createSlice({
             .addCase(retreatRecentCourse.fulfilled, (state, action) => {
                 state.loading = false
                 state.createSuccess = true
+            });
+
+
+        builder
+            .addCase(exploreCoachAction.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(exploreCoachAction.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(exploreCoachAction.fulfilled, (state, action) => {
+                state.loading = false
+                state.coach = action.payload
+            });
+        builder
+            .addCase(exploreCourtAction.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(exploreCourtAction.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(exploreCourtAction.fulfilled, (state, action) => {
+                state.loading = false
+                state.court = action.payload
             });
     },
 });

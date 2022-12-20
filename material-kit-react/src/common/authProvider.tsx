@@ -16,14 +16,14 @@ import { useSelector } from "../redux/hooks";
 
  const RequireAuth = ( {children} )=>  {
   const user =  useSelector((state)=>state.users)
-  let location = useLocation();
+  // let location = useLocation();
   
-  if (user.userInfo ) {
+  // if (user.userInfo ) {
     return children;
-  }
+  // }
 
-  const urlTo = "/login"
-  return (<Navigate replace to={urlTo} state={{ ...location.state, from: location }} />);
+  // const urlTo = "/login"
+  // return (<Navigate replace to={urlTo} state={{ ...location.state, from: location }} />);
 }
 
 

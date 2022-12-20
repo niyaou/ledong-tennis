@@ -17,17 +17,7 @@ import { makeStyles, createStyles } from '@mui/styles';
 import FolderIcon from '@mui/icons-material/Folder';
 import { styled } from '@mui/material/styles';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardTimePicker,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import FolderIconUrl from '../../assert/folderIcon.png'
-import CircularProgress, {
-    circularProgressClasses,
-    CircularProgressProps,
-} from '@mui/material/CircularProgress';
+
 import CachedIcon from '@mui/icons-material/Cached';
 import { useSelector } from "../../redux/hooks";
 import { useSnackbar } from 'notistack';
@@ -39,6 +29,7 @@ import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
 import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard, updateExpiredTime ,updateChargeAnnotation,retreatRecentCourse} from '../../store/slices/dominationSlice'
+import {createUserAccount} from '../../store/actions/usersActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -67,9 +58,13 @@ function SearchTask(props) {
     const [checked, setChecked] = React.useState<readonly number[]>([]);
     const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3]);
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
-    const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
+    // const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const { areas, users, sortValue, recentPrepayedCard, createSuccess } = useSelector((state) => state.domination)
+
+    const { success } = useSelector((state) => state.users)
+
+
     const [prepaidCard, setPrepaidCard] = React.useState({ balance: 0, balanceTimes: 0, expiredTime: null, restCount: 0 });
     const [courseList, setCourseList] = React.useState([]);
     const [detailMode, setDetailMode] = React.useState(false);
@@ -80,16 +75,21 @@ function SearchTask(props) {
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.expiredTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
+    const [create, setCreate] = React.useState(0);//0 关；  1 显示
+
     const [changeFee, setChangeFee] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeDesc, setChangeDesc] = React.useState('');
+
+    const [createUser, setCreateUser] = React.useState({number:'',name:''});//创建用户数据
     useEffect(() => {
 
         if (users) {
+            console.log('-----user',users)
             setDetailMode(false)
             let sorts = users.concat()
             sorts.sort((a, b) => {
-                return pinyin.pinyinUtil.getFirstLetter((a.realName || a.nickName).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.realName || b.nickName).substring(0, 1)).toUpperCase() ? 1 : -1
+                return pinyin.pinyinUtil.getFirstLetter((a.name ).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.name).substring(0, 1)).toUpperCase() ? 1 : -1
             })
             setUserSort(sorts)
         }
@@ -105,6 +105,7 @@ function SearchTask(props) {
             console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
         }
     }, [prepaidCard])
+
 
     useEffect(() => {
         if (open !== 0 || expiredTime!=='') {
@@ -123,6 +124,19 @@ function SearchTask(props) {
     }, [createSuccess])
 
 
+    useEffect(() => {
+        if (success) {
+            setCreate(0)
+            enqueueSnackbar(`添加会员成功`, {
+                variant: 'success',
+                autoHideDuration: 3000,
+              })
+              dispatch(exploreUsersAction())
+        }
+    }, [success])
+
+    
+
 
     useEffect(() => {
         if (recentPrepayedCard) {
@@ -134,7 +148,7 @@ function SearchTask(props) {
             setExpiredTime(card.expiredTime || '')
             setAnnualTimes(card.restCount || 0)
             setCourseList(courselist)
-            console.log("🚀 ~ file: searchTask.tsx ~ line 733 ~ SearchTask ~ prepaidCard", card, courselist)
+            console.log("🚀 ~ file: searchTask.tsx ~   1line 733 ~ SearchTask ~ prepaidCard", card, courselist)
         }
     }, [recentPrepayedCard])
 
@@ -161,8 +175,8 @@ function SearchTask(props) {
                 }}
                 onClick={() => {
                     setOpen(1)
-                    console.log('---------------------11--------')
-                    // dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
+                    console.log('-------1------11--------11----1----')
+                    // dispatch(updateEx1piredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
                 }}
             >
                 充值卡余额：{prepaidCard.balance}
@@ -267,7 +281,7 @@ function SearchTask(props) {
                             dispatch(exploreRecentCard(user.prepaidCard))
                         }
                     }}>
-                    <Avatar alt="Remy Sharp" src={user.avator} />
+                    {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
 
 
                     <Typography gutterBottom variant="body2"
@@ -277,9 +291,26 @@ function SearchTask(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
                         }} >
-                        {user.realName || user.nickName}
+                        {user.name}  
                     </Typography>
-
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
+                        }} >
+                       电话 {user.number} 
+                    </Typography>
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
+                        }} >
+                      余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}
+                    </Typography>
                 </Stack>
 
 
@@ -343,6 +374,50 @@ function SearchTask(props) {
                         onClick={() => {
                             dispatch(updateChargeAnnotation({ openId: customerOpenId, coachId: '13551226924', cardId: customerName, amount: parseInt(changeFee), time: moment(expiredTime).format('YYYY-MM-DD'), times: parseInt(changeCount), description: changeDesc }))
                         }}>确定充值</Button>
+                </Stack>
+            </Box>
+        </Modal>
+    )
+
+
+
+    
+    const createModal = (
+        <Modal
+            open={create !== 0}
+            onClose={() => { setCreate(0) }}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style} >
+                <Stack
+                    direction="column"
+                    justifyContent="space-around"
+                    alignItems="center"
+                    spacing={1}>
+                    <TextField
+                        id="outlined-password-input"
+                        label="名字"
+                        value={createUser.name}
+                        onChange={(e) => {
+                            setCreateUser({...createUser,name:e.target.value});
+                        }}
+                    />
+                    <TextField
+                        id="outlined-password-input2"
+                        label="电话"
+                        value={createUser.number}
+                        onChange={(e) => {
+                            setCreateUser({...createUser,number:e.target.value});
+                        }}
+                    />
+                   
+                    <Button variant="contained" size="small"
+                        onClick={() => {
+                            dispatch( createUserAccount(createUser.name,createUser.number))
+                            console.log('------确定添加---',createUser)
+                        }}>确定添加</Button>
+
                 </Stack>
             </Box>
         </Modal>
@@ -424,7 +499,6 @@ function SearchTask(props) {
         <Stack justifyContent="flex-start"
             alignItems="flex-start"
             sx={{ marginLeft: 2, overflowY: 'auto', height: '100%', paddingBottom: -2 }}
-
             spacing={2}
         >
             <Stack justifyContent="flex-start"
@@ -432,6 +506,28 @@ function SearchTask(props) {
                 spacing={2}
                 direction="row"
             >
+                    <CircleButton
+                            
+                            size="small"
+                            variant={1 === 1 ? "contained" : "outlined"}
+                            sx={{ margin: '5px' }}
+                            onClick={
+                                (e) => {
+                                    setCreate(1)
+                                    // if (!values.includes(e.target.value)) {
+                                    //   values.push(e.target.value)
+                                    // } else {
+                                    //   values = values.filter(value => e.target.value !== value)
+                                    // }
+                                    // params[props.searchType] = values
+                                    // delete params["topic"];
+                                    // navigate(`/explore?${qs.stringify(params, { arrayFormat: 'brackets' })}`)
+                                }
+                            }
+                        >
+                          添加会员
+                        </CircleButton>
+
                 {!detailMode && sortValue.map((a, ids) => {
                     return (
                         <CircleButton
@@ -487,6 +583,8 @@ function SearchTask(props) {
 
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
             {uploadWaitingModal}
+            {createModal}
+     
         </Stack>
     );
 }
