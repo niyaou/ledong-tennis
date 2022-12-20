@@ -25,6 +25,7 @@ import IconButton from '@mui/material/IconButton';
 import { useDispatch } from 'react-redux';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import CourseItem from '../../components/ldadmin/courseItem'
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
@@ -60,9 +61,12 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     // const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { areas, users, sortValue, charedLog,spendLog, createSuccess } = useSelector((state) => state.domination)
+    const { areas, users, sortValue, charedLog,spendLog, createSuccess ,course} = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
+
+
+    const [charedLogRec, setCharedLogRec] = React.useState(charedLog);
 
 
     const [prepaidCard, setPrepaidCard] = React.useState({});
@@ -86,7 +90,7 @@ function SearchTask(props) {
 
         if (users) {
             console.log('-----user',users)
-            setDetailMode(false)
+            // setDetailMode(false)
             let sorts = users.concat()
             sorts.sort((a, b) => {
                 return pinyin.pinyinUtil.getFirstLetter((a.name ).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.name).substring(0, 1)).toUpperCase() ? 1 : -1
@@ -106,27 +110,31 @@ function SearchTask(props) {
         }
     }, [customerName])
 
+    useEffect(() => {
+        
+            setCharedLogRec(charedLog)
+       console.log('-------charedLog-----',charedLog)
+    }, [charedLog])
 
-    // useEffect(() => {
-    //     if (open !== 0 || expiredTime!=='') {
-    //         setTimeout(() => {
-    //             dispatch(exploreRecentCharge(customerName))
-    //         }, 2200)
-    //         //     setDetailMode(true)
-    //         //     console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
-    //     }
-    //     setOpen(0)
-    //     setChangeFee(0)
-    //     setChangeCount(0)
-    //     setChangeDesc('')
-    //     setExpiredTime('')
 
-    // }, [createSuccess])
+    useEffect(() => {
+        if (createSuccess) {
+ 
+                dispatch(exploreUsersAction())
+                dispatch(exploreRecentCharge(customerOpenId))
+                enqueueSnackbar(`充值成功`, {
+                    variant: 'success',
+                    autoHideDuration: 3000,
+                  })
+
+
+        setOpen(0)
+        }
+    }, [createSuccess])
 
 
     useEffect(() => {
         if (success) {
-            setCreate(0)
             enqueueSnackbar(`添加会员成功`, {
                 variant: 'success',
                 autoHideDuration: 3000,
@@ -135,22 +143,19 @@ function SearchTask(props) {
         }
     }, [success])
 
+
+    useEffect(() => {
+        if (users && customerOpenId) {
+
+            setPrepaidCard(users.filter(u=>u.number===customerOpenId)[0])
+        }
+    }, [users])
+
+
     
 
 
-    // useEffect(() => {
-    //     if (recentPrepayedCard) {
-    //         let card = recentPrepayedCard.filter(card => typeof card.balance !== 'undefined')[0]
-    //         // let courselist = recentPrepayedCard.filter(card => typeof card.description !== 'undefined')
-    //         let courselist = recentPrepayedCard.filter(card => typeof card.balance === 'undefined')
-    //         // setDetailMode(true)
-    //         // setPrepaidCard(card)
-    //         setExpiredTime(card.expiredTime || '')
-    //         setAnnualTimes(card.restCount || 0)
-    //         setCourseList(courselist)
-    //         console.log("🚀 ~ file: searchTask.tsx ~   1line 733 ~ SearchTask ~ prepaidCard", card, courselist)
-    //     }
-    // }, [recentPrepayedCard])
+
 
 
 
@@ -252,11 +257,11 @@ function SearchTask(props) {
             />
 
             <Button variant="contained" size="small"
-                disabled={!expiredTime && !annualTimes}
+                disabled={ expiredTime==='' || !annualTimes}
 
                 onClick={() => {
-
-                    dispatch(updateExpiredTime({ cardId: customerName, time: moment(expiredTime).format('YYYY-MM-DD'), rest: parseInt(annualTimes) }))
+                    console.log('---expiredTime-',expiredTime)
+                    dispatch(updateExpiredTime({ number: customerOpenId, annualExpireTime: moment(expiredTime).format('YYYY-MM-DD'), annualTimes: parseInt(annualTimes) }))
                
                }}>修改年卡时间次数</Button>
 
@@ -285,7 +290,7 @@ function SearchTask(props) {
                             setCustomerName(user.name)
                             setCustomerOpenId(user.number)
                             dispatch(exploreRecentCharge(user.number))
-                            dispatch(exploreMemberCourse(user.number))
+                            dispatch(exploreRecentSpend(user.number))
                       
                     }}>
                     {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
@@ -377,9 +382,9 @@ function SearchTask(props) {
                     />
                     <Button variant="contained" size="small"
 
-
                         onClick={() => {
-                            dispatch(updateChargeAnnotation({ openId: customerOpenId, coachId: '13551226924', cardId: customerName, amount: parseInt(changeFee), time: moment(expiredTime).format('YYYY-MM-DD'), times: parseInt(changeCount), description: changeDesc }))
+                            dispatch(updateChargeAnnotation({ number: customerOpenId, charged: parseInt(changeFee), 
+                               times: parseInt(changeCount), description: changeDesc }))
                         }}>确定充值</Button>
                 </Stack>
             </Box>
@@ -432,10 +437,9 @@ function SearchTask(props) {
 
 
 
-    const courseItem = (course, index) => {
+    const chargeItem = (charge) => {
 
-
-        return (<Paper key={`course-item-${index}`} elevation={1} sx={{
+        return (<Paper key={`charge-item-${charge.id}`} elevation={1} sx={{
             minWidth: '850px',
             background: 'transparent',
             '& :hover': { background: 'rgb(0,0,0,0.1)' }
@@ -448,55 +452,45 @@ function SearchTask(props) {
                 alignItems="center"
                 sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
             >
-                <Typography gutterBottom variant="body2"
+               
+               <Typography gutterBottom variant="body2"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
                     }} >
-                    {course.openId}
+                    {charge.chargedTime}
                 </Typography>
                 <Typography gutterBottom variant="body2"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
                     }} >
-                    {course.time}
+                    {charge.description}
                 </Typography>
-                <Typography gutterBottom variant="body2"
+               <Typography gutterBottom variant="body2"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
                     }} >
-                    {course.description}
+                    充值{charge.charge}元，次卡{charge.times},年卡{charge.annualTimes}
                 </Typography>
-                {typeof course.amount !== 'undefined' && (<Typography gutterBottom variant="body2"
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        minWidth: '80px',
-                    }} >
-                    充值{course.amount}元，次数{course.times}
-                </Typography>)}
-                {typeof course.annualTimes !== 'undefined' && (<Typography gutterBottom variant="body2"
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        minWidth: '80px',
-                    }} >
-                    充值年卡，次数{course.annualTimes}，到期时间{course.expiredTime}
-                </Typography>)}
+   
 
-                {typeof course.course === 'undefined'&&(<Button  color="primary"
+              <Button 
+              variant="outlined"
+              color="primary"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
                     }}
                     onClick={()=>{
                         console.log(course,customerName)
-                        dispatch(retreatRecentCourse({cardId:customerName,time:course.time}))
+                        // dispatch(retreatRecentCourse({cardId:customerName,time:course.time}))
                     }}
                      >
 
                    删除
-                </Button>)}
+                </Button>
             </Stack>
         </Paper>)
     }
@@ -572,7 +566,10 @@ function SearchTask(props) {
 
                     }}
                 >
-                    {detailMode ? <ArrowBackIcon /> : <CachedIcon />}
+                    {detailMode ? <ArrowBackIcon /> : <CachedIcon           onClick={async () => {
+                       dispatch(exploreUsersAction())
+
+                    }}/>}
                 </IconButton>
             </Stack>
             {!detailMode && (<Grid
@@ -586,8 +583,28 @@ function SearchTask(props) {
             </Grid>)}
 
             {detailMode && finacialItem}
-            {detailMode && courseList && courseList.map((c, i) => courseItem(c, i))}
-
+            <Stack justifyContent="flex-start"
+              
+                spacing={2}
+                direction="row"
+            >
+                 {detailMode && <Stack justifyContent="flex-start"
+           
+                spacing={2}
+                direction="column"
+            >
+                {spendLog.map((c, i) => CourseItem({item:c,}))}
+            </Stack>}
+            {detailMode &&  <Stack justifyContent="flex-start"
+              
+                spacing={2}
+                direction="column"
+            >
+                 {charedLogRec.map((c, i) => chargeItem(c))}
+            </Stack>}
+            </Stack>
+         
+          
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
             {uploadWaitingModal}
             {createModal}

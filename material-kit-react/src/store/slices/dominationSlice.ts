@@ -150,10 +150,10 @@ export const exploreRecentCharge = createAsyncThunk(
         try {
             // throw new Error('Something bad happened');
             const response = await Axios.get(`/api/user/charged/${cardId}`)
-            if (response.data.code !== 0) {
-                return rejectWithValue(response.data.message)
-            }
-            return response.data.data;
+            // if (response.status !== 0) {
+            //     return rejectWithValue(response.data.message)
+            // }
+            return response.data;
         } catch (err) {
             return rejectWithValue(err)
         }
@@ -166,10 +166,10 @@ export const exploreRecentSpend = createAsyncThunk(
         try {
             // throw new Error('Something bad happened');
             const response = await Axios.get(`/api/prepaidCard/spend?number=${cardId}`)
-            if (response.data.code !== 0) {
-                return rejectWithValue(response.data.message)
-            }
-            return response.data.data;
+            // if (response.data.code !== 0) {
+            //     return rejectWithValue(response.data.message)
+            // }
+            return response.data;
         } catch (err) {
             return rejectWithValue(err)
         }
@@ -278,15 +278,15 @@ export const updateExpiredTime = createAsyncThunk(
     async (payload, { rejectWithValue }) => {
         try {
 
-        
-
+            let formdata = new FormData()
+           
+            formdata.append('number',payload.number)
+            formdata.append('annualTimes',payload.annualTimes)
+            formdata.append('annualExpireTime',payload.annualExpireTime)
             // throw new Error('Something bad happened');
-            const response = await Axios.request({method:'post',url:`/api/prepaidCard/ld/updateExpireTime`,params:payload})
+            const response = await Axios.post(`/api/user/charged`,formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
-            if (response.data.code !== 0) {
-                return rejectWithValue(response.data.message)
-            }
-            return response.data.data;
+            return response.data;
         } catch (err) {
             return rejectWithValue(err)
         }
@@ -300,14 +300,19 @@ export const updateChargeAnnotation = createAsyncThunk(
         try {
 
       
-
+            let formdata = new FormData()
+           
+            formdata.append('number',payload.number)
+            formdata.append('charged',payload.charged)
+            formdata.append('times',payload.times)
+            formdata.append('description',payload.description)
             // throw new Error('Something bad happened');
-            const response = await Axios.request({method:'post',url:`/api/prepaidCard/ld/chargeAnnotation`,params:payload})
+            const response = await Axios.post(`/api/user/charged`,formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
-            if (response.data.code !== 0) {
-                return rejectWithValue(response.data.message)
-            }
-            return response.data.data;
+            // if (response.data.code !== 0) {
+            //     return rejectWithValue(response.data.message)
+            // }
+            return response.data;
         } catch (err) {
             return rejectWithValue(err)
         }
@@ -439,8 +444,7 @@ export const exploreSlice = createSlice({
             })
             .addCase(exploreRecentSpend.fulfilled, (state, action) => {
                 state.loading = false
-                state.spendLog =  action.payload.content
-                
+                state.spendLog =  action.payload
             });
         builder
             .addCase(createCard.pending, (state) => {

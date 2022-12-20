@@ -157,7 +157,7 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.duration}
+                {item.duration}小时
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
