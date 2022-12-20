@@ -28,7 +28,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCard, updateExpiredTime ,updateChargeAnnotation,retreatRecentCourse} from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCharge, exploreRecentSpend,exploreMemberCourse,updateExpiredTime ,updateChargeAnnotation,retreatRecentCourse} from '../../store/slices/dominationSlice'
 import {createUserAccount} from '../../store/actions/usersActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -60,12 +60,12 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     // const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { areas, users, sortValue, recentPrepayedCard, createSuccess } = useSelector((state) => state.domination)
+    const { areas, users, sortValue, charedLog,spendLog, createSuccess } = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
 
-    const [prepaidCard, setPrepaidCard] = React.useState({ balance: 0, balanceTimes: 0, expiredTime: null, restCount: 0 });
+    const [prepaidCard, setPrepaidCard] = React.useState({});
     const [courseList, setCourseList] = React.useState([]);
     const [detailMode, setDetailMode] = React.useState(false);
     const [userSort, setUserSort] = React.useState(false);
@@ -100,28 +100,28 @@ function SearchTask(props) {
 
 
     useEffect(() => {
-        if (prepaidCard && customerName) {
+        if (customerName) {
             setDetailMode(true)
             console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
         }
-    }, [prepaidCard])
+    }, [customerName])
 
 
-    useEffect(() => {
-        if (open !== 0 || expiredTime!=='') {
-            setTimeout(() => {
-                dispatch(exploreRecentCard(customerName))
-            }, 2200)
-            //     setDetailMode(true)
-            //     console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
-        }
-        setOpen(0)
-        setChangeFee(0)
-        setChangeCount(0)
-        setChangeDesc('')
-        setExpiredTime('')
+    // useEffect(() => {
+    //     if (open !== 0 || expiredTime!=='') {
+    //         setTimeout(() => {
+    //             dispatch(exploreRecentCharge(customerName))
+    //         }, 2200)
+    //         //     setDetailMode(true)
+    //         //     console.log("🚀 ~ file: searchTask.tsx ~ line 71 ~ SearchTask ~ prepaidCard", prepaidCard)
+    //     }
+    //     setOpen(0)
+    //     setChangeFee(0)
+    //     setChangeCount(0)
+    //     setChangeDesc('')
+    //     setExpiredTime('')
 
-    }, [createSuccess])
+    // }, [createSuccess])
 
 
     useEffect(() => {
@@ -138,19 +138,19 @@ function SearchTask(props) {
     
 
 
-    useEffect(() => {
-        if (recentPrepayedCard) {
-            let card = recentPrepayedCard.filter(card => typeof card.balance !== 'undefined')[0]
-            // let courselist = recentPrepayedCard.filter(card => typeof card.description !== 'undefined')
-            let courselist = recentPrepayedCard.filter(card => typeof card.balance === 'undefined')
-            // setDetailMode(true)
-            setPrepaidCard(card)
-            setExpiredTime(card.expiredTime || '')
-            setAnnualTimes(card.restCount || 0)
-            setCourseList(courselist)
-            console.log("🚀 ~ file: searchTask.tsx ~   1line 733 ~ SearchTask ~ prepaidCard", card, courselist)
-        }
-    }, [recentPrepayedCard])
+    // useEffect(() => {
+    //     if (recentPrepayedCard) {
+    //         let card = recentPrepayedCard.filter(card => typeof card.balance !== 'undefined')[0]
+    //         // let courselist = recentPrepayedCard.filter(card => typeof card.description !== 'undefined')
+    //         let courselist = recentPrepayedCard.filter(card => typeof card.balance === 'undefined')
+    //         // setDetailMode(true)
+    //         // setPrepaidCard(card)
+    //         setExpiredTime(card.expiredTime || '')
+    //         setAnnualTimes(card.restCount || 0)
+    //         setCourseList(courselist)
+    //         console.log("🚀 ~ file: searchTask.tsx ~   1line 733 ~ SearchTask ~ prepaidCard", card, courselist)
+    //     }
+    // }, [recentPrepayedCard])
 
 
 
@@ -179,7 +179,7 @@ function SearchTask(props) {
                     // dispatch(updateEx1piredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
                 }}
             >
-                充值卡余额：{prepaidCard.balance}
+                充值卡余额：{prepaidCard.restCharge}
             </Typography>
             <Typography gutterBottom variant="body2"
                 sx={{
@@ -191,19 +191,25 @@ function SearchTask(props) {
                     // dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
                 }}
             >
-                次卡余额：  {prepaidCard.balanceTimes}
+                次卡余额：  {prepaidCard.timesCount}
+            </Typography>
+            {/* <Typography gutterBottom variant="body2"
+                sx={{
+                    color: 'rgba(0, 0, 0, 0.6)',
+                }} >
+                次卡到期时间  {prepaidCard.timesExpireTime}
+            </Typography> */}
+            <Typography gutterBottom variant="body2"
+                sx={{
+                    color: 'rgba(0, 0, 0, 0.6)',
+                }} >
+                剩余年卡次数  {prepaidCard.annualCount}
             </Typography>
             <Typography gutterBottom variant="body2"
                 sx={{
                     color: 'rgba(0, 0, 0, 0.6)',
                 }} >
-                年卡到期时间  {prepaidCard.expiredTime}
-            </Typography>
-            <Typography gutterBottom variant="body2"
-                sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
-                }} >
-                剩余年卡次数  {prepaidCard.restCount}
+                年卡到期时间  {prepaidCard.annualExpireTime}
             </Typography>
 
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -275,11 +281,12 @@ function SearchTask(props) {
 
                     }}
                     onClick={(event) => {
-                        if (user.prepaidCard) {
-                            setCustomerName(user.prepaidCard)
-                            setCustomerOpenId(user.openId)
-                            dispatch(exploreRecentCard(user.prepaidCard))
-                        }
+                            setPrepaidCard(user)
+                            setCustomerName(user.name)
+                            setCustomerOpenId(user.number)
+                            dispatch(exploreRecentCharge(user.number))
+                            dispatch(exploreMemberCourse(user.number))
+                      
                     }}>
                     {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
 

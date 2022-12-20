@@ -18,6 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.sql.Date;
+
 
 public class CardCases {
     @Autowired
@@ -32,25 +34,31 @@ public class CardCases {
     private SpendDAO spendDAO;
 
     @Transactional(rollbackFor = Exception.class)
-    public ChargeBo setRestCharge(String number, float charged, float times, float annualTimes, String description) {
+    public ChargeBo setRestCharge(String number, Float charged, Float times, Float annualTimes, String annualExpireTime,String description) {
         var user = userCases.findByNumber(number);
         if (user == null) {
             throw new CustomException(UseCaseCode.NOT_FOUND);
         }
         var chargeTemp = Charge.builder()
+                .charge(0)
+                .times(0)
+                .annualTimes(0)
                 .description(description)
                 .prepaidCard(PrepaidCard.fromBO(user));
-        if (charged != 0) {
+        if (charged!=null && charged != 0) {
             chargeTemp.charge(charged);
             userCases.setRestChargeChange(number, charged);
         }
-        if (times != 0) {
+        if (times!=null &&times != 0) {
             chargeTemp.times(times);
             userCases.setRestTimesChange(number, times);
         }
-        if (annualTimes != 0) {
+        if (annualTimes!=null &&annualTimes != 0) {
             chargeTemp.annualTimes(annualTimes);
             userCases.setRestAnnualTimesChange(number, annualTimes);
+        }
+        if (StringUtils.hasText(annualExpireTime)) {
+            userCases.setAnnualTimesExpired(number, Date.valueOf(annualExpireTime));
         }
         var charge = chargeTemp.build();
         chargeDao.save(charge);
@@ -97,6 +105,23 @@ public class CardCases {
             throw new CustomException(UseCaseCode.NOT_FOUND);
         }
         return spendDAO.findByPrepaidCard_Id(user.getId());
+//        return DefaultConverter.convert( spend,SpendBo.class);
+    }
+
+
+    public Page<Charge> getCharged(String number, Integer pageNum, Integer pageSize) {
+        var user = userDAO.findByNumber(number);
+        if (user == null) {
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        var sort = Sort.by(Sort.Direction.DESC, "chargedTime");
+        Pageable pageReq = PageRequest.of(pageNum - 1, pageSize, sort);
+        if (StringUtils.hasText(number)) {
+            return chargeDao.findByPrepaidCard_Id(user.getId(), pageReq);
+        } else {
+            return chargeDao.findAll(pageReq);
+        }
+
 //        return DefaultConverter.convert( spend,SpendBo.class);
     }
 

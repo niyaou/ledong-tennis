@@ -45,11 +45,20 @@ public class UserController extends BaseController {
 
 
     @PostMapping("/charged")
-    public ChargedResponseDTO charged(String number, float charged, float times, float annualTimes, String description) {
-        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, description);
-        return ChargedResponseDTO.builder().charge(charged).description(description).chargedTime(chargedLog.getChargedTime()).build();
+    public Object charged(String number, @RequestParam(required = false)Float charged, @RequestParam(required = false)Float times,
+                                      @RequestParam(required = false)Float annualTimes, @RequestParam(required = false)String annualExpireTime,
+                                      @RequestParam(required = false)String description) {
+        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime,description);
+        return chargedLog;
 
     }
+
+    @GetMapping("/charged/{number}")
+    public Object charged(@PathVariable("number")String number) {
+        return cardCase.getCharged(number, 1,  50);
+    }
+
+
 
     @PostMapping("/charged/retreat/{id}")
     public ChargedResponseDTO charged(@PathVariable("id") Long id) {

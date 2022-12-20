@@ -88,7 +88,6 @@ function RecentCourse(props) {
 
 
   const courseItem = (item, index) => {
-
     return (
       <Paper key={`item-course-${item.id}`} elevation={1} sx={{
         minWidth: '850px',

@@ -10,9 +10,9 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:mysql://10.217.2.51:3307/workship
+    url: jdbc:mysql://127.0.0.1:3306/workship
     username: root
-    password: desay_12345
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
   main:
     allow-bean-definition-overriding: true

@@ -28,7 +28,8 @@ const initialState = {
     areas: ['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '麓坊校区', '领馆国际城校区', '一品天下校区', '天府环宇坊校区', '其他'],
     sortValue: ['年卡', '次卡', '充值卡'],
     selectCourse: null,
-    recentPrepayedCard: null,
+    charedLog: [],
+    spendLog: [],
     createSuccess:false,
     coach:[],
     court:[],
@@ -109,10 +110,6 @@ export const exploreRecentCourse = createAsyncThunk(
         try {
             // throw new Error('Something bad happened');
             let formdata = new FormData()
-    
-       
-
-
             // payload.isExperience=0
             // payload.isDealing=0
             var startTime=moment().subtract(180,'days').format('YYYY-MM-DD HH:mm:ss')
@@ -126,12 +123,33 @@ export const exploreRecentCourse = createAsyncThunk(
     }
 );
 
-export const exploreRecentCard = createAsyncThunk(
+
+export const exploreMemberCourse = createAsyncThunk(
+    'lduser/course/member',
+    async (params, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+            let formdata = new FormData()
+            // payload.isExperience=0
+            // payload.isDealing=0
+            var startTime=moment().subtract(180,'days').format('YYYY-MM-DD HH:mm:ss')
+            formdata.append('startTime',startTime)
+
+            const response = await Axios.get(`/api/prepaidCard/course/total?startTime=${startTime}&number=${params}`)
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+export const exploreRecentCharge = createAsyncThunk(
     'lduser/cardLog',
     async (cardId, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
-            const response = await Axios.get(`/api/prepaidCard/ld/finacialLogs?cardId=${cardId}`)
+            const response = await Axios.get(`/api/user/charged/${cardId}`)
             if (response.data.code !== 0) {
                 return rejectWithValue(response.data.message)
             }
@@ -141,6 +159,23 @@ export const exploreRecentCard = createAsyncThunk(
         }
     }
 );
+
+export const exploreRecentSpend = createAsyncThunk(
+    'lduser/spend',
+    async (cardId, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+            const response = await Axios.get(`/api/prepaidCard/spend?number=${cardId}`)
+            if (response.data.code !== 0) {
+                return rejectWithValue(response.data.message)
+            }
+            return response.data.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
 
 
 
@@ -341,6 +376,21 @@ export const exploreSlice = createSlice({
 
             });
         builder
+            .addCase(exploreMemberCourse.pending, (state) => {
+                state.loading = true
+                state.loadError = false
+            })
+            .addCase(exploreMemberCourse.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(exploreMemberCourse.fulfilled, (state, action) => {
+                state.loading = false
+                state.course = action.payload.content
+
+            });
+        builder
             .addCase(selectCourse.pending, (state) => {
                 state.loading = true
 
@@ -357,22 +407,39 @@ export const exploreSlice = createSlice({
 
             });
         builder
-            .addCase(exploreRecentCard.pending, (state) => {
+            .addCase(exploreRecentCharge.pending, (state) => {
                 state.createSuccess=false
                 state.loading = true
-                state.recentPrepayedCard = null
+                state.charedLog = []
 
             })
-            .addCase(exploreRecentCard.rejected, (state, action) => {
+            .addCase(exploreRecentCharge.rejected, (state, action) => {
                 state.loadError = true
                 state.loading = false
 
                 state.errorMsg = getErrorMsg(action)
             })
-            .addCase(exploreRecentCard.fulfilled, (state, action) => {
-                console.log(  state.recentPrepayedCard )
+            .addCase(exploreRecentCharge.fulfilled, (state, action) => {
                 state.loading = false
-                state.recentPrepayedCard = JSON.parse( action.payload)
+                state.charedLog =  action.payload.content
+                
+            });
+        builder
+            .addCase(exploreRecentSpend.pending, (state) => {
+                state.createSuccess=false
+                state.loading = true
+                state.spendLog = []
+
+            })
+            .addCase(exploreRecentSpend.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(exploreRecentSpend.fulfilled, (state, action) => {
+                state.loading = false
+                state.spendLog =  action.payload.content
                 
             });
         builder

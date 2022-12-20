@@ -1,11 +1,13 @@
 package com.ledong.rest;
 
 
+import com.ledong.bo.SpendBo;
 import com.ledong.entity.Course;
 import com.ledong.entity.response.CourseResponseDTO;
 import com.ledong.service.CardCases;
 import com.ledong.service.CourseCases;
 import com.ledong.service.SmsCases;
+import com.ledong.util.DefaultConverter;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
@@ -18,6 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+
+import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 
 
 @RestController
@@ -51,8 +57,13 @@ public class PrepaidCardController {
     @GetMapping("/spend")
     @ResponseBody
     public Object spend(@RequestParam(required = false)  String number ){
-        return  cardCases.getSpend(number,1,1000);
-
+        var spends=cardCases.getSpend(number,1,1000);
+        var bos=new ArrayList<>();
+        for(var spend : spends){
+            var spendBo = DefaultConverter.convert(spend, SpendBo.class);
+            bos.add(spendBo);
+        }
+        return  bos;
     }
 
     @DeleteMapping("/course/{id}/{member}")
@@ -79,9 +90,8 @@ public class PrepaidCardController {
             if(pageNum==null ||pageNum<1){
                 pageNum=1;
             }
-            return courseCases.totalCourse(startTime,pageNum,1000);
+            return courseCases.totalCourse(startTime,pageNum,500);
         }
-
     }
 
     @PostMapping("/course/sm")
