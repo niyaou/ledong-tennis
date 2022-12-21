@@ -29,12 +29,13 @@ public class PrepaidCard   {
     private String name;
 
     private String number;
+    private String court;
     @Column
-    private float restCharge;
+    private float restCharge=0;
     @Column
-    private float annualCount;
+    private float annualCount=0;
     @Column
-    private float timesCount;
+    private float timesCount=0;
     @Column
     private Date annualExpireTime;
     @Column
@@ -56,6 +57,7 @@ public class PrepaidCard   {
                 .id(bo.getId())
                 .name(bo.getName())
                 .number(bo.getNumber())
+                .court(bo.getCourt())
                 .build();
     }
 

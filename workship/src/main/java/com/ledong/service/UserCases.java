@@ -24,12 +24,12 @@ public class UserCases {
     private SpendDAO spendDAO;
 
 
-    public PrepaidCardBo create(String name, String number) {
+    public PrepaidCardBo create(String name, String number,String court) {
         var existUser = findByNumber(number);
         if (existUser != null) {
             throw new CustomException(UseCaseCode.USER_EXIST);
         }
-        var user = PrepaidCard.builder().name(name).number(number).build();
+        var user = PrepaidCard.builder().name(name).number(number).court(court).build();
         userDAO.save(user);
         return findByNumber(number);
     }

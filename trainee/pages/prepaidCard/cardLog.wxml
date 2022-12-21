@@ -11,9 +11,10 @@
      <div slot="footer"></div>
   </i-modal>
   <mp-navigation-bar title="会员卡" back="{{true}}" size="{{large}}"></mp-navigation-bar>
-  <i-card full="{{true}}" title="" extra="会员卡使用记录" thumb="../../icon/player.jpg">
-    <view slot="content">您的会员卡余额为 ￥{{balance}}  {{balanceTimes?(' |  剩余课程 '+balanceTimes):''}}</view>
-    <view slot="footer">列表查看详细缴费及消课记录</view>
+  <i-card full="{{true}}" title="" extra="会员卡充值记录" thumb="../../icon/player.jpg">
+    <view slot="content" class="weui-flex"><text>您的会员卡 余额 ￥{{userInfo.restCharge}} ，次卡 {{userInfo.timesCount}} ， 年卡 {{userInfo.annualCount}}</text>
+     </view>
+    <view slot="footer">年卡到期时间{{userInfo.annualExpireTime||''}}</view>
   </i-card>
   <view class="weui-flex">
     <view class="weui-flex__item">
@@ -24,25 +25,15 @@
     <view class="weui-flex">
       <view class="weui-flex__item">
         <scroll-view scroll-y style="width: 100%; height: 30.5rem;">
-       <i-row style="background-color:#fff;width:100%;" wx:for="{{spendLogs}}">
-        <i-col span="24" i-class="blankBg i-cell output">
-          {{item.description}} {{item.charge?('消费 ￥'+item.charge+'元'):''}}  {{item.timesCharge?('消耗课程 '+item.timesCharge+'次'):''}}
-   
-        <!-- <i-divider height="12" content=""></i-divider> -->
+        <i-row style="background-color:#fff;width:100%;" wx:key="{{item.id}}"  wx:for="{{chargeLogs}}">
+        <i-col span="24" i-class="blankBg i-cell input"  data-log="{{item}}">
+          充值 {{item.charge?('￥'+item.charge+'元，'):''}}{{item.times?(' 课程'+item.times+'次'):''}} {{item.annualTimes?(' 年卡'+item.annualTimes+'次'):''}} 时间  {{item.chargedTime}}
         </i-col>
         </i-row>
-        <i-row style="background-color:#fff;width:100%;" wx:for="{{chargeLogs}}">
-        <i-col span="24" i-class="blankBg i-cell input" bindtap="showModalRetreat" data-log="{{item}}">
-          {{item.time}} 充值 {{item.amount?('￥'+item.amount+'元，'):''}}{{item.times?('课程'+item.times+'次'):''}} 备注{{item.description}}
-        </i-col>
-        </i-row>
-
         </scroll-view>
       </view>
     </view>
 
   </view>
-  <i-modal title="是否需要撤回' {{selectCharge.time}} '充值￥{{selectCharge.amount}} 这条记录" visible="{{ visible }}" bind:ok="handleOk" bind:cancel="handleClose">
-  
-  </i-modal>
+ 
 </view>

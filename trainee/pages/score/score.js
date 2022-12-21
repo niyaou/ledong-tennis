@@ -1,7 +1,8 @@
 // pages/matches/matchlist.js
 const app = getApp()
 var http = require('../../utils/http.js')
-
+var util = require('../../utils/util.js')
+var moment = require('../../utils/moment.js')
 Page({
 
   /**
@@ -9,39 +10,39 @@ Page({
    */
 
   data: {
-    total:0,
+    total: 0,
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
     visible1: false,
-    spotMap: {
-      y2022m5d9: 'deep-spot',
-      y2022m5d10: 'spot',
-      y2022m6d10: 'spot',
-      y2022m7d10: 'spot',
-      y2022m8d10: 'spot',
-      y2022m10d1: 'spot',
-      y2023m5d10: 'spot',
-      y2022m12d19: 'deep-spot',
-    },
-    disabledDate({ day, month, year }) {
+    userInfo: getApp().globalData.userInfo,
+    calendar: null,
+
+    spotMap: {},
+    disabledDate({
+      day,
+      month,
+      year
+    }) {
       // 例子，今天之后的日期不能被选中
       const now = new Date();
       const date = new Date(year, month - 1, day);
       return date > now;
     },
-    // 需要改变日期时所使用的字段
-    changeTime: '',
-    // 存储已经获取过的日期
-    dateListMap: [],
- 
+    course: [],
+    currentCourse: []
+
   },
-  handleFruitChange({ detail = {} }) {
+  handleFruitChange({
+    detail = {}
+  }) {
     this.setData({
-        current: detail.value
+      current: detail.value
     });
-},
-  handleClose1(){
-    this.setData({visible1:false})
+  },
+  handleClose1() {
+    this.setData({
+      visible1: false
+    })
   },
   handleClickItem2(e) {
     console.log(e.detail, this.data.slideButtons[e.detail.dataIndex].toggle)
@@ -50,21 +51,26 @@ Page({
       this.setData({
         slideButtons: this.data.slideButtons
       });
-    }else{
-      this.setData({visible1:true})
+    } else {
+      this.setData({
+        visible1: true
+      })
     }
 
   },
   // 获取日期数据，通常用来请求后台接口获取数据
-  getDateList({ detail }) {
-    // 检查是否已经获取过该月的数据
-    if (this.filterGetList(detail)) {
-      // 获取数据
-      console.log(detail, '获取数据');
-    }
+  getDateList({
+    detail
+  }) {
+    // console.log(detail, '获取数据');
+
   },
+
   // 过滤重复月份请求的方法
-  filterGetList({ setYear, setMonth }) {
+  filterGetList({
+    setYear,
+    setMonth
+  }) {
     const dateListMap = new Set(this.data.dateListMap);
     const key = `y${setYear}m${setMonth}`;
     if (dateListMap.has(key)) {
@@ -77,11 +83,23 @@ Page({
     return true;
   },
   // 日期改变的回调
-  selectDay({ detail }) {
+  selectDay({
+    detail
+  }) {
     console.log(detail, 'selectDay detail');
+    let _c = this.data.course.filter(c => {
+      console.log(`${moment(c.course.startTime).format('YYYY')}`, `${moment(c.course.startTime).format('MM')}`, `${moment(c.course.startTime).format('DD')}`)
+      return `${detail.year}` === `${moment(c.startTime).format('YYYY')}` && `${moment(c.startTime).format('MM')}` === `${detail.month}`
+    }).map(c=>{return {...c,course:{...c.course,startTime:moment(c.startTime).format('MM-DD HH:mm'),endTime:moment(c.endTime).format('HH:mm')}}})
+    console.log('-----', _c)
+    this.setData({
+      currentCourse: _c
+    })
   },
   // 展开收起时的回调
-  openChange({ detail }) {
+  openChange({
+    detail
+  }) {
     console.log(detail, 'openChange detail');
   },
   changetime() {
@@ -93,25 +111,45 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-   
-    const calendar = this.selectComponent('#calendar').calendar
-console.log(calendar)
 
+  },
+
+  getCourse() {
+    let that = this
+    http.getReq(`prepaidCard/spend?number=${this.data.userInfo.number}&startTime=${moment().subtract(180,'days').format('YYYY-MM-DD HH:mm:ss')}`, (res) => {
+      // http.getReq(`prepaidCard/course/total?number=${this.data.userInfo.number}&startTime=${moment().subtract(180,'days').format('YYYY-MM-DD HH:mm:ss')}`,(res)=>{
+
+      console.log(res)
+      this.setData({
+        course: res
+      })
+      var spot = {}
+      res.map(c => {
+        spot[`y${moment(c.course.startTime).format('YYYY')}m${moment(c.course.startTime).format('MM')}d${moment(c.course.startTime).format('DD')}`] = 'deep-spot'
+        return spot
+      })
+      this.setData({
+        spotMap: spot
+      })
+    })
   },
 
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-  
+
+
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
-
+    this.setData({
+      userInfo: app.globalData.userInfo
+    })
+    this.getCourse()
   },
 
   /**
@@ -148,28 +186,28 @@ console.log(calendar)
   onShareAppMessage: function () {
 
   },
-  getScoreList(){
+  getScoreList() {
 
     http.getReq(`rank/ld/scoreLog`, app.globalData.jwt, (res) => {
       console.log(res)
       if (res.code == 0 && res.data != null) {
-        let logs=res.data.map(l=>{
+        let logs = res.data.map(l => {
           return {
-            text:l.description,
-            time:l.rankingTime,
-            score:l.score
+            text: l.description,
+            time: l.rankingTime,
+            score: l.score
           }
         })
-this.setData({
-  slideButtons:logs
-})
-let total=0
-    logs.map(l=>{
-total+=l.score
-    })
-    this.setData({
-      total:total
-    })
+        this.setData({
+          slideButtons: logs
+        })
+        let total = 0
+        logs.map(l => {
+          total += l.score
+        })
+        this.setData({
+          total: total
+        })
         // slideButtons: [{
         //   text: '与 范大将军 的比赛获胜',
         //   src: '', // icon的路径,
@@ -178,9 +216,9 @@ total+=l.score
         //   score: '+30',
         //   toggle: false
         // }
-      }else{
+      } else {
         this.setData({
-          slideButtons:[]
+          slideButtons: []
         })
       }
     })

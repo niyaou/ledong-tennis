@@ -37,8 +37,8 @@ public class UserController extends BaseController {
     private CourseCases courseCases;
 
     @PostMapping("/register")
-    public UserResponseDTO register(@RequestParam String name, @RequestParam String number) {
-        var user = PrepaidCard.fromBO(useCase.create(name, number));
+    public UserResponseDTO register(@RequestParam String name, @RequestParam String number,@RequestParam String court) {
+        var user = PrepaidCard.fromBO(useCase.create(name, number,court));
         return UserResponseDTO.builder()
                 .token("------").user(user).build();
     }

@@ -11,7 +11,7 @@ import React, { useEffect } from 'react';
 import DsFolderTree from '../fileExplore/dsFolderTree'
 import DataFolderExplore from '../fileExplore/folderExploreComponent'
 import FsResourceManagement from '../createDs/fsResourseManagement'
-import { Button, Card, Stack, NoSsr, Paper, Box, Typography, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
+import { Button, Card, Stack,MenuItem, NoSsr, Paper, Box, Typography, Select,AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
 import IdsFileTree from '../fileExplore/idsFileTree'
 import { makeStyles, createStyles } from '@mui/styles';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -61,7 +61,7 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     // const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { areas, users, sortValue, charedLog,spendLog, createSuccess ,course} = useSelector((state) => state.domination)
+    const { court, users, sortValue, charedLog,spendLog, createSuccess ,course} = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
@@ -85,7 +85,7 @@ function SearchTask(props) {
     const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeDesc, setChangeDesc] = React.useState('');
 
-    const [createUser, setCreateUser] = React.useState({number:'',name:''});//创建用户数据
+    const [createUser, setCreateUser] = React.useState({number:'',name:'',court:''});//创建用户数据
     useEffect(() => {
 
         if (users) {
@@ -301,7 +301,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
                         }} >
                         {user.name}  
                     </Typography>
@@ -310,7 +310,16 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
+                        }} >
+                        {user.court}  
+                    </Typography>
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
                        电话 {user.number} 
                     </Typography>
@@ -319,7 +328,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '50%', textAlign: 'center'
                         }} >
                       余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}
                     </Typography>
@@ -423,10 +432,21 @@ function SearchTask(props) {
                             setCreateUser({...createUser,number:e.target.value});
                         }}
                     />
+                      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+        name='FileTypes'
+        size="small"
+        onChange={(e) => {
+        //   let after = { ...courseEdit, court: e.target.value }
+        //   setCourseEdit(after)
+        setCreateUser({...createUser,court:e.target.value});
+        }}
+        value={createUser.court}>
+        {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
+      </Select>
                    
                     <Button variant="contained" size="small"
                         onClick={() => {
-                            dispatch( createUserAccount(createUser.name,createUser.number))
+                            dispatch( createUserAccount(createUser.name,createUser.number,createUser.court))
                             console.log('------确定添加---',createUser)
                         }}>确定添加</Button>
 

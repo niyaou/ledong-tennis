@@ -1,5 +1,6 @@
 {
   "usingComponents": {
+    "mp-navigation-bar": "weui-miniprogram/navigation-bar/navigation-bar",
     "i-button": "../../dist/button/index",
     "i-cell-group": "../../dist/cell-group/index",
     "i-cell": "../../dist/cell/index",

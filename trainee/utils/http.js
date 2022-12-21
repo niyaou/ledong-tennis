@@ -1,23 +1,23 @@
 const app = getApp()
-// var rootDocment = 'http://192.168.2.108:8081/';
+var rootDocment = 'http://192.168.2.110:9968/';
 // var rootDocment = 'https://192.168.2.106:8081/';
 // var rootDocment = 'http://192.168.2.106:8081/';
 // var rootDocment = 'https://106.54.80.211:8081/';
 // var rootDocment = 'http://10.217.6.43:8081/';
-var rootDocment = 'https://www.ledongtennis.cn:8081/';
+// var rootDocment = 'https://www.ledongtennis.cn:8081/';
 var header = {
   'Accept': 'application/json',
   'content-type': 'application/x-www-form-urlencoded',
-  'Authorization': 'Bearer '+app.globalData.jwt
+  'Authorization': 'Bearer '
 }
-function getReq(url, jwt,cb,toast = true) {
+function getReq(url, cb,toast = true) {
  if(toast){
   wx.showLoading({
     mask:true,
     title: '加载中',
   })
  }
-  header.Authorization='Bearer '+jwt
+  header.Authorization='Bearer '
   wx.request({
     url: rootDocment + url,
     method: 'get',

@@ -29,13 +29,11 @@
               <view class="weui-flex__item ">
                 <view class="weui-flex filled ">
                   <view class="weui-flex__item makeCenterC" bindtap="loginClick">
-                    <view class="wfilled leftAli whiteCaptl userinfo-nickname">{{userInfo.nickName}}</view>
+                    <view class="wfilled leftAli whiteCaptl userinfo-nickname">{{userInfo.name}}</view>
               
-                    <view class="wfilled leftAli whiteCaptl  makeCenterV rowLeft">
-                   余额 1350 ，次卡 50 ， 年卡 30
-                      <!-- <div class="tags" wx:for="{{userRankInfo.tags}}" wx:key="{{index}}">
-                        {{item}}
-                      </div> -->
+                    <view class="wfilled leftAli whiteCaptl  makeCenterV rowLeft" wx:if="{{userInfo.name!=='请登录'}}">
+                   余额 ￥{{userInfo.restCharge}} ，次卡 {{userInfo.timesCount}} ， 年卡 {{userInfo.annualCount}}
+                   
 
                     </view>
                   </view>
@@ -110,9 +108,9 @@
     </view>
   </view> -->
     <i-toast id="toast" />
-    <view class="weui-footer weui-footer_fixed-bottom" style="color:#ccc" >
+    <view class="weui-footer weui-footer_fixed-bottom" style="color:#ccc" bindtap="logout">
       <view class="weui-footer__links">
-        <navigator url="" class="weui-footer__link" style="color:#ccc">乐动网球</navigator>
+        <text url="" class="weui-footer__link" style="color:#ccc">退出登录</text>
       </view>
       <view class="weui-footer__text">Copyright © 2020-2021 LDTennis v{{version}}</view>
     </view>

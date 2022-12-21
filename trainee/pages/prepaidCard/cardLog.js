@@ -14,6 +14,7 @@ Page({
   data: {
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
+    userInfo:getApp().globalData.userInfo,
     visible: false,
     currentIndex: 0,
     balance: 0,
@@ -66,25 +67,7 @@ Page({
     })
   },
 
-  handleOk() {
-    let url = 'prepaidCard/ld/chargeLogRetreat'
-    let params={cardId:this.data.prepaidCard,time:this.data.selectCharge.time}
-    http.postReq(`${url}`, app.globalData.jwt, params, (res) => {
-      if (res.code === 0) {
-        this.setData({chargeLogs:[],spendLogs:[]})
-        this.getCardLogs()
-      }else{
-        $Toast({
-          content: '失败，请重试',
-          type: 'error'
-        });
-      }
-    })
 
-    this.setData({
-      visible: false
-    })
-  },
 
   handleTapped(e) {
     let userTag = this.data.players[e.detail.index].polygen
@@ -106,11 +89,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    console.log('onload   ------- ')
-    console.log('onload ',options)
-    this.setData({
-      prepaidCard: options.cardId
-    })
+
   },
 
   /**
@@ -120,28 +99,12 @@ Page({
     console.log('onReady   ------- ')
   },
 
-getCardLogs(){
-  let url = 'prepaidCard/ld/finacialLogs?cardId='+this.data.prepaidCard
-  http.getReq(`${url}`, app.globalData.jwt, (res) => {
-    if(res.code===0){
-      let result=JSON.parse(res.data)
-      result.forEach(r=>{
-        if(typeof r.balance!=='undefined'){
-          this.setData({balance:r.balance})
-        }
-        if(typeof r.balanceTimes!=='undefined'){
-          this.setData({balanceTimes:r.balanceTimes})
-        }
-         if(typeof r.amount!=='undefined'){
-          this.data.chargeLogs.unshift(r)
-          this.setData({chargeLogs: this.data.chargeLogs})
-        }
-         if(typeof r.spend!=='undefined'){
-          this.data.spendLogs.unshift(r)
-          this.setData({spendLogs: this.data.spendLogs})
-        }
-      })
-    }
+
+getCardLogs(number){
+  let url = `user/charged/${number}`
+  http.getReq(`${url}`, (res) => {
+    console.log('----res',res)
+          this.setData({chargeLogs: res.content})
   })
 },
 
@@ -150,8 +113,9 @@ getCardLogs(){
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    console.log('onShow   ------- ')
-    this.getCardLogs()
+    console.log('onShow   ------- ',app.globalData.userInfo)
+    this.getCardLogs(app.globalData.userInfo.number)
+    this.setData({userInfo:app.globalData.userInfo})
   },
 
   onCreate:function(){
@@ -190,11 +154,5 @@ getCardLogs(){
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {},
-  getRankPosition(jwt) {
-    http.getReq('rank/ldRankPosition', jwt, (e) => {
-      this.setData({
-        rankPosition: e.data.sort
-      })
-    })
-  },
+
 })

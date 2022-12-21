@@ -89,7 +89,7 @@ export const login = (auth: UserFormValues) => async dispatch => {
 
 
 
-export const createUserAccount = (name,number) => async dispatch => {
+export const createUserAccount = (name,number,court) => async dispatch => {
     dispatch({
         type: UserActionTypes.CREATE_USERS,
     })
@@ -99,6 +99,7 @@ export const createUserAccount = (name,number) => async dispatch => {
     
         formdata.append("name",  name)
         formdata.append("number",  number)
+        formdata.append("court",  court)
         const user = await Axios.post(`/api/user/register`,formdata)
   
         if (user.status!== 200 ) {

@@ -15,6 +15,10 @@ App({
   globalData: {
     shortInterval:SHORTINTERVAL,
     slowInterval:SLOWINTERVAL,
+    userInfo: {
+      name: "请登录",
+      avatarUrl: "../../icon/user2.png"
+    },
     number:'',
     totalBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight'] +44 )/wx.getSystemInfoSync()['windowWidth'],
     statusBarHeight: 750*( wx.getSystemInfoSync()['statusBarHeight']  )/wx.getSystemInfoSync()['windowWidth'],

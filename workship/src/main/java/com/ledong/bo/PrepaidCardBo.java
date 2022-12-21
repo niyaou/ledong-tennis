@@ -20,6 +20,7 @@ public class PrepaidCardBo {
     private long id;
     private String name;
     private String number;
+    private String court;
     private float restCharge;
     private float annualCount;
     private float timesCount;
