@@ -112,7 +112,7 @@
       <view class="weui-footer__links">
         <text url="" class="weui-footer__link" style="color:#ccc">退出登录</text>
       </view>
-      <view class="weui-footer__text">Copyright © 2020-2021 LDTennis v{{version}}</view>
+      <view class="weui-footer__text">Copyright © 2019-2023 LDTennis v{{version}}</view>
     </view>
   </block>
 </view>

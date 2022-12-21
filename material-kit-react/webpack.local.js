@@ -72,13 +72,13 @@ module.exports = env => {
         // },
         // env dev
         '/api': {
-          target: 'http://localhost:9968',
+          target: 'https://localhost:9968',
           pathRewrite: { '^/api': '' },
           changeOrigin: true,
           secure: false,
           headers: {
-            host: "http://localhost:9968",
-            origin: "http://localhost:9968"
+            host: "https://localhost:9968",
+            origin: "https://localhost:9968"
           }
         },
         // '/api': {

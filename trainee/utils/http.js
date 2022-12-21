@@ -1,10 +1,10 @@
 const app = getApp()
-var rootDocment = 'http://192.168.2.110:9968/';
+// var rootDocment = 'https://192.168.2.110:9968/';
 // var rootDocment = 'https://192.168.2.106:8081/';
 // var rootDocment = 'http://192.168.2.106:8081/';
 // var rootDocment = 'https://106.54.80.211:8081/';
 // var rootDocment = 'http://10.217.6.43:8081/';
-// var rootDocment = 'https://www.ledongtennis.cn:8081/';
+var rootDocment = 'https://www.ledongtennis.cn:9968/';
 var header = {
   'Accept': 'application/json',
   'content-type': 'application/x-www-form-urlencoded',
@@ -24,6 +24,11 @@ function getReq(url, cb,toast = true) {
     header: header,
     success: function (res) {
       wx.hideLoading();
+      console.log(res)
+      if(res.statusCode!==200){
+        typeof cb == "function" && cb(false)
+        return
+      }
       return typeof cb == "function" && cb(res.data)
     },
     fail: function () {

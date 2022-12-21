@@ -7,8 +7,7 @@ const {
 } = require('../../dist/base/index');
 Page({
   data: {
-    version: '1.1.8',
-
+    version: '2.0.1',
     number:getApp().globalData.number,
     userInfo:getApp().globalData .userInfo,
 
@@ -97,7 +96,7 @@ console.log('------number',this.data.number)
       //   hasUserInfo: true,
       // })
       console.log('0--------',e)
-      if(e.status===500){
+      if(!e){
         wx.showModal({
           mask:true,
           title: '绑定失败',
