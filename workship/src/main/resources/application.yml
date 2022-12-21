@@ -1,6 +1,11 @@
 server:
   port: 9968
   shutdown: graceful
+  ssl:
+   protocol: TLS
+   key-store: classpath:ledongtennis.cn.jks
+   key-store-password: 88888888
+   key-store-type: JKS
 
 spring:
   application:
