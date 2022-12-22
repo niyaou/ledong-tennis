@@ -24,7 +24,7 @@ public class Court    {
    private Long id;
 
    private String name;
-
+   private int isActive=1;
 
    @OneToMany(mappedBy="court",cascade = {CascadeType.REMOVE})
    private List<Course> courses;

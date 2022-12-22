@@ -23,6 +23,7 @@ public class CourseResponseDTO {
     private LocalDateTime endTime;
     private float duration;
     private int courseTime;
+    private int  courseType;
     private Court court;
     private Coach coach;
     private List<PrepaidCard> member;

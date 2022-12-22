@@ -179,26 +179,27 @@ export const exploreRecentSpend = createAsyncThunk(
 
 
 
-export const retreatRecentCourse = createAsyncThunk(
+export const retreatCourseMember = createAsyncThunk(
     'lduser/course/retreat',
     async (params, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
-           if(params.spendingTime>3){
-      
-            if (params.spendingTime <= 60) {
-                params.spendingTime = 1
-              } else if (params.spendingTime <= 90) {
-                params.spendingTime = 1.5
-              } else if (params.spendingTime <= 120) {
-                params.spendingTime = 2
-              } else if (params.spendingTime <= 180) {
-                params.spendingTime = 2.5
-              }else{
-                params.spendingTime=3
-              }
-            }
-            const response = await Axios.post(`/api/prepaidCard/ld/chargeLogRetreat?cardId=${params.cardId}&time=${params.time}`)
+           
+            const response = await Axios.delete(`/api/prepaidCard/course/${params.courseId}/${params.number}`)
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+export const notifyCourse = createAsyncThunk(
+    'lduser/course/notify',
+    async (params, { rejectWithValue }) => {
+        try {
+            let formdata = new FormData()
+            formdata.append('courseId',params)
+            const response = await Axios.post(`/api/prepaidCard/course/notify`,formdata)
             return response.data;
         } catch (err) {
             return rejectWithValue(err)
@@ -229,6 +230,7 @@ export const createCard = createAsyncThunk(
             formdata.append("coachName",  payload.coach)
             formdata.append("spendingTime", payload.spendingTime  )
             formdata.append("courtName",  payload.court )
+            formdata.append("courseType",  payload.courseType )
             formdata.append("descript",  payload.descript )
             formdata.append("membersObj", JSON.stringify( payload. membersObj))
 
@@ -264,6 +266,24 @@ export const updateCourese= createAsyncThunk(
                 return rejectWithValue(response.data.message)
             }
             return response.data.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+export const deleteCourese= createAsyncThunk(
+    'lduser/deleteCourse',
+    async (payload, { rejectWithValue }) => {
+        try {
+           
+
+      
+            // throw new Error('Something bad happened');
+            const response = await Axios.request({method:'delete',url:`/api/prepaidCard/course/${payload}`})
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
+            return response.data;
         } catch (err) {
             return rejectWithValue(err)
         }
@@ -463,6 +483,38 @@ export const exploreSlice = createSlice({
                 state.createSuccess = true
             });
         builder
+            .addCase(notifyCourse.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(notifyCourse.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(notifyCourse.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
+            });
+        builder
+            .addCase(deleteCourese.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(deleteCourese.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(deleteCourese.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
+            });
+        builder
             .addCase(updateExpiredTime.pending, (state) => {
                 state.loading = true
                 state.createSuccess = false
@@ -512,18 +564,18 @@ export const exploreSlice = createSlice({
             });
     
         builder
-            .addCase(retreatRecentCourse.pending, (state) => {
+            .addCase(retreatCourseMember.pending, (state) => {
                 state.loading = true
                 state.createSuccess = false
 
             })
-            .addCase(retreatRecentCourse.rejected, (state, action) => {
+            .addCase(retreatCourseMember.rejected, (state, action) => {
                 state.loadError = true
                 state.loading = false
                 state.createSuccess = false
                 state.errorMsg = getErrorMsg(action)
             })
-            .addCase(retreatRecentCourse.fulfilled, (state, action) => {
+            .addCase(retreatCourseMember.fulfilled, (state, action) => {
                 state.loading = false
                 state.createSuccess = true
             });

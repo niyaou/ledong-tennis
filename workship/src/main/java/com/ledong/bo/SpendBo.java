@@ -21,7 +21,7 @@ public class SpendBo {
     private float charge;
     private float times;
     private float annualTimes;
-    private String description;
+    private float description;
     private Course course;
 
 }

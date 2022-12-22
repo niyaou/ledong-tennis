@@ -35,7 +35,8 @@ public class Course {
 
     private float duration;
 
-    @Column(name = "courseTime", columnDefinition = "int COMMENT '类型:1，班课；2，私教'")
+
+    @Column(name = "course_type",  columnDefinition = "int COMMENT '类型:0,订场，1，班课；2，私教'")
     private int courseType;
 
     @ManyToOne

@@ -132,7 +132,7 @@ function Additions(props) {
 
   const [courseEdit, setCourseEdit] = React.useState({
     startTime: new Date(), endTime: new Date(), coach: '', spendingTime: 1, courtSpend: 0, coachSpend: 0, descript: '',
-    court: '', grade: '', membersObj: null
+    court: '', courseType: 0, membersObj: null
   });
 
 
@@ -168,7 +168,7 @@ function Additions(props) {
       })
     }
     console.log("🚀 ~ file: additions.tsx ~ line 182 ~ useEffect ~ courseEdit", courseEdit)
-    dispatch(exploreRecentCourse({ page: 0, num: 50 }))
+    dispatch(exploreRecentCourse())
   }, [createSuccess])
 
   useEffect(() => {
@@ -348,11 +348,11 @@ function Additions(props) {
         inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
         value={m.spendFee}
         onChange={(e) => {
-          labelArr[idx].spendFee = parseInt(e.target.value)
+          labelArr[idx].spendFee = parseInt(e.target.value||0)
           let a = labelArr.concat()
           setLabelArr(a)
           let member = courseEdit.membersObj
-          member[mi.number] = [parseInt(e.target.value), 0, 0]
+          member[mi.number] = [parseInt(e.target.value), 0, 0,0]
           let after = { ...courseEdit, membersObj: member }
     
           setCourseEdit(after)
@@ -365,16 +365,16 @@ function Additions(props) {
         label="扣次卡"
         size="small"
         sx={{ width: '100px' }}
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        inputProps={{ inputMode: 'numeric',  }}
         value={m.times}
         onChange={(e) => {
           let pos = labelArr.findIndex(e => e.name === m.name)
           labelArr[pos].type = 2
           labelArr[pos].spendFee = 0
-          labelArr[pos].times = parseInt(e.target.value)
+          labelArr[pos].times = parseFloat(e.target.value||0).toFixed(1); 
 
           let member = courseEdit.membersObj
-          member[mi.number] = [0, parseInt(e.target.value), 0]
+          member[mi.number] = [0, parseFloat(e.target.value).toFixed(1),  labelArr[pos].perTime ]
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -388,17 +388,41 @@ function Additions(props) {
         卡"
         size="small"
         sx={{ width: '100px' }}
-        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        inputProps={{ inputMode: 'numeric',  }}
         value={m.annualTimes}
         onChange={(e) => {
+       
           let pos = labelArr.findIndex(e => e.name === m.name)
           labelArr[pos].type = 3
           labelArr[pos].spendFee = 0
           labelArr[pos].times = 0
-          labelArr[pos].annualTimes = parseInt(e.target.value)
+          labelArr[pos].annualTimes = parseFloat(e.target.value||0).toFixed(1); 
 
           let member = courseEdit.membersObj
-          member[mi.number] = [0, 0,parseInt(e.target.value)]
+          member[mi.number] = [0, 0,parseFloat(e.target.value).toFixed(1),labelArr[pos].perTime]
+          let after = { ...courseEdit, membersObj: member }
+          let a = labelArr.concat()
+          setLabelArr(a)
+          setCourseEdit(after)
+        }}
+      />}
+
+ {m.type !== 1 && <TextField
+        id="outlined-password-input"
+        label="单价"
+        size="small"
+        sx={{ width: '100px' }}
+        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        value={m.perTime}
+        onChange={(e) => {
+          
+          let pos = labelArr.findIndex(e => e.name === m.name)
+      
+
+          labelArr[pos].perTime = parseInt(e.target.value||0)
+
+          let member = courseEdit.membersObj
+          member[mi.number][3] = parseInt(e.target.value)
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -414,9 +438,7 @@ function Additions(props) {
           size="small"
           onClick={async () => {
             let pos = labelArr.findIndex(e => e.name === m.name)
-
             labelArr[pos].type = 1
-           
             let a = labelArr.concat()
             setLabelArr(a)
        
@@ -435,7 +457,7 @@ function Additions(props) {
             labelArr[pos].type = 2
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.number] = [0, 1, 0]
+            member[mi.number] = [0, 1, 0,0]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -455,7 +477,7 @@ function Additions(props) {
             labelArr[pos].type = 3
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.number] = [0, 0, 1]
+            member[mi.number] = [0, 0, 1,0]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -503,11 +525,11 @@ function Additions(props) {
       return
     }
     let member = users.find(u => u.name === item)
-    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0 ,annualTimes:0})
+    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0 ,annualTimes:0,perTime:0})
     let a = labelArr.concat()
     let temp = {}
     temp = Object.assign(temp, {
-      [member.number]: [0, courseEdit.spendingTime]
+      [member.number]: [0, courseEdit.spendingTime,0,0]
     })
     let after = { ...courseEdit, membersObj: { ...courseEdit.membersObj, ...temp } }
 
@@ -527,7 +549,7 @@ function Additions(props) {
     {selectCourse && (<Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
       {selectCourse.court}
     </Typography>)}
-    {!selectCourse && <FormControl sx={{ width: 350, }}>
+    {!selectCourse && <FormControl sx={{ width: '100%', }}>
       <InputLabel id="demo-controlled-open-select-label1">校区</InputLabel>
       <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
         name='FileTypes'
@@ -556,6 +578,23 @@ function Additions(props) {
         {coach && coach.map((dict, index) => { return (<MenuItem key={`select-${dict.number}`} value={dict.number}>{dict.name}</MenuItem>) })}
       </Select>
     </FormControl>}
+
+    <FormControl sx={{ width: '100%', }}>
+      <InputLabel id="demo-controlled-open-select-label1">课时类型</InputLabel>
+      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+        name='FileTypes'
+        size="small"
+        onChange={(e) => {
+          let after = { ...courseEdit, courseType: e.target.value }
+          setCourseEdit(after)
+        }}
+        value={[courseEdit.courseType]}>
+       {['订场','班课','私教'].map((dict, index) => { return (<MenuItem key={`courseType-${dict}`} value={index}>{dict}</MenuItem>) })}
+      </Select>
+    </FormControl>
+
+
+
 
     {!selectCourse && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}>
       <TextField

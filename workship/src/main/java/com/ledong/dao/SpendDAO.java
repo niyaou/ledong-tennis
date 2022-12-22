@@ -17,7 +17,9 @@ public interface SpendDAO extends JpaRepository<Spend, Serializable>, JpaSpecifi
 
     public Spend findByPrepaidCard_Id(Long id);
 
-    public Spend findByPrepaidCard_NumberAndCourse_Id(String number,Long Cid);
+    public Spend findByPrepaidCard_IdAndCourse_Id(Long prepaidCardId,Long cId);
+
+
 
 
 }

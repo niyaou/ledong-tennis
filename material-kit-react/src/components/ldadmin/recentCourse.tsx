@@ -17,7 +17,7 @@ import UserManagement from './userManagement'
 import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
 import { useNavigate } from 'react-router-dom';
-import { exploreUsersAction, exploreRecentCourse, selectCourse } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse ,deleteCourese,retreatCourseMember,notifyCourse} from '../../store/slices/dominationSlice'
 import { tagsInfoAction, scenceInfoAction } from '../../store/slices/tagsSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -124,7 +124,7 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '80px',
                 }} >
-                {item.court.name}
+                {item.court?.name}
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
@@ -157,7 +157,7 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.duration}小时
+                {item.duration}小时  ,{item.courseType===0?'订场':item.courseType===1?'班课':'私教'}
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
@@ -182,7 +182,7 @@ function RecentCourse(props) {
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
                 }} >
-                {item.coach.name}
+                {item.coach?.name}
               </Typography>
               <Stack
 
@@ -197,7 +197,7 @@ function RecentCourse(props) {
                 {item.member.map((m, idx) => (
                   <Button variant="outlined" size="small"   key={`${m}a5-${m.number}`}
                     onClick={() => {
-                    // dispatch(selectCourse(item))
+                    dispatch(retreatCourseMember({courseId:item.id,number:m.number}))
                   }}>   {m.name}</Button>
                   // <Typography gutterBottom variant="body2"
                   
@@ -220,12 +220,17 @@ function RecentCourse(props) {
 
             }}
           >
-            <Button variant="outlined" size="small" onClick={() => {
-              dispatch(selectCourse(item))
-            }}>编辑</Button>
-            <Button variant="outlined" size="small"
+             <Button variant="contained" size="small"
+             disabled={item.notified>0}
              onClick={() => {
-              // dispatch(selectCourse(item))
+              dispatch(notifyCourse(item.id))
+            }}>短信通知</Button>
+            {/* <Button variant="outlined" size="small" onClick={() => {
+              dispatch(selectCourse(item))
+            }}>编辑</Button> */}
+            <Button variant="contained" color="warning" size="small"
+             onClick={() => {
+              dispatch(deleteCourese(item.id))
             }}
             >删除</Button>
           </Stack>

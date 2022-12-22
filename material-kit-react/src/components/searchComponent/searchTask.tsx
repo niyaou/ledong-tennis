@@ -29,7 +29,7 @@ import CourseItem from '../../components/ldadmin/courseItem'
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCharge, exploreRecentSpend,exploreMemberCourse,updateExpiredTime ,updateChargeAnnotation,retreatRecentCourse} from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCharge, exploreRecentSpend,exploreMemberCourse,updateExpiredTime ,updateChargeAnnotation,} from '../../store/slices/dominationSlice'
 import {createUserAccount} from '../../store/actions/usersActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -75,8 +75,8 @@ function SearchTask(props) {
     const [userSort, setUserSort] = React.useState(false);
     const [customerName, setCustomerName] = React.useState('');
     const [customerOpenId, setCustomerOpenId] = React.useState('');
-    const [annualTimes, setAnnualTimes] = React.useState(prepaidCard.restCount || 0);
-    const [expiredTime, setExpiredTime] = React.useState(prepaidCard.expiredTime || '');
+    const [annualTimes, setAnnualTimes] = React.useState(prepaidCard.annualCount || 0);
+    const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
     const [create, setCreate] = React.useState(0);//0 关；  1 显示
@@ -245,23 +245,14 @@ function SearchTask(props) {
                     /> */}
                 </FormControl>
             </LocalizationProvider>
-            <TextField
-                label="年卡次数"
-                // label="Content(reply visable scale as the same as topic.)"
-                required
-                value={annualTimes}
-                onChange={(event: any) => {
-                    setAnnualTimes(event.target.value)
-                }}
-
-            />
+           
 
             <Button variant="contained" size="small"
-                disabled={ expiredTime==='' || !annualTimes}
+                disabled={ expiredTime===''}
 
                 onClick={() => {
                     console.log('---expiredTime-',expiredTime)
-                    dispatch(updateExpiredTime({ number: customerOpenId, annualExpireTime: moment(expiredTime).format('YYYY-MM-DD'), annualTimes: parseInt(annualTimes) }))
+                    dispatch(updateExpiredTime({ number: customerOpenId, annualExpireTime: moment(expiredTime).format('YYYY-MM-DD') }))
                
                }}>修改年卡时间次数</Button>
 
@@ -381,6 +372,16 @@ function SearchTask(props) {
                             setChangeCount(e.target.value);
                         }}
                     />
+                     <TextField
+                label="年卡次数"
+                // label="Content(reply visable scale as the same as topic.)"
+                required
+                value={annualTimes}
+                onChange={(event: any) => {
+                    setAnnualTimes(event.target.value)
+                }}
+
+            />
                     <TextField
                         id="outlined-password-input3"
                         label="备注"
@@ -392,7 +393,7 @@ function SearchTask(props) {
                     <Button variant="contained" size="small"
 
                         onClick={() => {
-                            dispatch(updateChargeAnnotation({ number: customerOpenId, charged: parseInt(changeFee), 
+                            dispatch(updateChargeAnnotation({ number: customerOpenId, charged: parseInt(changeFee), annualTimes:parseInt(annualTimes),
                                times: parseInt(changeCount), description: changeDesc }))
                         }}>确定充值</Button>
                 </Stack>

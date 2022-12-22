@@ -47,8 +47,9 @@ public class PrepaidCardController {
                                       @RequestParam  float spendingTime,
                                       @RequestParam  String courtName,
                                       @RequestParam  String descript,
+                                      @RequestParam  int courseType,
                                       @RequestParam  String membersObj){
-        var course = Course.fromBO(courseCases.createCourse(startTime,endTime,coachName,spendingTime,courtName,descript,membersObj));
+        var course = Course.fromBO(courseCases.createCourse(startTime,endTime,coachName,spendingTime,courtName,descript,courseType,membersObj));
         return CourseResponseDTO.builder()
                .build();
     }

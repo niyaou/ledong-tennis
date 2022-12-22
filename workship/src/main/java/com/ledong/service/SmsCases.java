@@ -26,7 +26,7 @@ public class SmsCases {
     private final String CODE="1";
     private final String SDKAPPID = "1400779674";
     private final String SIGNNAME = "成都乐动精灵体育";
-    private final   String TEMPLATEID = "1639069";
+    private final   String TEMPLATEID = "1640539";
     private  SmsClient client;
     public SmsCases(){
         HttpProfile httpProfile = new HttpProfile();
@@ -67,7 +67,7 @@ public class SmsCases {
         DateTimeFormatter dfDate = DateTimeFormatter.ofPattern("MM月dd日");
         var startTime = course.getStartTime().format(dfDate);
         var court = course.getCourt().getName();
-        var courseStr = startTime+court;
+        var courseStr = startTime;
         for (com.ledong.entity.Spend spend : spends) {
             var charge = spend.getCharge() != 0 ? (spend.getCharge() + "") : "";
             var times = spend.getTimes() != 0 ? (spend.getTimes() + "次") : "";
@@ -75,7 +75,7 @@ public class SmsCases {
             var spendStr = charge + times + annual;
             var member = spend.getPrepaidCard();
             var rest = member.getRestCharge() + (member.getTimesCount() + member.getAnnualCount()) + "次";
-            sendSms(member.getNumber(), new String[]{courseStr, spendStr, rest});
+            sendSms(member.getNumber(), new String[]{startTime,court, spendStr,  ""+member.getRestCharge(),""+member.getTimesCount() ,""+member.getAnnualCount()});
         }
         course.setNotified(course.getNotified()+1);
         courseDao.save(course);

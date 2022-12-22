@@ -26,7 +26,7 @@ public class Coach   {
     private String name;
 
     private String number;
-
+    private int isActive=1;
     private int level;
 
     @OneToMany(mappedBy = "coach",cascade = {CascadeType.REMOVE})

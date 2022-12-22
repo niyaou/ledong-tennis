@@ -63,6 +63,7 @@ public class CourseCases {
             float spendingTime,
             String courtName,
             String descript,
+            int courseType,
             String membersObj
     ) {
         var coach = coachDao.findByNumber(coachName);
@@ -74,32 +75,35 @@ public class CourseCases {
                 .endTime(DateUtil.parse(endTime).toLocalDateTime())
                 .duration(spendingTime)
                 .description(descript)
+                .courseType(courseType)
                 .member(new ArrayList<>())
                 .build();
         var course = Course.fromBO(courseBo);
-        course=  courseDao.save(course);
+        course = courseDao.save(course);
         for (Map.Entry<String, Object> entry : ((JSONObject) _mObj).entrySet()) {
+            //set spend description
             var key = entry.getKey();
             var value = entry.getValue();
             var member = userDao.findByNumber(key);
             var spend = SpendBo.builder().course(course).prepaidCard(member)
-                    .description(course.getDescription())
                     .build();
-            var charge =((List<Integer>) value).get(0);
-            var times =((List<Integer>) value).get(1);
-            var annualTimes =((List<Integer>) value).get(2);
-            if (charge!= 0) {
-                member.setRestCharge(member.getRestCharge() -charge);
-                spend.setCharge(charge);
+            var charge = ((JSONArray) value).get(0, Float.class);
+            var times = ((JSONArray) value).get(1, Float.class);
+            var annualTimes = ((JSONArray) value).get(2, Float.class);
+            var spendDescript = ((JSONArray) value).get(3, Float.class);
+            if (charge != 0) {
+                member.setRestCharge(member.getRestCharge() - charge);
+                spend.setCharge((Float) charge);
             }
             if (times != 0) {
                 member.setTimesCount(member.getTimesCount() - times);
                 spend.setTimes(times);
             }
             if (annualTimes != 0) {
-                member.setAnnualCount(member.getAnnualCount() -annualTimes);
+                member.setAnnualCount(member.getAnnualCount() - annualTimes);
                 spend.setAnnualTimes(annualTimes);
             }
+            spend.setDescription(spendDescript);
             userDao.save(member);
             spendDao.save(Spend.fromBO(spend));
             var members = course.getMember();
@@ -112,88 +116,100 @@ public class CourseCases {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public CourseBo removeCourseMember(Long courseId,String number){
-       var _course= courseDao.findById(courseId);
-       if(_course.isPresent()){
-        var course=   _course.get();
-       var members= course.getMember();
-           members= members.stream().filter((prepaidCard)->{
-               //查找spend,删除，
-              var spend= spendDao. findByPrepaidCard_NumberAndCourse_Id(number,courseId);
-               useCase.setRestChargeChange(number,spend.getCharge());
-               useCase.setRestTimesChange(number,spend.getTimes());
-               useCase.setRestAnnualTimesChange(number,spend.getAnnualTimes());
-               spendDao.delete(spend);
-               return !prepaidCard.getNumber().equals(number);
-           }).collect(Collectors.toList());
-           course.setMember(members);
-           courseDao.save(course);
-           return DefaultConverter.convert(course,CourseBo.class);
-       }else{
-           throw new CustomException(UseCaseCode.NOT_FOUND);
-       }
-    }
+    public CourseBo removeCourseMember(Long courseId, String number) {
+        var _course = courseDao.findById(courseId);
+        if (_course.isPresent()) {
+            var course = _course.get();
+            var members = course.getMember();
+            members = members.stream().filter((prepaidCard) -> {
+                if (!prepaidCard.getNumber().equals(number)) {
+                    return true;
+                }
+
+                var id = prepaidCard.getId();
+                var spend = spendDao.findByPrepaidCard_IdAndCourse_Id(id, courseId);
+                if (spend != null) {
+                    useCase.setRestChargeChange(number, spend.getCharge());
+                    useCase.setRestTimesChange(number, spend.getTimes());
+                    useCase.setRestAnnualTimesChange(number, spend.getAnnualTimes());
+                    spendDao.delete(spend);
+                    return false;
+                }
 
 
-    @Transactional(rollbackFor = Exception.class)
-    public CourseBo removeCourse(Long courseId){
-        var _course= courseDao.findById(courseId);
-        if(_course.isPresent()){
-            var course=   _course.get();
-            var members= course.getMember();
-            members.forEach((prepaidCard)->{
-                var number=prepaidCard.getNumber();
-                var spend= spendDao. findByPrepaidCard_NumberAndCourse_Id(number,courseId);
-                useCase.setRestChargeChange(number,spend.getCharge());
-                useCase.setRestTimesChange(number,spend.getTimes());
-                useCase.setRestAnnualTimesChange(number,spend.getAnnualTimes());
-                spendDao.delete(spend);
-            });
-            courseDao.delete(course);
-            return DefaultConverter.convert(course,CourseBo.class);
-        }else{
+                return true;
+//               return !prepaidCard.getNumber().equals(number);
+
+            }).collect(Collectors.toList());
+            course.setMember(members);
+            courseDao.save(course);
+            return DefaultConverter.convert(course, CourseBo.class);
+        } else {
             throw new CustomException(UseCaseCode.NOT_FOUND);
         }
     }
 
-    public Page<Course> totalCourse(String startTime,Integer pageNum,Integer pageSize){
-        var sort = Sort.by(Sort.Direction.DESC,"startTime");
-        Pageable pageReq = PageRequest.of(pageNum - 1, pageSize,sort);
-       return  courseDao.findAllWithStartTimeAfter(DateUtil.parseDateTime(startTime).toLocalDateTime(),pageReq);
+
+    @Transactional(rollbackFor = Exception.class)
+    public CourseBo removeCourse(Long courseId) {
+        var _course = courseDao.findById(courseId);
+        if (_course.isPresent()) {
+            var course = _course.get();
+            var members = course.getMember();
+            members.forEach((prepaidCard) -> {
+                var id = prepaidCard.getId();
+                var number = prepaidCard.getNumber();
+                var spend = spendDao.findByPrepaidCard_IdAndCourse_Id(id, courseId);
+                useCase.setRestChargeChange(number, spend.getCharge());
+                useCase.setRestTimesChange(number, spend.getTimes());
+                useCase.setRestAnnualTimesChange(number, spend.getAnnualTimes());
+                spendDao.delete(spend);
+            });
+            courseDao.delete(course);
+            return DefaultConverter.convert(course, CourseBo.class);
+        } else {
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
     }
 
-    public Page<Course> memberCourse(String startTime,String number,Integer pageNum,Integer pageSize){
-        var sort = Sort.by(Sort.Direction.DESC,"startTime");
-        Pageable pageReq = PageRequest.of(pageNum - 1, pageSize,sort);
+    public Page<Course> totalCourse(String startTime, Integer pageNum, Integer pageSize) {
+        var sort = Sort.by(Sort.Direction.DESC, "startTime");
+        Pageable pageReq = PageRequest.of(pageNum - 1, pageSize, sort);
+        return courseDao.findAllWithStartTimeAfter(DateUtil.parseDateTime(startTime).toLocalDateTime(), pageReq);
+    }
 
-        Specification<Course> spec=new Specification<Course>() {
+    public Page<Course> memberCourse(String startTime, String number, Integer pageNum, Integer pageSize) {
+        var sort = Sort.by(Sort.Direction.DESC, "startTime");
+        Pageable pageReq = PageRequest.of(pageNum - 1, pageSize, sort);
+
+        Specification<Course> spec = new Specification<Course>() {
             @Override
             public Predicate toPredicate(Root<Course> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Root<PrepaidCard> members = query.from(PrepaidCard.class);
-                Join<Course, PrepaidCard> join =  root.join("member", JoinType.INNER);
+                Join<Course, PrepaidCard> join = root.join("member", JoinType.INNER);
                 List<Predicate> predicates = new ArrayList<>();
-                predicates.add( cb.equal(join.get("number"),number)); // AB两表的关联条件，就是sql join 中的on条件
-                predicates.add(cb.greaterThanOrEqualTo(root.get("startTime"),DateUtil.parse(startTime).toLocalDateTime() ));
+                predicates.add(cb.equal(join.get("number"), number)); // AB两表的关联条件，就是sql join 中的on条件
+                predicates.add(cb.greaterThanOrEqualTo(root.get("startTime"), DateUtil.parse(startTime).toLocalDateTime()));
                 query.distinct(true);
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
-        return courseDao.findAll(spec,pageReq);
+        return courseDao.findAll(spec, pageReq);
 //        return  courseDao.findMemberWithStartTimeAfter(DateUtil.parseDateTime(startTime).toLocalDateTime(),number,pageReq);
     }
 
 
-    public Object notify(Long id){
-        var sort = Sort.by(Sort.Direction.DESC,"startTime");
-        Pageable pageReq = PageRequest.of(1, 1000,sort);
-        Specification<Course> spec=new Specification<Course>() {
+    public Object notify(Long id) {
+        var sort = Sort.by(Sort.Direction.DESC, "startTime");
+        Pageable pageReq = PageRequest.of(1, 1000, sort);
+        Specification<Course> spec = new Specification<Course>() {
             @Override
             public Predicate toPredicate(Root<Course> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Root<PrepaidCard> members = query.from(PrepaidCard.class);
                 List<Predicate> predicates = new ArrayList<>();
-                predicates.add( cb.equal(root.get("notified"),0)); // AB两表的关联条件，就是sql join 中的on条件
-                if(id!=null){
-                    predicates.add( cb.equal(root.get("id"),id));
+                predicates.add(cb.equal(root.get("notified"), 0)); // AB两表的关联条件，就是sql join 中的on条件
+                if (id != null) {
+                    predicates.add(cb.equal(root.get("id"), id));
                 }
 
                 query.distinct(true);
@@ -201,14 +217,14 @@ public class CourseCases {
             }
         };
 
-       var courses=  courseDao.findAll(spec);
-       courses.forEach(course -> {
-           try {
-               smsCase.notifyCourse(course);
-           } catch (TencentCloudSDKException e) {
-               e.printStackTrace();
-           }
-       });
-       return null;
+        var courses = courseDao.findAll(spec);
+        courses.forEach(course -> {
+            try {
+                smsCase.notifyCourse(course);
+            } catch (TencentCloudSDKException e) {
+                e.printStackTrace();
+            }
+        });
+        return null;
     }
 }

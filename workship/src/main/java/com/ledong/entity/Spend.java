@@ -31,7 +31,7 @@ public class Spend  {
     private float charge;
     private float times;
     private float annualTimes;
-    private String description;
+    private float description;
 
 
     @ManyToOne
