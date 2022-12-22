@@ -195,7 +195,9 @@ function RecentCourse(props) {
                 }}
               >
                 {item.member.map((m, idx) => (
-                  <Button variant="outlined" size="small"   key={`${m}a5-${m.number}`}
+                  <Button variant="contained" size="small"   
+                  disabled={item.notified>0}
+                  key={`${m}a5-${m.number}`}
                     onClick={() => {
                     dispatch(retreatCourseMember({courseId:item.id,number:m.number}))
                   }}>   {m.name}</Button>
