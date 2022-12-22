@@ -7,7 +7,7 @@ const {
 } = require('../../dist/base/index');
 Page({
   data: {
-    version: '2.0.1',
+    version: '2.0.2',
     number: getApp().globalData.number,
     userInfo: getApp().globalData.userInfo,
 
