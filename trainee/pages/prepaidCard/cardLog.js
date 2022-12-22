@@ -14,39 +14,39 @@ Page({
   data: {
     statusBarHeight: getApp().globalData.statusBarHeight,
     totalBarHeight: getApp().globalData.totalBarHeight,
-    userInfo:getApp().globalData.userInfo,
+    userInfo: getApp().globalData.userInfo,
     visible: false,
     currentIndex: 0,
     balance: 0,
-    balanceTimes:0,
-    prepaidCard:'',
+    balanceTimes: 0,
+    prepaidCard: '',
     current: '没参加比赛',
-    selectCharge:{},
-    chargeLogs:[],
-    spendLogs:[],
+    selectCharge: {},
+    chargeLogs: [],
+    spendLogs: [],
     currentTarget: [],
     actions: [{
-        name: '申诉',
-        color: '#fff',
-        fontsize: '20',
-        width: 100,
-        icon: 'interactive',
-        background: '#ed3f14'
-      },
-      {
-        name: '返回',
-        width: 100,
-        color: '#80848f',
-        fontsize: '20',
-        icon: 'undo'
-      }
+      name: '申诉',
+      color: '#fff',
+      fontsize: '20',
+      width: 100,
+      icon: 'interactive',
+      background: '#ed3f14'
+    },
+    {
+      name: '返回',
+      width: 100,
+      color: '#80848f',
+      fontsize: '20',
+      icon: 'undo'
+    }
     ],
     players: [],
     slideButtons: [],
   },
-  formatTime(time,pattern){
-    console.log(util.stringDateFormat('YYYY-mm-dd HH:MM',time))
-    return util.stringDateFormat('YYYY-mm-dd HH:MM',time)
+  formatTime(time, pattern) {
+    console.log(util.stringDateFormat('YYYY-mm-dd HH:MM', time))
+    return util.stringDateFormat('YYYY-mm-dd HH:MM', time)
   },
   onChange(event) {
     const detail = event.detail;
@@ -55,7 +55,7 @@ Page({
     })
     console.log(event.detail)
   },
-  showModalRetreat(e){
+  showModalRetreat(e) {
     this.setData({
       visible: true,
       selectCharge: e.target.dataset.log
@@ -100,25 +100,33 @@ Page({
   },
 
 
-getCardLogs(number){
-  let url = `user/charged/${number}`
-  http.getReq(`${url}`, (res) => {
-    console.log('----res',res)
-          this.setData({chargeLogs: res.content})
-  })
-},
+  getCardLogs(number) {
+    let url = `user/charged/${number}`
+    http.getReq(`${url}`, (res) => {
+      console.log('----res', res)
+      this.setData({ chargeLogs: res.content })
+    })
+  },
+  getUserInfo: function (e) {
+    http.getReq(`user/?number=${this.data.userInfo.number}`, (e) => {
+      this.setData({
+        userInfo: e,
+      })
+    })
 
+  },
 
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    console.log('onShow   ------- ',app.globalData.userInfo)
+    console.log('onShow   ------- ', app.globalData.userInfo)
     this.getCardLogs(app.globalData.userInfo.number)
-    this.setData({userInfo:app.globalData.userInfo})
+    this.setData({ userInfo: app.globalData.userInfo })
+    this.getUserInfo()
   },
 
-  onCreate:function(){
+  onCreate: function () {
     console.log('onCreate   ------- ')
   },
 
@@ -153,6 +161,6 @@ getCardLogs(number){
   /**
    * 用户点击右上角分享
    */
-  onShareAppMessage: function () {},
+  onShareAppMessage: function () { },
 
 })

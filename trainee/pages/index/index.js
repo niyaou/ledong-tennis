@@ -8,8 +8,8 @@ const {
 Page({
   data: {
     version: '2.0.1',
-    number:getApp().globalData.number,
-    userInfo:getApp().globalData .userInfo,
+    number: getApp().globalData.number,
+    userInfo: getApp().globalData.userInfo,
 
     vsCode: '',
 
@@ -28,15 +28,15 @@ Page({
       number: e.detail.value
     })
     wx.setStorageSync('number', e.detail.value)
-    console.log('--------setStorageSync------',e.detail.value)
-    console.log('--------get------',wx.getStorageSync('number'))
+    console.log('--------setStorageSync------', e.detail.value)
+    console.log('--------get------', wx.getStorageSync('number'))
   },
   //事件处理函数
   bindViewTap: function () {
     this.setData({
       hasUserInfo: false
     })
-    console.log('bindViewTap---hasuserinfo',this.data.hasUserInfo)
+    console.log('bindViewTap---hasuserinfo', this.data.hasUserInfo)
     return
   },
 
@@ -51,11 +51,10 @@ Page({
     }
   },
   onShow: function () {
-console.log('------number',this.data.number)
-    if (app.globalData.jwt) {
-      this.initPlayerInfo()
-    }
+    console.log('------number', this.data.number)
+    this.getUserInfo()
   },
+
   checkingLogin() {
     return this.data.userInfo.name !== "请登录"
   },
@@ -79,69 +78,59 @@ console.log('------number',this.data.number)
       this.setData({
         hasUserInfo: false
       })
-      console.log('--loginClick-----',this.data.hasUserInfo)
+      console.log('--loginClick-----', this.data.hasUserInfo)
     }
   },
   onConfirmEmitted() { },
 
 
   getUserInfo: function (e) {
-    http.getReq(`user/?number=${this.data.number}`,  (e) => {
-      // this.setData({
-      //   userInfo: {
-      //     avatarUrl: e.data.avator,
-      //     name: e.data.name,
-      //     prepaidCard:e.data.prepaidCard
-      //   },
-      //   hasUserInfo: true,
-      // })
-      console.log('0--------',e)
-      if(!e){
+    http.getReq(`user/?number=${this.data.number}`, (e) => {
+      console.log('0--------', e)
+      if (!e) {
         wx.showModal({
-          mask:true,
+          mask: true,
           title: '绑定失败',
           content: '输入的电话未登记，请联系教练处理',
           showCancel: false
         })
-        return 
+        return
       }
       this.setData({
-        userInfo:e,
-        hasUserInfo:true,
+        userInfo: e,
+        hasUserInfo: true,
       })
       app.globalData.userInfo = e
-
-      console.log('---set app global user info ', app.globalData.userInfo)
     })
 
   },
 
-  
-
-        
 
 
-  
 
-logout(){
-  wx.clearStorage({
-    success: (res) => {
-      app.globalData.number = ''
-      app.globalData.userInfo = {
-        name: "请登录",
-        avatarUrl: "../../icon/user2.png"
-      }
-      this.setData({
-        userInfo:{
+
+
+
+
+  logout() {
+    wx.clearStorage({
+      success: (res) => {
+        app.globalData.number = ''
+        app.globalData.userInfo = {
           name: "请登录",
           avatarUrl: "../../icon/user2.png"
-        },
-        hasUserInfo:false,
-      })
-      
-    },
-  })
-},
+        }
+        this.setData({
+          userInfo: {
+            name: "请登录",
+            avatarUrl: "../../icon/user2.png"
+          },
+          hasUserInfo: false,
+        })
+
+      },
+    })
+  },
   getNearByUser(jwt) {
 
   },
@@ -153,27 +142,27 @@ logout(){
 
 
   navigateTo(event) {
-    if (this.data.userInfo.name==='请登录') {
+    if (this.data.userInfo.name === '请登录') {
       this.setData({
         hasUserInfo: false
       })
-      console.log('------navigateTo-----',this.data.hasUserInfo)
+      console.log('------navigateTo-----', this.data.hasUserInfo)
       return
     }
 
     if (event.currentTarget.dataset.variable === -1) {
-         wx.navigateTo({
-          url: '../../pages/teenage/create'
-        })
-     } else
+      wx.navigateTo({
+        url: '../../pages/teenage/create'
+      })
+    } else
       if (event.currentTarget.dataset.variable === 0) {
         wx.navigateTo({
-          url: '../../pages/prepaidCard/cardLog?cardId='+this.data.userInfo.prepaidCard
+          url: '../../pages/prepaidCard/cardLog?cardId=' + this.data.userInfo.prepaidCard
         })
-      } else        if (event.currentTarget.dataset.variable === 1) {
-          wx.navigateTo({
-            url: '../../pages/score/score'
-          })
-        } 
+      } else if (event.currentTarget.dataset.variable === 1) {
+        wx.navigateTo({
+          url: '../../pages/score/score'
+        })
+      }
   },
 })
