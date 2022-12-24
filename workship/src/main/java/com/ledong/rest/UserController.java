@@ -15,6 +15,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/user")
 @Validated
@@ -37,8 +39,9 @@ public class UserController extends BaseController {
     private CourseCases courseCases;
 
     @PostMapping("/register")
-    public UserResponseDTO register(@RequestParam String name, @RequestParam String number,@RequestParam String court) {
-        var user = PrepaidCard.fromBO(useCase.create(name, number,court));
+    public UserResponseDTO register( @RequestHeader(value = "secure", required = false)String secure,@RequestParam String name, @RequestParam String number) {
+        verifiedSecure(secure);
+        var user = PrepaidCard.fromBO(useCase.create(name, number));
         return UserResponseDTO.builder()
                 .token("------").user(user).build();
     }
