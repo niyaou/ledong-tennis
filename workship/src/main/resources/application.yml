@@ -15,9 +15,9 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/workship
+    url: jdbc:mysql://10.217.2.51:3307/workship
     username: root
-    password: 123456
+    password: desay_12345
     driver-class-name: com.mysql.cj.jdbc.Driver
   main:
     allow-bean-definition-overriding: true
@@ -25,3 +25,6 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   verified: 12345678
+  sms:
+    id: 1
+    code:  1

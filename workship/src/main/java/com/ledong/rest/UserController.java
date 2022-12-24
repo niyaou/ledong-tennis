@@ -39,18 +39,19 @@ public class UserController extends BaseController {
     private CourseCases courseCases;
 
     @PostMapping("/register")
-    public UserResponseDTO register( @RequestHeader(value = "secure", required = false)String secure,@RequestParam String name, @RequestParam String number) {
+    public UserResponseDTO register( @RequestHeader(value = "secure", required = false)String secure,@RequestParam String name, @RequestParam String number,@RequestParam String court) {
         verifiedSecure(secure);
-        var user = PrepaidCard.fromBO(useCase.create(name, number));
+        var user = PrepaidCard.fromBO(useCase.create(name, number,court));
         return UserResponseDTO.builder()
                 .token("------").user(user).build();
     }
 
 
     @PostMapping("/charged")
-    public Object charged(String number, @RequestParam(required = false)Float charged, @RequestParam(required = false)Float times,
+    public Object charged( @RequestHeader(value = "secure", required = false)String secure,String number, @RequestParam(required = false)Float charged, @RequestParam(required = false)Float times,
                                       @RequestParam(required = false)Float annualTimes, @RequestParam(required = false)String annualExpireTime,
                                       @RequestParam(required = false)String description) {
+        verifiedSecure(secure);
         var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime,description);
         return chargedLog;
 
@@ -64,13 +65,15 @@ public class UserController extends BaseController {
 
 
     @PostMapping("/charged/retreat/{id}")
-    public ChargedResponseDTO charged(@PathVariable("id") Long id) {
+    public ChargedResponseDTO charged( @RequestHeader(value = "secure", required = false)String secure,@PathVariable("id") Long id) {
+        verifiedSecure(secure);
         var chargedLog = cardCase.retreatCharge(id);
         return ChargedResponseDTO.builder().build();
     }
 
     @GetMapping("/")
     public Object members(@RequestParam(required = false) String number) {
+
         if (StringUtils.hasText(number)) {
             return useCase.getMember(number);
         } else {
@@ -81,7 +84,8 @@ public class UserController extends BaseController {
 
 
     @PostMapping("/course/notify")
-    public Object notify(@RequestParam(required = false) Long id) {
+    public Object notify( @RequestHeader(value = "secure", required = false)String secure,@RequestParam(required = false) Long id) {
+        verifiedSecure(secure);
         return  courseCases.notify(id);
     }
 

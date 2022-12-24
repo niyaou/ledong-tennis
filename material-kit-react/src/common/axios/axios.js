@@ -22,7 +22,7 @@ const Axios = axios.create({
 // Axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
 
 
-
+const secure = process.env.CODE
 export const ACCESS_TOKEN = 'accept_token'
 export const DAS_TOKEN = 'access_token'
 
@@ -33,7 +33,7 @@ Axios.interceptors.request.use(config => {
     if (userStr && userStr !== 'null') {
             config.headers['Authorization'] = `Bearer ${userStr}` // 让每个请求携带自定义 token 请根据实际情况自行修改
     }
-
+    config.headers['secure']=secure
     return config
 }, err => {
     return Promise.reject(err)

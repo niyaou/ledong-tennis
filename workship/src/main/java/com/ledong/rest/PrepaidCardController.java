@@ -29,7 +29,7 @@ import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 @RestController
 @RequestMapping("/prepaidCard")
 @Slf4j
-public class PrepaidCardController {
+public class PrepaidCardController extends BaseController{
 
     @Autowired
     private CourseCases courseCases;
@@ -41,7 +41,8 @@ public class PrepaidCardController {
 
 
     @PostMapping("/course/create")
-    public CourseResponseDTO register(@RequestParam  String startTime,
+    public CourseResponseDTO register( @RequestHeader(value = "secure", required = false)String secure,
+                                       @RequestParam  String startTime,
                                       @RequestParam String endTime,
                                       @RequestParam   String coachName,
                                       @RequestParam  float spendingTime,
@@ -49,6 +50,7 @@ public class PrepaidCardController {
                                       @RequestParam  String descript,
                                       @RequestParam  int courseType,
                                       @RequestParam  String membersObj){
+        verifiedSecure(secure);
         var course = Course.fromBO(courseCases.createCourse(startTime,endTime,coachName,spendingTime,courtName,descript,courseType,membersObj));
         return CourseResponseDTO.builder()
                .build();
@@ -68,16 +70,18 @@ public class PrepaidCardController {
     }
 
     @DeleteMapping("/course/{id}/{member}")
-    public CourseResponseDTO removeMember(@PathVariable("id")Long courseId,@PathVariable("member")String number
+    public CourseResponseDTO removeMember( @RequestHeader(value = "secure", required = false)String secure,@PathVariable("id")Long courseId,@PathVariable("member")String number
                               ){
+        verifiedSecure(secure);
        var bo= courseCases.removeCourseMember(courseId,number);
         return CourseResponseDTO.builder()
                 .build();
     }
 
     @DeleteMapping("/course/{id}")
-    public CourseResponseDTO removeCourse(@PathVariable("id")Long courseId
+    public CourseResponseDTO removeCourse( @RequestHeader(value = "secure", required = false)String secure,@PathVariable("id")Long courseId
     ){
+        verifiedSecure(secure);
         var bo= courseCases.removeCourse(courseId);
         return CourseResponseDTO.builder()
                 .build();
@@ -96,13 +100,15 @@ public class PrepaidCardController {
     }
 
     @PostMapping("/course/sm")
-    public Object courseSm(@RequestParam String number,@RequestParam String[] params) throws TencentCloudSDKException {
+    public Object courseSm( @RequestHeader(value = "secure", required = false)String secure,@RequestParam String number,@RequestParam String[] params) throws TencentCloudSDKException {
+        verifiedSecure(secure);
        return smsdCases.sendSms(number,params);
 
     }
 
     @PostMapping("/course/notify")
-    public Object courseNotify(@RequestParam Long courseId) throws TencentCloudSDKException {
+    public Object courseNotify( @RequestHeader(value = "secure", required = false)String secure,@RequestParam Long courseId) throws TencentCloudSDKException {
+        verifiedSecure(secure);
         return courseCases.notify(courseId);
 
     }

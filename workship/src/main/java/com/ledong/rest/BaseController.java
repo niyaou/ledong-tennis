@@ -10,8 +10,8 @@ public  class BaseController {
     private String verified;
 
     public void verifiedSecure(String secure) {
-        if(!StringUtils.hasText(secure)|| secure.equals(verified)){
-            throw  new CustomException(UseCaseCode.ERROR);
+        if(!StringUtils.hasText(secure)|| !secure.equals(verified)){
+            throw  new CustomException(UseCaseCode.PERMISSION_DENIED);
         }
     }
 

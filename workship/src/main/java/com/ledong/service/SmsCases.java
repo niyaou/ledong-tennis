@@ -12,6 +12,7 @@ import com.tencentcloudapi.sms.v20190711.SmsClient;
 import com.tencentcloudapi.sms.v20190711.models.SendSmsRequest;
 import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
@@ -21,12 +22,15 @@ public class SmsCases {
     @Autowired
     private CourseDAO courseDao;
 
+    @Value("${spring.sms.id}")
+    private  String ID;
+    @Value("${spring.sms.code}")
+    private  String CODE;
 
-    private final String ID="1";
-    private final String CODE="1";
+
     private final String SDKAPPID = "1400779674";
     private final String SIGNNAME = "成都乐动精灵体育";
-    private final   String TEMPLATEID = "1640539";
+    private final String TEMPLATEID = "1640539";
     private  SmsClient client;
     public SmsCases(){
         HttpProfile httpProfile = new HttpProfile();

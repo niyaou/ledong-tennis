@@ -10,7 +10,7 @@ public enum UseCaseCode {
     NOT_FOUND("NOT_FOUND", "Resource not found"),
     DUPLICATED("DUPLICATED", "Resource duplicated"),
     PARAM_ERROR("PARAM_ERROR", "Param error"),
-
+    PERMISSION_DENIED("PARAM_ERROR", "Permission denied"),
     NAME_DUPLICATED("NAME_DUPLICATED", "name already exists"),
 
     // User
