@@ -261,7 +261,7 @@ function SearchTask(props) {
 
     const fileItem = (user, index) => {
         // console.log(user)
-        return (<Grid item xs={3} key={index} space={1}>
+        return (<Grid item xs={4} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
 
                 <Stack
@@ -312,7 +312,7 @@ function SearchTask(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
-                       电话 {user.number} 
+                       {user.number} 
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
