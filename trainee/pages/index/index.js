@@ -22,7 +22,7 @@ Page({
     ratio: getApp().globalData.ratio,
     tabBarStatus: 1, // 栏目标志位 0:技术统计， 1：比赛 ， 2：天梯,
 
-  },
+  },    
   bindKeyInput: function (e) {
     this.setData({
       number: e.detail.value
@@ -88,6 +88,12 @@ Page({
     http.getReq(`user/?number=${this.data.number}`, (e) => {
       console.log('0--------', e)
       if (!e) {
+        this.setData({
+          userInfo:   {
+            name: "请登录",
+            avatarUrl: "../../icon/user2.png"
+          },
+        })
         wx.showModal({
           mask: true,
           title: '绑定失败',
