@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.format.DateTimeFormatter;
 
@@ -81,6 +82,9 @@ public class SmsCases {
             var spendStr = charge + times + annual;
             var member = spend.getPrepaidCard();
             var rest = member.getRestCharge() + (member.getTimesCount() + member.getAnnualCount()) + "次";
+            if(StringUtils.startsWithIgnoreCase(member.getNumber(),"不发短信")){
+                continue;
+            }
             sendSms(member.getNumber(), new String[]{startTime,court, spendStr,  ""+member.getRestCharge(),""+member.getTimesCount() ,""+member.getAnnualCount()});
         }
         course.setNotified(course.getNotified()+1);
