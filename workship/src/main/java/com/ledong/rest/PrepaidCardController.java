@@ -4,6 +4,7 @@ package com.ledong.rest;
 import com.ledong.bo.SpendBo;
 import com.ledong.entity.Course;
 import com.ledong.entity.response.CourseResponseDTO;
+import com.ledong.service.AnalyseCases;
 import com.ledong.service.CardCases;
 import com.ledong.service.CourseCases;
 import com.ledong.service.SmsCases;
@@ -37,6 +38,8 @@ public class PrepaidCardController extends BaseController{
     private CardCases cardCases;
     @Autowired
     private SmsCases smsdCases;
+    @Autowired
+    private AnalyseCases analyseCases;
 
 
 
@@ -110,6 +113,13 @@ public class PrepaidCardController extends BaseController{
     public Object courseNotify( @RequestHeader(value = "secure", required = false)String secure,@RequestParam Long courseId) throws TencentCloudSDKException {
         verifiedSecure(secure);
         return courseCases.notify(courseId);
+
+    }
+
+    @GetMapping("/coach/efficient")
+    public Object efficient( @RequestHeader(value = "secure", required = false)String secure,@RequestParam(required = true) String startTime,@RequestParam(required = true) String endTime)   {
+//        verifiedSecure(secure);
+        return analyseCases.analyseEfficiancy( startTime, endTime);
 
     }
 

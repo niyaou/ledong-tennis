@@ -8,13 +8,11 @@
  * @content: edit your page content
  */
 import React from 'react';
-import DsFolderTree from '../fileExplore/dsFolderTree'
-import DataFolderExplore from '../fileExplore/folderExploreComponent'
 import AdminComp from '../ldadmin/adminComp'
 import { useSelector } from "../../redux/hooks";
 import { Button, Card, Box,CardHeader, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import IdsFileTree from '../fileExplore/idsFileTree'
 import SearchTask from '../searchComponent/searchTask'
+import Analyse from '../searchComponent/analyse'
 function IndexContainer(props) {
     const index = props.index
   
@@ -26,7 +24,7 @@ function IndexContainer(props) {
   
     return (
       <Box   justifyContent="space-around" alignItems="center" sx={{width:'96vw',height:'97%',padding:'20px 0 0 10px'}}>
-     {index===0?<AdminComp />:<SearchTask />}
+     {index===0?<AdminComp />:index===1?<SearchTask />:<Analyse />}
       </Box>
     );
   }

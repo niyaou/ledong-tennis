@@ -26,4 +26,6 @@ public class ChargeBo {
     private LocalDateTime chargedTime;
     private int notified;
     private Coach coach;
+    private int worth;
+    private String court;
 }

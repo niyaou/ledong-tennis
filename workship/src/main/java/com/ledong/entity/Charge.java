@@ -40,6 +40,9 @@ public class Charge   {
     private float annualTimes;
     private int notified;
 
+    private int worth;
+    private String court;
+
     @ManyToOne
     @JoinColumn(name = "coach_id")
     private Coach coach;
@@ -57,6 +60,8 @@ public class Charge   {
                 .id(bo.getId())
                 .charge(bo.getCharge())
                 .times(bo.getTimes())
+                .worth(bo.getWorth())
+                .court(bo.getCourt())
                 .annualTimes(bo.getAnnualTimes())
                 .chargedTime(bo.getChargedTime())
                 .prepaidCard(bo.getPrepaidCard())

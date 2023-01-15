@@ -26,4 +26,6 @@ public class ChargedResponseDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime chargedTime;
     private int notified;
+    private int worth;
+    private String court;
 }

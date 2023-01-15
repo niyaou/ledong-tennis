@@ -64,6 +64,7 @@ public class Course {
                 .description(bo.getDescription())
                 .coach(bo.getCoach())
                 .court(bo.getCourt())
+                .courseType(bo.getCourseType())
                 .duration(bo.getDuration())
                 .startTime(bo.getStartTime())
                 .endTime(bo.getEndTime())

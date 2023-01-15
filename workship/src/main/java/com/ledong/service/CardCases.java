@@ -34,7 +34,7 @@ public class CardCases {
     private SpendDAO spendDAO;
 
     @Transactional(rollbackFor = Exception.class)
-    public ChargeBo setRestCharge(String number, Float charged, Float times, Float annualTimes, String annualExpireTime,String description) {
+    public ChargeBo setRestCharge(String number, Float charged, Float times, Float annualTimes, String annualExpireTime,Integer worth,String court,String description) {
         var user = userCases.findByNumber(number);
         if (user == null) {
             throw new CustomException(UseCaseCode.NOT_FOUND);
@@ -43,8 +43,12 @@ public class CardCases {
                 .charge(0)
                 .times(0)
                 .annualTimes(0)
+                .court(court)
                 .description(description)
                 .prepaidCard(PrepaidCard.fromBO(user));
+        if (worth!=null && worth != 0) {
+            chargeTemp.worth(worth);
+        }
         if (charged!=null && charged != 0) {
             chargeTemp.charge(charged);
             userCases.setRestChargeChange(number, charged);

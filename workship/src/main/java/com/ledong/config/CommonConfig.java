@@ -32,6 +32,9 @@ public class CommonConfig implements WebMvcConfigurer {
     public CourseCases courseCases(){return new CourseCases() ;   }
 
     @Bean
+    public AnalyseCases analyseCases(){return new AnalyseCases() ;   }
+
+    @Bean
     public SmsCases smsCases(){return new SmsCases(ID,CODE) ;   }
 
 

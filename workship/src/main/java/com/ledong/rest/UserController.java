@@ -50,9 +50,11 @@ public class UserController extends BaseController {
     @PostMapping("/charged")
     public Object charged( @RequestHeader(value = "secure", required = false)String secure,String number, @RequestParam(required = false)Float charged, @RequestParam(required = false)Float times,
                                       @RequestParam(required = false)Float annualTimes, @RequestParam(required = false)String annualExpireTime,
+                                      @RequestParam(required = false)Integer worth,
+                                      @RequestParam(required = true)String court,
                                       @RequestParam(required = false)String description) {
         verifiedSecure(secure);
-        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime,description);
+        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime,worth,court,description);
         return chargedLog;
 
     }
