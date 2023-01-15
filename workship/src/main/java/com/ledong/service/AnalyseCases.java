@@ -27,9 +27,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 public class AnalyseCases {
@@ -60,7 +58,7 @@ public class AnalyseCases {
     public Object analyseEfficiancy(String startTime, String endTime) {
 
         var course = courseDao.findAllWithTimeRange(DateUtil.parse(startTime).toLocalDateTime(), DateUtil.parse(endTime).toLocalDateTime());
-        var analys = new HashMap<String, HashMap<String, Float>>();
+        var analys = new LinkedHashMap<String, HashMap<String, Float>>();
 
         course.stream().forEach(course1 -> {
             if (course1.getCourseType() > 0) {
@@ -82,6 +80,9 @@ public class AnalyseCases {
             }
         });
 
-        return analys;
+      var entrylist=new ArrayList<>(analys.entrySet())  ;
+        Collections.sort(entrylist, ((m1,m2)->{return (int) (m2.getValue().get("analyse")*100-m1.getValue().get("analyse")*100);}));
+
+        return entrylist;
     }
 }

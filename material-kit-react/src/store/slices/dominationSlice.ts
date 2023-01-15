@@ -33,9 +33,34 @@ const initialState = {
     createSuccess:false,
     coach:[],
     court:[],
+    analyseCourt:[],
 
 
 }
+
+
+
+export const exploreCourseAnalyse = createAsyncThunk(
+    'analyse/course',
+    async (params, { rejectWithValue }) => {
+        try {
+            // throw new Error('Something bad happened');
+            let formdata = new FormData()
+            // payload.isExperience=0
+            // payload.isDealing=0
+            var startTime=moment().startOf('month').format('YYYY-MM-DD')
+            var endTime=moment().endOf('month').format('YYYY-MM-DD')
+            formdata.append('startTime',startTime)
+            const response = await Axios.get(`/api/prepaidCard/coach/efficient?startTime=${startTime}&endTime=${endTime}`)
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
 // will call the thunk with the `dispatch` function as the first argument. Async
@@ -326,6 +351,8 @@ export const updateChargeAnnotation = createAsyncThunk(
             formdata.append('charged',payload.charged)
             formdata.append('times',payload.times)
             formdata.append('description',payload.description)
+            formdata.append('worth',payload.worth)
+            formdata.append('court',payload.court)
             // throw new Error('Something bad happened');
             const response = await Axios.post(`/api/user/charged`,formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
@@ -429,6 +456,22 @@ export const exploreSlice = createSlice({
             .addCase(selectCourse.fulfilled, (state, action) => {
                 state.loading = false
                 state.selectCourse = action.payload
+
+            });
+        builder
+            .addCase(exploreCourseAnalyse.pending, (state) => {
+                state.loading = true
+
+            })
+            .addCase(exploreCourseAnalyse.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(exploreCourseAnalyse.fulfilled, (state, action) => {
+                state.loading = false
+                state.analyseCourt = action.payload
 
             });
         builder

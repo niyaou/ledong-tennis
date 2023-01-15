@@ -11,7 +11,7 @@ import React, { useEffect } from 'react';
 import DsFolderTree from '../fileExplore/dsFolderTree'
 import DataFolderExplore from '../fileExplore/folderExploreComponent'
 import FsResourceManagement from '../createDs/fsResourseManagement'
-import { Button, Card, Stack,MenuItem, NoSsr, Paper, Box, Typography, Select,AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
+import { Button, Card, Stack, MenuItem, NoSsr, Paper, Box, Typography, Select, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
 import IdsFileTree from '../fileExplore/idsFileTree'
 import { makeStyles, createStyles } from '@mui/styles';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -29,8 +29,8 @@ import CourseItem from '../../components/ldadmin/courseItem'
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCharge, exploreRecentSpend,exploreMemberCourse,updateExpiredTime ,updateChargeAnnotation,} from '../../store/slices/dominationSlice'
-import {createUserAccount} from '../../store/actions/usersActions';
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCharge, exploreRecentSpend, exploreMemberCourse, updateExpiredTime, updateChargeAnnotation, } from '../../store/slices/dominationSlice'
+import { createUserAccount } from '../../store/actions/usersActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -61,7 +61,7 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     // const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { court, users, sortValue, charedLog,spendLog, createSuccess ,course} = useSelector((state) => state.domination)
+    const { court, users, sortValue, charedLog, spendLog, createSuccess, course } = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
@@ -76,6 +76,8 @@ function SearchTask(props) {
     const [customerName, setCustomerName] = React.useState('');
     const [customerOpenId, setCustomerOpenId] = React.useState('');
     const [annualTimes, setAnnualTimes] = React.useState(prepaidCard.annualCount || 0);
+    const [worth, setWorth] = React.useState(prepaidCard.worth || 0);
+    const [courtSelect, setCourtSelect] = React.useState('');
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
@@ -85,15 +87,15 @@ function SearchTask(props) {
     const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeDesc, setChangeDesc] = React.useState('');
 
-    const [createUser, setCreateUser] = React.useState({number:'',name:'',court:''});//创建用户数据
+    const [createUser, setCreateUser] = React.useState({ number: '', name: '', court: '' });//创建用户数据
     useEffect(() => {
 
         if (users) {
-            console.log('-----user',users)
+            console.log('-----user', users)
             // setDetailMode(false)
             let sorts = users.concat()
             sorts.sort((a, b) => {
-                return pinyin.pinyinUtil.getFirstLetter((a.name ).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.name).substring(0, 1)).toUpperCase() ? 1 : -1
+                return pinyin.pinyinUtil.getFirstLetter((a.name).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.name).substring(0, 1)).toUpperCase() ? 1 : -1
             })
             setUserSort(sorts)
         }
@@ -111,24 +113,24 @@ function SearchTask(props) {
     }, [customerName])
 
     useEffect(() => {
-        
-            setCharedLogRec(charedLog)
-       console.log('-------charedLog-----',charedLog)
+
+        setCharedLogRec(charedLog)
+        console.log('-------charedLog-----', charedLog)
     }, [charedLog])
 
 
     useEffect(() => {
         if (createSuccess) {
- 
-                dispatch(exploreUsersAction())
-                dispatch(exploreRecentCharge(customerOpenId))
-                enqueueSnackbar(`充值成功`, {
-                    variant: 'success',
-                    autoHideDuration: 3000,
-                  })
+
+            dispatch(exploreUsersAction())
+            dispatch(exploreRecentCharge(customerOpenId))
+            enqueueSnackbar(`充值成功`, {
+                variant: 'success',
+                autoHideDuration: 3000,
+            })
 
 
-        setOpen(0)
+            setOpen(0)
         }
     }, [createSuccess])
 
@@ -138,21 +140,20 @@ function SearchTask(props) {
             enqueueSnackbar(`添加会员成功`, {
                 variant: 'success',
                 autoHideDuration: 3000,
-              })
-              dispatch(exploreUsersAction())
+            })
+            dispatch(exploreUsersAction())
         }
     }, [success])
 
 
     useEffect(() => {
         if (users && customerOpenId) {
-
-            setPrepaidCard(users.filter(u=>u.number===customerOpenId)[0])
+            setPrepaidCard(users.filter(u => u.number === customerOpenId)[0])
         }
     }, [users])
 
 
-    
+
 
 
 
@@ -245,16 +246,16 @@ function SearchTask(props) {
                     /> */}
                 </FormControl>
             </LocalizationProvider>
-           
+
 
             <Button variant="contained" size="small"
-                disabled={ expiredTime===''}
+                disabled={expiredTime === ''}
 
                 onClick={() => {
-                    console.log('---expiredTime-',expiredTime)
+                    console.log('---expiredTime-', expiredTime)
                     dispatch(updateExpiredTime({ number: customerOpenId, annualExpireTime: moment(expiredTime).format('YYYY-MM-DD') }))
-               
-               }}>修改年卡时间次数</Button>
+
+                }}>修改年卡时间次数</Button>
 
         </Stack>)
 
@@ -277,12 +278,12 @@ function SearchTask(props) {
 
                     }}
                     onClick={(event) => {
-                            setPrepaidCard(user)
-                            setCustomerName(user.name)
-                            setCustomerOpenId(user.number)
-                            dispatch(exploreRecentCharge(user.number))
-                            dispatch(exploreRecentSpend(user.number))
-                      
+                        setPrepaidCard(user)
+                        setCustomerName(user.name)
+                        setCustomerOpenId(user.number)
+                        dispatch(exploreRecentCharge(user.number))
+                        dispatch(exploreRecentSpend(user.number))
+
                     }}>
                     {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
 
@@ -294,7 +295,7 @@ function SearchTask(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
                         }} >
-                        {user.name}  
+                        {user.name}
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
@@ -303,7 +304,7 @@ function SearchTask(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
                         }} >
-                        {user.court}  
+                        {user.court}
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
@@ -312,7 +313,7 @@ function SearchTask(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
-                       {user.number} 
+                        {user.number}
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
@@ -321,7 +322,7 @@ function SearchTask(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '50%', textAlign: 'center'
                         }} >
-                      余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}
+                        余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}
                     </Typography>
                 </Stack>
 
@@ -372,16 +373,38 @@ function SearchTask(props) {
                             setChangeCount(e.target.value);
                         }}
                     />
-                     <TextField
-                label="年卡次数"
-                // label="Content(reply visable scale as the same as topic.)"
-                required
-                value={annualTimes}
-                onChange={(event: any) => {
-                    setAnnualTimes(event.target.value)
-                }}
+                    <TextField
+                        label="年卡次数"
+                        // label="Content(reply visable scale as the same as topic.)"
+                        required
+                        value={annualTimes}
+                        onChange={(event: any) => {
+                            setAnnualTimes(event.target.value)
+                        }}
 
-            />
+                    />
+                     <TextField
+                        label="次年卡等价金额"
+                        // label="Content(reply visable scale as the same as topic.)"
+                        required
+                        value={worth}
+                        onChange={(event: any) => {
+                            setWorth(event.target.value)
+                        }}
+
+                    />
+                      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+                        name='FileTypes'
+                        size="small"
+                        onChange={(e) => {
+                            //   let after = { ...courseEdit, court: e.target.value }
+                            //   setCourseEdit(after)
+                            setCourtSelect( e.target.value );
+                        }}
+                        value={courtSelect}>
+                        {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
+                    </Select>
+
                     <TextField
                         id="outlined-password-input3"
                         label="备注"
@@ -393,8 +416,14 @@ function SearchTask(props) {
                     <Button variant="contained" size="small"
 
                         onClick={() => {
-                            dispatch(updateChargeAnnotation({ number: customerOpenId, charged: parseInt(changeFee), annualTimes:parseInt(annualTimes),
-                               times: parseInt(changeCount), description: changeDesc }))
+                            console.log('---------',{
+                                number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
+                                times: parseInt(changeCount), description: changeDesc,worth:parseInt(worth),court:courtSelect
+                            })
+                            dispatch(updateChargeAnnotation({
+                                number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
+                                times: parseInt(changeCount), description: changeDesc,worth:worth,court:courtSelect
+                            }))
                         }}>确定充值</Button>
                 </Stack>
             </Box>
@@ -403,7 +432,7 @@ function SearchTask(props) {
 
 
 
-    
+
     const createModal = (
         <Modal
             open={create !== 0}
@@ -422,7 +451,7 @@ function SearchTask(props) {
                         label="名字"
                         value={createUser.name}
                         onChange={(e) => {
-                            setCreateUser({...createUser,name:e.target.value});
+                            setCreateUser({ ...createUser, name: e.target.value });
                         }}
                     />
                     <TextField
@@ -430,25 +459,25 @@ function SearchTask(props) {
                         label="电话"
                         value={createUser.number}
                         onChange={(e) => {
-                            setCreateUser({...createUser,number:e.target.value});
+                            setCreateUser({ ...createUser, number: e.target.value });
                         }}
                     />
-                      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
-        name='FileTypes'
-        size="small"
-        onChange={(e) => {
-        //   let after = { ...courseEdit, court: e.target.value }
-        //   setCourseEdit(after)
-        setCreateUser({...createUser,court:e.target.value});
-        }}
-        value={createUser.court}>
-        {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
-      </Select>
-                   
+                    <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+                        name='FileTypes'
+                        size="small"
+                        onChange={(e) => {
+                            //   let after = { ...courseEdit, court: e.target.value }
+                            //   setCourseEdit(after)
+                            setCreateUser({ ...createUser, court: e.target.value });
+                        }}
+                        value={createUser.court}>
+                        {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
+                    </Select>
+
                     <Button variant="contained" size="small"
                         onClick={() => {
-                            dispatch( createUserAccount(createUser.name,createUser.number,createUser.court))
-                            console.log('------确定添加---',createUser)
+                            dispatch(createUserAccount(createUser.name, createUser.number, createUser.court))
+                            console.log('------确定添加---', createUser)
                         }}>确定添加</Button>
 
                 </Stack>
@@ -473,8 +502,8 @@ function SearchTask(props) {
                 alignItems="center"
                 sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
             >
-               
-               <Typography gutterBottom variant="body2"
+
+                <Typography gutterBottom variant="body2"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
@@ -488,29 +517,29 @@ function SearchTask(props) {
                     }} >
                     {charge.description}
                 </Typography>
-               <Typography gutterBottom variant="body2"
+                <Typography gutterBottom variant="body2"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
                     }} >
                     充值{charge.charge}元，次卡{charge.times},年卡{charge.annualTimes}
                 </Typography>
-   
 
-              <Button 
-              variant="outlined"
-              color="primary"
+
+                <Button
+                    variant="outlined"
+                    color="primary"
                     sx={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         minWidth: '80px',
                     }}
-                    onClick={()=>{
-                        console.log(course,customerName)
+                    onClick={() => {
+                        console.log(course, customerName)
                         // dispatch(retreatRecentCourse({cardId:customerName,time:course.time}))
                     }}
-                     >
+                >
 
-                   删除
+                    删除
                 </Button>
             </Stack>
         </Paper>)
@@ -528,27 +557,27 @@ function SearchTask(props) {
                 spacing={2}
                 direction="row"
             >
-                    <CircleButton
-                            
-                            size="small"
-                            variant={1 === 1 ? "contained" : "outlined"}
-                            sx={{ margin: '5px' }}
-                            onClick={
-                                (e) => {
-                                    setCreate(1)
-                                    // if (!values.includes(e.target.value)) {
-                                    //   values.push(e.target.value)
-                                    // } else {
-                                    //   values = values.filter(value => e.target.value !== value)
-                                    // }
-                                    // params[props.searchType] = values
-                                    // delete params["topic"];
-                                    // navigate(`/explore?${qs.stringify(params, { arrayFormat: 'brackets' })}`)
-                                }
-                            }
-                        >
-                          添加会员
-                        </CircleButton>
+                <CircleButton
+
+                    size="small"
+                    variant={1 === 1 ? "contained" : "outlined"}
+                    sx={{ margin: '5px' }}
+                    onClick={
+                        (e) => {
+                            setCreate(1)
+                            // if (!values.includes(e.target.value)) {
+                            //   values.push(e.target.value)
+                            // } else {
+                            //   values = values.filter(value => e.target.value !== value)
+                            // }
+                            // params[props.searchType] = values
+                            // delete params["topic"];
+                            // navigate(`/explore?${qs.stringify(params, { arrayFormat: 'brackets' })}`)
+                        }
+                    }
+                >
+                    添加会员
+                </CircleButton>
 
                 {!detailMode && sortValue.map((a, ids) => {
                     return (
@@ -587,10 +616,10 @@ function SearchTask(props) {
 
                     }}
                 >
-                    {detailMode ? <ArrowBackIcon /> : <CachedIcon           onClick={async () => {
-                       dispatch(exploreUsersAction())
+                    {detailMode ? <ArrowBackIcon /> : <CachedIcon onClick={async () => {
+                        dispatch(exploreUsersAction())
 
-                    }}/>}
+                    }} />}
                 </IconButton>
             </Stack>
             {!detailMode && (<Grid
@@ -605,31 +634,31 @@ function SearchTask(props) {
 
             {detailMode && finacialItem}
             <Stack justifyContent="flex-start"
-              
+
                 spacing={2}
                 direction="row"
             >
-                 {detailMode && <Stack justifyContent="flex-start"
-           
-                spacing={2}
-                direction="column"
-            >
-                {spendLog.map((c, i) => CourseItem({item:c,}))}
-            </Stack>}
-            {detailMode &&  <Stack justifyContent="flex-start"
-              
-                spacing={2}
-                direction="column"
-            >
-                 {charedLogRec.map((c, i) => chargeItem(c))}
-            </Stack>}
+                {detailMode && <Stack justifyContent="flex-start"
+
+                    spacing={2}
+                    direction="column"
+                >
+                    {spendLog.map((c, i) => CourseItem({ item: c, }))}
+                </Stack>}
+                {detailMode && <Stack justifyContent="flex-start"
+
+                    spacing={2}
+                    direction="column"
+                >
+                    {charedLogRec.map((c, i) => chargeItem(c))}
+                </Stack>}
             </Stack>
-         
-          
+
+
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
             {uploadWaitingModal}
             {createModal}
-     
+
         </Stack>
     );
 }

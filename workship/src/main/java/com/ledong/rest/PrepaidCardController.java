@@ -118,7 +118,7 @@ public class PrepaidCardController extends BaseController{
 
     @GetMapping("/coach/efficient")
     public Object efficient( @RequestHeader(value = "secure", required = false)String secure,@RequestParam(required = true) String startTime,@RequestParam(required = true) String endTime)   {
-//        verifiedSecure(secure);
+        verifiedSecure(secure);
         return analyseCases.analyseEfficiancy( startTime, endTime);
 
     }

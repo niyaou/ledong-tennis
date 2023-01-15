@@ -13,11 +13,8 @@ import { useDispatch } from 'react-redux';
 import UserManagement from './userManagement'
 import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
-import { tagsInfoAction ,scenceInfoAction} from '../../store/slices/tagsSlice'
-import { rootProjects, selectedFolderContent
-  ,toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig,
-   searchActiveAction, searchDeActiveAction,selectedByParams,labelsStatisticAction } from '../../store/actions/filesAndFoldersActions';
-   import { exploreUsersAction ,exploreCoachAction,exploreCourtAction} from '../../store/slices/dominationSlice'
+
+   import { exploreUsersAction ,exploreCoachAction,exploreCourtAction,exploreCourseAnalyse} from '../../store/slices/dominationSlice'
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -55,6 +52,7 @@ function AdminComp(props) {
 
 
 useEffect(() => {
+      dispatch(exploreCourseAnalyse())
         dispatch(exploreUsersAction())
         dispatch(exploreCoachAction())
         dispatch(exploreCourtAction())
