@@ -66,11 +66,13 @@ public class AnalyseCases {
                 var coach = analys.get(course1.getCoach().getName());
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
+                    spec.put("workTime", course1.getDuration());
                     spec.put("courses", 1F);
                     spec.put("members", course1.getCourseType() * 1F);
                     spec.put("analyse",course1.getCourseType() * 1F/1);
                     analys.put(course1.getCoach().getName(), spec);
                 } else {
+                    coach.put("workTime", coach.get("workTime") + course1.getDuration());
                     coach.put("courses", coach.get("courses") + 1);
                     coach.put("members", coach.get("members") + course1.getCourseType() * 1);
                     coach.put("analyse",coach.get("members")/ coach.get("courses"));
