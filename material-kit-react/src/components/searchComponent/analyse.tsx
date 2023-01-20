@@ -27,7 +27,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import moment from 'moment';
-import { get} from 'lodash'
+import { get } from 'lodash'
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 
@@ -39,7 +39,7 @@ function Analyse(props) {
     const CircleButton = styled(Button)({ borderRadius: '20px', })
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { court, users, sortValue, charedLog, spendLog, createSuccess, course, analyseCourt } = useSelector((state) => state.domination)
+    const { court, users, sortValue, monthValue, charedLog, spendLog, createSuccess, course, analyseCourt } = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
@@ -57,10 +57,10 @@ function Analyse(props) {
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
-  
+
 
     useEffect(() => {
-        dispatch(exploreCourseAnalyse)
+        dispatch(exploreCourseAnalyse({ startTime: moment().startOf('month').format('YYYY-MM-DD'), endTime: moment().endOf('month').format('YYYY-MM-DD') }))
     }, [])
 
 
@@ -68,109 +68,58 @@ function Analyse(props) {
 
 
 
-    const finacialItem =
-        (<Stack
-            justifyContent="flex-start"
-            alignItems="center"
-            spacing={2}
-            direction="row"
-        >
-            <Typography gutterBottom variant="body2"
-                sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
+    const finacialItem = () => {
+        return (
+            monthValue.map((a, ids) => {
+                return (
+                    <CircleButton
+                        key={ids}
+                        value={a}
+                        size="small"
+                        variant={1 === 1 ? "contained" : "outlined"}
+                        sx={{ margin: '5px' }}
+                        onClick={
+                            (e) => {
+                                console.log(e.target.value)
+                                var idx = monthValue.indexOf(e.target.value)
+                                var def = idx - moment().month()
+                                console.log(e.target.value, idx, def)
+                                if (idx === 12) {
+                                    dispatch(exploreCourseAnalyse({
+                                        startTime: moment().startOf('year').format('YYYY-MM-DD'),
+                                        endTime: moment().endOf('year').format('YYYY-MM-DD')
+                                    }))
+                                } else {
 
-                }} >
-                会员名称：{customerName}
-            </Typography>
-            <Typography gutterBottom variant="body2"
-                sx={{
-                    color: 'rgba(0, 0, 0, 0.6)', cursor: 'pointer',
-                }}
-                onClick={() => {
-                    setOpen(1)
-                    console.log('-------1------11--------11----1----')
-                    // dispatch(updateEx1piredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
-                }}
-            >
-                充值卡余额：{prepaidCard.restCharge}
-            </Typography>
-            <Typography gutterBottom variant="body2"
-                sx={{
-                    color: 'rgba(0, 0, 0, 0.6)', cursor: 'pointer',
-                }}
-                onClick={() => {
-                    console.log('---------------------2222--------')
-                    setOpen(2)
-                    // dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
-                }}
-            >
-                次卡余额：  {prepaidCard.timesCount}
-            </Typography>
-            {/* <Typography gutterBottom variant="body2"
-                sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
-                }} >
-                次卡到期时间  {prepaidCard.timesExpireTime}
-            </Typography> */}
-            <Typography gutterBottom variant="body2"
-                sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
-                }} >
-                剩余年卡次数  {prepaidCard.annualCount}
-            </Typography>
-            <Typography gutterBottom variant="body2"
-                sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
-                }} >
-                年卡到期时间  {prepaidCard.annualExpireTime}
-            </Typography>
+                                    dispatch(exploreCourseAnalyse({
+                                        startTime: moment().add(def, "month").startOf('month').format('YYYY-MM-DD'),
+                                        endTime: moment().add(def, "month").endOf('month').format('YYYY-MM-DD')
+                                    }))
+                                }
 
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <FormControl sx={{ m: 1, minWidth: 120, }} size="small">
-                    <TextField
-                        id="date"
-                        label="Birthday"
-                        type="date"
-                        value={expiredTime}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        onChange={(newValue) => {
-                            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
-                            setExpiredTime(newValue.currentTarget.value)
-                        }}
-                    />
-                    {/* <DatePicker
-                        label="年卡到期时间"
-                        value={expiredTime}
-                        onChange={(newValue) => {
-                            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ newValue", newValue)
-                            setExpiredTime(newValue)
-                        }}
-                        renderInput={(params) => {
-                            return (<TextField {...params} />)
-                        }}
-                    /> */}
-                </FormControl>
-            </LocalizationProvider>
+                                // if (!values.includes(e.target.value)) {
+                                //   values.push(e.target.value)
+                                // } else {
+                                //   values = values.filter(value => e.target.value !== value)
+                                // }
+                                // params[props.searchType] = values
+                                // delete params["topic"];
+                                // navigate(`/explore?${qs.stringify(params, { arrayFormat: 'brackets' })}`)
+                            }
+                        }
+                    >
+                        {a}
+                    </CircleButton>
+                )
+            }))
+    }
 
-
-            <Button variant="contained" size="small"
-                disabled={expiredTime === ''}
-
-                onClick={() => {
-                    console.log('---expiredTime-', expiredTime)
-                    dispatch(updateExpiredTime({ number: customerOpenId, annualExpireTime: moment(expiredTime).format('YYYY-MM-DD') }))
-
-                }}>修改年卡时间次数</Button>
-
-        </Stack>)
 
 
     const fileItem = (user, index) => {
-     
-        var member=Object.values(user)[0]
-        console.log(user,member)
+
+        var member = Object.values(user)[0]
+        console.log(user, member)
         return (<Grid item xs={4} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
                 <Stack
@@ -186,7 +135,7 @@ function Analyse(props) {
 
                     }}
                     onClick={(event) => {
-                      
+
 
                     }}>
                     {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
@@ -217,7 +166,7 @@ function Analyse(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
-                       上课： {member.courses}节
+                        上课： {member.courses}节
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
@@ -226,7 +175,7 @@ function Analyse(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
-                      学生： {member.members}人
+                        学生： {member.members}人
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
@@ -235,7 +184,16 @@ function Analyse(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
-                        满班率：{member.analyse}
+                        满班率：{member.analyse.toFixed(1)}
+                    </Typography>
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
+                        }} >
+                        课时数：{member.workTime}
                     </Typography>
                 </Stack>
 
@@ -334,7 +292,7 @@ function Analyse(props) {
                 spacing={2}
                 direction="row"
             >
-
+                {finacialItem()}
 
                 <IconButton
                     aria-label="expand row"

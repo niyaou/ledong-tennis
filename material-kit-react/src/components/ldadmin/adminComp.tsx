@@ -7,14 +7,15 @@
  * @LastEditTime: 2022-05-10 15:48:44
  * @content: edit your page content
  */
-import { Backdrop,CircularProgress,Button, Card,Grow, CardHeader, Checkbox, Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText ,Box} from '@mui/material';
-import React,{useEffect} from 'react';
+import { Backdrop, CircularProgress, Button, Card, Grow, CardHeader, Checkbox, Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box } from '@mui/material';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import UserManagement from './userManagement'
 import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
+import moment from "moment";
 
-   import { exploreUsersAction ,exploreCoachAction,exploreCourtAction,exploreCourseAnalyse} from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreCoachAction, exploreCourtAction, exploreCourseAnalyse } from '../../store/slices/dominationSlice'
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -30,11 +31,11 @@ function union(a: readonly number[], b: readonly number[]) {
 function AdminComp(props) {
   const datasetId = props.datasetId
   const index = props.index
-  const { loading ,searchActive,mergeActive} = useSelector((state) => state.filesAndFolders)
+  const { loading, searchActive, mergeActive } = useSelector((state) => state.filesAndFolders)
   const [checked, setChecked] = React.useState<readonly number[]>([]);
   const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3]);
   const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
-  const dispatch =useDispatch()
+  const dispatch = useDispatch()
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
 
@@ -51,15 +52,15 @@ function AdminComp(props) {
   };
 
 
-useEffect(() => {
-      dispatch(exploreCourseAnalyse())
-        dispatch(exploreUsersAction())
-        dispatch(exploreCoachAction())
-        dispatch(exploreCourtAction())
-  // dispatch(tagsInfoAction())
-  // dispatch(scenceInfoAction())
-  // dispatch(labelsStatisticAction())
-},[])
+  useEffect(() => {
+    dispatch(exploreCourseAnalyse({ startTime: moment().startOf('month').format('YYYY-MM-DD'), endTime: moment().endOf('month').format('YYYY-MM-DD') }))
+    dispatch(exploreUsersAction())
+    dispatch(exploreCoachAction())
+    dispatch(exploreCourtAction())
+    // dispatch(tagsInfoAction())
+    // dispatch(scenceInfoAction())
+    // dispatch(labelsStatisticAction())
+  }, [])
 
 
   const numberOfChecked = (items: readonly number[]) =>
@@ -82,11 +83,11 @@ useEffect(() => {
         justifyContent="flex-start"
         alignItems="center"
         sx={{ height: '100%', width: '100%' }}>
-        
+
         <UserManagement />
-      
-        <Additions 
-        sx={{marginRight:30,}}/>
+
+        <Additions
+          sx={{ marginRight: 30, }} />
         {/* <Grid item><DsFolderTree  datasetId={datasetId} editType={true} /></Grid> */}
       </Stack>
     </Box>

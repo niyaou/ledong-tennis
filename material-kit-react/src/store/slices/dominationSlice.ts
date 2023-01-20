@@ -27,13 +27,14 @@ const initialState = {
     course: [],
     areas: ['音乐花园校区', '雅居乐校区', '英郡校区', '银泰城校区', '麓坊校区', '领馆国际城校区', '一品天下校区', '天府环宇坊校区', '其他'],
     sortValue: ['年卡', '次卡', '充值卡'],
+    monthValue: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月', '全年',],
     selectCourse: null,
     charedLog: [],
     spendLog: [],
-    createSuccess:false,
-    coach:[],
-    court:[],
-    analyseCourt:[],
+    createSuccess: false,
+    coach: [],
+    court: [],
+    analyseCourt: [],
 
 
 }
@@ -44,14 +45,10 @@ export const exploreCourseAnalyse = createAsyncThunk(
     'analyse/course',
     async (params, { rejectWithValue }) => {
         try {
-            // throw new Error('Something bad happened');
             let formdata = new FormData()
-            // payload.isExperience=0
-            // payload.isDealing=0
-            var startTime=moment().startOf('month').format('YYYY-MM-DD')
-            var endTime=moment().endOf('month').format('YYYY-MM-DD')
-            formdata.append('startTime',startTime)
-            const response = await Axios.get(`/api/prepaidCard/coach/efficient?startTime=${startTime}&endTime=${endTime}`)
+            var startTime = moment().startOf('month').format('YYYY-MM-DD')
+            var endTime = moment().endOf('month').format('YYYY-MM-DD')
+            const response = await Axios.get(`/api/prepaidCard/coach/efficient?startTime=${params.startTime}&endTime=${params.endTime}`)
             return response.data;
         } catch (err) {
             return rejectWithValue(err)
@@ -137,8 +134,8 @@ export const exploreRecentCourse = createAsyncThunk(
             let formdata = new FormData()
             // payload.isExperience=0
             // payload.isDealing=0
-            var startTime=moment().subtract(180,'days').format('YYYY-MM-DD HH:mm:ss')
-            formdata.append('startTime',startTime)
+            var startTime = moment().subtract(180, 'days').format('YYYY-MM-DD HH:mm:ss')
+            formdata.append('startTime', startTime)
 
             const response = await Axios.get(`/api/prepaidCard/course/total?startTime=${startTime}`)
             return response.data;
@@ -157,8 +154,8 @@ export const exploreMemberCourse = createAsyncThunk(
             let formdata = new FormData()
             // payload.isExperience=0
             // payload.isDealing=0
-            var startTime=moment().subtract(180,'days').format('YYYY-MM-DD HH:mm:ss')
-            formdata.append('startTime',startTime)
+            var startTime = moment().subtract(180, 'days').format('YYYY-MM-DD HH:mm:ss')
+            formdata.append('startTime', startTime)
 
             const response = await Axios.get(`/api/prepaidCard/course/total?startTime=${startTime}&number=${params}`)
             return response.data;
@@ -209,7 +206,7 @@ export const retreatCourseMember = createAsyncThunk(
     async (params, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
-           
+
             const response = await Axios.delete(`/api/prepaidCard/course/${params.courseId}/${params.number}`)
             return response.data;
         } catch (err) {
@@ -223,8 +220,8 @@ export const notifyCourse = createAsyncThunk(
     async (params, { rejectWithValue }) => {
         try {
             let formdata = new FormData()
-            formdata.append('courseId',params)
-            const response = await Axios.post(`/api/prepaidCard/course/notify`,formdata)
+            formdata.append('courseId', params)
+            const response = await Axios.post(`/api/prepaidCard/course/notify`, formdata)
             return response.data;
         } catch (err) {
             return rejectWithValue(err)
@@ -241,26 +238,26 @@ export const createCard = createAsyncThunk(
         try {
 
             let formdata = new FormData()
-    
-       
+
+
 
 
             // payload.isExperience=0
             // payload.isDealing=0
-            payload.startTime=moment(payload.startTime).format('YYYY-MM-DD HH:mm')
-            payload.endTime=moment(payload.endTime).format('YYYY-MM-DD HH:mm')
+            payload.startTime = moment(payload.startTime).format('YYYY-MM-DD HH:mm')
+            payload.endTime = moment(payload.endTime).format('YYYY-MM-DD HH:mm')
 
-            formdata.append("startTime",    payload.startTime)
-            formdata.append("endTime",    payload.endTime)
-            formdata.append("coachName",  payload.coach)
-            formdata.append("spendingTime", payload.spendingTime  )
-            formdata.append("courtName",  payload.court )
-            formdata.append("courseType",  payload.courseType )
-            formdata.append("descript",  payload.descript )
-            formdata.append("membersObj", JSON.stringify( payload. membersObj))
+            formdata.append("startTime", payload.startTime)
+            formdata.append("endTime", payload.endTime)
+            formdata.append("coachName", payload.coach)
+            formdata.append("spendingTime", payload.spendingTime)
+            formdata.append("courtName", payload.court)
+            formdata.append("courseType", payload.courseType)
+            formdata.append("descript", payload.descript)
+            formdata.append("membersObj", JSON.stringify(payload.membersObj))
 
 
-            const response = await Axios.post(`/api/prepaidCard/course/create`,formdata)
+            const response = await Axios.post(`/api/prepaidCard/course/create`, formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
             if (response.status !== 200) {
                 return rejectWithValue(response.data.message)
@@ -274,18 +271,18 @@ export const createCard = createAsyncThunk(
 );
 
 
-export const updateCourese= createAsyncThunk(
+export const updateCourese = createAsyncThunk(
     'lduser/updateCourse',
     async (payload, { rejectWithValue }) => {
         try {
             // payload.isExperience=0
             // payload.isDealing=0
-            payload.startTime=moment(payload.startTime).format('YYYY-MM-DD HH:mm')
-            payload.endTime=moment(payload.endTime).format('YYYY-MM-DD HH:mm')
+            payload.startTime = moment(payload.startTime).format('YYYY-MM-DD HH:mm')
+            payload.endTime = moment(payload.endTime).format('YYYY-MM-DD HH:mm')
 
-      
+
             // throw new Error('Something bad happened');
-            const response = await Axios.request({method:'post',url:`/api/course/ld/uploadCourse`,params:payload})
+            const response = await Axios.request({ method: 'post', url: `/api/course/ld/uploadCourse`, params: payload })
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
             if (response.data.code !== 0) {
                 return rejectWithValue(response.data.message)
@@ -298,15 +295,15 @@ export const updateCourese= createAsyncThunk(
 );
 
 
-export const deleteCourese= createAsyncThunk(
+export const deleteCourese = createAsyncThunk(
     'lduser/deleteCourse',
     async (payload, { rejectWithValue }) => {
         try {
-           
 
-      
+
+
             // throw new Error('Something bad happened');
-            const response = await Axios.request({method:'delete',url:`/api/prepaidCard/course/${payload}`})
+            const response = await Axios.request({ method: 'delete', url: `/api/prepaidCard/course/${payload}` })
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
             return response.data;
         } catch (err) {
@@ -324,12 +321,12 @@ export const updateExpiredTime = createAsyncThunk(
         try {
 
             let formdata = new FormData()
-           
-            formdata.append('number',payload.number)
-            formdata.append('annualTimes',payload.annualTimes)
-            formdata.append('annualExpireTime',payload.annualExpireTime)
+
+            formdata.append('number', payload.number)
+            formdata.append('annualTimes', payload.annualTimes)
+            formdata.append('annualExpireTime', payload.annualExpireTime)
             // throw new Error('Something bad happened');
-            const response = await Axios.post(`/api/user/charged`,formdata)
+            const response = await Axios.post(`/api/user/charged`, formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
             return response.data;
         } catch (err) {
@@ -344,17 +341,17 @@ export const updateChargeAnnotation = createAsyncThunk(
     async (payload, { rejectWithValue }) => {
         try {
 
-      
+
             let formdata = new FormData()
-           
-            formdata.append('number',payload.number)
-            formdata.append('charged',payload.charged)
-            formdata.append('times',payload.times)
-            formdata.append('description',payload.description)
-            formdata.append('worth',payload.worth)
-            formdata.append('court',payload.court)
+
+            formdata.append('number', payload.number)
+            formdata.append('charged', payload.charged)
+            formdata.append('times', payload.times)
+            formdata.append('description', payload.description)
+            formdata.append('worth', payload.worth)
+            formdata.append('court', payload.court)
             // throw new Error('Something bad happened');
-            const response = await Axios.post(`/api/user/charged`,formdata)
+            const response = await Axios.post(`/api/user/charged`, formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
             // if (response.data.code !== 0) {
             //     return rejectWithValue(response.data.message)
@@ -476,7 +473,7 @@ export const exploreSlice = createSlice({
             });
         builder
             .addCase(exploreRecentCharge.pending, (state) => {
-                state.createSuccess=false
+                state.createSuccess = false
                 state.loading = true
                 state.charedLog = []
 
@@ -489,12 +486,12 @@ export const exploreSlice = createSlice({
             })
             .addCase(exploreRecentCharge.fulfilled, (state, action) => {
                 state.loading = false
-                state.charedLog =  action.payload.content
-                
+                state.charedLog = action.payload.content
+
             });
         builder
             .addCase(exploreRecentSpend.pending, (state) => {
-                state.createSuccess=false
+                state.createSuccess = false
                 state.loading = true
                 state.spendLog = []
 
@@ -507,7 +504,7 @@ export const exploreSlice = createSlice({
             })
             .addCase(exploreRecentSpend.fulfilled, (state, action) => {
                 state.loading = false
-                state.spendLog =  action.payload
+                state.spendLog = action.payload
             });
         builder
             .addCase(createCard.pending, (state) => {
@@ -605,7 +602,7 @@ export const exploreSlice = createSlice({
                 state.loading = false
                 state.createSuccess = true
             });
-    
+
         builder
             .addCase(retreatCourseMember.pending, (state) => {
                 state.loading = true
