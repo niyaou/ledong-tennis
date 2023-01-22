@@ -29,7 +29,7 @@ import CourseItem from '../../components/ldadmin/courseItem'
 import {
     selectedAndMoveTaskAction, deleteSelectedAndMoveTaskAction
 } from '../../store/actions/inSensitiveActions';
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCharge, exploreRecentSpend, exploreMemberCourse, updateExpiredTime, updateChargeAnnotation, } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreRecentCharge, retreatChargeAnnotation, exploreRecentSpend, exploreMemberCourse, updateExpiredTime, updateChargeAnnotation, } from '../../store/slices/dominationSlice'
 import { createUserAccount } from '../../store/actions/usersActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -534,8 +534,8 @@ function SearchTask(props) {
                         minWidth: '80px',
                     }}
                     onClick={() => {
-                        console.log(course, customerName)
-                        // dispatch(retreatRecentCourse({cardId:customerName,time:course.time}))
+                        console.log(charge)
+                        dispatch(retreatChargeAnnotation(charge.id))
                     }}
                 >
 

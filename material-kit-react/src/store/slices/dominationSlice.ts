@@ -366,6 +366,28 @@ export const updateChargeAnnotation = createAsyncThunk(
 
 
 
+export const retreatChargeAnnotation = createAsyncThunk(
+    'lduser/chargeAnnotation/retreat',
+    async (payload, { rejectWithValue }) => {
+        try {
+
+
+
+            // throw new Error('Something bad happened');
+            const response = await Axios.post(`/api/user/charged/retreat/${payload}`, {})
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
+            // if (response.data.code !== 0) {
+            //     return rejectWithValue(response.data.message)
+            // }
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+
 
 export const selectCourse = createAsyncThunk(
     'lduser/course/select',
@@ -584,6 +606,23 @@ export const exploreSlice = createSlice({
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(updateChargeAnnotation.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
+            });
+
+        builder
+            .addCase(retreatChargeAnnotation.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(retreatChargeAnnotation.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(retreatChargeAnnotation.fulfilled, (state, action) => {
                 state.loading = false
                 state.createSuccess = true
             });

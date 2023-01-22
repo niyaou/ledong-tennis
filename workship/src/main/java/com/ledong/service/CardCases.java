@@ -77,9 +77,9 @@ public class CardCases {
         if (_charge.isPresent()) {
             var charge = _charge.get();
             var number = charge.getPrepaidCard().getNumber();
-            userCases.setRestChargeChange(number, charge.getCharge());
-            userCases.setRestTimesChange(number, charge.getTimes());
-            userCases.setRestAnnualTimesChange(number, charge.getAnnualTimes());
+            userCases.setRestChargeChange(number, -charge.getCharge());
+            userCases.setRestTimesChange(number, -charge.getTimes());
+            userCases.setRestAnnualTimesChange(number, -charge.getAnnualTimes());
             chargeDao.delete(charge);
             return DefaultConverter.convert(charge, ChargeBo.class);
         } else {
