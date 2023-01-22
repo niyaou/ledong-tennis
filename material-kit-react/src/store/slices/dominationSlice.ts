@@ -350,6 +350,7 @@ export const updateChargeAnnotation = createAsyncThunk(
             formdata.append('description', payload.description)
             formdata.append('worth', payload.worth)
             formdata.append('court', payload.court)
+            formdata.append('annualTimes', payload.annualTimes)
             // throw new Error('Something bad happened');
             const response = await Axios.post(`/api/user/charged`, formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)

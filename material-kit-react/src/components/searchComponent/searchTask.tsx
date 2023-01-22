@@ -383,7 +383,7 @@ function SearchTask(props) {
                         }}
 
                     />
-                     <TextField
+                    <TextField
                         label="次年卡等价金额"
                         // label="Content(reply visable scale as the same as topic.)"
                         required
@@ -393,13 +393,13 @@ function SearchTask(props) {
                         }}
 
                     />
-                      <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+                    <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
                         name='FileTypes'
                         size="small"
                         onChange={(e) => {
                             //   let after = { ...courseEdit, court: e.target.value }
                             //   setCourseEdit(after)
-                            setCourtSelect( e.target.value );
+                            setCourtSelect(e.target.value);
                         }}
                         value={courtSelect}>
                         {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
@@ -416,13 +416,13 @@ function SearchTask(props) {
                     <Button variant="contained" size="small"
 
                         onClick={() => {
-                            console.log('---------',{
+                            console.log('---------', {
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc,worth:parseInt(worth),court:courtSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect
                             })
                             dispatch(updateChargeAnnotation({
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc,worth:worth,court:courtSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: worth, court: courtSelect
                             }))
                         }}>确定充值</Button>
                 </Stack>
