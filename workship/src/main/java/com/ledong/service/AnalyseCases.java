@@ -1,33 +1,11 @@
 package com.ledong.service;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.ledong.bo.CourseBo;
-import com.ledong.bo.SpendBo;
 import com.ledong.dao.*;
-import com.ledong.entity.Coach;
-import com.ledong.entity.Course;
-import com.ledong.entity.PrepaidCard;
-import com.ledong.entity.Spend;
-import com.ledong.exception.CustomException;
-import com.ledong.exception.UseCaseCode;
-import com.ledong.util.DefaultConverter;
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class AnalyseCases {
@@ -48,7 +26,7 @@ public class AnalyseCases {
     private CourseDAO courseDao;
 
     @Autowired
-    private CoachDAO chargeDao;
+    private ChargeDAO chargeDao;
 
 
     @Autowired
@@ -57,13 +35,60 @@ public class AnalyseCases {
 
     public Object analyseEfficiancy(String startTime, String endTime) {
 
+        var total = new HashMap<String,Object>();
         var course = courseDao.findAllWithTimeRange(DateUtil.parse(startTime).toLocalDateTime(), DateUtil.parse(endTime).toLocalDateTime());
+        var charge =   chargeDao.findAllWithTimeRange(DateUtil.parse(startTime).toLocalDateTime(), DateUtil.parse(endTime).toLocalDateTime());
+
         var analys = new LinkedHashMap<String, HashMap<String, Float>>();
+
+        var revenue = new LinkedHashMap<String, HashMap<String, Float>>();
+
+        var totalMap=new HashMap<String, Float>();
+        totalMap.put("spend",0f);
+        totalMap.put("charge",0f);
+
+
+        charge.stream().forEach(charge1 -> {
+         var court=  revenue.get( charge1.getCourt());
+            if (court == null) {
+                var spec = new HashMap<String, Float>();
+
+                spec.put("charge",charge1.getCharge()==0f?charge1.getWorth():charge1.getCharge());
+
+                revenue.put(charge1.getCourt(),spec);
+
+            }else{
+                court.put("charge", court.get("charge") + (charge1.getCharge()==0f?charge1.getWorth():charge1.getCharge()));
+
+                revenue.put(charge1.getCourt(),court);
+            }
+
+        });
+
 
         course.stream().forEach(course1 -> {
             if (course1.getCourseType() > 0) {
-
                 var coach = analys.get(course1.getCoach().getName());
+
+                var court=  revenue.get( course1.getCourt().getName());
+                var spends = course1.getSpend();
+                if (court == null ) {
+                    var spec = new HashMap<String, Float>();
+
+                    spends.stream().forEach(spend1->{
+                        spec.put("spend",spend1.getCharge()==0F?spend1.getDescription():spend1.getCharge());
+                    });
+
+                    revenue.put(course1.getCourt().getName(),spec);
+                }else{
+                    spends.stream().forEach(spend1->{
+
+                        court.put("spend",(court.get("spend")==null?0:court.get("spend"))+ (spend1.getCharge()==0F?spend1.getDescription():spend1.getCharge()));
+                    });
+
+                    revenue.put(course1.getCourt().getName(),court);
+                }
+
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
                     spec.put("workTime", course1.getDuration());
@@ -82,9 +107,24 @@ public class AnalyseCases {
             }
         });
 
-      var entrylist=new ArrayList<>(analys.entrySet())  ;
+        var entrylist=new ArrayList<>(analys.entrySet())  ;
         Collections.sort(entrylist, ((m1,m2)->{return (int) (m2.getValue().get("analyse")*100-m1.getValue().get("analyse")*100);}));
 
-        return entrylist;
+
+
+        total.put("analyse",entrylist);
+
+        for(var key:revenue.keySet()){
+            var value=revenue.get(key);
+            totalMap.put("spend",totalMap.get("spend")+(value.get("spend")==null?0:value.get("spend")));
+            totalMap.put("charge",totalMap.get("charge")+(value.get("charge")==null?0:value.get("charge")));
+        }
+        revenue.put("总共",totalMap);
+
+        var revenuelist=new ArrayList<>(revenue.entrySet())  ;
+        Collections.sort(revenuelist, ((m1,m2)->{return (int) ((m2.getValue().get("spend")==null?0:m2.getValue().get("spend"))*100-(m1.getValue().get("spend")==null?0:m1.getValue().get("spend"))*100);}));
+        total.put("revenue",revenuelist);
+
+        return total;
     }
 }

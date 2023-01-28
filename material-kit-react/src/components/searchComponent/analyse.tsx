@@ -39,7 +39,7 @@ function Analyse(props) {
     const CircleButton = styled(Button)({ borderRadius: '20px', })
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { court, users, sortValue, monthValue, charedLog, spendLog, createSuccess, course, analyseCourt } = useSelector((state) => state.domination)
+    const { court, users, sortValue, monthValue, charedLog, spendLog, createSuccess, course, analyseCourt, revenueCourt } = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
@@ -119,7 +119,7 @@ function Analyse(props) {
     const fileItem = (user, index) => {
 
         var member = Object.values(user)[0]
-        console.log(user, member)
+        // console.log(user, member)
         return (<Grid item xs={4} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
                 <Stack
@@ -203,6 +203,79 @@ function Analyse(props) {
         )
     }
 
+
+    const revenueItem = (user, index) => {
+
+        var member = Object.values(user)[0]
+        console.log(user, member)
+        return (<Grid item xs={4} key={index} space={1}>
+            <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
+                <Stack
+                    direction="row"
+                    justifyContent="center"
+                    alignItems="center"
+                    spacing={0}
+                    sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
+                    onMouseEnter={() => {
+
+                    }}
+                    onMouseLeave={() => {
+
+                    }}
+                    onClick={(event) => {
+
+
+                    }}>
+                    {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
+
+
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
+                        }} >
+                        {Object.keys(user)[0]}
+                    </Typography>
+                    {/* <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
+                        }} >
+                        {user}
+                    </Typography> */}
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
+                        }} >
+                        充值： {member.charge}元
+                    </Typography>
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
+                        }} >
+                        消费： {member.spend}元
+                    </Typography>
+
+
+                </Stack>
+
+
+            </Paper>
+        </Grid>
+        )
+    }
+
+
     const style = {
         position: 'absolute' as 'absolute',
         top: '50%',
@@ -222,70 +295,11 @@ function Analyse(props) {
 
 
 
-    const chargeItem = (charge) => {
-
-        return (<Paper key={`charge-item-${charge.id}`} elevation={1} sx={{
-            minWidth: '850px',
-            background: 'transparent',
-            '& :hover': { background: 'rgb(0,0,0,0.1)' }
-        }}>
-            <Stack
-
-                spacing={2}
-                direction="row"
-                justifyContent="flex-start"
-                alignItems="center"
-                sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
-            >
-
-                <Typography gutterBottom variant="body2"
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        minWidth: '80px',
-                    }} >
-                    {charge.chargedTime}
-                </Typography>
-                <Typography gutterBottom variant="body2"
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        minWidth: '80px',
-                    }} >
-                    {charge.description}
-                </Typography>
-                <Typography gutterBottom variant="body2"
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        minWidth: '80px',
-                    }} >
-                    充值{charge.charge}元，次卡{charge.times},年卡{charge.annualTimes}
-                </Typography>
-
-
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    sx={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        minWidth: '80px',
-                    }}
-                    onClick={() => {
-                        console.log(course, customerName)
-                        // dispatch(retreatRecentCourse({cardId:customerName,time:course.time}))
-                    }}
-                >
-
-                    删除
-                </Button>
-            </Stack>
-        </Paper>)
-    }
-
-
     return (
         <Stack justifyContent="flex-start"
             alignItems="flex-start"
             sx={{ marginLeft: 2, overflowY: 'auto', height: '100%', paddingBottom: -2 }}
-            spacing={2}
+            spacing={5}
         >
             <Stack justifyContent="flex-start"
                 alignItems="center"
@@ -312,23 +326,50 @@ function Analyse(props) {
                     }} />}
                 </IconButton>
             </Stack>
-            <Grid
-                container
-                direction="row"
-                justifyContent="flex-start"
-                alignItems="flex-start"
-                spacing={4}
-                sx={{ height: '10%', width: '100%' }}>
-                {analyseCourt && analyseCourt.map((file, index) => fileItem(file, index))}
-            </Grid>
-
 
             <Stack justifyContent="flex-start"
+                spacing={2}
+                direction="row"
+            >
+               满班率
+            </Stack>
 
+            <Stack justifyContent="flex-start"
+                spacing={2}
+                direction="row"
+            >
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="flex-start"
+                    alignItems="flex-start"
+                    spacing={4}
+                    sx={{ height: '10%', width: '100%' }}>
+                    {analyseCourt && analyseCourt.map((file, index) => fileItem(file, index))}
+                </Grid>
+            </Stack>
+
+            <Stack justifyContent="flex-start"
+                spacing={2}
+                direction="row"
+            >
+               充值消课
+            </Stack>
+
+            <Stack justifyContent="flex-start"
                 spacing={2}
                 direction="row"
             >
 
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="flex-start"
+                    alignItems="flex-start"
+                    spacing={4}
+                    sx={{ height: '10%', width: '100%' }}>
+                    {revenueCourt && revenueCourt.map((file, index) => revenueItem(file, index))}
+                </Grid>
 
             </Stack>
 

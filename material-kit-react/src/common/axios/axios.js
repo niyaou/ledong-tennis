@@ -15,7 +15,7 @@ import { USER_INFO_KEY } from '../../store/actions/usersActions'
 import { logOut } from '../../store/actions/usersActions';
 
 const Axios = axios.create({
-    timeout: 18000, // 设置超时时长
+    timeout: 28000, // 设置超时时长
 })
 
 // 设置post请求头

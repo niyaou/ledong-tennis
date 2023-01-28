@@ -35,7 +35,7 @@ const initialState = {
     coach: [],
     court: [],
     analyseCourt: [],
-
+    revenueCourt: [],
 
 }
 
@@ -491,7 +491,8 @@ export const exploreSlice = createSlice({
             })
             .addCase(exploreCourseAnalyse.fulfilled, (state, action) => {
                 state.loading = false
-                state.analyseCourt = action.payload
+                state.analyseCourt = action.payload.analyse
+                state.revenueCourt = action.payload.revenue
 
             });
         builder
