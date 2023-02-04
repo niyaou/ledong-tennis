@@ -120,7 +120,7 @@ function Analyse(props) {
 
         var member = Object.values(user)[0]
         // console.log(user, member)
-        return (<Grid item xs={4} key={index} space={1}>
+        return (<Grid item xs={6} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
                 <Stack
                     direction="row"
