@@ -627,7 +627,7 @@ function Additions(props) {
               diff = 1.5
             } else if (diff <= 120) {
               diff = 2
-            } else if (diff <= 180) {
+            } else if (diff <= 150) {
               diff = 2.5
             }else{
               diff=3
@@ -659,7 +659,7 @@ function Additions(props) {
               diff = 1.5
             } else if (diff <= 120) {
               diff = 2
-            } else if (diff <= 180) {
+            } else if (diff <= 150) {
               diff = 2.5
             }else{
               diff=3
