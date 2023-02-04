@@ -275,16 +275,13 @@ export const updateCourese = createAsyncThunk(
     'lduser/updateCourse',
     async (payload, { rejectWithValue }) => {
         try {
-            // payload.isExperience=0
-            // payload.isDealing=0
-            payload.startTime = moment(payload.startTime).format('YYYY-MM-DD HH:mm')
-            payload.endTime = moment(payload.endTime).format('YYYY-MM-DD HH:mm')
+          
 
 
             // throw new Error('Something bad happened');
-            const response = await Axios.request({ method: 'post', url: `/api/course/ld/uploadCourse`, params: payload })
+            const response = await Axios.request({ method: 'post', url: `/api/prepaidCard/course/trial/${payload}` })
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
-            if (response.data.code !== 0) {
+            if (response.status !== 200) {
                 return rejectWithValue(response.data.message)
             }
             return response.data.data;
@@ -351,6 +348,7 @@ export const updateChargeAnnotation = createAsyncThunk(
             formdata.append('worth', payload.worth)
             formdata.append('court', payload.court)
             formdata.append('annualTimes', payload.annualTimes)
+            formdata.append('coach', payload.coach)
             // throw new Error('Something bad happened');
             const response = await Axios.post(`/api/user/charged`, formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)

@@ -90,6 +90,16 @@ public class PrepaidCardController extends BaseController{
                 .build();
     }
 
+
+    @PostMapping("/course/trial/{id}")
+    public CourseResponseDTO trialCourseUpdate( @RequestHeader(value = "secure", required = false)String secure,@PathVariable("id")Long courseId
+    ){
+        verifiedSecure(secure);
+        var bo= courseCases.trialCourseUpdate(courseId);
+        return CourseResponseDTO.builder()
+                .build();
+    }
+
     @GetMapping("/course/total")
     public Object totalCourse(@RequestParam  String startTime,@RequestParam(required = false) String number,@RequestParam(required = false) Integer pageNum){
         if(StringUtils.hasText(number)){

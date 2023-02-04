@@ -124,7 +124,7 @@ function CourseItem(props) {
                 color: 'rgba(0, 0, 0, 0.6)',
                 minWidth: '180px',
               }} >
-              {item.duration}小时  ,{item.courseType===0?'订场':item.courseType===1?'班课':'私教'}
+              {item.duration}小时  ,{item.courseType===-2?'体验课未成单':item.courseType===-1?'体验课成单':item.courseType===0?'订场':item.courseType===1?'班课':'私教'}
             </Typography>
             <Typography gutterBottom variant="body2"
               sx={{

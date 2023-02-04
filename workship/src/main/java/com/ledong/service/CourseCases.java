@@ -68,7 +68,7 @@ public class CourseCases {
     ) {
         var coach = coachDao.findByNumber(coachName);
         var court = courtDao.findByName(courtName);
-        var _mObj = JSONUtil.parse(membersObj);
+
         var courseBo = CourseBo.builder().court(court)
                 .coach(coach)
                 .startTime(DateUtil.parse(startTime).toLocalDateTime())
@@ -80,35 +80,38 @@ public class CourseCases {
                 .build();
         var course = Course.fromBO(courseBo);
         course = courseDao.save(course);
-        for (Map.Entry<String, Object> entry : ((JSONObject) _mObj).entrySet()) {
-            //set spend description
-            var key = entry.getKey();
-            var value = entry.getValue();
-            var member = userDao.findByNumber(key);
-            var spend = SpendBo.builder().course(course).prepaidCard(member)
-                    .build();
-            var charge = ((JSONArray) value).get(0, Float.class);
-            var times = ((JSONArray) value).get(1, Float.class);
-            var annualTimes = ((JSONArray) value).get(2, Float.class);
-            var spendDescript = ((JSONArray) value).get(3, Float.class);
-            if (charge != 0) {
-                member.setRestCharge(member.getRestCharge() - charge);
-                spend.setCharge((Float) charge);
+        if (course.getCourseType() >= 0) {
+            var _mObj = JSONUtil.parse(membersObj);
+            for (Map.Entry<String, Object> entry : ((JSONObject) _mObj).entrySet()) {
+                //set spend description
+                var key = entry.getKey();
+                var value = entry.getValue();
+                var member = userDao.findByNumber(key);
+                var spend = SpendBo.builder().course(course).prepaidCard(member)
+                        .build();
+                var charge = ((JSONArray) value).get(0, Float.class);
+                var times = ((JSONArray) value).get(1, Float.class);
+                var annualTimes = ((JSONArray) value).get(2, Float.class);
+                var spendDescript = ((JSONArray) value).get(3, Float.class);
+                if (charge != 0) {
+                    member.setRestCharge(member.getRestCharge() - charge);
+                    spend.setCharge((Float) charge);
+                }
+                if (times != 0) {
+                    member.setTimesCount(member.getTimesCount() - times);
+                    spend.setTimes(times);
+                }
+                if (annualTimes != 0) {
+                    member.setAnnualCount(member.getAnnualCount() - annualTimes);
+                    spend.setAnnualTimes(annualTimes);
+                }
+                spend.setDescription(spendDescript);
+                userDao.save(member);
+                spendDao.save(Spend.fromBO(spend));
+                var members = course.getMember();
+                members.add(member);
+                course.setMember(members);
             }
-            if (times != 0) {
-                member.setTimesCount(member.getTimesCount() - times);
-                spend.setTimes(times);
-            }
-            if (annualTimes != 0) {
-                member.setAnnualCount(member.getAnnualCount() - annualTimes);
-                spend.setAnnualTimes(annualTimes);
-            }
-            spend.setDescription(spendDescript);
-            userDao.save(member);
-            spendDao.save(Spend.fromBO(spend));
-            var members = course.getMember();
-            members.add(member);
-            course.setMember(members);
         }
         courseDao.save(course);
         return courseBo;
@@ -166,6 +169,19 @@ public class CourseCases {
                 spendDao.delete(spend);
             });
             courseDao.delete(course);
+            return DefaultConverter.convert(course, CourseBo.class);
+        } else {
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public CourseBo trialCourseUpdate(Long courseId) {
+        var _course = courseDao.findById(courseId);
+        if (_course.isPresent()) {
+            var course = _course.get();
+            course.setCourseType(course.getCourseType()+1);
+            courseDao.save(course);
             return DefaultConverter.convert(course, CourseBo.class);
         } else {
             throw new CustomException(UseCaseCode.NOT_FOUND);

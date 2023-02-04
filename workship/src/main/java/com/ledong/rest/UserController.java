@@ -52,9 +52,10 @@ public class UserController extends BaseController {
                                       @RequestParam(required = false)Float annualTimes, @RequestParam(required = false)String annualExpireTime,
                                       @RequestParam(required = false)Integer worth,
                                       @RequestParam(required = true)String court,
+                                      @RequestParam(required = true)String coach,
                                       @RequestParam(required = false)String description) {
         verifiedSecure(secure);
-        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime,worth,court,description);
+        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime,worth,court,description,coach);
         return chargedLog;
 
     }

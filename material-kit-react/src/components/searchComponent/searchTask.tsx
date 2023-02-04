@@ -61,7 +61,7 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     // const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { court, users, sortValue, charedLog, spendLog, createSuccess, course } = useSelector((state) => state.domination)
+    const { court, users, sortValue, charedLog, spendLog, createSuccess, course ,coach} = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
@@ -78,6 +78,7 @@ function SearchTask(props) {
     const [annualTimes, setAnnualTimes] = React.useState(prepaidCard.annualCount || 0);
     const [worth, setWorth] = React.useState(prepaidCard.worth || 0);
     const [courtSelect, setCourtSelect] = React.useState('');
+    const [coachSelect, setCoachSelect] = React.useState('');
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
@@ -207,8 +208,13 @@ function SearchTask(props) {
             </Typography> */}
             <Typography gutterBottom variant="body2"
                 sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',
-                }} >
+                    color: 'rgba(0, 0, 0, 0.6)',cursor: 'pointer',
+                }} 
+                onClick={() => {
+                    console.log('---------------------2222--------')
+                    setOpen(2)
+                    // dispatch(updateExpiredTime({cardId:customerName,time: moment(expiredTime).format( 'YYYY-MM-DD'),rest:parseInt(annualTimes)}))
+                }}>
                 剩余年卡次数  {prepaidCard.annualCount}
             </Typography>
             <Typography gutterBottom variant="body2"
@@ -404,6 +410,17 @@ function SearchTask(props) {
                         value={courtSelect}>
                         {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
                     </Select>
+                    <Select label="教练" labelId="demo-controlled-open-select-label12"
+                        name='教练'
+                        size="small"
+                        onChange={(e) => {
+                            //   let after = { ...courseEdit, court: e.target.value }
+                            //   setCourseEdit(after)
+                            setCoachSelect(e.target.value);
+                        }}
+                        value={coachSelect}>
+                        {coach && coach.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
+                    </Select>
 
                     <TextField
                         id="outlined-password-input3"
@@ -418,11 +435,11 @@ function SearchTask(props) {
                         onClick={() => {
                             console.log('---------', {
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect,coach:coachSelect
                             })
                             dispatch(updateChargeAnnotation({
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: worth, court: courtSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: worth, court: courtSelect,coach:coachSelect
                             }))
                         }}>确定充值</Button>
                 </Stack>

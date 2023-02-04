@@ -17,7 +17,7 @@ import UserManagement from './userManagement'
 import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
 import { useNavigate } from 'react-router-dom';
-import { exploreUsersAction, exploreRecentCourse, selectCourse ,deleteCourese,retreatCourseMember,notifyCourse} from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreRecentCourse, selectCourse ,deleteCourese,retreatCourseMember,notifyCourse,updateCourese} from '../../store/slices/dominationSlice'
 import { tagsInfoAction, scenceInfoAction } from '../../store/slices/tagsSlice'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -157,7 +157,7 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.duration}小时  ,{item.courseType===0?'订场':item.courseType===1?'班课':'私教'}
+                {item.duration}小时  ,{item.courseType===-2?'体验课未成单':item.courseType===-1?'体验课成单':item.courseType===0?'订场':item.courseType===1?'班课':'私教'}
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
@@ -222,14 +222,14 @@ function RecentCourse(props) {
 
             }}
           >
-             <Button variant="contained" size="small"
+            {item.courseType>=0 &&(<Button variant="contained" size="small"
              disabled={item.notified>0}
              onClick={() => {
               dispatch(notifyCourse(item.id))
-            }}>短信通知</Button>
-            {/* <Button variant="outlined" size="small" onClick={() => {
-              dispatch(selectCourse(item))
-            }}>编辑</Button> */}
+            }}>短信通知</Button>)}
+            {item.courseType===-2 &&( <Button variant="contained" size="small" onClick={() => {
+              dispatch(updateCourese(item.id))
+            }}>体验课成单</Button>)}
             <Button variant="contained" color="warning" size="small"
              onClick={() => {
               dispatch(deleteCourese(item.id))

@@ -586,10 +586,11 @@ function Additions(props) {
         size="small"
         onChange={(e) => {
           let after = { ...courseEdit, courseType: e.target.value }
+          console.log('----课时类型---',after)
           setCourseEdit(after)
         }}
         value={[courseEdit.courseType]}>
-       {['订场','班课','私教'].map((dict, index) => { return (<MenuItem key={`courseType-${dict}`} value={index}>{dict}</MenuItem>) })}
+       {['体验课未成单','体验课成单','订场','班课','私教'].map((dict, index) => { return (<MenuItem key={`courseType-${dict}`} value={index-2}>{dict}</MenuItem>) })}
       </Select>
     </FormControl>
 

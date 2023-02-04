@@ -2,6 +2,7 @@ package com.ledong.service;
 
 import com.ledong.bo.ChargeBo;
 import com.ledong.dao.ChargeDAO;
+import com.ledong.dao.CoachDAO;
 import com.ledong.dao.SpendDAO;
 import com.ledong.dao.UserDAO;
 import com.ledong.entity.Charge;
@@ -32,18 +33,22 @@ public class CardCases {
 
     @Autowired
     private SpendDAO spendDAO;
+    @Autowired
+    private CoachDAO coachDAO;
 
     @Transactional(rollbackFor = Exception.class)
-    public ChargeBo setRestCharge(String number, Float charged, Float times, Float annualTimes, String annualExpireTime,Integer worth,String court,String description) {
+    public ChargeBo setRestCharge(String number, Float charged, Float times, Float annualTimes, String annualExpireTime,Integer worth,String court,String description,String coachName) {
         var user = userCases.findByNumber(number);
         if (user == null) {
             throw new CustomException(UseCaseCode.NOT_FOUND);
         }
+        var coach  = coachDAO.findByName(coachName);
         var chargeTemp = Charge.builder()
                 .charge(0)
                 .times(0)
                 .annualTimes(0)
                 .court(court)
+                .coach(coach)
                 .description(description)
                 .prepaidCard(PrepaidCard.fromBO(user));
         if (worth!=null && worth != 0) {

@@ -146,7 +146,7 @@ function Analyse(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '8%', textAlign: 'center'
                         }} >
                         {Object.keys(user)[0]}
                     </Typography>
@@ -164,7 +164,7 @@ function Analyse(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
                         }} >
                         上课： {member.courses}节
                     </Typography>
@@ -173,7 +173,7 @@ function Analyse(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
                         }} >
                         学生： {member.members}人
                     </Typography>
@@ -182,7 +182,7 @@ function Analyse(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
                         }} >
                         满班率：{member.analyse.toFixed(1)}
                     </Typography>
@@ -191,9 +191,18 @@ function Analyse(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
                         }} >
                         课时数：{member.workTime}
+                    </Typography>
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
+                        }} >
+                        体验课：{member.deal||0}/{member.trial||0} ,成单率:{((member.deal||0)/(member.trial||0)).toFixed(2)*100}%
                     </Typography>
                 </Stack>
 

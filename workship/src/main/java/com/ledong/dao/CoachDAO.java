@@ -10,4 +10,5 @@ import java.io.Serializable;
 
 public interface CoachDAO extends JpaRepository<Coach, Serializable>,JpaSpecificationExecutor<Coach> {
     public Coach findByNumber(String number);
+    public Coach findByName(String name);
 }
