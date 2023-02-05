@@ -91,6 +91,10 @@ public class AnalyseCases {
                 var coach = analys.get(course1.getCoach().getName());
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
+                    spec.put("workTime", 0f);
+                    spec.put("courses", 0F);
+                    spec.put("members",0f);
+                    spec.put("analyse", 0f);
                     spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
                     analys.put(course1.getCoach().getName(), spec);
@@ -167,7 +171,7 @@ public class AnalyseCases {
 
         var entrylist = new ArrayList<>(analys.entrySet());
         Collections.sort(entrylist, ((m1, m2) -> {
-            return (int) (m2.getValue().get("analyse") * 100 - m1.getValue().get("analyse") * 100);
+            return (int) ((m2.getValue().get("analyse")==null?0:m2.getValue().get("analyse")) * 100 - (m1.getValue().get("analyse")==null?0:m1.getValue().get("analyse") )* 100);
         }));
 
 
