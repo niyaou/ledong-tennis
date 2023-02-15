@@ -53,7 +53,7 @@ function AdminComp(props) {
 
 
   useEffect(() => {
-    dispatch(exploreCourseAnalyse({ startTime: moment().startOf('month').format('YYYY-MM-DD'), endTime: moment().endOf('month').format('YYYY-MM-DD') }))
+    dispatch(exploreCourseAnalyse({ startTime: moment().subtract(1, 'M').startOf('month').format('YYYY-MM-DD'), endTime: moment().endOf('month').format('YYYY-MM-DD') }))
     dispatch(exploreUsersAction())
     dispatch(exploreCoachAction())
     dispatch(exploreCourtAction())
