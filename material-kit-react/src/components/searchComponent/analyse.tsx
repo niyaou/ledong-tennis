@@ -202,7 +202,7 @@ function Analyse(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
                         }} >
-                        体验课：{member.deal||0}/{member.trial||0} ,成单率:{((member.deal||0)/(member.trial||0)).toFixed(2)*100}%
+                        体验课：{member.deal || 0}/{member.trial || 0} ,成单率:{((member.deal || 0) / (member.trial || 0)).toFixed(2) * 100}%
                     </Typography>
                 </Stack>
 
@@ -263,7 +263,7 @@ function Analyse(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
                         }} >
-                        充值： {member.charge}元
+                        充值： {Object.keys(user)[0] === '总共' ? member.charge / 2 : member.charge}元
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
@@ -272,7 +272,7 @@ function Analyse(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
                         }} >
-                        消费： {member.spend}元
+                        消费： {Object.keys(user)[0] === '总共' ? member.spend / 2 : member.spend}元
                     </Typography>
 
 
@@ -340,7 +340,7 @@ function Analyse(props) {
                 spacing={2}
                 direction="row"
             >
-               满班率
+                满班率
             </Stack>
 
             <Stack justifyContent="flex-start"
@@ -362,7 +362,7 @@ function Analyse(props) {
                 spacing={2}
                 direction="row"
             >
-               充值消课
+                充值消课
             </Stack>
 
             <Stack justifyContent="flex-start"
