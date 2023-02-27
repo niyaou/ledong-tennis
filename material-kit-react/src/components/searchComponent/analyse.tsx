@@ -217,6 +217,14 @@ function Analyse(props) {
 
         var member = Object.values(user)[0]
         console.log(user, member)
+        var color = '#69d147'
+        Object.keys(user).forEach(key => {
+            console.log('----key', key)
+            if (key.includes('校区')) {
+                color = '#e1e2e4'
+            }
+        })
+        console.log(user, color)
         return (<Grid item xs={4} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
                 <Stack
@@ -224,7 +232,7 @@ function Analyse(props) {
                     justifyContent="center"
                     alignItems="center"
                     spacing={0}
-                    sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
+                    sx={{ background: color, cursor: 'pointer', '& :hover': { background: 'transparent' } }}
                     onMouseEnter={() => {
 
                     }}
@@ -232,7 +240,7 @@ function Analyse(props) {
 
                     }}
                     onClick={(event) => {
-
+                        console.log('----------点迹收入详情---------', user, member)
 
                     }}>
                     {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
