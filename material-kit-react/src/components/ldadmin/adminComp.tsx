@@ -15,7 +15,7 @@ import Additions from '../fileExplore/additions'
 import { useSelector } from "../../redux/hooks";
 import moment from "moment";
 
-import { exploreUsersAction, exploreCoachAction, exploreCourtAction, exploreCourseAnalyse } from '../../store/slices/dominationSlice'
+import { exploreUsersAction, exploreCoachAction, exploreCourtAction, exploreCourseAnalyse, exploreRecentCourse } from '../../store/slices/dominationSlice'
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -66,7 +66,13 @@ function AdminComp(props) {
   const numberOfChecked = (items: readonly number[]) =>
     intersection(checked, items).length;
 
+  const pageRefresh = (pageNo: number) => {
+    dispatch(exploreRecentCourse({
+      pageNum: pageNo, startTime: moment().subtract(45, 'days').startOf('month').format('YYYY-MM-DD hh:mm:ss'),
+      endTime: moment().endOf('month').format('YYYY-MM-DD hh:mm:ss')
+    }))
 
+  }
 
 
   return (
@@ -84,7 +90,7 @@ function AdminComp(props) {
         alignItems="center"
         sx={{ height: '100%', width: '100%' }}>
 
-        <UserManagement />
+        <UserManagement pageRefresh={pageRefresh} />
 
         <Additions
           sx={{ marginRight: 30, }} />

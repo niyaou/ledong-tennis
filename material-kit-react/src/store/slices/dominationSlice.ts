@@ -34,6 +34,7 @@ const initialState = {
     createSuccess: false,
     coach: [],
     court: [],
+    courseDetail: '',
     analyseCourt: [],
     revenueCourt: [],
 
@@ -57,6 +58,20 @@ export const exploreCourseAnalyse = createAsyncThunk(
 );
 
 
+
+
+export const exploreCourseDetail = createAsyncThunk(
+    'analyse/course/detail',
+    async (params, { rejectWithValue }) => {
+        try {
+
+            const response = await Axios.get(`/api/user/charged/coach/${params.coach}?startTime=${params.startTime}&endTime=${params.endTime}`)
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
 
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -134,10 +149,10 @@ export const exploreRecentCourse = createAsyncThunk(
             let formdata = new FormData()
             // payload.isExperience=0
             // payload.isDealing=0
-            var startTime = moment().subtract(180, 'days').format('YYYY-MM-DD HH:mm:ss')
-            formdata.append('startTime', startTime)
+            // var startTime = moment().subtract(180, 'days').format('YYYY-MM-DD HH:mm:ss')
+            // formdata.append('startTime', startTime)
 
-            const response = await Axios.get(`/api/prepaidCard/course/total?startTime=${startTime}`)
+            const response = await Axios.get(`/api/prepaidCard/course/total?startTime=${params.startTime}&endTime=${params.endTime}&pageNum=${params.pageNum}`)
             return response.data;
         } catch (err) {
             return rejectWithValue(err)
@@ -275,7 +290,7 @@ export const updateCourese = createAsyncThunk(
     'lduser/updateCourse',
     async (payload, { rejectWithValue }) => {
         try {
-          
+
 
 
             // throw new Error('Something bad happened');
@@ -691,6 +706,25 @@ export const exploreSlice = createSlice({
             .addCase(exploreCourtAction.fulfilled, (state, action) => {
                 state.loading = false
                 state.court = action.payload
+            });
+
+
+        builder
+            .addCase(exploreCourseDetail.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+                state.courseDetail = ''
+
+            })
+            .addCase(exploreCourseDetail.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(exploreCourseDetail.fulfilled, (state, action) => {
+                state.loading = false
+                state.courseDetail = action.payload
             });
     },
 });

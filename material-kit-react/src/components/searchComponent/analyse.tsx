@@ -20,7 +20,10 @@ import { useSnackbar } from 'notistack';
 import IconButton from '@mui/material/IconButton';
 import { useDispatch } from 'react-redux';
 
-import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreCourseAnalyse, exploreRecentCharge, exploreRecentSpend, exploreMemberCourse, updateExpiredTime, updateChargeAnnotation, } from '../../store/slices/dominationSlice'
+import {
+    exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreCourseAnalyse, exploreCourseDetail,
+    exploreRecentCharge, exploreRecentSpend, exploreMemberCourse, updateExpiredTime, updateChargeAnnotation,
+} from '../../store/slices/dominationSlice'
 import { createUserAccount } from '../../store/actions/usersActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -28,6 +31,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import moment from 'moment';
 import { get } from 'lodash'
+import Axios from '../../common/axios/axios'
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 
@@ -39,7 +43,7 @@ function Analyse(props) {
     const CircleButton = styled(Button)({ borderRadius: '20px', })
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { court, users, sortValue, monthValue, charedLog, spendLog, createSuccess, course, analyseCourt, revenueCourt } = useSelector((state) => state.domination)
+    const { court, users, sortValue, monthValue, charedLog, spendLog, createSuccess, course, analyseCourt, revenueCourt, courseDetail } = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
@@ -57,12 +61,17 @@ function Analyse(props) {
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
-
-
+    const [timeRange, setTimeRange] = React.useState([]);
+    const [coachName, setCoachName] = React.useState('');
     useEffect(() => {
         dispatch(exploreCourseAnalyse({ startTime: moment().startOf('month').format('YYYY-MM-DD'), endTime: moment().endOf('month').format('YYYY-MM-DD') }))
     }, [])
 
+
+
+    const currentList = (coach) => {
+        dispatch(exploreCourseDetail({ coach, startTime: timeRange[0], endTime: timeRange[1] }))
+    }
 
 
 
@@ -95,6 +104,7 @@ function Analyse(props) {
                                         startTime: moment().add(def, "month").startOf('month').format('YYYY-MM-DD'),
                                         endTime: moment().add(def, "month").endOf('month').format('YYYY-MM-DD')
                                     }))
+                                    setTimeRange([moment().add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().add(def, "month").endOf('month').format('YYYY-MM-DD')])
                                 }
 
                                 // if (!values.includes(e.target.value)) {
@@ -220,7 +230,7 @@ function Analyse(props) {
         var color = '#69d147'
         Object.keys(user).forEach(key => {
             console.log('----key', key)
-            if (key.includes('校区')) {
+            if (key.includes('校区') || key.trim() === '' || key.includes('总共')) {
                 color = '#e1e2e4'
             }
         })
@@ -240,7 +250,11 @@ function Analyse(props) {
 
                     }}
                     onClick={(event) => {
-                        console.log('----------点迹收入详情---------', user, member)
+                        console.log('----------点迹收入详情---------', Object.keys(user)[0], member)
+                        if (!Object.keys(user)[0].includes('总共') && !Object.keys(user)[0].includes('校区') && Object.keys(user)[0].trim() !== '') {
+                            setCoachName(Object.keys(user)[0])
+                            currentList(Object.keys(user)[0])
+                        }
 
                     }}>
                     {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
@@ -389,7 +403,23 @@ function Analyse(props) {
                 </Grid>
 
             </Stack>
+            <Stack justifyContent="flex-start"
+                spacing={2}
+                direction="row"
+            >
+                {coachName}
+            </Stack>
+            <Stack justifyContent="flex-start"
+                spacing={2}
+                direction="row"
+            >
+                <Typography component='p' paragraph={true}>
 
+                    {courseDetail.split("\r\n").map((i, key) => {
+                        return <div key={key}>{i}</div>;
+                    })}
+                </Typography>
+            </Stack>
 
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
 

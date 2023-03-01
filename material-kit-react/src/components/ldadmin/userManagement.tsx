@@ -11,7 +11,7 @@
 import CachedIcon from '@mui/icons-material/Cached';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { TreeItemProps } from '@mui/lab/TreeItem';
-import { Box, Checkbox, Grid, Paper, Stack, Typography, Button, Avatar ,Divider} from '@mui/material';
+import { Box, Checkbox, Grid, Paper, Stack, Typography, Button, Avatar, Divider } from '@mui/material';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -76,8 +76,9 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 
 
 function UserManagement(props) {
+  const { pageRefresh } = props;
   const CircleButton = styled(Button)({ borderRadius: '20px', })
-  const {areas, users,court } = useSelector((state) => state.domination)
+  const { areas, users, court } = useSelector((state) => state.domination)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(true);
   const [treeSets, setTreeSets] = React.useState({ path: '', raw: '' });
@@ -98,8 +99,7 @@ function UserManagement(props) {
   useEffect(() => {
     let ele = folders.concat(files)
     setElement(ele)
-    setFileIndex(-1)
-    setFileIndexChecked(-1)
+
     setSelectedNode(null)
   }, [folders, files])
 
@@ -135,152 +135,17 @@ function UserManagement(props) {
 
   useEffect(() => {
     if (!searchActive && rootPath) {
-      console.log("🚀 ~ file: idsFileTree.tsx ~ line 127 ~ useEffect ~ pageParams", pageParams)
-      dispatch(selectedFolderContent(treeSets.raw || rootPath.rootPath, currentIndex, pageParams.size))
-      dispatch(folderContentStatistic(treeSets.raw || rootPath.rootPath))
+
     }
   }, [searchActive])
 
 
-  useEffect(() => {
-    if (!exploreMode) {
-      setFileIndexChecked(-1)
-      setSelectedNode(null)
-    }
-  }, [exploreMode])
 
 
 
 
 
-  const setTreePath = (filePath) => {
-    let path = filePath.replace(rootPath.rootPath, '')
-    path = path.split('/')
-    if (path[0] === '') {
-      path.shift()
-    }
-    let node = { path, raw: filePath }
-    setTreeSets(node)
-  }
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, folder) => {
-    setTreePath(folder.filePath)
-    dispatch(selectedFolderContent(folder.filePath, pageParams.num, pageParams.size))
-    dispatch(folderContentStatistic(folder.filePath))
-
-  };
-  const arr = []
-
-
-
-
-  const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-
-  const [fileIndex, setFileIndex] = React.useState(-1)
-  const [fileIndexChecked, setFileIndexChecked] = React.useState(-1)
-
-
-  const fileNav = (navType) => {
-    return (<Grid item xs={1} key={`${navType}-1`}>
-      <Paper elevation={0} sx={{ background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
-
-        <Stack
-          direction="column"
-          justifyContent="center"
-          alignItems=""
-          spacing={0}
-          sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
-
-          onClick={(event) => {
-
-          }}>
-          <Box sx={{ height: '38px', width: '100%' }}></Box>
-          <Stack
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-            spacing={0}
-            sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
-            onClick={(event) => {
-              if (navType === -1) {
-                //上一页
-                if (searchActive) {
-                  dispatch(selectedByParams({ ...searchParams, queryType: -1, pageNo: currentIndex - 1, sortValues: element[0] }, pageParams.size))
-                } else {
-                  dispatch(selectedFolderContent(treeSets.raw, currentIndex - 1, pageParams.size))
-                }
-              } else {
-                // 下一页
-                if (searchActive) {
-                  dispatch(selectedByParams({ ...searchParams, queryType: 1, pageNo: currentIndex + 1, sortValues: element[element.length - 1] }, pageParams.size))
-                } else {
-                  dispatch(selectedFolderContent(treeSets.raw, currentIndex + 1, pageParams.size))
-                }
-              }
-
-
-
-            }
-
-
-            }>
-            <img src={ForwardUrl} style={{ transform: navType === -1 ? 'rotateY(180deg)' : ' rotateY(0deg)' }} />
-            <Typography gutterBottom variant="body2"
-              sx={{
-                color: 'rgba(0, 0, 0, 0.6)',
-                whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
-              }} >
-              {navType === -1 ? '上一页' : '下一页'}
-            </Typography>
-          </Stack>
-        </Stack>
-
-
-      </Paper>
-    </Grid>
-    )
-  }
-
-
-
-
-  const fileItem = (user, index) => {
-    return (<Grid item xs={1} key={index} space={1}>
-      <Paper elevation={1} sx={{ background: 'transparent', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
-
-        <Stack
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          spacing={0}
-          sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
-          onMouseEnter={() => {
-
-          }}
-          onMouseLeave={() => {
-
-          }}
-          onClick={(event) => {
-
-          }}>
-          <Avatar alt="Remy Sharp" src={user.avator} />
-
-
-          <Typography gutterBottom variant="body2"
-            sx={{
-              color: 'rgba(0, 0, 0, 0.6)',
-              whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '90%', textAlign: 'center'
-            }} >
-            {user.realName || user.nickName}
-          </Typography>
-
-        </Stack>
-
-
-      </Paper>
-    </Grid>
-    )
-  }
 
 
   return (<Stack
@@ -288,16 +153,30 @@ function UserManagement(props) {
     justifyContent="flex-start"
     alignItems="flex-start"
     spacing={0}
-    sx={{ height: '100%', width: '85%', paddingTop: 2, overflowY: 'auto' ,
-}}  >
-   
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={0}
-        sx={{ width: '100%' ,    marginBottom:5}}    >
-        {court.map((a, ids) => {return (
+    sx={{
+      height: '100%', width: '85%', paddingTop: 2, overflowY: 'auto',
+    }}  >
+
+    <Stack
+      direction="row"
+      justifyContent="flex-start"
+      alignItems="center"
+      spacing={0}
+      sx={{ width: '100%', marginBottom: 5 }}    >
+      <CircleButton sx={{ margin: '5px' }} variant={"contained"} size="small" onClick={() => {
+        setPageParams({ num: pageParams.num + 1, size: 50 })
+        pageRefresh(pageParams.num + 1)
+
+      }}>   往前
+      </CircleButton>
+      <CircleButton sx={{ margin: '5px' }} variant={"contained"} size="small" onClick={() => {
+        setPageParams({ num: pageParams.num - 1, size: 50 })
+        pageRefresh(pageParams.num - 1)
+      }}>   往后
+      </CircleButton>
+
+      {/* {court.map((a, ids) => {
+        return (
           <CircleButton
             key={a.name}
             value={a.name}
@@ -319,24 +198,22 @@ function UserManagement(props) {
           >
             {a.name}
           </CircleButton>
-        )})}
+        )
+      })} */}
 
 
 
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          spacing={5}
-        >
-          <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
-            {currentSelectFolderTree && currentSelectFolderTree.root.filePath && `目标文件夹：${currentSelectFolderTree.root.filePath}`}
-          </Typography>
-         
-        </Stack>
-     
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        spacing={5}
+      >
+
       </Stack>
-      {/* <Grid
+
+    </Stack>
+    {/* <Grid
         container
         direction="row"
         justifyContent="flex-start"
@@ -347,8 +224,9 @@ function UserManagement(props) {
         {users && users.map((file, index) => fileItem(file, index))}
    
       </Grid> */}
-      <RecentCourse />
-  
+
+    <RecentCourse />
+
   </Stack>
   )
 }

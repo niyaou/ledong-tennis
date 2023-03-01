@@ -9,22 +9,19 @@
  */
 import {
   Paper, Typography, Backdrop, CircularProgress, Button, Card, Grow, CardHeader, Checkbox,
-  Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box, IconButton,TextField
+  Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box, IconButton, TextField
 } from '@mui/material';
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import UserManagement from './userManagement'
-import Additions from '../fileExplore/additions'
+
 import { useSelector } from "../../redux/hooks";
 import { useNavigate } from 'react-router-dom';
-import { exploreUsersAction, exploreRecentCourse, selectCourse ,deleteCourese,retreatCourseMember,notifyCourse,updateCourese} from '../../store/slices/dominationSlice'
-import { tagsInfoAction, scenceInfoAction } from '../../store/slices/tagsSlice'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { exploreUsersAction, exploreRecentCourse, selectCourse, deleteCourese, retreatCourseMember, notifyCourse, updateCourese } from '../../store/slices/dominationSlice'
+
 import CachedIcon from '@mui/icons-material/Cached';
-import {
-  rootProjects, selectedFolderContent
-  , toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig, searchActiveAction, searchDeActiveAction, selectedByParams, labelsStatisticAction
-} from '../../store/actions/filesAndFoldersActions';
+
+import moment from 'moment';
+
 import { find } from 'lodash';
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => b.indexOf(value) === -1);
@@ -77,7 +74,11 @@ function RecentCourse(props) {
 
 
   useEffect(() => {
-    dispatch(exploreRecentCourse({ page: 0, num: 50 }))
+    dispatch(exploreRecentCourse({
+      pageNum: 1, startTime: moment().subtract(45, 'days').startOf('month').format('YYYY-MM-DD hh:mm:ss'),
+      endTime: moment().endOf('month').format('YYYY-MM-DD hh:mm:ss')
+    }))
+
   }, [])
 
   // useEffect(() => {
@@ -152,12 +153,12 @@ function RecentCourse(props) {
                 }} >
                 {item.startTime}
               </Typography>
-            <Typography gutterBottom variant="body2"
+              <Typography gutterBottom variant="body2"
                 sx={{
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.duration}小时  ,{item.courseType===-2?'体验课未成单':item.courseType===-1?'体验课成单':item.courseType===0?'订场':item.courseType===1?'班课':'私教'}
+                {item.duration}小时  ,{item.courseType === -2 ? '体验课未成单' : item.courseType === -1 ? '体验课成单' : item.courseType === 0 ? '订场' : item.courseType === 1 ? '班课' : '私教'}
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
@@ -195,18 +196,18 @@ function RecentCourse(props) {
                 }}
               >
                 {item.member.map((m, idx) => (
-                  <Button variant="contained" size="small"   
-                  disabled={item.notified>0}
-                  key={`${m}a5-${m.number}`}
+                  <Button variant="contained" size="small"
+                    disabled={item.notified > 0}
+                    key={`${m}a5-${m.number}`}
                     onClick={() => {
-                    dispatch(retreatCourseMember({courseId:item.id,number:m.number}))
-                  }}>   {m.name}</Button>
+                      dispatch(retreatCourseMember({ courseId: item.id, number: m.number }))
+                    }}>   {m.name}</Button>
                   // <Typography gutterBottom variant="body2"
-                  
+
                   //   sx={{
                   //     color: 'rgba(0, 0, 0, 0.6)',
                   //   }} >
-                 
+
                   // </Typography>
                 ))}
               </Stack>
@@ -222,18 +223,18 @@ function RecentCourse(props) {
 
             }}
           >
-            {item.courseType>=0 &&(<Button variant="contained" size="small"
-             disabled={item.notified>0}
-             onClick={() => {
-              dispatch(notifyCourse(item.id))
-            }}>短信通知</Button>)}
-            {item.courseType===-2 &&( <Button variant="contained" size="small" onClick={() => {
+            {item.courseType >= 0 && (<Button variant="contained" size="small"
+              disabled={item.notified > 0}
+              onClick={() => {
+                dispatch(notifyCourse(item.id))
+              }}>短信通知</Button>)}
+            {item.courseType === -2 && (<Button variant="contained" size="small" onClick={() => {
               dispatch(updateCourese(item.id))
             }}>体验课成单</Button>)}
             <Button variant="contained" color="warning" size="small"
-             onClick={() => {
-              dispatch(deleteCourese(item.id))
-            }}
+              onClick={() => {
+                dispatch(deleteCourese(item.id))
+              }}
             >删除</Button>
           </Stack>
         </Stack>
@@ -256,7 +257,10 @@ function RecentCourse(props) {
             //     setDetailMode(!detailMode)
             //     setCustomerName('')
             // }
-            dispatch(exploreRecentCourse({ page: 0, num: 50 }))
+            dispatch(exploreRecentCourse({
+              pageNum: 1, startTime: moment().subtract(45, 'days').startOf('month').format('YYYY-MM-DD hh:mm:ss'),
+              endTime: moment().endOf('month').format('YYYY-MM-DD hh:mm:ss')
+            }))
 
           }}
         >

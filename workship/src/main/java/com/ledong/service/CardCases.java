@@ -148,7 +148,7 @@ public class CardCases {
         var chargeLists = new ArrayList<String>();
         var buff = new StringBuffer();
         result.forEach(r->{
-            buff.append( r.getPrepaidCard().getName()+"   充值:"+r.getCharge()+"元,  "+r.getTimes()+"次, "+r.getAnnualTimes()+"年卡次,  "+r.getWorth()+"等值  备注："+r.getDescription()+"\r\n");
+            buff.append( r.getPrepaidCard().getName()+"   充值时间: "+r.getChargedTime()+"   充值:"+r.getCharge()+"元,  "+r.getTimes()+"次, "+r.getAnnualTimes()+"年卡次,  "+r.getWorth()+"等值  备注："+r.getDescription()+"\r\n");
         });
         return buff.toString();
 

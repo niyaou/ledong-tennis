@@ -125,7 +125,7 @@ export const ExpandListText = styled(({ classes, ...props }: ListItemTextProps) 
 
 function Additions(props) {
 
-  const { areas, users, selectCourse, createSuccess,coach,court } = useSelector((state) => state.domination)
+  const { areas, users, selectCourse, createSuccess, coach, court } = useSelector((state) => state.domination)
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [startTime, setStartTime] = React.useState(new Date());
   const [endTime, setEndTime] = React.useState(new Date);
@@ -155,7 +155,7 @@ function Additions(props) {
   useEffect(() => {
 
     if (users && users.length > 0) {
-      setUserOptions(users.map(u=>u.name))
+      setUserOptions(users.map(u => u.name))
     }
 
   }, [users])
@@ -168,7 +168,11 @@ function Additions(props) {
       })
     }
     console.log("🚀 ~ file: additions.tsx ~ line 182 ~ useEffect ~ courseEdit", courseEdit)
-    dispatch(exploreRecentCourse())
+    dispatch(exploreRecentCourse({
+      pageNum: 1, startTime: moment().subtract(45, 'days').startOf('month').format('YYYY-MM-DD hh:mm:ss'),
+      endTime: moment().endOf('month').format('YYYY-MM-DD hh:mm:ss')
+    }))
+
   }, [createSuccess])
 
   useEffect(() => {
@@ -317,7 +321,7 @@ function Additions(props) {
 
   const memberItem = (m, idx) => {
     let mi = find(users, { 'name': m.name })
-    console.log('------memberItem----',m)
+    console.log('------memberItem----', m)
     return (<Stack
       direction="row"
       justifyContent="flex-start"
@@ -348,33 +352,33 @@ function Additions(props) {
         inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
         value={m.spendFee}
         onChange={(e) => {
-          labelArr[idx].spendFee = parseInt(e.target.value||0)
+          labelArr[idx].spendFee = parseInt(e.target.value || 0)
           let a = labelArr.concat()
           setLabelArr(a)
           let member = courseEdit.membersObj
-          member[mi.number] = [parseInt(e.target.value), 0, 0,0]
+          member[mi.number] = [parseInt(e.target.value), 0, 0, 0]
           let after = { ...courseEdit, membersObj: member }
-    
+
           setCourseEdit(after)
         }}
       />}
 
 
-{m.type === 2 && <TextField
+      {m.type === 2 && <TextField
         id="outlined-password-input"
         label="扣次卡"
         size="small"
         sx={{ width: '100px' }}
-        inputProps={{ inputMode: 'numeric',  }}
+        inputProps={{ inputMode: 'numeric', }}
         value={m.times}
         onChange={(e) => {
           let pos = labelArr.findIndex(e => e.name === m.name)
           labelArr[pos].type = 2
           labelArr[pos].spendFee = 0
-          labelArr[pos].times = parseFloat(e.target.value||0).toFixed(1); 
+          labelArr[pos].times = parseFloat(e.target.value || 0).toFixed(1);
 
           let member = courseEdit.membersObj
-          member[mi.number] = [0, parseFloat(e.target.value).toFixed(1),  labelArr[pos].perTime ]
+          member[mi.number] = [0, parseFloat(e.target.value).toFixed(1), labelArr[pos].perTime]
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -382,24 +386,24 @@ function Additions(props) {
         }}
       />}
 
-{m.type === 3 && <TextField
+      {m.type === 3 && <TextField
         id="outlined-password-input"
         label="扣年
         卡"
         size="small"
         sx={{ width: '100px' }}
-        inputProps={{ inputMode: 'numeric',  }}
+        inputProps={{ inputMode: 'numeric', }}
         value={m.annualTimes}
         onChange={(e) => {
-       
+
           let pos = labelArr.findIndex(e => e.name === m.name)
           labelArr[pos].type = 3
           labelArr[pos].spendFee = 0
           labelArr[pos].times = 0
-          labelArr[pos].annualTimes = parseFloat(e.target.value||0).toFixed(1); 
+          labelArr[pos].annualTimes = parseFloat(e.target.value || 0).toFixed(1);
 
           let member = courseEdit.membersObj
-          member[mi.number] = [0, 0,parseFloat(e.target.value).toFixed(1),labelArr[pos].perTime]
+          member[mi.number] = [0, 0, parseFloat(e.target.value).toFixed(1), labelArr[pos].perTime]
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -407,7 +411,7 @@ function Additions(props) {
         }}
       />}
 
- {m.type !== 1 && <TextField
+      {m.type !== 1 && <TextField
         id="outlined-password-input"
         label="单价"
         size="small"
@@ -415,11 +419,11 @@ function Additions(props) {
         inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
         value={m.perTime}
         onChange={(e) => {
-          
-          let pos = labelArr.findIndex(e => e.name === m.name)
-      
 
-          labelArr[pos].perTime = parseInt(e.target.value||0)
+          let pos = labelArr.findIndex(e => e.name === m.name)
+
+
+          labelArr[pos].perTime = parseInt(e.target.value || 0)
 
           let member = courseEdit.membersObj
           member[mi.number][3] = parseInt(e.target.value)
@@ -441,7 +445,7 @@ function Additions(props) {
             labelArr[pos].type = 1
             let a = labelArr.concat()
             setLabelArr(a)
-       
+
           }}
         >
           <ArticleIcon />
@@ -457,7 +461,7 @@ function Additions(props) {
             labelArr[pos].type = 2
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.number] = [0, 1, 0,0]
+            member[mi.number] = [0, 1, 0, 0]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -477,7 +481,7 @@ function Additions(props) {
             labelArr[pos].type = 3
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.number] = [0, 0, 1,0]
+            member[mi.number] = [0, 0, 1, 0]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -519,17 +523,17 @@ function Additions(props) {
   // new Date(),
 
   const appendArr = (item) => {
-    console.log('-------',item)
+    console.log('-------', item)
     let ids = labelArr.findIndex(e => e.name === item)
     if (ids >= 0) {
       return
     }
     let member = users.find(u => u.name === item)
-    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0 ,annualTimes:0,perTime:0})
+    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0, annualTimes: 0, perTime: 0 })
     let a = labelArr.concat()
     let temp = {}
     temp = Object.assign(temp, {
-      [member.number]: [0, courseEdit.spendingTime,0,0]
+      [member.number]: [0, courseEdit.spendingTime, 0, 0]
     })
     let after = { ...courseEdit, membersObj: { ...courseEdit.membersObj, ...temp } }
 
@@ -586,11 +590,11 @@ function Additions(props) {
         size="small"
         onChange={(e) => {
           let after = { ...courseEdit, courseType: e.target.value }
-          console.log('----课时类型---',after)
+          console.log('----课时类型---', after)
           setCourseEdit(after)
         }}
         value={[courseEdit.courseType]}>
-       {['体验课未成单','体验课成单','订场','班课','私教'].map((dict, index) => { return (<MenuItem key={`courseType-${dict}`} value={index-2}>{dict}</MenuItem>) })}
+        {['体验课未成单', '体验课成单', '订场', '班课', '私教'].map((dict, index) => { return (<MenuItem key={`courseType-${dict}`} value={index - 2}>{dict}</MenuItem>) })}
       </Select>
     </FormControl>
 
@@ -629,11 +633,11 @@ function Additions(props) {
               diff = 2
             } else if (diff <= 150) {
               diff = 2.5
-            }else{
-              diff=3
+            } else {
+              diff = 3
             }
-            after = { ...courseEdit, spendingTime: diff, startTime: newValue}
-            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff,after)
+            after = { ...courseEdit, spendingTime: diff, startTime: newValue }
+            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff, after)
             setCourseEdit(after)
           }}
           renderInput={(params) => {
@@ -661,11 +665,11 @@ function Additions(props) {
               diff = 2
             } else if (diff <= 150) {
               diff = 2.5
-            }else{
-              diff=3
+            } else {
+              diff = 3
             }
-            after = { ...courseEdit, spendingTime: diff, endTime: newValue}
-            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff,after)
+            after = { ...courseEdit, spendingTime: diff, endTime: newValue }
+            console.log("🚀 ~ file: additions.tsx ~ line 665 ~ Additions ~ diff", diff, after)
             setCourseEdit(after)
           }}
           renderInput={(params) => <TextField {...params} />}
@@ -701,8 +705,8 @@ function Additions(props) {
     {!selectCourse && <FormControl sx={{ m: 1, width: '100%' }} >
       <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
         onClick={() => {
-          let diff =courseEdit.spendingTime
-          if(diff>3){
+          let diff = courseEdit.spendingTime
+          if (diff > 3) {
             if (diff <= 60) {
               diff = 1
             } else if (diff <= 90) {
@@ -711,12 +715,12 @@ function Additions(props) {
               diff = 2
             } else if (diff <= 180) {
               diff = 2.5
-            }else{
-              diff =   3
+            } else {
+              diff = 3
             }
-            courseEdit.spendingTime=diff
+            courseEdit.spendingTime = diff
           }
-          console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit,startTime,endTime)
+          console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit, startTime, endTime)
 
           dispatch(createCard(courseEdit))
         }}>

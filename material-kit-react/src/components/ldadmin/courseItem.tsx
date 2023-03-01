@@ -11,21 +11,7 @@ import {
   Paper, Typography, Backdrop, CircularProgress, Button, Card, Grow, CardHeader, Checkbox,
   Divider, Grid, Stack, List, ListItem, ListItemIcon, ListItemText, Box, IconButton, TextField
 } from '@mui/material';
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import UserManagement from './userManagement'
-import Additions from '../fileExplore/additions'
-import { useSelector } from "../../redux/hooks";
-import { useNavigate } from 'react-router-dom';
-import { exploreUsersAction, exploreRecentCourse, selectCourse } from '../../store/slices/dominationSlice'
-import { tagsInfoAction, scenceInfoAction } from '../../store/slices/tagsSlice'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CachedIcon from '@mui/icons-material/Cached';
-import {
-  rootProjects, selectedFolderContent
-  , toggleFolderTreeExpand, copyIDSFilesToDataSet, pathConfig, searchActiveAction, searchDeActiveAction, selectedByParams, labelsStatisticAction
-} from '../../store/actions/filesAndFoldersActions';
-import { find } from 'lodash';
+import moment from "moment";
 
 function CourseItem(props) {
   let spend = props.item
@@ -79,21 +65,21 @@ function CourseItem(props) {
               }} >
               {item.description}
             </Typography>
-           {spend.charge>0&& (<Typography gutterBottom variant="body2"
+            {spend.charge > 0 && (<Typography gutterBottom variant="body2"
               sx={{
                 color: 'rgba(0, 0, 0, 0.6)',
 
               }} >
               消费{spend.charge}元
             </Typography>)}
-            {spend.times>0 && (<Typography gutterBottom variant="body2"
+            {spend.times > 0 && (<Typography gutterBottom variant="body2"
               sx={{
                 color: 'rgba(0, 0, 0, 0.6)',
 
               }} >
               消费{spend.times}次
             </Typography>)}
-            {spend.annualTimes>0 && (<Typography gutterBottom variant="body2"
+            {spend.annualTimes > 0 && (<Typography gutterBottom variant="body2"
               sx={{
                 color: 'rgba(0, 0, 0, 0.6)',
 
@@ -124,7 +110,7 @@ function CourseItem(props) {
                 color: 'rgba(0, 0, 0, 0.6)',
                 minWidth: '180px',
               }} >
-              {item.duration}小时  ,{item.courseType===-2?'体验课未成单':item.courseType===-1?'体验课成单':item.courseType===0?'订场':item.courseType===1?'班课':'私教'}
+              {item.duration}小时  ,{item.courseType === -2 ? '体验课未成单' : item.courseType === -1 ? '体验课成单' : item.courseType === 0 ? '订场' : item.courseType === 1 ? '班课' : '私教'}
             </Typography>
             <Typography gutterBottom variant="body2"
               sx={{
