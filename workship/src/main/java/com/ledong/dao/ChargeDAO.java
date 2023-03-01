@@ -19,6 +19,9 @@ public interface ChargeDAO extends JpaRepository<Charge, Serializable>, JpaSpeci
 
     public Page<Charge> findByPrepaidCard_Id(Long id, Pageable pageParams );
 
+    @Query("select a from Charge a where a.chargedTime >= :startTime and a.chargedTime <=:endTime and a.coach.id=:id")
+    public List<Charge> findAllWithTimeRangeAndId(@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime,Long id );
+
     public Charge findByPrepaidCard_Id(Long id);
 
     @Query("select a from Charge a where a.chargedTime >= :startTime and a.chargedTime <=:endTime")

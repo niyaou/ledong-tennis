@@ -1,5 +1,6 @@
 package com.ledong.service;
 
+import cn.hutool.core.date.DateUtil;
 import com.ledong.bo.ChargeBo;
 import com.ledong.dao.ChargeDAO;
 import com.ledong.dao.CoachDAO;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CardCases {
@@ -132,6 +135,24 @@ public class CardCases {
         }
 
 //        return DefaultConverter.convert( spend,SpendBo.class);
+    }
+
+
+    public String getChargedByCoach(String coach, String startTime, String endTime) {
+        var user = coachDAO.findByName(coach);
+        if (user == null) {
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        var sort = Sort.by(Sort.Direction.DESC, "chargedTime");
+        var result =  chargeDao.findAllWithTimeRangeAndId(DateUtil.parse(startTime).toLocalDateTime(),DateUtil.parse(endTime).toLocalDateTime(),user.getId());
+        var chargeLists = new ArrayList<String>();
+        var buff = new StringBuffer();
+        result.forEach(r->{
+            buff.append( r.getPrepaidCard().getName()+"   充值:"+r.getCharge()+"元,  "+r.getTimes()+"次, "+r.getAnnualTimes()+"年卡次,  "+r.getWorth()+"等值  备注："+r.getDescription()+"\r\n");
+        });
+        return buff.toString();
+
+
     }
 
 }

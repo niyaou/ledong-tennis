@@ -66,6 +66,13 @@ public class UserController extends BaseController {
     }
 
 
+    @GetMapping("/charged/coach/{number}")
+    public Object coachCharged(@PathVariable("number")String number,   @RequestParam  String startTime,
+                               @RequestParam String endTime) {
+        return cardCase.getChargedByCoach(number, startTime,  endTime);
+    }
+
+
 
     @PostMapping("/charged/retreat/{id}")
     public ChargedResponseDTO charged( @RequestHeader(value = "secure", required = false)String secure,@PathVariable("id") Long id) {

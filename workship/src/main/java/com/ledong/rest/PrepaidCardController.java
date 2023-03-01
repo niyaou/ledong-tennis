@@ -108,7 +108,7 @@ public class PrepaidCardController extends BaseController{
             if(pageNum==null ||pageNum<1){
                 pageNum=1;
             }
-            return courseCases.totalCourse(startTime,pageNum,750);
+            return courseCases.totalCourse(startTime,pageNum,500);
         }
     }
 
