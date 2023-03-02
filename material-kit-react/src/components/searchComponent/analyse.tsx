@@ -61,7 +61,7 @@ function Analyse(props) {
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
-    const [timeRange, setTimeRange] = React.useState([]);
+    const [timeRange, setTimeRange] = React.useState([moment().startOf('month').format('YYYY-MM-DD'), moment().endOf('month').add(1, 'days').format('YYYY-MM-DD')]);
     const [coachName, setCoachName] = React.useState('');
     useEffect(() => {
         dispatch(exploreCourseAnalyse({ startTime: moment().startOf('month').format('YYYY-MM-DD'), endTime: moment().endOf('month').format('YYYY-MM-DD') }))
@@ -104,7 +104,7 @@ function Analyse(props) {
                                         startTime: moment().add(def, "month").startOf('month').format('YYYY-MM-DD'),
                                         endTime: moment().add(def, "month").endOf('month').format('YYYY-MM-DD')
                                     }))
-                                    setTimeRange([moment().add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().add(def, "month").endOf('month').format('YYYY-MM-DD')])
+                                    setTimeRange([moment().add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')])
                                 }
 
                                 // if (!values.includes(e.target.value)) {
