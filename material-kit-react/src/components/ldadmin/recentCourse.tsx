@@ -21,8 +21,7 @@ import { exploreUsersAction, exploreRecentCourse, selectCourse, deleteCourese, r
 import CachedIcon from '@mui/icons-material/Cached';
 
 import moment from 'moment';
-
-import { find } from 'lodash';
+import { findIndex, find } from 'lodash';
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -89,6 +88,10 @@ function RecentCourse(props) {
 
 
   const courseItem = (item, index) => {
+    let quantities = 0
+    for(var i of item.spend){
+      quantities+=  i.quantities
+    }
     return (
       <Paper key={`item-course-${item.id}`} elevation={1} sx={{
         minWidth: '850px',
@@ -132,7 +135,7 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
 
                 }} >
-                {item.description}
+            人数 {quantities},   {item.description} 
               </Typography>
             </Stack>
 
@@ -196,14 +199,14 @@ function RecentCourse(props) {
                 }}
               >
                 {item.member.map((m, idx) => (
-                  <Button variant="contained" size="small"
-                    disabled={item.notified > 0}
-                    key={`${m}a5-${m.number}`}
-                    onClick={() => {
-                      dispatch(retreatCourseMember({ courseId: item.id, number: m.number }))
-                    }}>   {m.name}</Button>
+                    <Button variant="contained" size="small"
+                      disabled={item.notified > 0}
+                      key={`${m}a5-${m.number}`}
+                      onClick={() => {
+                        dispatch(retreatCourseMember({ courseId: item.id, number: m.number }))
+                      }}>   {m.name}</Button>
                   // <Typography gutterBottom variant="body2"
-
+                   
                   //   sx={{
                   //     color: 'rgba(0, 0, 0, 0.6)',
                   //   }} >
