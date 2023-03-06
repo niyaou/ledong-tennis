@@ -91,7 +91,7 @@ public class AnalyseCases {
                 var coach = analys.get(course1.getCoach().getName());
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
-                    spec.put("workTime", 0f);
+                    spec.put("workTime",course1.getDuration());
                     spec.put("courses", 0F);
                     spec.put("members",0f);
                     spec.put("analyse", 0f);
@@ -99,6 +99,7 @@ public class AnalyseCases {
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
                     analys.put(course1.getCoach().getName(), spec);
                 } else {
+                    coach.put("workTime", coach.get("workTime") + course1.getDuration());
                     coach.put("trial", coach.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
                     coach.put("deal", coach.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));
                     analys.put(course1.getCoach().getName(), coach);
@@ -121,7 +122,6 @@ public class AnalyseCases {
                     revenue.put(course1.getCourt().getName(), spec);
                 } else {
                     spends.stream().forEach(spend1 -> {
-
                         court.put("spend", (court.get("spend") == null ? 0 : court.get("spend")) + (spend1.getCharge() == 0F ? spend1.getDescription() : spend1.getCharge()));
                     });
 
@@ -133,7 +133,7 @@ public class AnalyseCases {
                     spec.put("workTime", course1.getDuration());
                     spec.put("courses", 1F);
                     spec.put("members", (course1.getCourseType() *course1.getSpend().size())* 1F);
-                    spec.put("analyse", course1.getCourseType() * 1F / 1);
+                    spec.put("analyse",coach.get("members") / coach.get("courses"));
                     spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
                     analys.put(course1.getCoach().getName(), spec);
