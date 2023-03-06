@@ -128,11 +128,15 @@ public class AnalyseCases {
                     revenue.put(course1.getCourt().getName(), court);
                 }
 
+                var memberQuantities = 0;
+                for(var spend:course1.getSpend()){
+                    memberQuantities += spend.getQuantities();
+                }
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
                     spec.put("workTime", course1.getDuration());
                     spec.put("courses", 1F);
-                    spec.put("members", (course1.getCourseType() *course1.getSpend().size())* 1F);
+                    spec.put("members", (course1.getCourseType() *memberQuantities)* 1F);
                     spec.put("analyse",spec.get("members"));
                     spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
@@ -140,7 +144,7 @@ public class AnalyseCases {
                 } else {
                     coach.put("workTime", coach.get("workTime") + course1.getDuration());
                     coach.put("courses", coach.get("courses") + 1);
-                    coach.put("members", coach.get("members") +(course1.getCourseType() *course1.getSpend().size()) * 1F);
+                    coach.put("members", coach.get("members") +(course1.getCourseType() *memberQuantities) * 1F);
                     coach.put("analyse", coach.get("members") / coach.get("courses"));
                     coach.put("trial", coach.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
                     coach.put("deal", coach.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));

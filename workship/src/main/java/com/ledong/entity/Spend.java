@@ -32,7 +32,7 @@ public class Spend  {
     private float times;
     private float annualTimes;
     private float description;
-    private int quantities;
+    private int quantities=1;
 
 
     @ManyToOne

@@ -23,6 +23,6 @@ public class SpendBo {
     private float annualTimes;
     private float description;
     private Course course;
-    private int quantities;
+    private int quantities=1;
 
 }
