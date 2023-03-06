@@ -356,7 +356,7 @@ function Additions(props) {
           let a = labelArr.concat()
           setLabelArr(a)
           let member = courseEdit.membersObj
-          member[mi.number] = [parseInt(e.target.value), 0, 0, 0]
+          member[mi.number] = [parseInt(e.target.value), 0, 0, 0, labelArr[idx].quantities]
           let after = { ...courseEdit, membersObj: member }
 
           setCourseEdit(after)
@@ -378,7 +378,7 @@ function Additions(props) {
           labelArr[pos].times = parseFloat(e.target.value || 0).toFixed(1);
 
           let member = courseEdit.membersObj
-          member[mi.number] = [0, parseFloat(e.target.value).toFixed(1), labelArr[pos].perTime]
+          member[mi.number] = [0, parseFloat(e.target.value).toFixed(1), 0, labelArr[pos].perTime, labelArr[pos].quantities]
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -403,7 +403,7 @@ function Additions(props) {
           labelArr[pos].annualTimes = parseFloat(e.target.value || 0).toFixed(1);
 
           let member = courseEdit.membersObj
-          member[mi.number] = [0, 0, parseFloat(e.target.value).toFixed(1), labelArr[pos].perTime]
+          member[mi.number] = [0, 0, parseFloat(e.target.value).toFixed(1), labelArr[pos].perTime, labelArr[pos].quantities]
           let after = { ...courseEdit, membersObj: member }
           let a = labelArr.concat()
           setLabelArr(a)
@@ -433,8 +433,28 @@ function Additions(props) {
           setCourseEdit(after)
         }}
       />}
+      <TextField
+        id="outlined-password-input"
+        label="人数"
+        size="small"
+        sx={{ width: '100px' }}
+        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+        value={m.quantities}
+        onChange={(e) => {
+
+          let pos = labelArr.findIndex(e => e.name === m.name)
 
 
+          labelArr[pos].quantities = parseInt(e.target.value || 0)
+
+          let member = courseEdit.membersObj
+          member[mi.number][4] = parseInt(e.target.value)
+          let after = { ...courseEdit, membersObj: member }
+          let a = labelArr.concat()
+          setLabelArr(a)
+          setCourseEdit(after)
+        }}
+      />
       {m.type !== 1 && <Tooltip title={'课时费'} placement="top">
 
         <IconButton
@@ -492,6 +512,7 @@ function Additions(props) {
         </IconButton>
       </Tooltip>
       }
+
       <IconButton
         aria-label="expand row"
         size="small"
@@ -526,10 +547,11 @@ function Additions(props) {
     console.log('-------', item)
     let ids = labelArr.findIndex(e => e.name === item)
     if (ids >= 0) {
+      console.log('---exit duplicate item----', item)
       return
     }
     let member = users.find(u => u.name === item)
-    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0, annualTimes: 0, perTime: 0 })
+    labelArr.push({ name: item, type: 1, spendFee: 0, times: 0, annualTimes: 0, perTime: 0, quantities: 1 })
     let a = labelArr.concat()
     let temp = {}
     temp = Object.assign(temp, {
@@ -767,7 +789,7 @@ function Additions(props) {
       justifyContent="flex-start"
       alignItems="flex-start"
       spacing={5}
-      sx={{ height: '100%', width: '15%', minWidth: '400px', paddingRight: '30px', paddingLeft: '30px', paddingTop: 5, overflowY: 'auto', background: '#f5f6fa' }}
+      sx={{ height: '100%', width: '15%', minWidth: '500px', paddingRight: '30px', paddingLeft: '30px', paddingTop: 5, overflowY: 'auto', background: '#f5f6fa' }}
     >
       <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }} >
         记录课程

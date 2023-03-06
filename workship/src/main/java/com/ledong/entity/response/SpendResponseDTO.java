@@ -19,4 +19,5 @@ public class SpendResponseDTO {
     private float annualTimes;
     private float description;
     private Course course;
+    private int quantities;
 }

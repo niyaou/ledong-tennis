@@ -32,6 +32,7 @@ public class Spend  {
     private float times;
     private float annualTimes;
     private float description;
+    private int quantities;
 
 
     @ManyToOne
@@ -48,6 +49,7 @@ public class Spend  {
                 .description(bo.getDescription())
                 .course(bo.getCourse())
                 .prepaidCard(bo.getPrepaidCard())
+                .quantities(bo.getQuantities())
                 .build();
     }
 

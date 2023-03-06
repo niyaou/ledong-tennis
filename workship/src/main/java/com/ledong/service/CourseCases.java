@@ -93,6 +93,7 @@ public class CourseCases {
                 var times = ((JSONArray) value).get(1, Float.class);
                 var annualTimes = ((JSONArray) value).get(2, Float.class);
                 var spendDescript = ((JSONArray) value).get(3, Float.class);
+                var quantities = ((JSONArray) value).get(4, Integer.class);
                 if (charge != 0) {
                     member.setRestCharge(member.getRestCharge() - charge);
                     spend.setCharge((Float) charge);
@@ -106,6 +107,7 @@ public class CourseCases {
                     spend.setAnnualTimes(annualTimes);
                 }
                 spend.setDescription(spendDescript);
+                spend.setQuantities(quantities);
                 userDao.save(member);
                 spendDao.save(Spend.fromBO(spend));
                 var members = course.getMember();
