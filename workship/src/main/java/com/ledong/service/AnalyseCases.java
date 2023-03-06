@@ -133,7 +133,7 @@ public class AnalyseCases {
                     spec.put("workTime", course1.getDuration());
                     spec.put("courses", 1F);
                     spec.put("members", (course1.getCourseType() *course1.getSpend().size())* 1F);
-                    spec.put("analyse",coach.get("members") / coach.get("courses"));
+                    spec.put("analyse",spec.get("members"));
                     spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
                     analys.put(course1.getCoach().getName(), spec);
