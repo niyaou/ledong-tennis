@@ -135,7 +135,7 @@ function CourseItem(props) {
               sx={{
                 color: 'rgba(0, 0, 0, 0.6)',
               }} >
-              {item.coach.name}
+              {item.coach?.name}
             </Typography>
             <Stack
 
