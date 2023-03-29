@@ -11,7 +11,7 @@ import React, { useEffect } from 'react';
 
 import { Button, Card, Stack, MenuItem, NoSsr, Paper, Box, Typography, Select, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
 
-import { styled } from '@mui/material/styles';
+import { keyframes, styled } from '@mui/material/styles';
 
 
 import CachedIcon from '@mui/icons-material/Cached';
@@ -32,6 +32,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import moment from 'moment';
 import { get } from 'lodash'
 import Axios from '../../common/axios/axios'
+import XLSX from 'xlsx'
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 
@@ -68,13 +69,22 @@ function Analyse(props) {
     }, [])
 
 
+    useEffect(() => {
+        console.log('-----analyseCourt,revenueCourt,courseDetail-----', analyseCourt, revenueCourt, courseDetail)
+    }, [analyseCourt, revenueCourt, courseDetail])
+
 
     const currentList = (coach) => {
         dispatch(exploreCourseDetail({ coach, startTime: timeRange[0], endTime: timeRange[1] }))
     }
 
 
-
+    const generateExcel = (jsonData, fileName) => {
+        const worksheet = XLSX.utils.json_to_sheet(jsonData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        XLSX.writeFile(workbook, fileName);
+    }
 
 
     const finacialItem = () => {
@@ -226,15 +236,12 @@ function Analyse(props) {
     const revenueItem = (user, index) => {
 
         var member = Object.values(user)[0]
-        console.log(user, member)
         var color = '#69d147'
         Object.keys(user).forEach(key => {
-            console.log('----key', key)
             if (key.includes('校区') || key.trim() === '' || key.includes('总共')) {
                 color = '#e1e2e4'
             }
         })
-        console.log(user, color)
         return (<Grid item xs={4} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
                 <Stack
@@ -332,6 +339,55 @@ function Analyse(props) {
             sx={{ marginLeft: 2, overflowY: 'auto', height: '100%', paddingBottom: -2 }}
             spacing={5}
         >
+            <Button variant="outlined" size="small"
+                onClick={() => {
+                    // dispatch(selectCourse(item))
+
+                    var courtItems = []
+                    analyseCourt.forEach(item => {
+                        var courtItem = {}
+                        for (let key in item) {
+                            if (typeof item[key] === 'object') {
+                                courtItem = Object.assign(courtItem, { name: key })
+                                // 如果属性值是对象，则继续遍历
+                                for (let subKey in item[key]) {
+                                    courtItem[subKey] = item[key][subKey]
+                                }
+                            }
+                        }
+                        courtItems.push(courtItem)
+                    })
+                    generateExcel(courtItems, '课程统计.xlsx')
+
+
+
+
+                    courtItems = []
+                    var shools = []
+                    revenueCourt.forEach(item => {
+                        var courtItem = {}
+                        for (let key in item) {
+                            if (typeof item[key] === 'object') {
+                                if (key === '总共' || typeof key === 'undefined') {
+                                    continue
+                                }
+                                courtItem = Object.assign(courtItem, { name: key })
+                                // 如果属性值是对象，则继续遍历
+                                for (let subKey in item[key]) {
+                                    courtItem[subKey] = item[key][subKey]
+                                }
+                            }
+                        }
+                        if (courtItem.name && courtItem.name.includes('校区')) {
+                            shools.push(courtItem)
+                        } else {
+                            courtItems.push(courtItem)
+                        }
+
+                    })
+                    generateExcel([...courtItems, ...shools], '充值消课统计.xlsx')
+                    // , revenueCourt, courseDetail
+                }}>下载excel</Button>
             <Stack justifyContent="flex-start"
                 alignItems="center"
                 spacing={2}
@@ -424,7 +480,7 @@ function Analyse(props) {
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
 
 
-        </Stack>
+        </Stack >
     );
 }
 export default Analyse
