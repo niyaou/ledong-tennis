@@ -290,18 +290,27 @@ function Analyse(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
-                        充值： {Object.keys(user)[0] === '总共' ? member.charge / 2 : member.charge}元
+                        充值： {Object.keys(user)[0] === '总共' ? member.charge / 1: member.charge}元
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '30%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
-                        消费： {Object.keys(user)[0] === '总共' ? member.spend / 2 : member.spend}元
+                        消费： {Object.keys(user)[0] === '总共' ? member.spend / 1: member.spend}元
+                    </Typography>
+                    <Typography gutterBottom variant="body2"
+                        sx={{
+                            // background: 'transparent',
+                            '& :hover': { background: '#985541' },
+                            // color: 'rgba(0, 0, 0, 0.6)',
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
+                        }} >
+                        未消费： {member.equival }元
                     </Typography>
 
 
