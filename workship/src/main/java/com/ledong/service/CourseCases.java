@@ -106,7 +106,7 @@ public class CourseCases {
                     member.setAnnualCount(member.getAnnualCount() - annualTimes);
                     spend.setAnnualTimes(annualTimes);
                 }
-                if(quantities!=0){
+                if(spendDescript!=0){
                     member.setEquivalentBalance(member.getEquivalentBalance()- spendDescript.intValue());
                 }
 
@@ -172,6 +172,7 @@ public class CourseCases {
                 useCase.setRestChargeChange(number, spend.getCharge());
                 useCase.setRestTimesChange(number, spend.getTimes());
                 useCase.setRestAnnualTimesChange(number, spend.getAnnualTimes());
+                useCase.setEquivalentChange(number,spend.getQuantities());
                 spendDao.delete(spend);
             });
             courseDao.delete(course);
