@@ -56,7 +56,7 @@ public class AnalyseCases {
                 spec.put("charge", charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge());
                 spec.put("equival",0f);
                 revenue.put(charge1.getCourt(), spec);
-                
+
 
             } else {
                 court.put("charge", court.get("charge") + (charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge()));
@@ -197,9 +197,13 @@ public class AnalyseCases {
         total.put("analyse", entrylist);
 
         for (var key : revenue.keySet()) {
+            if(!key.contains("校区")){
+                continue;
+            }
             var value = revenue.get(key);
             totalMap.put("spend", totalMap.get("spend") + (value.get("spend") == null ? 0 : value.get("spend")));
             totalMap.put("charge", totalMap.get("charge") + (value.get("charge") == null ? 0 : value.get("charge")));
+            totalMap.put("equival", totalMap.get("equival") + (value.get("equival") == null ? 0 : value.get("equival")));
         }
         revenue.put("总共", totalMap);
 
