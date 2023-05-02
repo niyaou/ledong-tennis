@@ -68,6 +68,7 @@ public class AnalyseCases {
                 var coach = revenue.get(charge1.getCoach().getName());
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
+                    spec.put("equival",0f);
                     spec.put("spend", 0f);
                     spec.put("charge", 0f);
                     spec.put("charge", charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge());
