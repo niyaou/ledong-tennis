@@ -107,7 +107,7 @@ public class CourseCases {
                     spend.setAnnualTimes(annualTimes);
                 }
                 if(quantities!=0){
-                    member.setEquivalentBalance(member.getEquivalentBalance()-quantities);
+                    member.setEquivalentBalance(member.getEquivalentBalance()- spendDescript.intValue());
                 }
 
                 spend.setDescription(spendDescript);
