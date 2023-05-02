@@ -135,10 +135,15 @@ public class CardCases {
         } else {
             return chargeDao.findAll(pageReq);
         }
+     }
 
-//        return DefaultConverter.convert( spend,SpendBo.class);
+    public Page<Charge> getCharged(Integer pageNum, Integer pageSize) {
+
+        var sort = Sort.by(Sort.Direction.DESC, "chargedTime");
+        Pageable pageReq = PageRequest.of(pageNum - 1, pageSize, sort);
+            return chargeDao.findAll(pageReq);
+
     }
-
 
     public String getChargedByCoach(String coach, String startTime, String endTime) {
         var user = coachDAO.findByName(coach);

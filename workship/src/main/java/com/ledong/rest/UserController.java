@@ -66,6 +66,12 @@ public class UserController extends BaseController {
     }
 
 
+    @GetMapping("/charged/total")
+    public Object charged(@RequestParam Integer pageSize) {
+        return cardCase.getCharged(1,  pageSize);
+    }
+
+
     @GetMapping("/charged/coach/{number}")
     public Object coachCharged(@PathVariable("number")String number,   @RequestParam  String startTime,
                                @RequestParam String endTime) {
