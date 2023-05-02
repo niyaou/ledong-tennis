@@ -54,7 +54,9 @@ public class AnalyseCases {
                 var spec = new HashMap<String, Float>();
 
                 spec.put("charge", charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge());
+                spec.put("equival",0f);
                 revenue.put(charge1.getCourt(), spec);
+                
 
             } else {
                 court.put("charge", court.get("charge") + (charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge()));
