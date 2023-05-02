@@ -79,7 +79,6 @@ function SearchTask(props) {
     useEffect(() => {
 
         if (users) {
-            console.log('-----user', users)
             // setDetailMode(false)
             let sorts = users.concat()
             sorts.sort((a, b) => {

@@ -172,7 +172,7 @@ public class CourseCases {
                 useCase.setRestChargeChange(number, spend.getCharge());
                 useCase.setRestTimesChange(number, spend.getTimes());
                 useCase.setRestAnnualTimesChange(number, spend.getAnnualTimes());
-                useCase.setEquivalentChange(number,spend.getQuantities());
+                useCase.setEquivalentChange(number,(int)spend.getDescription());
                 spendDao.delete(spend);
             });
             courseDao.delete(course);

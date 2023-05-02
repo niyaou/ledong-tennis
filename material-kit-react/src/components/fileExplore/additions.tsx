@@ -481,7 +481,7 @@ function Additions(props) {
             labelArr[pos].type = 2
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.number] = [0, 1, 0, 0]
+            member[mi.number] = [0, 1, 0, 0,1]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)
@@ -501,7 +501,7 @@ function Additions(props) {
             labelArr[pos].type = 3
             labelArr[pos].spendFee = 0
             let member = courseEdit.membersObj
-            member[mi.number] = [0, 0, 1, 0]
+            member[mi.number] = [0, 0, 1, 0,1]
             let after = { ...courseEdit, membersObj: member }
             let a = labelArr.concat()
             setLabelArr(a)

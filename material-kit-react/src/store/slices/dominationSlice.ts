@@ -339,7 +339,7 @@ export const updateExpiredTime = createAsyncThunk(
             formdata.append('annualExpireTime', payload.annualExpireTime)
             // throw new Error('Something bad happened');
             const response = await Axios.post(`/api/user/charged`, formdata)
-            console.log("🚀 ~ file: dominationSlice.ts ~ line 109 ~ response", response)
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 342 ~ response", response)
             return response.data;
         } catch (err) {
             return rejectWithValue(err)
