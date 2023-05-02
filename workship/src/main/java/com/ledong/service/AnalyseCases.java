@@ -54,12 +54,10 @@ public class AnalyseCases {
                 var spec = new HashMap<String, Float>();
 
                 spec.put("charge", charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge());
-                spec.put("equival",  (float)charge1.getWorth());
                 revenue.put(charge1.getCourt(), spec);
 
             } else {
                 court.put("charge", court.get("charge") + (charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge()));
-                court.put("equival",  court.get("equival") +(float)charge1.getWorth());
                 revenue.put(charge1.getCourt(), court);
             }
 
@@ -71,17 +69,33 @@ public class AnalyseCases {
                     spec.put("spend", 0f);
                     spec.put("charge", 0f);
                     spec.put("charge", charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge());
-                    spec.put("equival",  (float)charge1.getWorth());
                     revenue.put(charge1.getCoach().getName(), spec);
-
                 } else {
                     coach.put("charge", coach.get("charge") + (charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge()));
-                    coach.put("equival",  coach.get("equival") +(float)charge1.getWorth());
                     revenue.put(charge1.getCoach().getName(), coach);
                 }
             }
 
         });
+
+       for(var court : revenue.keySet()){
+         var users=  userDao.findAllByCourt(court);
+         var equival = 0;
+         for(var u : users){
+             equival +=(float)u.getEquivalentBalance();
+         }
+           var _court = revenue.get(court);
+           if (_court == null) {
+               var spec = new HashMap<String, Float>();
+               spec.put("equival",  (float)equival);
+               revenue.put(court, spec);
+           } else {
+               _court.put("equival",  _court.get("equival") +equival);
+               revenue.put(court, _court);
+           }
+       }
+
+
 
 
         course.stream().forEach(course1 -> {
