@@ -86,6 +86,7 @@ public class AnalyseCases {
          var equival = 0;
          for(var u : users){
              equival +=(float)u.getEquivalentBalance();
+             equival+=u.getRestCharge();
          }
            var _court = revenue.get(court);
            if (_court == null) {
