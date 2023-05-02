@@ -45,7 +45,7 @@ public class AnalyseCases {
         var totalMap = new HashMap<String, Float>();
         totalMap.put("spend", 0f);
         totalMap.put("charge", 0f);
-
+        totalMap.put("equival", 0f);
 
         charge.stream().forEach(charge1 -> {
             var court = revenue.get(charge1.getCourt());
@@ -54,12 +54,12 @@ public class AnalyseCases {
                 var spec = new HashMap<String, Float>();
 
                 spec.put("charge", charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge());
-
+                spec.put("equival",  (float)charge1.getWorth());
                 revenue.put(charge1.getCourt(), spec);
 
             } else {
                 court.put("charge", court.get("charge") + (charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge()));
-
+                court.put("equival",  court.get("equival") +(float)charge1.getWorth());
                 revenue.put(charge1.getCourt(), court);
             }
 
@@ -71,12 +71,12 @@ public class AnalyseCases {
                     spec.put("spend", 0f);
                     spec.put("charge", 0f);
                     spec.put("charge", charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge());
-
+                    spec.put("equival",  (float)charge1.getWorth());
                     revenue.put(charge1.getCoach().getName(), spec);
 
                 } else {
                     coach.put("charge", coach.get("charge") + (charge1.getCharge() == 0f ? charge1.getWorth() : charge1.getCharge()));
-
+                    coach.put("equival",  coach.get("equival") +(float)charge1.getWorth());
                     revenue.put(charge1.getCoach().getName(), coach);
                 }
             }

@@ -304,7 +304,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
                         }} >
                         {user.number}
                     </Typography>
@@ -313,9 +313,9 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '50%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '55%', textAlign: 'center'
                         }} >
-                        余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}
+                        余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}，未消费:{user.equivalentBalance}
                     </Typography>
                 </Stack>
 

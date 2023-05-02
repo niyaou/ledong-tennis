@@ -56,6 +56,7 @@ public class CardCases {
                 .prepaidCard(PrepaidCard.fromBO(user));
         if (worth!=null && worth != 0) {
             chargeTemp.worth(worth);
+            userCases.setEquivalentChange(number,worth);
         }
         if (charged!=null && charged != 0) {
             chargeTemp.charge(charged);
@@ -88,6 +89,7 @@ public class CardCases {
             userCases.setRestChargeChange(number, -charge.getCharge());
             userCases.setRestTimesChange(number, -charge.getTimes());
             userCases.setRestAnnualTimesChange(number, -charge.getAnnualTimes());
+            userCases.setEquivalentChange(number,-charge.getWorth());
             chargeDao.delete(charge);
             return DefaultConverter.convert(charge, ChargeBo.class);
         } else {

@@ -36,6 +36,12 @@ public class PrepaidCard   {
     private float annualCount=0;
     @Column
     private float timesCount=0;
+
+    @Column
+    private Integer equivalentBalance=0;
+
+
+
     @Column
     private Date annualExpireTime;
     @Column

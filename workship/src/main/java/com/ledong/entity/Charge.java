@@ -40,7 +40,7 @@ public class Charge   {
     private float annualTimes;
     private int notified;
 
-    private int worth;
+    private int worth=0;
     private String court;
 
     @ManyToOne

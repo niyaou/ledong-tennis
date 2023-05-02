@@ -106,6 +106,10 @@ public class CourseCases {
                     member.setAnnualCount(member.getAnnualCount() - annualTimes);
                     spend.setAnnualTimes(annualTimes);
                 }
+                if(quantities!=0){
+                    member.setEquivalentBalance(member.getEquivalentBalance()-quantities);
+                }
+
                 spend.setDescription(spendDescript);
                 spend.setQuantities(quantities);
                 userDao.save(member);

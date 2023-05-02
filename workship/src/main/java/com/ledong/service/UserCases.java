@@ -50,6 +50,17 @@ public class UserCases {
         return DefaultConverter.convert( user,PrepaidCardBo.class);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public PrepaidCardBo setEquivalentChange(String number,Integer equivalent){
+        var user=   userDAO.findByNumber(number);
+        if(user==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+        user.setEquivalentBalance(user.getEquivalentBalance()+equivalent);
+        userDAO.save(user);
+        return DefaultConverter.convert( user,PrepaidCardBo.class);
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public PrepaidCardBo setRestTimesChange(String number,float times){
