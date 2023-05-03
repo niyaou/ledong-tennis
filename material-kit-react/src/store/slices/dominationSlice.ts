@@ -186,6 +186,9 @@ export const exploreRecentCharge = createAsyncThunk(
     async (cardId, { rejectWithValue }) => {
         try {
             // throw new Error('Something bad happened');
+            if(`/api/user/charged/${cardId}` ==='/api/user/charged/'){
+                return rejectWithValue('')
+            }
             const response = await Axios.get(`/api/user/charged/${cardId}`)
             // if (response.status !== 0) {
             //     return rejectWithValue(response.data.message)
