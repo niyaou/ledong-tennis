@@ -64,6 +64,7 @@ public class PrepaidCard   {
                 .name(bo.getName())
                 .number(bo.getNumber())
                 .court(bo.getCourt())
+                .equivalentBalance(0)
                 .build();
     }
 
