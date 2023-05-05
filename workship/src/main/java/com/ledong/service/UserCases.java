@@ -29,7 +29,7 @@ public class UserCases {
         if (existUser != null) {
             throw new CustomException(UseCaseCode.USER_EXIST);
         }
-        var user = PrepaidCard.builder().name(name).number(number).court(court).build();
+        var user = PrepaidCard.builder().name(name).number(number).court(court).equivalentBalance(0).build();
         userDAO.save(user);
         return findByNumber(number);
     }
