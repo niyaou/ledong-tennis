@@ -108,7 +108,7 @@ public class UserController extends BaseController {
 
     @GetMapping("/coach")
     public Object coaches() {
-        return coachDAO.findAll();
+        return coachDAO.findByIsActive(1);
     }
 
     @GetMapping("/court")
