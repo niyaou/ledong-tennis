@@ -47,7 +47,7 @@ public class AnalyseCases {
         totalMap.put("charge", 0f);
         totalMap.put("equival", 0f);
 
-        charge.stream().filter(member->member.getCoach().getIsActive()>0).forEach(charge1 -> {
+        charge.stream().filter(member->member.getCoach()==null || member.getCoach().getIsActive()>0).forEach(charge1 -> {
             var court = revenue.get(charge1.getCourt());
 
             if (court == null) {
@@ -103,7 +103,7 @@ public class AnalyseCases {
 
 
 
-        course.stream().filter(c->c.getCoach().getIsActive()>0).forEach(course1 -> {
+        course.stream().filter(c->c.getCoach()==null||c.getCoach().getIsActive()>0).forEach(course1 -> {
 //            体验课
             if (course1.getCourseType() < 0) {
                 var coach = analys.get(course1.getCoach().getName());
