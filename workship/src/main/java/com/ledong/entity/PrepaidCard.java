@@ -40,6 +40,10 @@ public class PrepaidCard   {
     @Column
     private Integer equivalentBalance=0;
 
+    @Column
+    private Integer younths=0;
+    @Column
+    private Integer adults=0;
 
 
     @Column
@@ -65,6 +69,8 @@ public class PrepaidCard   {
                 .number(bo.getNumber())
                 .court(bo.getCourt())
                 .equivalentBalance(0)
+                .younths(0)
+                .adults(0)
                 .build();
     }
 

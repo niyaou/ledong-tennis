@@ -109,6 +109,21 @@ public class UserCases {
         return DefaultConverter.convert( user,PrepaidCardBo.class);
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
+    public PrepaidCardBo setYonthAndAdult(String number, Integer yonth,Integer adult){
+        var user=    userDAO.findByNumber(number);
+        if(user==null){
+            throw new CustomException(UseCaseCode.NOT_FOUND);
+        }
+      user.setAdults(adult);
+        user.setYounths(yonth);
+        userDAO.save(user);
+        return DefaultConverter.convert( user,PrepaidCardBo.class);
+    }
+
+
+
     public List<PrepaidCard> getMembers(){
         return userDAO.findAll();
     }

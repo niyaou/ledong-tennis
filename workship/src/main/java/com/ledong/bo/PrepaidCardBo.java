@@ -25,6 +25,8 @@ public class PrepaidCardBo {
     private float annualCount;
     private float timesCount;
     private Integer equivalentBalance;
+    private Integer younths;
+    private Integer adults;
     private Date annualExpireTime;
     private Date timesExpireTime;
     private List<Course> courses;

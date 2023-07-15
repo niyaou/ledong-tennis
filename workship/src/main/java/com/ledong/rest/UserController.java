@@ -78,6 +78,13 @@ public class UserController extends BaseController {
         return cardCase.getChargedByCoach(number, startTime,  endTime);
     }
 
+    @PostMapping("/member/{number}")
+    public Object yonthAndAdult(@PathVariable("number")String number,   @RequestParam  Integer yonth,
+                               @RequestParam Integer adult) {
+        return useCase.setYonthAndAdult(number, yonth,adult);
+    }
+
+
 
 
     @PostMapping("/charged/retreat/{id}")
