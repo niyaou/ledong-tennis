@@ -10,7 +10,8 @@
 import { Box, Button, FormControl, Grid, MenuItem, Modal, Paper, Select, Stack, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useEffect } from 'react';
-
+import InputBase from '@mui/material/InputBase';
+import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CachedIcon from '@mui/icons-material/Cached';
 import IconButton from '@mui/material/IconButton';
@@ -23,7 +24,10 @@ import { useDispatch } from 'react-redux';
 import CourseItem from '../../components/ldadmin/courseItem';
 import { useSelector } from "../../redux/hooks";
 import { createUserAccount } from '../../store/actions/usersActions';
-import { exploreRecentCharge, exploreRecentSpend, exploreUsersAction, retreatChargeAnnotation, updateChargeAnnotation, updateExpiredTime } from '../../store/slices/dominationSlice';
+import { exploreRecentCharge, exploreRecentSpend, exploreUsersAction, retreatChargeAnnotation, updateChargeAnnotation, updateExpiredTime, updateUserMember } from '../../store/slices/dominationSlice';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -48,7 +52,7 @@ function SearchTask(props) {
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
     // const { taskQueue, deleteTaskSuccess, cacheTree, createFolderSuccess, errorMsg, folderAsyncStatus, currentSelectFolderTree } = useSelector((state) => state.inSensitive)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-    const { court, users, sortValue, charedLog, spendLog, createSuccess, course ,coach} = useSelector((state) => state.domination)
+    const { court, users, sortValue, charedLog, spendLog, createSuccess, course, coach } = useSelector((state) => state.domination)
 
     const { success } = useSelector((state) => state.users)
 
@@ -57,6 +61,8 @@ function SearchTask(props) {
 
 
     const [prepaidCard, setPrepaidCard] = React.useState({});
+    const [currentYonth, setCurrentYonth] = React.useState(0);
+    const [currentAdult, setCurrentAdult] = React.useState(0);
     const [courseList, setCourseList] = React.useState([]);
     const [detailMode, setDetailMode] = React.useState(false);
     const [userSort, setUserSort] = React.useState(false);
@@ -74,15 +80,25 @@ function SearchTask(props) {
     const [changeFee, setChangeFee] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeDesc, setChangeDesc] = React.useState('');
-
+    const [yonth, setYonth] = React.useState(0);
+    const [adult, setAdult] = React.useState(0);
     const [createUser, setCreateUser] = React.useState({ number: '', name: '', court: '' });//创建用户数据
     useEffect(() => {
 
         if (users) {
             // setDetailMode(false)
             let sorts = users.concat()
+            var _yonth = 0
+            var _adult = 0
+            sorts.forEach(u => {
+                _yonth += u.younths
+                _adult += u.adults
+            })
+            setYonth(_yonth)
+            setAdult(_adult)
             sorts.sort((a, b) => {
-                return pinyin.pinyinUtil.getFirstLetter((a.name).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.name).substring(0, 1)).toUpperCase() ? 1 : -1
+                // return pinyin.pinyinUtil.getFirstLetter((a.name).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.name).substring(0, 1)).toUpperCase() ? 1 : -1
+                return (a.restCharge + a.equivalentBalance) > (b.equivalentBalance + b.restCharge) ? 1 : -1
             })
             setUserSort(sorts)
         }
@@ -135,7 +151,10 @@ function SearchTask(props) {
 
     useEffect(() => {
         if (users && customerOpenId) {
-            setPrepaidCard(users.filter(u => u.number === customerOpenId)[0])
+            var _card = users.filter(u => u.number === customerOpenId)[0]
+            setPrepaidCard(_card)
+            setCurrentYonth(_card.younths)
+            setCurrentAdult(_card.adults)
         }
     }, [users])
 
@@ -147,7 +166,59 @@ function SearchTask(props) {
 
 
 
+    const memberItem = (<Stack
+        justifyContent="flex-start"
+        alignItems="center"
+        spacing={2}
+        direction="row"
+    >
+        <Paper
+            component="form"
+            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+        >
+            小朋友：
+            <InputBase
+                // sx={{ ml: 1, flex: 1 }}
+                onChange={(e) => {
+                    console.log('---------小朋友', e.target.value)
+                    setCurrentYonth(e.target.value)
+                }}
+                inputProps={{ 'aria-label': 'search google maps' }}
+                value={currentYonth}
+            />
+            <IconButton type="button" sx={{ p: '10px' }} aria-label="search"
+                onClick={() => {
+                    dispatch(updateUserMember({ number: prepaidCard.number, yonth: currentYonth, adult: prepaidCard.adults }))
+                }}>
+                <CheckCircleIcon />
+            </IconButton>
 
+        </Paper>
+        <Paper
+            component="form"
+            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+        >
+            成年人：
+            <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                onChange={(e) => {
+                    console.log('---------成年人', e.target.value)
+                    setCurrentAdult(e.target.value)
+                }}
+                inputProps={{ 'aria-label': 'search google maps' }}
+                value={currentAdult}
+            />
+            <IconButton type="button" sx={{ p: '10px' }} aria-label="search"
+                onClick={() => {
+                    dispatch(updateUserMember({ number: prepaidCard.number, yonth: prepaidCard.younths, adult: currentAdult }))
+                }}>
+                <CheckCircleIcon />
+            </IconButton>
+
+        </Paper>
+
+
+    </Stack>)
     const finacialItem =
         (<Stack
             justifyContent="flex-start"
@@ -194,8 +265,8 @@ function SearchTask(props) {
             </Typography> */}
             <Typography gutterBottom variant="body2"
                 sx={{
-                    color: 'rgba(0, 0, 0, 0.6)',cursor: 'pointer',
-                }} 
+                    color: 'rgba(0, 0, 0, 0.6)', cursor: 'pointer',
+                }}
                 onClick={() => {
                     console.log('---------------------2222--------')
                     setOpen(2)
@@ -254,7 +325,7 @@ function SearchTask(props) {
 
     const fileItem = (user, index) => {
         // console.log(user)
-        return (<Grid item xs={4} key={index} space={1}>
+        return (<Grid item xs={6} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
 
                 <Stack
@@ -262,7 +333,7 @@ function SearchTask(props) {
                     justifyContent="center"
                     alignItems="center"
                     spacing={0}
-                    sx={{ cursor: 'pointer', '& :hover': { background: 'transparent' } }}
+                    sx={{ background: (user.equivalentBalance + user.restCharge) < 1000 ? '#e7d4c8' : 'inheri', cursor: 'pointer', '& :hover': { background: 'transparent' } }}
                     onMouseEnter={() => {
 
                     }}
@@ -285,7 +356,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
                         }} >
                         {user.name}
                     </Typography>
@@ -294,7 +365,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
                         }} >
                         {user.court}
                     </Typography>
@@ -303,7 +374,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
                         }} >
                         {user.number}
                     </Typography>
@@ -312,7 +383,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '55%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '40%', textAlign: 'center'
                         }} >
                         余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}，未消费:{user.equivalentBalance}
                     </Typography>
@@ -421,11 +492,11 @@ function SearchTask(props) {
                         onClick={() => {
                             console.log('---------', {
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect,coach:coachSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect, coach: coachSelect
                             })
                             dispatch(updateChargeAnnotation({
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: worth, court: courtSelect,coach:coachSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: worth, court: courtSelect, coach: coachSelect
                             }))
                         }}>确定充值</Button>
                 </Stack>
@@ -582,6 +653,7 @@ function SearchTask(props) {
                     添加会员
                 </CircleButton>
 
+
                 {!detailMode && sortValue.map((a, ids) => {
                     return (
                         <CircleButton
@@ -624,6 +696,11 @@ function SearchTask(props) {
 
                     }} />}
                 </IconButton>
+                {!detailMode && (<Stack justifyContent="flex-start"
+                    alignItems="center"
+                    spacing={2}
+                    direction="row"
+                >小朋友：{yonth} || 成年人：{adult}</Stack>)}
             </Stack>
             {!detailMode && (<Grid
                 container
@@ -636,6 +713,8 @@ function SearchTask(props) {
             </Grid>)}
 
             {detailMode && finacialItem}
+            {detailMode && memberItem}
+
             <Stack justifyContent="flex-start"
 
                 spacing={2}

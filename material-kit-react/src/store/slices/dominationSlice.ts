@@ -326,7 +326,6 @@ export const deleteCourese = createAsyncThunk(
 
 
 
-
 export const updateExpiredTime = createAsyncThunk(
     'lduser/updateExpiredTime',
     async (payload, { rejectWithValue }) => {
@@ -340,6 +339,27 @@ export const updateExpiredTime = createAsyncThunk(
             // throw new Error('Something bad happened');
             const response = await Axios.post(`/api/user/charged`, formdata)
             console.log("🚀 ~ file: dominationSlice.ts ~ line 342 ~ response", response)
+            return response.data;
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+
+
+export const updateUserMember = createAsyncThunk(
+    'lduser/updateUserMember',
+    async (payload, { rejectWithValue }) => {
+        try {
+
+            let formdata = new FormData()
+
+            // formdata.append('number', payload.number)
+            formdata.append('yonth', payload.yonth)
+            formdata.append('adult', payload.adult)
+            const response = await Axios.post(`/api/user/member/${payload.number}`, formdata)
+            console.log("🚀 ~ file: dominationSlice.ts ~ line 342 ~ updateUserMember", response)
             return response.data;
         } catch (err) {
             return rejectWithValue(err)
@@ -604,6 +624,23 @@ export const exploreSlice = createSlice({
                 state.errorMsg = getErrorMsg(action)
             })
             .addCase(updateExpiredTime.fulfilled, (state, action) => {
+                state.loading = false
+                state.createSuccess = true
+            });
+
+        builder
+            .addCase(updateUserMember.pending, (state) => {
+                state.loading = true
+                state.createSuccess = false
+
+            })
+            .addCase(updateUserMember.rejected, (state, action) => {
+                state.loadError = true
+                state.loading = false
+                state.createSuccess = false
+                state.errorMsg = getErrorMsg(action)
+            })
+            .addCase(updateUserMember.fulfilled, (state, action) => {
                 state.loading = false
                 state.createSuccess = true
             });
