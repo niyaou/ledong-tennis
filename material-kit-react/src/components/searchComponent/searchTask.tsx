@@ -347,6 +347,10 @@ function SearchTask(props) {
                         dispatch(exploreRecentCharge(user.number))
                         dispatch(exploreRecentSpend(user.number))
 
+
+                        setCurrentYonth(user.younths)
+                        setCurrentAdult(user.adults)
+
                     }}>
                     {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
 
