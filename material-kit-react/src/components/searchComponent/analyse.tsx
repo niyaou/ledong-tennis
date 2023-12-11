@@ -204,7 +204,7 @@ function Analyse(props) {
                             // color: 'rgba(0, 0, 0, 0.6)',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
                         }} >
-                        满班率：{member.analyse.toFixed(1)}
+                        满班率：{member.analyse.toFixed(2)}
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
