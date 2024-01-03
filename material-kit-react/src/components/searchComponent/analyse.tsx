@@ -111,8 +111,8 @@ function Analyse(props) {
                                 } else {
 
                                     dispatch(exploreCourseAnalyse({
-                                        startTime: moment().add(def, "month").startOf('month').format('YYYY-MM-DD'),
-                                        endTime: moment().add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')
+                                        startTime: moment().add(def, "month").startOf('month').subtract(1,'years').format('YYYY-MM-DD'),
+                                        endTime: moment().add(def, "month").endOf('month').add(1, 'days').subtract(1,'years').format('YYYY-MM-DD')
                                     }))
                                     setTimeRange([moment().add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')])
                                 }
