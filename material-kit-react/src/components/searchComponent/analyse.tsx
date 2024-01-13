@@ -105,8 +105,8 @@ function Analyse(props) {
                                 console.log(e.target.value, idx, def)
                                 if (idx === 12) {
                                     dispatch(exploreCourseAnalyse({
-                                        startTime: moment().startOf('year').format('YYYY-MM-DD'),
-                                        endTime: moment().endOf('year').format('YYYY-MM-DD')
+                                        startTime: moment().startOf('year').subtract(1,'years').format('YYYY-MM-DD'),
+                                        endTime: moment().endOf('year').subtract(1,'years').format('YYYY-MM-DD')
                                     }))
                                 } else {
 
