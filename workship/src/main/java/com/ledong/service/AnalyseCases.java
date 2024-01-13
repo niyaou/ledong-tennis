@@ -207,11 +207,11 @@ public class AnalyseCases {
                     school.put("analyse", school.get("members") / school.get("courses"));
                     school.put("trial", school.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
                     school.put("deal", school.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));
-                    analys.put(course1.getCourt().getName(), coach);
+                    analys.put(course1.getCourt().getName(), school);
 
                 }
 
-                
+
 
                 //教练消课
                 var coachRevenue = revenue.get(course1.getCoach().getName());
