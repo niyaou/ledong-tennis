@@ -106,6 +106,7 @@ public class AnalyseCases {
         course.stream().filter(c->c.getCoach()==null||c.getCoach().getIsActive()>0).forEach(course1 -> {
 //            体验课
             if (course1.getCourseType() < 0) {
+                //统计教练的满班率
                 var coach = analys.get(course1.getCoach().getName());
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
@@ -123,11 +124,30 @@ public class AnalyseCases {
                     analys.put(course1.getCoach().getName(), coach);
 
                 }
+
+                //统计校区的满班率
+                var school = analys.get(course1.getCourt().getName());
+                if (school == null) {
+                    var spec = new HashMap<String, Float>();
+                    spec.put("workTime",course1.getDuration());
+                    spec.put("courses", 0F);
+                    spec.put("members",0f);
+                    spec.put("analyse", 0f);
+                    spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
+                    spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
+                    analys.put(course1.getCourt().getName(), spec);
+                } else {
+                    school.put("workTime", school.get("workTime") + course1.getDuration());
+                    school.put("trial", school.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
+                    school.put("deal", school.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));
+                    analys.put(course1.getCourt().getName(), school);
+
+                }
             }
 //            正式课
             if (course1.getCourseType() > 0) {
                 var coach = analys.get(course1.getCoach().getName());
-
+                var school =  analys.get(course1.getCourt().getName());
                 var court = revenue.get(course1.getCourt().getName());
                 var spends = course1.getSpend();
                 if (court == null) {
@@ -170,6 +190,28 @@ public class AnalyseCases {
 
                 }
 
+
+                if (school == null) {
+                    var spec = new HashMap<String, Float>();
+                    spec.put("workTime", course1.getDuration());
+                    spec.put("courses", 1F);
+                    spec.put("members", (course1.getCourseType() *memberQuantities)* 1F);
+                    spec.put("analyse",spec.get("members"));
+                    spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
+                    spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
+                    analys.put(course1.getCourt().getName(), spec);
+                } else {
+                    school.put("workTime", school.get("workTime") + course1.getDuration());
+                    school.put("courses", school.get("courses") + 1);
+                    school.put("members", school.get("members") +(course1.getCourseType() *memberQuantities) * 1F);
+                    school.put("analyse", school.get("members") / school.get("courses"));
+                    school.put("trial", school.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
+                    school.put("deal", school.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));
+                    analys.put(course1.getCourt().getName(), coach);
+
+                }
+
+                
 
                 //教练消课
                 var coachRevenue = revenue.get(course1.getCoach().getName());
