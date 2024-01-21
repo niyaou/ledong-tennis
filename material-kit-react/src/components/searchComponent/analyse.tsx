@@ -102,7 +102,7 @@ function Analyse(props) {
                                 console.log(e.target.value)
                                 var idx = monthValue.indexOf(e.target.value)
                                 var def = idx - moment().month()
-                                console.log(e.target.value, idx, def)
+                                console.log(e.target.value, idx, def,1)
                                 if (idx === 12) {
                                     dispatch(exploreCourseAnalyse({
                                         startTime: moment().startOf('year').subtract(1,'years').format('YYYY-MM-DD'),
