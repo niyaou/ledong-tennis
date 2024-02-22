@@ -4,7 +4,7 @@ server:
   ssl:
    protocol: TLS
    key-store: classpath:ledongtennis.cn.jks
-   key-store-password: 9zlg36l2u7108
+   key-store-password: 1gy71x5060hp72t
    key-store-type: JKS
 
 spring:
