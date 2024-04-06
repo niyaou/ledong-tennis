@@ -42,9 +42,8 @@ function Autoloading(props) {
   const dispatch = useDispatch()
 
   const CircleButton = styled(Button)({ borderRadius: '20px', })
-
-
-
+  const { areas, users, selectCourse, createSuccess, coach, court } = useSelector((state) => state.domination)
+ 
 
 
   const [excelData, setExcelData] = useState<any[]>([]);
@@ -76,13 +75,28 @@ function Autoloading(props) {
           }
         }
         console.log('--------excel===11111111', excelD)
-        setExcelData(excelD);
-        setLoading(false);
+       
+        Axios.post(`/api/prepaidCard/course/duplicate`,excelD).then(res=>{
+          console.log('---------res from web ',res)
+          setExcelData(res.data);
+          setLoading(false);
+        }).catch((e)=>{
+          setLoading(false);
+        })
+
       };
       reader.readAsArrayBuffer(file);
     }
   };
 
+const handleSubmitCourse=(item) => {
+  console.log("🚀 ~ handleSubmitCourse ~ item:", item)
+ 
+}
+
+  useEffect(()=>{
+    console.log('--------coach',coach,users)
+  },[excelData])
 
   const courseItem = (item) => {
     return (<Paper key={`item-course-${item[0]}-${item[2]}`} elevation={3} sx={{
@@ -107,7 +121,7 @@ function Autoloading(props) {
         justifyContent="space-between"
         alignItems="center"
         sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
-      >{item[2]}~~~{item[3]}, 上课 {item[4]}小时，  课程类别: {item[5]} ,   上课人数:{item[6]}  , 灯光:{item[7]}，场地费:{item[8]} </Stack>
+      >{item[2]}~{item[3]}, 上课 {item[4]}小时，  课程类别: {item[5]} , 校区： {item[6]}  上课人数:{item[7]}  , 灯光:{item[8]}，场地费:{item[9]} </Stack>
       <Stack
         spacing={2}
         direction="column"
@@ -115,11 +129,11 @@ function Autoloading(props) {
         alignItems="center"
         sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
       >
-        {Array.from({ length: Math.min(12, Math.floor((item.length - 10) / 5)) }, (_, index) => index).map(idx => {
-          return (<Stack><Typography>{`${item[10 + idx * 5]}, 课型（ ${item[11 + idx * 5]}）, 扣费数量 ${item[12 + idx * 5]}， 等效价格：${item[13 + idx * 5]}， 上课人数：${item[14 + idx * 5]} `}</Typography></Stack>)
+        {Array.from({ length: Math.min(12, Math.floor((item.length - 11) / 5)) }, (_, index) => index).map(idx => {
+          return (<Stack><Typography>{`${item[11 + idx * 5]}, 课型（ ${item[12 + idx * 5]}）, 扣费数量 ${item[13 + idx * 5]}， 等效价格：${item[14 + idx * 5]}， 上课人数：${item[15 + idx * 5]} `}</Typography></Stack>)
         })}
       </Stack>
-      <Button variant='contained'>提交</Button>
+      <Button variant='contained' onClick={()=>{handleSubmitCourse(item)}}>提交</Button>
     </Paper>)
   }
 

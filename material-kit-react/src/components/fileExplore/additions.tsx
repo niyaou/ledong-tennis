@@ -742,8 +742,8 @@ function Additions(props) {
             }
             courseEdit.spendingTime = diff
           }
+          
           console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit, startTime, endTime)
-
           dispatch(createCard(courseEdit))
         }}>
         确认添加
