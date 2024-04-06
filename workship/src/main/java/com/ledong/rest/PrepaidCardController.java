@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.List;
 import java.util.ArrayList;
 
 import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
@@ -123,6 +123,13 @@ public class PrepaidCardController extends BaseController{
     public Object courseNotify( @RequestHeader(value = "secure", required = false)String secure,@RequestParam Long courseId) throws TencentCloudSDKException {
         verifiedSecure(secure);
         return courseCases.notify(courseId);
+
+    }
+
+    @PostMapping("/course/duplicate")
+    public Object courseDuplicatedCheck( @RequestHeader(value = "secure", required = false)String secure,@RequestBody List<Object[]> params)   {
+        verifiedSecure(secure);
+        return courseCases.duplicatedCheck(params);
 
     }
 

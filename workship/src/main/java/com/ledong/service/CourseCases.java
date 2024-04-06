@@ -1,6 +1,5 @@
 package com.ledong.service;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -24,7 +23,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
-import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -220,6 +218,35 @@ public class CourseCases {
         return courseDao.findAll(spec, pageReq);
 //        return  courseDao.findMemberWithStartTimeAfter(DateUtil.parseDateTime(startTime).toLocalDateTime(),number,pageReq);
     }
+
+
+    public Object[] courseExist(Object[] item){
+        try {
+            var coachId = coachDao.findByName(item[0].toString()).getId();
+            var start = DateUtil.parse(item[2].toString()).toLocalDateTime();
+            var end = DateUtil.parse(item[3].toString()).toLocalDateTime();
+          List<Course> result=  courseDao.findAllWithReport(start, end, coachId);
+            if(result.isEmpty()){
+                return item;
+            }
+            return null;
+        }catch (Exception e){
+            return null;
+        }
+
+    }
+
+    public Object duplicatedCheck(List<Object[]>params){
+        List<Object[]> notExisted=new ArrayList<>();
+        for(var i : params){
+           var dup=courseExist(i);
+           if(dup!=null){
+               notExisted.add(dup);
+           }
+        }
+        return notExisted;
+    }
+
 
 
     public Object notify(Long id) {
