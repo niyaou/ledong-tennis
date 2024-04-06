@@ -29,6 +29,7 @@ import { useSelector } from "../../redux/hooks";
 import { logOut } from '../../store/actions/usersActions';
 import FolderIcon from '@mui/icons-material/Folder';
 import AnalyticsSharp from '@mui/icons-material/AnalyticsSharp';
+import AccessAlarmsOutlined from '@mui/icons-material/AccessAlarmsOutlined';
 import { clearDatasetFilesCache } from "../../store/actions/filesAndFoldersActions"
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import GridViewIcon from '@mui/icons-material/GridView';
@@ -164,6 +165,31 @@ function SideMenu(props) {
                             // navigate(`/explore`)
                         }}>
                          统计
+                        </Typography>
+                    </Stack>
+                    <Stack
+                        direction="column"
+                        justifyContent="flex-start"
+                        alignItems="center"
+                        spacing={1}
+                        onClick={async () => {
+                            indexChange(3)
+                        }}
+                        sx={{ width: '100%', height: 80, color: '#8b8b8b', cursor: 'pointer', '&:hover': { background: 'rgba(0, 0, 0, 0.04)', color: '#a1a1a1' } }}
+                    >
+                        <IconButton
+                            aria-label="expand row"
+                            size="large"
+                            disabled={true}
+
+                        >
+                            <AccessAlarmsOutlined />
+                        </IconButton>
+                        <Typography variant="button" display="block" gutterBottom sx={{}} onClick={() => {
+                            // dispatch(clearDatasetFilesCache())
+                            // navigate(`/explore`)
+                        }}>
+                         自动录课
                         </Typography>
                     </Stack>
                 </Stack>

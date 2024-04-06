@@ -13,6 +13,7 @@ import { useSelector } from "../../redux/hooks";
 import { Button, Card, Box,CardHeader, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import SearchTask from '../searchComponent/searchTask'
 import Analyse from '../searchComponent/analyse'
+import Autoloading from '../searchComponent/autoloading'
 function IndexContainer(props) {
     const index = props.index
   
@@ -24,7 +25,7 @@ function IndexContainer(props) {
   
     return (
       <Box   justifyContent="space-around" alignItems="center" sx={{width:'96vw',height:'97%',padding:'20px 0 0 10px'}}>
-     {index===0?<AdminComp />:index===1?<SearchTask />:<Analyse />}
+     {index===0?<AdminComp />:index===1?<SearchTask />:index===2?<Analyse />:<Autoloading />}
       </Box>
     );
   }
