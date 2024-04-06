@@ -103,12 +103,12 @@ public class PrepaidCardController extends BaseController{
     @GetMapping("/course/total")
     public Object totalCourse(@RequestParam  String startTime,@RequestParam(required = false) String number,@RequestParam(required = false) Integer pageNum){
         if(StringUtils.hasText(number)){
-            return courseCases.memberCourse(startTime,number,1,200);
+            return courseCases.memberCourse(startTime,number,1,100);
         }else{
             if(pageNum==null ||pageNum<1){
                 pageNum=1;
             }
-            return courseCases.totalCourse(startTime,pageNum,500);
+            return courseCases.totalCourse(startTime,pageNum,100);
         }
     }
 
