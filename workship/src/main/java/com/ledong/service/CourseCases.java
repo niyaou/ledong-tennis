@@ -123,6 +123,7 @@ public class CourseCases {
             }
         }
         courseDao.save(course);
+        updateCache();
         return courseBo;
     }
 

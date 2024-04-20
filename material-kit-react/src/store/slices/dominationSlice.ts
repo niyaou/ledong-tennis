@@ -250,6 +250,7 @@ export const notifyCourse = createAsyncThunk(
 export const createCard = createAsyncThunk(
     'lduser/createCard',
     async (payload, { rejectWithValue }) => {
+        console.log("🚀 ~ payload:", payload)
         try {
 
             let formdata = new FormData()

@@ -744,7 +744,7 @@ function Additions(props) {
           }
           
           console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit)
-          // dispatch(createCard(courseEdit))
+          dispatch(createCard(courseEdit))
         }}>
         确认添加
       </Button>

@@ -22,7 +22,7 @@ import { useDispatch } from 'react-redux';
 
 import {
   exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, exploreCourseAnalyse, exploreCourseDetail,
-  exploreRecentCharge, exploreRecentSpend, exploreMemberCourse, updateExpiredTime, updateChargeAnnotation,
+  exploreRecentCharge, exploreRecentSpend, exploreMemberCourse, updateExpiredTime, updateChargeAnnotation,createCard
 } from '../../store/slices/dominationSlice'
 import { createUserAccount } from '../../store/actions/usersActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -83,15 +83,7 @@ function Autoloading(props) {
 
         // console.log('--------excel===11111111', excelD)
         // setExcelData(res.data)
-        Axios.post(`/api/prepaidCard/course/duplicate`, excelD).then(res => {
-          console.log('---------res from web ', res)
-          setExcelData(res.data);
-          setLoading(false);
-        }).catch((e) => {
-          console.log("🚀 ~ Axios.post ~ e:", e)
-
-          setLoading(false);
-        })
+        unSubmittedCourse(excelD)
 
       };
       reader.onerror = (e) => {
@@ -103,6 +95,18 @@ function Autoloading(props) {
     }
   };
 
+const unSubmittedCourse=async (excelD)=>{
+  Axios.post(`/api/prepaidCard/course/duplicate`, excelD).then(res => {
+    console.log('---------res from web ', res)
+    setExcelData(res.data);
+    setLoading(false);
+  }).catch((e) => {
+    console.log("🚀 ~ Axios.post ~ e:", e)
+
+    setLoading(false);
+  })
+}
+
   const handleSubmitCourse = (item) => {
     const coureseType = ['体验课未成单', '体验课成单', '订场', '私教', '班课']
 
@@ -113,21 +117,34 @@ function Autoloading(props) {
       court: item[6], courseType: coureseType.indexOf(item[5]) - 2, membersObj: null
     }
 
-    let membersObj = []
+    let membersObj = {}
     if (course.courseType > 0) {
       let membs = Math.ceil((item.length - 11) / 5)
       for (let i = 0; i < membs; i++) {
         let membId = find(users, { 'name': item[i * 5 + 11] })
+        if(  typeof membId==='undefined'){
+          console.log("🚀 ~ error submit ~ item:数据错误，请修改日志", )
+          return 
+        }
         membId = membId.number
-        let obj = {}
-        obj[membId] = [0, 0, 0, item[i * 5 + 11 + 3], item[i * 5 + 11 + 4]]
+     
+
+        membersObj[membId] = [0, 0, 0, item[i * 5 + 11 + 3], item[i * 5 + 11 + 4]]
         let idx = ['课时费', '次卡', '年卡'].indexOf(item[i * 5 + 11 + 1])
-        obj[membId][idx] = item[i * 5 + 11 + 2]
-        membersObj.push(obj)
+        membersObj[membId][idx] = item[i * 5 + 11 + 2]
+        for (let j = 0;j < membersObj[membId].length; j++) {
+          if(  membersObj[membId][idx]===null){
+            console.log("🚀 ~ error submit ~ item:数据错误，请修改日志", )
+            return 
+          }
+        }
       }
       course.membersObj = membersObj
     }
+
     console.log("🚀 ~ handleSubmitCourse ~ item:", item, course)
+    dispatch(createCard(course))
+    unSubmittedCourse(excelData)
   }
 
   // useEffect(() => {
@@ -157,7 +174,7 @@ function Autoloading(props) {
         justifyContent="space-between"
         alignItems="center"
         sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
-      ><Typography variant="body1" wrap="wrap">
+      ><Typography >
           {item[2]}~{item[3]}, 上课 {item[4]}小时，  课程类别: {item[5]} , 校区： {item[6]}  上课人数:{item[7]}  <br />, 灯光:{item[8]}，场地费:{item[9]} ,  备注:{item[10]}
         </Typography>
       </Stack>
