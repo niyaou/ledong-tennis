@@ -102,7 +102,6 @@ const unSubmittedCourse=async (excelD)=>{
     setLoading(false);
   }).catch((e) => {
     console.log("🚀 ~ Axios.post ~ e:", e)
-
     setLoading(false);
   })
 }
@@ -144,7 +143,10 @@ const unSubmittedCourse=async (excelD)=>{
 
     console.log("🚀 ~ handleSubmitCourse ~ item:", item, course)
     dispatch(createCard(course))
-    unSubmittedCourse(excelData)
+    setTimeout(()=>{
+      unSubmittedCourse(excelData)
+
+    },3000)
   }
 
   // useEffect(() => {
