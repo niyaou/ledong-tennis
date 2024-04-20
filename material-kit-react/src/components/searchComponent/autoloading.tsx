@@ -30,7 +30,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import moment from 'moment';
-import { get } from 'lodash'
+import { get, find } from 'lodash'
 import Axios from '../../common/axios/axios'
 import XLSX from 'xlsx'
 var pinyin = require('../../common/utils/pinyinUtil.js')
@@ -43,7 +43,7 @@ function Autoloading(props) {
 
   const CircleButton = styled(Button)({ borderRadius: '20px', })
   const { areas, users, selectCourse, createSuccess, coach, court } = useSelector((state) => state.domination)
- 
+
 
 
   const [excelData, setExcelData] = useState<any[]>([]);
@@ -51,6 +51,7 @@ function Autoloading(props) {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log("🚀 ~ handleFileUpload ~ file:", file)
     if (file) {
       setLoading(true);
       const reader = new FileReader();
@@ -58,48 +59,83 @@ function Autoloading(props) {
         let excelD = []
         const data = new Uint8Array(e.target!.result as ArrayBuffer);
         const workbook = read(data, { type: 'array' });
-        console.log('----sheet length,', workbook.SheetNames.length)
+        // console.log('----sheet length,',workbook, workbook.SheetNames.length)
         for (let i in workbook.SheetNames) {
+          const sheetName = workbook.SheetNames[i];
+          // console.log("🚀 ~ handleFileUpload ~ sheetName:", sheetName)
           if ((i as number) > 4) {
+            console.log("🚀 ~ handleFileUpload ~ sheetName:    and break", sheetName)
             break
           }
 
-          const sheetName = workbook.SheetNames[i];
+
           const sheet = workbook.Sheets[sheetName];
-          const jsonData = utils.sheet_to_json(sheet, { header: 1 });
-          console.log('---------i', i,)
-          if (jsonData.length > 1) {
-            const numGroups = Math.min(12, Math.floor((jsonData[1].length - 10) / 5)); // 最多12组
-            excelD.push(jsonData[1])
-            console.log('--------excel===', sheetName, jsonData, '一共有学员', numGroups)
-          }
+          const jsonData = utils.sheet_to_json(sheet, { header: 1, range: 1 });
+          console.log('---------sheetName', sheetName, jsonData)
+          const filt = jsonData.filter(j => j[5] !== '单独订场')
+          console.log('---------sheetName', sheetName, filt)
+          excelD = [...excelD, ...filt]
+          // if (jsonData.length > 1) {
+          //   const numGroups = Math.min(12, Math.floor((jsonData[1].length - 10) / 5)); // 最多12组
+          //   console.log('--------excel===', sheetName, jsonData, '一共有学员', numGroups)
+          // }
         }
-        console.log('--------excel===11111111', excelD)
-       
-        Axios.post(`/api/prepaidCard/course/duplicate`,excelD).then(res=>{
-          console.log('---------res from web ',res)
+
+        // console.log('--------excel===11111111', excelD)
+        // setExcelData(res.data)
+        Axios.post(`/api/prepaidCard/course/duplicate`, excelD).then(res => {
+          console.log('---------res from web ', res)
           setExcelData(res.data);
           setLoading(false);
-        }).catch((e)=>{
+        }).catch((e) => {
+          console.log("🚀 ~ Axios.post ~ e:", e)
+
           setLoading(false);
         })
 
       };
+      reader.onerror = (e) => {
+        console.log("🚀 ~ handleFileUpload ~ onerror e:", e)
+
+
+      }
       reader.readAsArrayBuffer(file);
     }
   };
 
-const handleSubmitCourse=(item) => {
-  console.log("🚀 ~ handleSubmitCourse ~ item:", item)
- 
-}
+  const handleSubmitCourse = (item) => {
+    const coureseType = ['体验课未成单', '体验课成单', '订场', '私教', '班课']
 
-  useEffect(()=>{
-    console.log('--------coach',coach,users)
-  },[excelData])
+    let coachId = find(coach, { 'name': item[0] })
+    coachId = coachId.number
+    let course = {
+      startTime: item[2], endTime: item[3], coach: coachId, spendingTime: item[4], courtSpend: 0, coachSpend: 0, descript: item[10] || '备注无',
+      court: item[6], courseType: coureseType.indexOf(item[5]) - 2, membersObj: null
+    }
+
+    let membersObj = []
+    if (course.courseType > 0) {
+      let membs = Math.ceil((item.length - 11) / 5)
+      for (let i = 0; i < membs; i++) {
+        let membId = find(users, { 'name': item[i * 5 + 11] })
+        membId = membId.number
+        let obj = {}
+        obj[membId] = [0, 0, 0, item[i * 5 + 11 + 3], item[i * 5 + 11 + 4]]
+        let idx = ['课时费', '次卡', '年卡'].indexOf(item[i * 5 + 11 + 1])
+        obj[membId][idx] = item[i * 5 + 11 + 2]
+        membersObj.push(obj)
+      }
+      course.membersObj = membersObj
+    }
+    console.log("🚀 ~ handleSubmitCourse ~ item:", item, course)
+  }
+
+  // useEffect(() => {
+  //   console.log('--------coach', coach, users)
+  // }, [excelData])
 
   const courseItem = (item) => {
-    return (<Paper key={`item-course-${item[0]}-${item[2]}`} elevation={3} sx={{
+    return (<Paper key={`item-course-${item[0]}-${item[2]}-${item[3]}`} elevation={3} sx={{
       minWidth: '850px',
       background: 'transparent',
       '& :hover': { background: 'rgb(0,0,0,0.1)' }
@@ -121,7 +157,10 @@ const handleSubmitCourse=(item) => {
         justifyContent="space-between"
         alignItems="center"
         sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
-      >{item[2]}~{item[3]}, 上课 {item[4]}小时，  课程类别: {item[5]} , 校区： {item[6]}  上课人数:{item[7]}  , 灯光:{item[8]}，场地费:{item[9]} </Stack>
+      ><Typography variant="body1" wrap="wrap">
+          {item[2]}~{item[3]}, 上课 {item[4]}小时，  课程类别: {item[5]} , 校区： {item[6]}  上课人数:{item[7]}  <br />, 灯光:{item[8]}，场地费:{item[9]} ,  备注:{item[10]}
+        </Typography>
+      </Stack>
       <Stack
         spacing={2}
         direction="column"
@@ -133,7 +172,7 @@ const handleSubmitCourse=(item) => {
           return (<Stack><Typography>{`${item[11 + idx * 5]}, 课型（ ${item[12 + idx * 5]}）, 扣费数量 ${item[13 + idx * 5]}， 等效价格：${item[14 + idx * 5]}， 上课人数：${item[15 + idx * 5]} `}</Typography></Stack>)
         })}
       </Stack>
-      <Button variant='contained' onClick={()=>{handleSubmitCourse(item)}}>提交</Button>
+      <Button variant='contained' onClick={() => { handleSubmitCourse(item) }}>提交</Button>
     </Paper>)
   }
 
@@ -156,7 +195,7 @@ const handleSubmitCourse=(item) => {
       />
       <label htmlFor="contained-button-file">
         <Button variant="contained" component="span">
-      上传excel
+          上传excel
         </Button>
       </label>
       {excelData.map(item => { return courseItem(item) })}

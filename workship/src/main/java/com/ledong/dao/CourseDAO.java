@@ -21,6 +21,10 @@ public interface CourseDAO extends JpaRepository<Course, Serializable>,JpaSpecif
     Page<Course> findAllWithStartTimeAfter(@Param("startTime") LocalDateTime startTime, Pageable pageParams);
 
 
+    @Query("select a from Course a where a.startTime >= :startTime and a.endTime <:endTime")
+    List<Course> findAByMonth(@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
+
+
     @Query("select a from Course a where a.startTime >= :startTime and a.startTime <=:endTime")
      List<Course> findAllWithTimeRange(@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime );
 

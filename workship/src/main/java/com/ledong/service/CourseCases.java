@@ -23,6 +23,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +55,8 @@ public class CourseCases {
 
     @Autowired
     private SmsCases smsCase;
+
+    private List<Course> courseCache=new ArrayList<>();
 
     @Transactional(rollbackFor = Exception.class)
     public CourseBo createCourse(
@@ -193,9 +198,24 @@ public class CourseCases {
         }
     }
 
+    private void updateCache(){
+        LocalDate now = LocalDate.now();
+
+        // 获取当月第一天的日期
+        LocalDateTime firstDayOfThisMonth = now.with(TemporalAdjusters.firstDayOfMonth()).atTime(0,0,0);
+        System.out.println("当月第一天: " + firstDayOfThisMonth);
+
+        // 获取下个月第一天的日期
+        LocalDateTime firstDayOfNextMonth = now.plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).atTime(0,0,0);
+        System.out.println("下个月第一天: " + firstDayOfNextMonth);
+        courseCache=  courseDao.findAByMonth(firstDayOfThisMonth,firstDayOfNextMonth);
+    }
+
+
     public Page<Course> totalCourse(String startTime, Integer pageNum, Integer pageSize) {
         var sort = Sort.by(Sort.Direction.DESC, "startTime");
         Pageable pageReq = PageRequest.of(pageNum - 1, pageSize, sort);
+        updateCache();
         return courseDao.findAllWithStartTimeAfter(DateUtil.parseDateTime(startTime).toLocalDateTime(), pageReq);
     }
 
@@ -222,14 +242,21 @@ public class CourseCases {
 
     public Object[] courseExist(Object[] item){
         try {
-            var coachId = coachDao.findByName(item[0].toString()).getId();
+//            var coachId = coachDao.findByName(item[0].toString()).getId();
             var start = DateUtil.parse(item[2].toString()).toLocalDateTime();
             var end = DateUtil.parse(item[3].toString()).toLocalDateTime();
-          List<Course> result=  courseDao.findAllWithReport(start, end, coachId);
-            if(result.isEmpty()){
-                return item;
+//            List<Course> result=  courseDao.findAllWithReport(start, end, coachId);
+
+//            if(result.isEmpty()){
+//                return item;
+//            }
+
+            for(Course c:courseCache){
+                if(c.getCoach().getName().equals(item[0].toString()) && c.getStartTime().equals(start) && c.getEndTime().equals(end) ){
+                    return null;
+                }
             }
-            return null;
+            return item;
         }catch (Exception e){
             return null;
         }
