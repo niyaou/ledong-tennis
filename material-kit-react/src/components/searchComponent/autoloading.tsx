@@ -108,7 +108,7 @@ const unSubmittedCourse=async (excelD)=>{
 }
 
   const handleSubmitCourse = (item) => {
-    const coureseType = ['体验课未成单', '体验课成单', '订场', '私教', '班课']
+    const coureseType = ['体验课未成单', '体验课成单', '订场','班课', '私教' ]
 
     let coachId = find(coach, { 'name': item[0] })
     coachId = coachId.number
