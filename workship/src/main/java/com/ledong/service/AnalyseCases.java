@@ -174,7 +174,7 @@ public class AnalyseCases {
                     var spec = new HashMap<String, Float>();
                     spec.put("workTime", course1.getDuration());
                     spec.put("courses", 1F);
-                    spec.put("members", (course1.getCourseType() *memberQuantities)* 1F);
+                    spec.put("members", ((memberQuantities>1?1:course1.getCourseType()) *memberQuantities)* 1F);//如果客人数量大于1，就是普通
                     spec.put("analyse",spec.get("members"));
                     spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
@@ -182,7 +182,7 @@ public class AnalyseCases {
                 } else {
                     coach.put("workTime", coach.get("workTime") + course1.getDuration());
                     coach.put("courses", coach.get("courses") + 1);
-                    coach.put("members", coach.get("members") +(course1.getCourseType() *memberQuantities) * 1F);
+                    coach.put("members", coach.get("members") +((memberQuantities>1?1:course1.getCourseType()) *memberQuantities) * 1F);
                     coach.put("analyse", coach.get("members") / coach.get("courses"));
                     coach.put("trial", coach.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
                     coach.put("deal", coach.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));
@@ -195,7 +195,7 @@ public class AnalyseCases {
                     var spec = new HashMap<String, Float>();
                     spec.put("workTime", course1.getDuration());
                     spec.put("courses", 1F);
-                    spec.put("members", (course1.getCourseType() *memberQuantities)* 1F);
+                    spec.put("members", ((memberQuantities>1?1:course1.getCourseType()) *memberQuantities)* 1F);
                     spec.put("analyse",spec.get("members"));
                     spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
@@ -203,7 +203,7 @@ public class AnalyseCases {
                 } else {
                     school.put("workTime", school.get("workTime") + course1.getDuration());
                     school.put("courses", school.get("courses") + 1);
-                    school.put("members", school.get("members") +(course1.getCourseType() *memberQuantities) * 1F);
+                    school.put("members", school.get("members") +((memberQuantities>1?1:course1.getCourseType()) *memberQuantities) * 1F);
                     school.put("analyse", school.get("members") / school.get("courses"));
                     school.put("trial", school.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
                     school.put("deal", school.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));
