@@ -146,7 +146,9 @@ public class AnalyseCases {
             }
 //            正式课
             if (course1.getCourseType() > 0) {
+
                 var coach = analys.get(course1.getCoach().getName());
+
                 var school =  analys.get(course1.getCourt().getName());
                 var court = revenue.get(course1.getCourt().getName());
                 var spends = course1.getSpend();
@@ -170,20 +172,31 @@ public class AnalyseCases {
                 for(var spend:course1.getSpend()){
                     memberQuantities += spend.getQuantities();
                 }
+
                 if (coach == null) {
                     var spec = new HashMap<String, Float>();
                     spec.put("workTime", course1.getDuration());
-                    spec.put("courses", 1F);
-                    spec.put("members", ((memberQuantities>1?1:course1.getCourseType()) *memberQuantities)* 1F);//如果客人数量大于1，就是普通
-                    spec.put("analyse",spec.get("members"));
+                    if(memberQuantities>0){
+                        spec.put("courses", 1F);
+                        spec.put("members", ((memberQuantities>1?1:course1.getCourseType()) *memberQuantities)* 1F);//如果客人数量大于1，就是普通
+                    }else{
+                        //   如果是现金消费，没有扣卡和spend记录，不计算满班率
+                        spec.put("courses", 0F);
+                        spec.put("members",0f);
+                    }
+
+
+                    spec.put("analyse",0f);
                     spec.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                     spec.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
                     analys.put(course1.getCoach().getName(), spec);
                 } else {
                     coach.put("workTime", coach.get("workTime") + course1.getDuration());
-                    coach.put("courses", coach.get("courses") + 1);
-                    coach.put("members", coach.get("members") +((memberQuantities>1?1:course1.getCourseType()) *memberQuantities) * 1F);
-                    coach.put("analyse", coach.get("members") / coach.get("courses"));
+                    if(memberQuantities>0){
+                        coach.put("courses", coach.get("courses") + 1);
+                        coach.put("members", coach.get("members") +((memberQuantities>1?1:course1.getCourseType()) *memberQuantities) * 1F);
+                        coach.put("analyse", coach.get("members") / coach.get("courses"));
+                    }
                     coach.put("trial", coach.get("trial") + (course1.getCourseType() < 0f ? 1f : 0f));
                     coach.put("deal", coach.get("deal") + (course1.getCourseType() == -1f ? 1f : 0f));
                     analys.put(course1.getCoach().getName(), coach);
