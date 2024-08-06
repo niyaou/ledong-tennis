@@ -98,7 +98,9 @@ function SearchTask(props) {
             setAdult(_adult)
             sorts.sort((a, b) => {
                 // return pinyin.pinyinUtil.getFirstLetter((a.name).substring(0, 1)).toUpperCase() > pinyin.pinyinUtil.getFirstLetter((b.name).substring(0, 1)).toUpperCase() ? 1 : -1
-                return (a.restCharge + a.equivalentBalance) > (b.equivalentBalance + b.restCharge) ? 1 : -1
+                // return (a.restCharge + a.equivalentBalance) > (b.equivalentBalance + b.restCharge) ? 1 : -1
+              
+                return  moment(a.timesExpireTime).isAfter( moment(b.timesExpireTime)) ? -1 : 1
             })
             setUserSort(sorts)
         }
@@ -333,7 +335,8 @@ function SearchTask(props) {
                     justifyContent="center"
                     alignItems="center"
                     spacing={0}
-                    sx={{ background: (user.equivalentBalance + user.restCharge) < 1000 ? '#e7d4c8' : 'inheri', cursor: 'pointer', '& :hover': { background: 'transparent' } }}
+                    // sx={{ background: (user.equivalentBalance + user.restCharge) < 1000 ? '#e7d4c8' : 'inheri', cursor: 'pointer', '& :hover': { background: 'transparent' } }}
+                    sx={{ background: moment().isAfter(user.timesExpireTime)  ? '#e7d4c8' : 'inheri', cursor: 'pointer', '& :hover': { background: 'transparent' } }}
                     onMouseEnter={() => {
 
                     }}
@@ -373,7 +376,7 @@ function SearchTask(props) {
                         }} >
                         {user.court}
                     </Typography>
-                    <Typography gutterBottom variant="body2"
+                    {/* <Typography gutterBottom variant="body2"
                         sx={{
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
@@ -381,15 +384,15 @@ function SearchTask(props) {
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
                         }} >
                         {user.number}
-                    </Typography>
+                    </Typography> */}
                     <Typography gutterBottom variant="body2"
                         sx={{
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '40%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '60%', textAlign: 'center'
                         }} >
-                        余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}，未消费:{user.equivalentBalance}
+                        余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}，过期:{user.timesExpireTime}
                     </Typography>
                 </Stack>
 
