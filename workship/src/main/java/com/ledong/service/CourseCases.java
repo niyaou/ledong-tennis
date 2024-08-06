@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class CourseCases {
@@ -112,10 +113,11 @@ public class CourseCases {
                 if(spendDescript!=0){
                     member.setEquivalentBalance(member.getEquivalentBalance()- spendDescript.intValue());
                 }
-
+                member.setTimesExpireTime(DateUtil.offsetDay(DateUtil.date().toSqlDate(),60).toSqlDate());
                 spend.setDescription(spendDescript);
                 spend.setQuantities(quantities);
                 userDao.save(member);
+                
                 spendDao.save(Spend.fromBO(spend));
                 var members = course.getMember();
                 members.add(member);
