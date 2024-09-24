@@ -142,6 +142,12 @@ const unSubmittedCourse=async (excelD)=>{
     }
 
     console.log("🚀 ~ handleSubmitCourse ~ item:", item, course)
+    
+    if(course.court===null || course.coach===null||course.courseType===null){
+
+      alert('数据错误，请修改日志')
+      return
+    }
     dispatch(createCard(course))
     setTimeout(()=>{
       unSubmittedCourse(excelData)
