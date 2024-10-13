@@ -363,7 +363,7 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '12%', textAlign: 'center'
                         }} >
                         {user.name}
                     </Typography>
@@ -372,19 +372,19 @@ function SearchTask(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
                         }} >
                         {user.court}
                     </Typography>
-                    {/* <Typography gutterBottom variant="body2"
+                     <Typography gutterBottom variant="body2"
                         sx={{
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '10%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
                         }} >
                         {user.number}
-                    </Typography> */}
+                    </Typography> 
                     <Typography gutterBottom variant="body2"
                         sx={{
                             // background: 'transparent',
