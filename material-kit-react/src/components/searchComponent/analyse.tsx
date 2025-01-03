@@ -105,16 +105,15 @@ function Analyse(props) {
                                 console.log(e.target.value, idx, def,1)
                                 if (idx === 12) {
                                     dispatch(exploreCourseAnalyse({
-                                        startTime: moment().startOf('year').format('YYYY-MM-DD'),
-                                        endTime: moment().endOf('year').format('YYYY-MM-DD')
+                                        startTime: moment().subtract(1,"years").startOf('year').format('YYYY-MM-DD'),
+                                        endTime: moment().subtract(1,"years").endOf('year').format('YYYY-MM-DD')
                                     }))
                                 } else {
-
                                     dispatch(exploreCourseAnalyse({
-                                        startTime: moment().add(def, "month").startOf('month').format('YYYY-MM-DD'),
-                                        endTime: moment().add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')
+                                        startTime: moment().subtract(1,"years").add(def, "month").startOf('month').format('YYYY-MM-DD'),
+                                        endTime: moment().subtract(1,"years").add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')
                                     }))
-                                    setTimeRange([moment().add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')])
+                                    setTimeRange([moment().subtract(1,"years").add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().subtract(1,"years").add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')])
                                 }
 
                                 // if (!values.includes(e.target.value)) {
