@@ -116,7 +116,7 @@ public class PrepaidCardController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cardId", value = "cardId ", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "openId", value = "openId ", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "time", value = "time ", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "time", value = "充值时间 ", required = false, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "amount", value = "amount ", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "times", value = "times ", required = true, dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "coachId", value = "coachId ", required = true, dataType = "string", paramType = "query"),
@@ -127,7 +127,7 @@ public class PrepaidCardController {
             @RequestParam(value = "openId", required = true) String openId,
             @RequestParam(value = "time", required = false) String time,
             @RequestParam(value = "amount", required = true) Integer amount,
-                                              @RequestParam(value = "times", required = true) Integer times,
+            @RequestParam(value = "times", required = true) Integer times,
             @RequestParam(value = "coachId", required = true) String coachId,
             @RequestParam(value = "courseId", required = false) String courseId,
             @RequestParam(value = "description", required = false) String description) throws AuthenticationException {

@@ -380,6 +380,7 @@ export const updateChargeAnnotation = createAsyncThunk(
             formdata.append('number', payload.number)
             formdata.append('charged', payload.charged)
             formdata.append('times', payload.times)
+            formdata.append('time', payload.time)
             formdata.append('description', payload.description)
             formdata.append('worth', payload.worth)
             formdata.append('court', payload.court)

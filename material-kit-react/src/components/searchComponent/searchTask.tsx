@@ -26,7 +26,7 @@ import { useSelector } from "../../redux/hooks";
 import { createUserAccount } from '../../store/actions/usersActions';
 import { exploreRecentCharge, exploreRecentSpend, exploreUsersAction, retreatChargeAnnotation, updateChargeAnnotation, updateExpiredTime, updateUserMember } from '../../store/slices/dominationSlice';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
@@ -80,6 +80,7 @@ function SearchTask(props) {
     const [changeFee, setChangeFee] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeDesc, setChangeDesc] = React.useState('');
+    const [chargeDate, setChargeDate] = React.useState(moment().format('YYYY-MM-DD HH:mm:ss'));
     const [yonth, setYonth] = React.useState(0);
     const [adult, setAdult] = React.useState(0);
     const [createUser, setCreateUser] = React.useState({ number: '', name: '', court: '' });//创建用户数据
@@ -445,24 +446,32 @@ function SearchTask(props) {
                     />
                     <TextField
                         label="年卡次数"
-                        // label="Content(reply visable scale as the same as topic.)"
                         required
                         value={annualTimes}
                         onChange={(event: any) => {
                             setAnnualTimes(event.target.value)
                         }}
-
                     />
                     <TextField
                         label="次年卡等价金额"
-                        // label="Content(reply visable scale as the same as topic.)"
                         required
                         value={worth}
                         onChange={(event: any) => {
                             setWorth(event.target.value)
                         }}
-
                     />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                            label="充值日期"
+                            value={moment(chargeDate).toDate()}
+                            onChange={(newValue) => {
+                                if (newValue) {
+                                    setChargeDate(moment(newValue).format('YYYY-MM-DD HH:mm:ss'));
+                                }
+                            }}
+                            renderInput={(params) => <TextField {...params} />}
+                        />
+                    </LocalizationProvider>
                     <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
                         name='FileTypes'
                         size="small"
@@ -499,11 +508,13 @@ function SearchTask(props) {
                         onClick={() => {
                             console.log('---------', {
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect, coach: coachSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect, coach: coachSelect,
+                                time: chargeDate
                             })
                             dispatch(updateChargeAnnotation({
                                 number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: worth, court: courtSelect, coach: coachSelect
+                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect, coach: coachSelect,
+                                time: chargeDate
                             }))
                         }}>确定充值</Button>
                 </Stack>

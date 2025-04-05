@@ -184,9 +184,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
     public String chargeAnnotation(String cardId, String openId, String operatorName, String time, Integer amount,Integer times,
                                    String coachId, String courseId, String description) {
         LdChargeVo vo = new LdChargeVo();
-        String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+        // String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
         vo.setAmount(amount);
-        vo.setTime(date);
+        vo.setTime(time); // 直接使用前端传递的时间格式
         vo.setOpenId(openId);
         vo.setOwner(coachId);
         vo.setTimes(times);
@@ -213,7 +213,7 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
             if (!TextUtils.isEmpty(description)) {
                 chargLog.setDescription(description);
             }
-            chargLog.setTime(date);
+            chargLog.setTime(time);
             chargLog.setOwner(coachId);
 
 //            String id = SearchApi.updateFieldValueById(DataSetConstant.LD_PREPAID_CARD_INFORMATION,
@@ -247,9 +247,9 @@ public class PrepaidCardServiceImpl implements IPrepaidCardService {
 
 
             LdChargeVo vo = new LdChargeVo();
-            String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
+            // String date = DateUtil.getCurrentDate(DateUtil.FORMAT_DATE_TIME);
 
-            vo.setTime(date);
+            vo.setTime(time);
             vo.setExpiredTime(time);
             vo.setAnnualTimes(rest);
 
