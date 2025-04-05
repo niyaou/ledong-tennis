@@ -9,14 +9,9 @@ import com.ledong.service.CardCases;
 import com.ledong.service.CourseCases;
 import com.ledong.service.SmsCases;
 import com.ledong.util.DefaultConverter;
-import com.tencentcloudapi.common.Credential;
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
-import com.tencentcloudapi.common.profile.ClientProfile;
-import com.tencentcloudapi.common.profile.HttpProfile;
-import com.tencentcloudapi.sms.v20190711.SmsClient;
 
-import com.tencentcloudapi.sms.v20190711.models.SendSmsRequest;
-import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -40,6 +35,10 @@ public class PrepaidCardController extends BaseController{
     private SmsCases smsdCases;
     @Autowired
     private AnalyseCases analyseCases;
+
+
+    // @Autowired
+    // private OptimizedAnalysisService optAnalyzeCase;
 
 
 
@@ -135,6 +134,13 @@ public class PrepaidCardController extends BaseController{
 
     @GetMapping("/coach/efficient")
     public Object efficient( @RequestHeader(value = "secure", required = false)String secure,@RequestParam(required = true) String startTime,@RequestParam(required = true) String endTime)   {
+        verifiedSecure(secure);
+        return analyseCases.analyseEfficiancy( startTime, endTime);
+
+    }
+
+    @GetMapping("/coach/optimized/efficient")
+    public Object optimizedEfficient( @RequestHeader(value = "secure", required = false)String secure,@RequestParam(required = true) String startTime,@RequestParam(required = true) String endTime)   {
         verifiedSecure(secure);
         return analyseCases.analyseEfficiancy( startTime, endTime);
 
