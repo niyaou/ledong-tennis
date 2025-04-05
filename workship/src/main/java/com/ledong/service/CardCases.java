@@ -40,7 +40,7 @@ public class CardCases {
     private CoachDAO coachDAO;
 
     @Transactional(rollbackFor = Exception.class)
-    public ChargeBo setRestCharge(String number, Float charged, Float times, Float annualTimes, String annualExpireTime,Integer worth,String court,String description,String coachName) {
+    public ChargeBo setRestCharge(String number, Float charged, Float times, Float annualTimes, String annualExpireTime,Integer worth,String court,String description,String coachName,String time) {
         var user = userCases.findByNumber(number);
         if (user == null) {
             throw new CustomException(UseCaseCode.NOT_FOUND);
@@ -48,7 +48,8 @@ public class CardCases {
         var coach  = coachDAO.findByName(coachName);
         var chargeTemp = Charge.builder()
                 .charge(0)
-                .times(0)
+                .chargedTime(DateUtil.parse(time).toLocalDateTime())
+                .times(0)   
                 .annualTimes(0)
                 .court(court)
                 .coach(coach)

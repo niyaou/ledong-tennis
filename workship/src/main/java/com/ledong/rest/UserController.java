@@ -39,56 +39,58 @@ public class UserController extends BaseController {
     private CourseCases courseCases;
 
     @PostMapping("/register")
-    public UserResponseDTO register( @RequestHeader(value = "secure", required = false)String secure,@RequestParam String name, @RequestParam String number,@RequestParam String court) {
+    public UserResponseDTO register(@RequestHeader(value = "secure", required = false) String secure,
+            @RequestParam String name, @RequestParam String number, @RequestParam String court) {
         verifiedSecure(secure);
-        var user = PrepaidCard.fromBO(useCase.create(name, number,court));
+        var user = PrepaidCard.fromBO(useCase.create(name, number, court));
         return UserResponseDTO.builder()
                 .token("------").user(user).build();
     }
 
-
     @PostMapping("/charged")
-    public Object charged( @RequestHeader(value = "secure", required = false)String secure,String number, @RequestParam(required = false)Float charged, @RequestParam(required = false)Float times,
-                                      @RequestParam(required = false)Float annualTimes, @RequestParam(required = false)String annualExpireTime,
-                                      @RequestParam(required = false)Integer worth,
-                                      @RequestParam(required = true)String court,
-                                      @RequestParam(required = true)String coach,
-                                      @RequestParam(required = false)String description) {
+    public Object charged(@RequestHeader(value = "secure", required = false) String secure, 
+    String number,
+            @RequestParam(required = false) Float charged,
+            @RequestParam(required = false) String time,
+             @RequestParam(required = false) Float times,
+            @RequestParam(required = false) Float annualTimes,
+            @RequestParam(required = false) String annualExpireTime,
+            @RequestParam(required = false) Integer worth,
+            @RequestParam(required = true) String court,
+            @RequestParam(required = true) String coach,
+            @RequestParam(required = false) String description) {
         verifiedSecure(secure);
-        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime,worth,court,description,coach);
+        var chargedLog = cardCase.setRestCharge(number, charged, times, annualTimes, annualExpireTime, worth, court,
+                description, coach,time);
         return chargedLog;
 
     }
 
     @GetMapping("/charged/{number}")
-    public Object charged(@PathVariable("number")String number) {
-        return cardCase.getCharged(number, 1,  50);
+    public Object charged(@PathVariable("number") String number) {
+        return cardCase.getCharged(number, 1, 50);
     }
-
 
     @GetMapping("/charged/total")
     public Object charged(@RequestParam Integer pageSize) {
-        return cardCase.getCharged(1,  pageSize);
+        return cardCase.getCharged(1, pageSize);
     }
 
-
     @GetMapping("/charged/coach/{number}")
-    public Object coachCharged(@PathVariable("number")String number,   @RequestParam  String startTime,
-                               @RequestParam String endTime) {
-        return cardCase.getChargedByCoach(number, startTime,  endTime);
+    public Object coachCharged(@PathVariable("number") String number, @RequestParam String startTime,
+            @RequestParam String endTime) {
+        return cardCase.getChargedByCoach(number, startTime, endTime);
     }
 
     @PostMapping("/member/{number}")
-    public Object yonthAndAdult(@PathVariable("number")String number,   @RequestParam  Integer yonth,
-                               @RequestParam Integer adult) {
-        return useCase.setYonthAndAdult(number, yonth,adult);
+    public Object yonthAndAdult(@PathVariable("number") String number, @RequestParam Integer yonth,
+            @RequestParam Integer adult) {
+        return useCase.setYonthAndAdult(number, yonth, adult);
     }
 
-
-
-
     @PostMapping("/charged/retreat/{id}")
-    public ChargedResponseDTO charged( @RequestHeader(value = "secure", required = false)String secure,@PathVariable("id") Long id) {
+    public ChargedResponseDTO charged(@RequestHeader(value = "secure", required = false) String secure,
+            @PathVariable("id") Long id) {
         verifiedSecure(secure);
         var chargedLog = cardCase.retreatCharge(id);
         return ChargedResponseDTO.builder().build();
@@ -105,13 +107,12 @@ public class UserController extends BaseController {
 
     }
 
-
     @PostMapping("/course/notify")
-    public Object notify( @RequestHeader(value = "secure", required = false)String secure,@RequestParam(required = false) Long id) {
+    public Object notify(@RequestHeader(value = "secure", required = false) String secure,
+            @RequestParam(required = false) Long id) {
         verifiedSecure(secure);
-        return  courseCases.notify(id);
+        return courseCases.notify(id);
     }
-
 
     @GetMapping("/coach")
     public Object coaches() {
@@ -122,6 +123,5 @@ public class UserController extends BaseController {
     public Object courts() {
         return courtDAO.findAll();
     }
-
 
 }

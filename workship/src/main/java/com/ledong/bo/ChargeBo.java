@@ -20,6 +20,7 @@ public class ChargeBo {
     private Long id;
     private PrepaidCard prepaidCard;
     private float charge;
+    private String time;
     private float times;
     private float annualTimes;
     private String description;
