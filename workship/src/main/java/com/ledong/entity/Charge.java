@@ -59,7 +59,7 @@ public class Charge   {
         return Charge.builder()
                 .id(bo.getId())
                 .charge(bo.getCharge())
-                .chargedTime(LocalDateTime.parse(bo.getTime()))
+              .chargedTime(bo.getChargedTime())
                 .times(bo.getTimes())
                 .worth(bo.getWorth())
                 .court(bo.getCourt())

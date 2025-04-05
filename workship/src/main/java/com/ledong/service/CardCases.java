@@ -75,6 +75,8 @@ public class CardCases {
             userCases.setAnnualTimesExpired(number, Date.valueOf(annualExpireTime));
         }
         var charge = chargeTemp.build();
+        charge.setChargedTime(DateUtil.parse(time).toLocalDateTime());
+        System.out.println(charge.toString());
         chargeDao.save(charge);
 
         return DefaultConverter.convert(charge, ChargeBo.class);
