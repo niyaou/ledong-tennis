@@ -48,8 +48,7 @@ public class Charge   {
     private Coach coach;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @CreatedDate
-    @Column( columnDefinition = "datetime")
+    @Column(columnDefinition = "datetime")
     private LocalDateTime chargedTime;
 
     @Column(length =200,name = "description")
