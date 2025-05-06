@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="user-info">
+    <view class="avatar-placeholder"></view>
+    <view class="info">
+      <text class="nickname">{{userInfo.nickName || '未登录'}}</text>
+      <text class="member-level" wx:if="{{userInfo.memberLevel}}">{{userInfo.memberLevel}}级会员</text>
+    </view>
+    <button class="login-btn" wx:if="{{!userInfo.nickName}}" bindtap="getUserProfile">登录/注册</button>
+  </view>
+
+  <view class="member-card">
+    <view class="card-title">会员卡信息</view>
+    <view class="card-content">
+      <view class="card-item">
+        <text class="label">会员卡号</text>
+        <text class="value">{{userInfo.memberCardNo || '未绑定'}}</text>
+      </view>
+      <view class="card-item">
+        <text class="label">剩余积分</text>
+        <text class="value">{{userInfo.points || 0}}</text>
+      </view>
+      <view class="card-item">
+        <text class="label">有效期</text>
+        <text class="value">{{userInfo.expireDate || '未激活'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="menu-list">
+    <view class="menu-item" bindtap="navigateToMyBookings">
+      <text>我的预约</text>
+    </view>
+    <view class="menu-item" bindtap="navigateToPoints">
+      <text>积分记录</text>
+    </view>
+    <view class="menu-item" bindtap="navigateToSettings">
+      <text>设置</text>
+    </view>
+    <view class="menu-item">
+      <button bindtap="showAddCourtModal">添加场地</button>
+    </view>
+  </view>
+
+  <modal
+    title="添加场地"
+    visible="{{showAddCourtModal}}"
+    bind:cancel="handleModalCancel"
+    bind:confirm="handleModalConfirm"
+    show-cancel="true"
+    confirm-text="提交"
+    cancel-text="取消"
+    >
+    <view class="modal-content">
+      <input placeholder="请输入校区" value="{{campus}}" bindinput="onCampusInput" />
+      <input placeholder="请输入场地编号" value="{{courtNumber}}" bindinput="onCourtNumberInput" type="number" />
+    </view>
+  </modal>
+</view> 

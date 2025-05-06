@@ -1,0 +1,77 @@
+<view class="booking-page-freeze">
+  <!-- 顶部固定：预约信息+日期选择 -->
+  <view class="booking-header-fixed">
+    <view class="booking-header">
+      <view class="header-row">
+        <text class="header-title">场地预约</text>
+      </view>
+      <view class="venue-info">
+        <view class="venue-name">S Ace Tennis 网球学练馆</view>
+        <view class="venue-desc">距离您&gt;1000km</view>
+      </view>
+    </view>
+    <view class="date-scroll sticky-date">
+      <scroll-view scroll-x="true" class="date-scroll-view">
+        <view class="date-item {{item.selected ? 'selected' : ''}}" wx:for="{{dateList}}" wx:key="date" bindtap="onDateTabChange" data-index="{{index}}">
+          <view class="date">{{item.dateStr}}</view>
+          <view class="week">{{item.weekStr}}</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 主体内容区 -->
+  <view class="booking-table-freeze">
+    <!-- 左侧固定列 -->
+    <view class="left-fixed-column">
+      <view class="fixed"></view>
+      <!-- 场地标题 -->
+      <view class="court-header">
+        <view class="corner-cell"></view>
+        <view class="court-header-item" wx:for="{{courtList}}" wx:key="id">
+          {{item.courtNumber}}
+        </view>
+      </view>
+      <view class="court-scroll-container">
+        <view class="time-column">
+          <view class="time-item" wx:for="{{timeList}}" wx:key="time">
+            {{item.time}}
+          </view>
+        </view>
+        <view class="court-main">
+          <view class="court-container">
+            <view class ="single-court" wx:for="{{courtList}}" wx:key="courtNumber">
+              <view class="court-status-item {{item.status}} {{item.selected ? 'selected' : ''}}"
+                    wx:for="{{courtStatus[item.courtNumber]}}"
+                    wx:key="time"
+                    data-courtnumber="{{item.courtNumber}}"
+                    data-time="{{item.time}}"
+                    data-status="{{item.status}}"
+                    data-text="{{item.text}}"
+                    bindtap="onCourtTimeTap">
+                {{item.text}}{{item.selected}}
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+
+
+    </view>
+  </view>
+
+  <!-- 底部合计栏 -->
+  <view class="booking-footer-fixed">
+    <view class="booking-footer">
+      <view class="footer-left">
+        <view>合计：<text class="price">￥{{totalPrice}}</text></view>
+        <view>已选:  <text> {{selectedCount}}小时 </text></view>
+      </view>
+      <view>
+      <button class="footer-btn {{selectedCount > 0 ? ' active' : ''}}" disabled="{{selectedCount <= 0}}" bindtap="onOrderSubmit">下单</button>
+      </view>
+
+    </view>
+  </view>
+</view>
