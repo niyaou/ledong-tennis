@@ -50,6 +50,31 @@ exports.main = async (event, context) => {
   }).get()
   const orderList = orderRes.data
 
+  // 3.1 过滤并删除过期的锁定订单
+  const now = new Date()
+  const expiredLockedOrders = orderList.filter(order => {
+    if (order.status === 'locked') {
+      const orderTime = new Date(order.updated_at)
+      const diffMinutes = (now - orderTime) / (1000 * 60)
+      return diffMinutes > 10
+    }
+    return false
+  })
+
+  // 删除过期的锁定订单
+  if (expiredLockedOrders.length > 0) {
+    const expiredOrderIds = expiredLockedOrders.map(order => order._id)
+    await db.collection('court_order_collection').where({
+      _id: db.command.in(expiredOrderIds)
+    }).remove()
+    
+    // 从orderList中移除已删除的订单
+    const expiredOrderIdSet = new Set(expiredOrderIds)
+    const filteredOrderList = orderList.filter(order => !expiredOrderIdSet.has(order._id))
+    orderList.length = 0
+    orderList.push(...filteredOrderList)
+  }
+
   // 4. 补全空闲状态
   const result = []
   for (let court of courtList.data) {

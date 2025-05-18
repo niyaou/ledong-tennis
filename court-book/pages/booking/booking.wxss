@@ -597,12 +597,28 @@ color: #103f6b;
   background: #a29e9e;
   color: #101010;
 }
+  /**background: #abb53e40;*/
 .court-status-item.available {
-  background: #abb53e40;
   color: #2c2d1f;
 }
 .court-status-item.selected {
   background: #1976d2;
   color: #fff;
   border-color: #1565c0;
+}
+.court-status-item.locked {
+  background: #e2c221 !important;
+  color: #61540a !important;
 } 
+.court-status-item.self-booked {
+  background-color: #4CAF50 !important; /* Green color for self-booked slots */
+  color: white !important;
+}
+.court-status-item.self-locked {
+  background: #ffe066;
+  color: #b8860b;
+}
+.court-status-item.other-locked {
+  background: #c7c7c7;
+  color: #3a3535;
+}

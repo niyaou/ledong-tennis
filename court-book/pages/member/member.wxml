@@ -5,7 +5,8 @@
       <text class="nickname">{{userInfo.nickName || '未登录'}}</text>
       <text class="member-level" wx:if="{{userInfo.memberLevel}}">{{userInfo.memberLevel}}级会员</text>
     </view>
-    <button class="login-btn" wx:if="{{!userInfo.nickName}}" bindtap="getUserProfile">登录/注册</button>
+   
+    <button class="login-btn" wx:if="{{!phoneNumber}}" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">登录/注册</button>
   </view>
 
   <view class="member-card">
@@ -43,7 +44,7 @@
 
   <modal
     title="添加场地"
-    visible="{{showAddCourtModal}}"
+    hidden="{{!showAddCourtModal}}"
     bind:cancel="handleModalCancel"
     bind:confirm="handleModalConfirm"
     show-cancel="true"

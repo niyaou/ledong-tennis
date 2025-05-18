@@ -8,6 +8,7 @@ Page({
     selectedCount: 0,
     court_count: 13,
     currentDate: '',
+    phoneNumber: '', // Add phone number field
   },
 
   onLoad: function () {
@@ -21,10 +22,15 @@ Page({
     const dd = String(today.getDate()).padStart(2, '0');
     const fullDate = `${yyyy}${mm}${dd}`;
     this.onDateTabChange({ currentTarget: { dataset: { index: 0, fullDate } } });
-
   },
 
-  
+  onShow: function() {
+    // Read phone number from storage every time page is shown
+    const phoneNumber = wx.getStorageSync('phoneNumber');
+    this.setData({ 
+      phoneNumber: phoneNumber 
+    });
+  },
 
   initDateList: function () {
     const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -56,7 +62,7 @@ Page({
   },
 
   initCourtStatusByCloud: function (date) {
-    this.setData({ courtStatus:{} });
+    this.setData({ courtStatus: {} });
     wx.cloud.callFunction({
       name: 'get_court_order',
       data: {
@@ -79,16 +85,18 @@ Page({
               if (found) {
                 return {
                   time: found.start_time,
-                  status: found.status === 'free' ? 'available' : 'booked',
-                  text: found.status === 'free' ? `${found.price}` : '已预定',
-                  courtNumber: courtNumber
+                  status: found.status === 'free' ? 'available' :found.status,
+                  text: found.status === 'free' ? `${found.price}` :  found.status === 'locked' ? '已锁定' : '已预定',
+                  courtNumber: courtNumber,
+                  booked_by: found.booked_by || ''
                 }
               } else {
                 return {
                   time,
                   status: 'available',
                   text: '60',
-                  courtNumber: courtNumber
+                  courtNumber: courtNumber,
+                  booked_by: ''
                 }
               }
             });
@@ -178,7 +186,7 @@ Page({
     const idx = e.currentTarget.dataset.index;
     const dateList = this.data.dateList.map((item, i) => ({ ...item, selected: i === idx }));
     this.setData({ dateList });
-    
+
     // 打印被点击的日期和索引
     console.log('点击的日期索引:', idx);
     console.log('点击的日期对象:', this.data.dateList[idx]);
@@ -196,26 +204,26 @@ Page({
     this.initCourtStatusByCloud(fullDate);
   },
 
-  getTimesByCourtNumber: function(courtNumber) {
+  getTimesByCourtNumber: function (courtNumber) {
     console.log('----courtNumber---', this.data.courtStatus)
     const found = this.data.courtStatus.find(item => item.courtNumber == courtNumber);
     return found ? found.times : [];
   },
 
-  onCourtTimeTap: function(e) {
+  onCourtTimeTap: function (e) {
     console.log('----e---', e)
     const courtNumber = e.currentTarget.dataset.courtnumber;
     const time = e.currentTarget.dataset.time;
     const text = e.currentTarget.dataset.time;
     const status = e.currentTarget.dataset.time;
-    console.log('----courtNumber---time', courtNumber,time,text,status)
+    console.log('----courtNumber---time', courtNumber, time, text, status)
     let courtStatus = this.data.courtStatus;
     const times = courtStatus[courtNumber] || [];
     const idx = times.findIndex(item => item.time === time);
     if (idx !== -1) {
       const item = times[idx];
       if (item.status === 'booked') return; // 已预定不可选
-    //   // 切换选中状态onOrderSubmit
+      //   // 切换选中状态onOrderSubmit
       item.selected = !item.selected;
       courtStatus = { ...courtStatus, [courtNumber]: [...times] };
       this.setData({ courtStatus });
@@ -223,7 +231,7 @@ Page({
     }
   },
 
-  updateSelectedSummary: function() {
+  updateSelectedSummary: function () {
     let selectedCount = 0;
     let totalPrice = 0;
     const courtStatus = this.data.courtStatus;
@@ -239,26 +247,154 @@ Page({
     this.setData({ selectedCount, totalPrice });
   },
 
-  onOrderSubmit: function() {
+  onOrderSubmit: function () {
     // 收集所有选中的项
     const selectedList = [];
     const courtStatus = this.data.courtStatus;
     const campus = '麓坊校区';
     const date = this.data.currentDate;
+ 
     Object.keys(courtStatus).forEach(courtNumber => {
       courtStatus[courtNumber].forEach(item => {
         if (item.selected) {
+          // 计算结束时间（+30分钟）
+          let [h, m] = item.time.split(':').map(Number);
+          m += 30;
+          if (m >= 60) { h += 1; m -= 60; }
+          const end_time = `${h < 10 ? '0' + h : h}:${m === 0 ? '00' : '30'}`;
+          // 价格
+          const price = parseFloat(item.text.replace(/[^\d.]/g, '')) || 0;
+          // 构造court_id: 场地号+日期+开始时间
+          const court_id = `${courtNumber}_${date}_${item.time}`;
           selectedList.push({
-            courtNumber: courtNumber,
-            time: item.time,
-            text: item.text,
-            status: item.status,
+            court_id,
             campus: campus,
-            date: date
+            courtNumber: courtNumber,
+            date: date,
+            start_time: item.time,
+            end_time: end_time,
+            status: 'locked',
+            price: price,
+            booked_by: this.data.phoneNumber,
+            is_verified: false
           });
         }
       });
     });
     console.log('已选中的场地时间段:', selectedList);
-  }
+
+    if (selectedList.length === 0) {
+      wx.showToast({ title: '请选择时间段', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '加载中...' });
+    // 批量调用云函数
+    wx.cloud.callFunction({
+      name: 'update_court_order',
+      data: {
+        data: selectedList
+      },
+      success: res => {
+        wx.hideLoading();
+        wx.showModal({
+          title: '提示',
+          content: '场地已锁定，请尽快支付',
+          showCancel: false,
+          success: (modalRes) => {
+            if (modalRes.confirm) {
+              wx.showLoading({ title: '加载中...' });
+              this.initCourtStatusByCloud(date);
+              console.log('云函数返回:', res.result.results);
+              this.onCreateOrderPayment(res.result.results, date);
+              wx.hideLoading();
+            }
+          }
+        });
+      },
+      fail: err => {
+        wx.showToast({ title: '预订失败', icon: 'none' });
+        console.error('预订失败:', err);
+      }
+    });
+  },
+  // 生成随机字符串
+  generateNonceStr() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const length = 32;
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+  onCreateOrderPayment: function (order_objs,date) {
+
+    const court_ids = []
+    order_objs.forEach(item => {
+      court_ids.push(item.court_id)
+    })
+    const orderParams = {
+      phoneNumber: this.data.phoneNumber,
+      total_fee: court_ids.length/100,
+      court_ids,
+      nonceStr: this.generateNonceStr()
+    };
+    wx.showLoading({ title: '加载中...' });
+    // 调用云函数创建订单
+    wx.cloud.callFunction({
+      name: 'pay_order_create',
+      data: orderParams,
+      success: (res) => {
+        console.log('创建订单成功', res);
+        if (res.result && res.result.payment) {
+          // 调用微信支付
+          wx.requestPayment({
+            ...res.result.payment,
+            // ...{"appId":"wx3250e72f7d776124","timeStamp":"1747490082","nonceStr":"USt2HgGHHEbuoZX3","package":"prepay_id=wx17215442344454c5ff540ae85f52460001","signType":"MD5","paySign":"4908B68D11149CE2511F88CC50272E3A"},
+            success: (payRes) => {
+              wx.hideLoading();
+              wx.showToast({
+                title: '支付成功',
+                icon: 'success'
+              });
+              console.log('支付成功', payRes);
+              this.initCourtStatusByCloud(date);
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({
+                title: '支付失败',
+                icon: 'error'
+              });
+              console.error('支付失败', err);
+            }
+          });
+        } else {
+          wx.hideLoading();
+          wx.showToast({
+            title: '创建订单失败',
+            icon: 'error'
+          });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        wx.showToast({
+          title: '创建订单失败',
+          icon: 'error'
+        });
+        console.error('创建订单失败', err);
+      }
+    });
+
+
+  },
+
+  onGoToLogin: function() {
+
+    wx.switchTab({
+      url: '/pages/member/member'
+    });
+    console.log('--------onGoToLogin-------')
+  },
 }); 

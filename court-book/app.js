@@ -1,5 +1,10 @@
 // app.js
 App({
+  globalData: {
+    userInfo: null,
+    openid: null
+  },
+  
   onLaunch: function () {
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
@@ -11,10 +16,30 @@ App({
         env: 'cloud1-6gebob4m4ba8f3de',
         traceUser: true,
       })
-    }
-
-    this.globalData = {
-      userInfo: null
+      
+      // 先检查本地存储是否有openid
+      const openid = wx.getStorageSync('openid')
+      if (openid) {
+        // 如果有，直接加载到全局变量
+        this.globalData.openid = openid
+        console.log('从本地存储加载openid:', openid)
+      } else {
+        // 如果没有，调用云函数获取
+        wx.cloud.callFunction({
+          name: "getopenId",
+          success: res => {
+            const openid = res.result.openid
+            // 保存到本地存储
+            wx.setStorageSync('openid', openid)
+            // 加载到全局变量
+            this.globalData.openid = openid
+            console.log('获取并保存openid:', openid)
+          },
+          fail: err => {
+            console.error('获取openid失败：', err)
+          }
+        })
+      }
     }
   }
 }) 
