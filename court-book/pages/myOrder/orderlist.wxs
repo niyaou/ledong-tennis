@@ -1,0 +1,21 @@
+var formatTime = function(dateString) {
+  var date = getDate(dateString);
+  var year = date.getFullYear();
+  var month = padStart(date.getMonth() + 1, 2, '0');
+  var day = padStart(date.getDate(), 2, '0');
+  var hours = padStart(date.getHours(), 2, '0');
+  var minutes = padStart(date.getMinutes(), 2, '0');
+  return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+}
+
+var padStart = function(str, targetLength, padString) {
+  str = str.toString();
+  while (str.length < targetLength) {
+    str = padString + str;
+  }
+  return str;
+}
+
+module.exports = {
+  formatTime: formatTime
+}; 

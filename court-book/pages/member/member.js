@@ -11,21 +11,34 @@ Page({
     showAddCourtModal: false,
     campus: '',
     courtNumber: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    maskedPhoneNumber: '',
+    orders: []
+  },
+
+  maskPhoneNumber: function(phoneNumber) {
+    if (!phoneNumber || phoneNumber.length !== 11) return phoneNumber || '';
+    return phoneNumber.substr(0, 3) + '****' + phoneNumber.substr(7);
   },
 
   onLoad: function() {
     // 检查本地存储中是否有用户信息
-    const userInfo = wx.getStorageSync('userInfo');
     const phoneNumber = wx.getStorageSync('phoneNumber');
-    if (userInfo) {
-      this.setData({ userInfo });
-    }
     if (phoneNumber) {
-      this.setData({ phoneNumber });
+      this.setData({ 
+        phoneNumber,
+        maskedPhoneNumber: this.maskPhoneNumber(phoneNumber)
+      });
     }
   },
-
+  onShow: function() {
+    // Read phone number from storage every time page is shown
+    const phoneNumber = wx.getStorageSync('phoneNumber');
+    this.setData({ 
+      phoneNumber: phoneNumber,
+      maskedPhoneNumber: this.maskPhoneNumber(phoneNumber)
+    });
+  },
   getUserProfile: function() {
     wx.getUserProfile({
       desc: '用于完善会员资料',
@@ -43,7 +56,7 @@ Page({
 
   navigateToMyBookings: function() {
     wx.navigateTo({
-      url: '/pages/my-bookings/my-bookings'
+      url: '/pages/myOrder/orderlist'
     });
   },
 
@@ -126,7 +139,8 @@ Page({
           console.log('resutl',res.result)
           if (res.result && res.result.errCode===0) {
             this.setData({
-              phoneNumber: res.result.phoneInfo.phoneNumber
+              phoneNumber: res.result.phoneInfo.phoneNumber,
+              maskedPhoneNumber: this.maskPhoneNumber(res.result.phoneInfo.phoneNumber)
             });
             wx.setStorageSync('phoneNumber', res.result.phoneInfo.phoneNumber);
             wx.showToast({

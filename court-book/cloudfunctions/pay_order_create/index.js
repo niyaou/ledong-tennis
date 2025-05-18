@@ -35,6 +35,7 @@ exports.main = async (event, ) => {
 
   // 创建订单记录
   const db = cloud.database()
+  console.log(res.payment)
   await db.collection('pay_order').add({
     data: {
       phoneNumber,
@@ -46,6 +47,14 @@ exports.main = async (event, ) => {
       status: 'PENDING' // 初始状态为待支付
     }
   })
-  
+  console.log( {
+    phoneNumber,
+    total_fee,
+    court_ids,
+    outTradeNo,
+    payment_parmas:res.payment,
+    createTime: db.serverDate(),
+    status: 'PENDING' // 初始状态为待支付
+  })
   return res
 }

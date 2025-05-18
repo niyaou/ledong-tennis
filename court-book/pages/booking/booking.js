@@ -9,6 +9,8 @@ Page({
     court_count: 13,
     currentDate: '',
     phoneNumber: '', // Add phone number field
+    needRefresh: false, // Add flag to control refresh
+    eventChannel: null, // Add event channel
   },
 
   onLoad: function () {
@@ -22,14 +24,54 @@ Page({
     const dd = String(today.getDate()).padStart(2, '0');
     const fullDate = `${yyyy}${mm}${dd}`;
     this.onDateTabChange({ currentTarget: { dataset: { index: 0, fullDate } } });
+
+
+    const app = getApp();
+    const eventChannel = app.globalData.eventBus;
+    if (eventChannel) {
+      this.setData({ eventChannel });
+      // Listen for refresh event
+      eventChannel.on('refreshBooking', () => {
+        this.refreshPage();
+      });
+    }
+
+    // Add global event bus listener
+    app.globalData.eventBus.on('refreshBookingPage', () => {
+      this.refreshPage();
+    });
+  },
+
+  onUnload: function() {
+    // Clean up event bus listener
+    const app = getApp();
+    app.globalData.eventBus.off('refreshBookingPage');
+    app.globalData.eventBus.off('refreshBooking');
+  },
+
+  // Add refresh method
+  refreshPage: function() {
+    console.log('Refreshing booking page...');
+    const phoneNumber = wx.getStorageSync('phoneNumber');
+    this.setData({ 
+      phoneNumber: phoneNumber 
+    });
+    this.initCourtStatusByCloud(this.data.currentDate);
   },
 
   onShow: function() {
+    console.log('----onshow---')
     // Read phone number from storage every time page is shown
     const phoneNumber = wx.getStorageSync('phoneNumber');
     this.setData({ 
       phoneNumber: phoneNumber 
     });
+    
+    // Only refresh if needed
+    if (this.data.needRefresh) {
+      this.initCourtStatusByCloud(this.data.currentDate);
+      this.setData({ needRefresh: false });
+    }
   },
 
   initDateList: function () {
@@ -222,7 +264,14 @@ Page({
     const idx = times.findIndex(item => item.time === time);
     if (idx !== -1) {
       const item = times[idx];
-      if (item.status === 'booked') return; // 已预定不可选
+      // if (item.status === 'booked' || item.status === 'locked') return; // 已预定不可选
+      if (item.status === 'booked' || item.status === 'locked') {
+        this.setData({ needRefresh: true }); // Set flag before navigation
+        wx.navigateTo({
+          url: '/pages/myOrder/orderlist'
+        });
+        return
+      };
       //   // 切换选中状态onOrderSubmit
       item.selected = !item.selected;
       courtStatus = { ...courtStatus, [courtNumber]: [...times] };
