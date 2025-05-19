@@ -16,6 +16,14 @@ var padStart = function(str, targetLength, padString) {
   return str;
 }
 
+var isWithinOneDay = function(dateString) {
+  var orderDate = getDate(dateString);
+  var now = getDate();
+  var diff = now - orderDate;
+  return diff <= 1*24 * 60 * 60 * 1000; // 24 hours in milliseconds
+}
+
 module.exports = {
-  formatTime: formatTime
+  formatTime: formatTime,
+  isWithinOneDay: isWithinOneDay
 }; 

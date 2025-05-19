@@ -172,7 +172,7 @@ Page({
           wx.cloud.callFunction({
             name: 'cancel_order',
             data: {
-              orderId: order._id
+              order
             }
           }).then(() => {
             wx.showToast({
