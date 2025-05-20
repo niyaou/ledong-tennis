@@ -370,11 +370,17 @@ Page({
   generateNonceStr() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
-    const length = 32;
-    for (let i = 0; i < length; i++) {
+    const timestamp = Date.now().toString(36); // 将时间戳转换为36进制
+    const randomPart = Math.random().toString(36).substring(2, 8); // 获取随机数的一部分
+    result = timestamp + randomPart;
+    
+    // 如果长度不够32位，继续添加随机字符
+    while (result.length < 32) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return result;
+    
+    // 如果超过32位，截取前32位
+    return result.substring(0, 32);
   },
   onCreateOrderPayment: function (order_objs,date) {
 

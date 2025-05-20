@@ -22,7 +22,7 @@
                 <view class="action-btn pay-btn" catchtap="onPayClick" data-order="{{item}}">付款</view>
                 <view class="action-btn cancel-btn" catchtap="onCancelClick" data-order="{{item}}">取消</view>
               </block>
-              <block wx:elif="{{item.status === 'PAIDED' && utils.isWithinOneDay(item.createTime)}}">
+              <block wx:elif="{{item.status === 'PAIDED' && utils.isWithinOneDay(item.createTime)  && utils.isOrderWithinOneDay(item.court_ids)}}">
                 <view class="action-btn refund-btn" catchtap="onRefundClick" data-order="{{item}}">退款</view>
               </block>
             </view>

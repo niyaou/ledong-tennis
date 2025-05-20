@@ -191,19 +191,35 @@ Page({
       }
     });
   },
-
+  // 生成随机字符串
+  generateNonceStr() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const timestamp = Date.now().toString(36); // 将时间戳转换为36进制
+    const randomPart = Math.random().toString(36).substring(2, 8); // 获取随机数的一部分
+    result = timestamp + randomPart;
+    
+    // 如果长度不够32位，继续添加随机字符
+    while (result.length < 32) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    // 如果超过32位，截取前32位
+    return result.substring(0, 32);
+  },
   onRefundClick: function(e) {
     const order = e.currentTarget.dataset.order;
+    const nonceStr = this.generateNonceStr()
     wx.showModal({
       title: '申请退款',
       content: '确定要申请退款吗？',
       success: (res) => {
         if (res.confirm) {
+         
+
           wx.cloud.callFunction({
             name: 'refund_order',
-            data: {
-              orderId: order._id
-            }
+            data:{...order,nonceStr}
           }).then(() => {
             wx.showToast({
               title: '退款申请已提交',

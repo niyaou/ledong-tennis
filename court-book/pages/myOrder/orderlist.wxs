@@ -20,10 +20,46 @@ var isWithinOneDay = function(dateString) {
   var orderDate = getDate(dateString);
   var now = getDate();
   var diff = now - orderDate;
-  return diff <= 1*24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  return diff <= 1 *24 * 60 * 60 * 1000; // 24 hours in milliseconds
+}
+
+var isOrderWithinOneDay = function(court_ids) {
+           const now = getDate()
+        
+          console.log('当前时间:', now.toLocaleString());
+       
+          for(var i = 0; i < court_ids.length; i++) {
+            var courtId = court_ids[i];
+            console.log('正在检查场地ID:', courtId);
+            // 解析场地ID中的日期和时间
+            const [courtNumber, date, time] = courtId.split('_')
+            const year = date.substring(0, 4)
+            const month = date.substring(4, 6)
+            const day = date.substring(6, 8)
+            const [hour, minute] = time.split(':')
+            
+            // 创建预订时间对象
+            const bookingTime = getDate(year, month - 1, day, hour, minute)
+            console.log('场地预订时间:', bookingTime.toLocaleString());
+            console.log('场地预订时间(ISO):', bookingTime.toISOString());
+            
+            // 如果预订时间在未来，检查是否超过24小时
+          
+              const diffHours = (bookingTime - now) / (1000 * 60 * 60)
+              console.log('距离预订时间还有:', diffHours.toFixed(2), '小时');
+              if (diffHours <= 24) {
+                canRefund = false
+                earliestBookingTime = bookingTime
+                console.log('发现24小时内的预订，无法退款');
+                return false
+              }
+        
+          }
+          return true
 }
 
 module.exports = {
   formatTime: formatTime,
-  isWithinOneDay: isWithinOneDay
+  isWithinOneDay: isWithinOneDay,
+  isOrderWithinOneDay: isOrderWithinOneDay
 }; 

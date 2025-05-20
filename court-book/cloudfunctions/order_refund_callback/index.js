@@ -14,6 +14,7 @@ exports.main = async (event) => {
 
   const db = cloud.database();
   console.log('outTradeNo:', outTradeNo);
+
   // 查询 pay_order 表
   const orderRes = await db.collection('pay_order').where({ outTradeNo }).get();
   console.log('pay_order 查询结果:', orderRes.data);
@@ -22,16 +23,16 @@ exports.main = async (event) => {
   }
   const order = orderRes.data[0];
   // 更新 pay_order 的 status 字段为 'PAIDED'
-  const updateOrderRes = await db.collection('pay_order').where({ outTradeNo }).update({ data: { status: 'PAIDED',paided_at:db.serverDate() } });
+  const updateOrderRes = await db.collection('pay_order').where({ outTradeNo }).update({ data: { status: 'REFUNDED' } });
   console.log('pay_order 状态更新结果:', updateOrderRes);
   const court_ids = order.court_ids;
   console.log('court_ids:', court_ids);
-  // 批量更新 court_order_collection，把 court_id 在 court_ids 里的 status 改为 'booked'
+  // 批量更新 court_order_collection，把 court_id 在 court_ids 里的 删除
   if (court_ids && court_ids.length > 0) {
     const updateCourtRes = await db.collection('court_order_collection')
       .where({ court_id: db.command.in(court_ids) })
-      .update({ data: { status: 'booked' } });
+      .remove();
     console.log('court_order_collection 更新结果:', updateCourtRes);
   }
-  return  { "errcode": 0, court_ids };
+  return  { "errcode": 0  };
 }
