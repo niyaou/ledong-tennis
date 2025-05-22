@@ -21,7 +21,7 @@
     <view class="section-title">最新动态</view>
     <view class="news-list">
       <view class="news-item" wx:for="{{newsList}}" wx:key="id">
-        <text class="news-title">{{item.title}}</text>
+        <text class="news-title">{{item.content}}</text>
         <text class="news-date">{{item.date}}</text>
       </view>
     </view>

@@ -15,19 +15,31 @@ exports.main = async (event) => {
     query.phoneNumber = phoneNumber
   }
 
-  // 计算10分钟前的时间戳
-  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
+  // 检查是否是管理员
+  const managerCheck = await db.collection('manager').where({
+    phoneNumber: phoneNumber
+  }).get()
 
-  // 添加状态筛选条件
-  query._ = db.command.or([
-    {
-      status: 'PAIDED'
-    },
-    {
-      status: 'PENDING',
-      createTime: db.command.gte(tenMinutesAgo)
-    }
-  ])
+  const isManager = managerCheck.data && managerCheck.data.length > 0
+
+  if (isManager) {
+    // 如果是管理员，查询当天及以后的数据
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    query.createTime = db.command.gte(today)
+  } else {
+    // 如果不是管理员，使用原有的查询逻辑
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
+    query._ = db.command.or([
+      {
+        status: 'PAIDED'
+      },
+      {
+        status: 'PENDING',
+        createTime: db.command.gte(tenMinutesAgo)
+      }
+    ])
+  }
 
   // 计算分页参数
   const skip = (pageNum - 1) * pageSize

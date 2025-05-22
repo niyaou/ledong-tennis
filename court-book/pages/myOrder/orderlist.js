@@ -9,7 +9,8 @@ Page({
     phoneNumber: '',
     pageNum: 1,
     pageSize: 10,
-    hasMore: true
+    hasMore: true,
+    isAdmin: false
   },
 
   /**
@@ -17,7 +18,15 @@ Page({
    */
   onLoad: function() {
     const phoneNumber = wx.getStorageSync('phoneNumber') || '';
-    this.setData({ phoneNumber }, () => {
+    const app = getApp();
+
+    const managerList = app.globalData.managerList;
+    const isAdmin = managerList && managerList.includes(phoneNumber);
+    
+    this.setData({ 
+      phoneNumber,
+      isAdmin
+    }, () => {
       this.loadOrders();
     });
   },
@@ -33,7 +42,14 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow() {
-
+    const app = getApp();
+    const phoneNumber = wx.getStorageSync('phoneNumber');
+    const managerList = app.globalData.managerList;
+    const isAdmin = managerList && managerList.includes(phoneNumber);
+    this.setData({ 
+      phoneNumber: phoneNumber ,
+      isAdmin
+    });
   },
 
   /**
@@ -215,8 +231,7 @@ Page({
       content: '确定要申请退款吗？',
       success: (res) => {
         if (res.confirm) {
-         
-
+          wx.showLoading({ title: '退款申请中...' });
           wx.cloud.callFunction({
             name: 'refund_order',
             data:{...order,nonceStr}
@@ -225,13 +240,20 @@ Page({
               title: '退款申请已提交',
               icon: 'success'
             });
-            this.onPullDownRefresh();
+            wx.hideLoading();
+            setTimeout(() => {
+              this.onPullDownRefresh();
+            }, 8500);
           }).catch(err => {
             console.error('申请退款失败', err);
             wx.showToast({
               title: '申请失败',
               icon: 'none'
             });
+            wx.hideLoading();
+            setTimeout(() => {
+              this.onPullDownRefresh();
+            }, 1500);
           });
         }
       }

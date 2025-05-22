@@ -3,6 +3,7 @@ App({
   globalData: {
     userInfo: null,
     openid: null,
+    managerList: [],
     eventBus: {
       listeners: {},
       on(event, callback) {
@@ -63,6 +64,32 @@ App({
           }
         })
       }
+
+      // 先检查本地存储是否有管理员列表
+      const managerList = wx.getStorageSync('managerList')
+      if (managerList) {
+        // 如果有，直接加载到全局变量
+        this.globalData.managerList = managerList
+        console.log('从本地存储加载管理员列表:', managerList)
+      }
+
+      // 调用manager_list云函数获取管理员列表
+      wx.cloud.callFunction({
+        name: "manager_list",
+        success: res => {
+          const newManagerList = res.result
+          // 保存到本地存储
+          wx.setStorageSync('managerList', newManagerList)
+          // 加载到全局变量
+          this.globalData.managerList = newManagerList
+          console.log('获取并保存管理员列表:', newManagerList)
+        },
+        fail: err => {
+          console.error('获取管理员列表失败：', err)
+        }
+      })
     }
-  }
+  },
+
+
 }) 

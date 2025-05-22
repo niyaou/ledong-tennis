@@ -78,7 +78,7 @@ Page({
     const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const dateList = [];
     const today = new Date();
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 7; i++) {
       const d = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
       const month = d.getMonth() + 1;
       const day = d.getDate();
@@ -95,7 +95,7 @@ Page({
 
   initTimeList: function () {
     const timeList = [];
-    for (let h = 6; h < 24; h++) {
+    for (let h = 7; h < 24; h++) {
       timeList.push({ time: `${h < 10 ? '0' + h : h}:00` });
       timeList.push({ time: `${h < 10 ? '0' + h : h}:30` });
     }
@@ -114,14 +114,15 @@ Page({
       success: res => {
         if (res.result && res.result.success) {
           // 先获取所有场地号
-          const courtNumbers = [...new Set(res.result.data.map(item => item.courtNumber))];
+          const courtNumbers = [...new Set(res.result.data.map(item => ({courtNumber:item.courtNumber, price:item.price})))];
           // 获取所有时间点
           const timeList = this.data.timeList.map(t => t.time);
-
+          console.log('----courtNumbers---', courtNumbers)
           // 构造结构，courtStatus为对象，key为courtNumber，value为times数组
           const courtStatus = {};
-          courtNumbers.forEach(courtNumber => {
-            const courtData = res.result.data.filter(item => item.courtNumber === courtNumber);
+          courtNumbers.forEach((order) => {
+            // console.log('----order---', order)
+            const courtData = res.result.data.filter(item => item.courtNumber === order.courtNumber);
             const times = timeList.map(time => {
               const found = courtData.find(item => item.start_time === time);
               if (found) {
@@ -129,20 +130,20 @@ Page({
                   time: found.start_time,
                   status: found.status === 'free' ? 'available' :found.status,
                   text: found.status === 'free' ? `${found.price}` :  found.status === 'locked' ? '已锁定' : '已预定',
-                  courtNumber: courtNumber,
+                  courtNumber: order.courtNumber,
                   booked_by: found.booked_by || ''
                 }
               } else {
                 return {
                   time,
                   status: 'available',
-                  text: '60',
-                  courtNumber: courtNumber,
+                  text: order.price,
+                  courtNumber: order.courtNumber,
                   booked_by: ''
                 }
               }
             });
-            courtStatus[courtNumber] = times;
+            courtStatus[order.courtNumber] = times;
           });
 
           this.setData({ courtStatus });
@@ -159,48 +160,7 @@ Page({
     })
   },
 
-  initCourtStatus: function () {
-    // 80%未预定（显示价格60），20%已预定（显示已预定）
-    const courtStatus = {};
-    const courtList = this.data.courtList.length ? this.data.courtList : (() => {
-      const arr = [];
-      for (let i = 1; i <= this.data.court_count; i++) arr.push({ id: i, name: `${i}号场` });
-      return arr;
-    })();
-    const timeList = this.data.timeList.length ? this.data.timeList : (() => {
-      const arr = [];
-      for (let h = 6; h < 24; h++) {
-        arr.push({ time: `${h < 10 ? '0' + h : h}:00` });
-        arr.push({ time: `${h < 10 ? '0' + h : h}:30` });
-      }
-      // arr.push({ time: '24:00' });
-      return arr;
-    })();
 
-    courtList.forEach(court => {
-      courtStatus[court.id] = {};
-      timeList.forEach(t => {
-        if (Math.random() < 0.2) {
-          courtStatus[court.id][t.time] = { status: 'booked', text: '已预定' };
-        } else {
-          courtStatus[court.id][t.time] = { status: 'available', text: '￥60' };
-        }
-      });
-    });
-
-    this.setData({ courtStatus });
-
-    // 调试输出
-    console.log('场地预定状态数据结构:', {
-      '示例场地1的状态': courtStatus[1],
-      '示例场地1的6:00状态': courtStatus[1]['06:00'],
-      '示例场地1的6:30状态': courtStatus[1]['06:30'],
-      '示例场地1的24:00状态': courtStatus[1]['24:00'],
-      '所有场地ID': Object.keys(courtStatus),
-      '场地1的所有时间点': Object.keys(courtStatus[1])
-    });
-    console.log('courtStatus:', courtStatus);
-  },
 
   initCourtListByCloud: function () {
     wx.cloud.callFunction({
@@ -253,12 +213,26 @@ Page({
   },
 
   onCourtTimeTap: function (e) {
-    console.log('----e---', e)
+    
     const courtNumber = e.currentTarget.dataset.courtnumber;
     const time = e.currentTarget.dataset.time;
     const text = e.currentTarget.dataset.time;
     const status = e.currentTarget.dataset.time;
-    console.log('----courtNumber---time', courtNumber, time, text, status)
+    console.log('----courtNumber---time', courtNumber, time, text, status, this.data.currentDate)
+
+    // 检查日期是否超过2天
+    const today = new Date();
+    const selectedDate = new Date(this.data.currentDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
+    const twoDaysFromNow = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
+    
+    if (selectedDate > twoDaysFromNow) {
+      wx.showToast({
+        title: '只能预约2天内的场地',
+        icon: 'none'
+      });
+      return;
+    }
+
     let courtStatus = this.data.courtStatus;
     const times = courtStatus[courtNumber] || [];
     const idx = times.findIndex(item => item.time === time);
@@ -297,8 +271,20 @@ Page({
   },
 
   onOrderSubmit: function () {
+    // Get global managerList
+    const app = getApp();
+    const managerList = app.globalData.managerList;
+    console.log('Global managerList:', managerList);
+
+    // Get user's phone number and check if in managerList
+    const userPhone = this.data.phoneNumber;
+    const isManager = managerList && managerList.includes(userPhone);
+    console.log('User phone:', userPhone);
+    console.log('Is user a manager:', isManager);
+
     // 收集所有选中的项
     const selectedList = [];
+    let total_fee = 0;
     const courtStatus = this.data.courtStatus;
     const campus = '麓坊校区';
     const date = this.data.currentDate;
@@ -313,6 +299,7 @@ Page({
           const end_time = `${h < 10 ? '0' + h : h}:${m === 0 ? '00' : '30'}`;
           // 价格
           const price = parseFloat(item.text.replace(/[^\d.]/g, '')) || 0;
+          total_fee += price;
           // 构造court_id: 场地号+日期+开始时间
           const court_id = `${courtNumber}_${date}_${item.time}`;
           selectedList.push({
@@ -354,7 +341,7 @@ Page({
               wx.showLoading({ title: '加载中...' });
               this.initCourtStatusByCloud(date);
               console.log('云函数返回:', res.result.results);
-              this.onCreateOrderPayment(res.result.results, date);
+              this.onCreateOrderPayment(res.result.results, date,total_fee);
               wx.hideLoading();
             }
           }
@@ -382,7 +369,17 @@ Page({
     // 如果超过32位，截取前32位
     return result.substring(0, 32);
   },
-  onCreateOrderPayment: function (order_objs,date) {
+  onCreateOrderPayment: function (order_objs,date,price) {
+    // Get global managerList
+    const app = getApp();
+    const managerList = app.globalData.managerList;
+    console.log('Global managerList:', managerList);
+
+    // Get user's phone number and check if in managerList
+    const userPhone = this.data.phoneNumber;
+    const isManager = managerList && managerList.includes(userPhone);
+    console.log('User phone:', userPhone);
+    console.log('Is user a manager:', isManager);
 
     const court_ids = []
     order_objs.forEach(item => {
@@ -390,7 +387,8 @@ Page({
     })
     const orderParams = {
       phoneNumber: this.data.phoneNumber,
-      total_fee: court_ids.length/100,
+      // total_fee: court_ids.length/100,
+      total_fee: price,
       court_ids,
       nonceStr: this.generateNonceStr()
     };
@@ -402,28 +400,42 @@ Page({
       success: (res) => {
         console.log('创建订单成功', res);
         if (res.result && res.result.payment) {
-          // 调用微信支付
-          wx.requestPayment({
-            ...res.result.payment,
-            // ...{"appId":"wx3250e72f7d776124","timeStamp":"1747490082","nonceStr":"USt2HgGHHEbuoZX3","package":"prepay_id=wx17215442344454c5ff540ae85f52460001","signType":"MD5","paySign":"4908B68D11149CE2511F88CC50272E3A"},
-            success: (payRes) => {
-              wx.hideLoading();
-              wx.showToast({
-                title: '支付成功',
-                icon: 'success'
-              });
-              console.log('支付成功', payRes);
+          if (isManager) {
+            // Skip payment for managers
+            wx.hideLoading();
+            wx.showToast({
+              title: '管理员预订成功',
+              icon: 'success'
+            });
+            console.log('管理员预订成功');
+            setTimeout(() => {
               this.initCourtStatusByCloud(date);
-            },
-            fail: (err) => {
-              wx.hideLoading();
-              wx.showToast({
-                title: '支付失败',
-                icon: 'error'
-              });
-              console.error('支付失败', err);
-            }
-          });
+            }, 1500);
+          } else {
+            // 调用微信支付
+            wx.requestPayment({
+              ...res.result.payment,
+              success: (payRes) => {
+                wx.hideLoading();
+                wx.showToast({
+                  title: '支付成功',
+                  icon: 'success'
+                });
+                console.log('支付成功', payRes);
+                setTimeout(() => {
+                  this.initCourtStatusByCloud(date);
+                }, 1500);
+              },
+              fail: (err) => {
+                wx.hideLoading();
+                wx.showToast({
+                  title: '支付失败',
+                  icon: 'error'
+                });
+                console.error('支付失败', err);
+              }
+            });
+          }
         } else {
           wx.hideLoading();
           wx.showToast({

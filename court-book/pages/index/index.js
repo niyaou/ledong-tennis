@@ -13,11 +13,7 @@ Page({
       { id: 2, title: '新会员优惠活动' },
       { id: 3, title: '场地预约优惠' }
     ],
-    newsList: [
-      { id: 1, title: '网球场地维护通知', date: '2024-05-01' },
-      { id: 2, title: '新会员优惠活动', date: '2024-04-28' },
-      { id: 3, title: '网球培训课程更新', date: '2024-04-25' }
-    ]
+    newsList: []
   },
   onLoad() {
     if (wx.getUserProfile) {
@@ -25,6 +21,7 @@ Page({
         canIUseGetUserProfile: true
       })
     }
+    this.getAnnouncements()
   },
   qiuhe(){
     wx.cloud.callFunction({
@@ -42,6 +39,23 @@ Page({
     })
   },
 
+  getAnnouncements() {
+    wx.cloud.callFunction({
+      name: 'announcement',
+      success: res => {
+        this.setData({
+          newsList: res.result.data
+        })
+      },
+      fail: err => {
+        console.error('获取公告失败：', err)
+        wx.showToast({
+          title: '获取公告失败',
+          icon: 'none'
+        })
+      }
+    })
+  },
 
   navigateToBooking: function() {
     wx.switchTab({
@@ -64,6 +78,5 @@ Page({
     }
     return result;
   },
-
 
 }) 

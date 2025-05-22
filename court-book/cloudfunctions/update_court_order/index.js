@@ -4,8 +4,8 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
 
 // 云函数入口函数
-exports.main = async (event, context) => {
-  const wxContext = cloud.getWXContext()
+exports.main = async (event, ) => {
+
   const db = cloud.database()
   const _ = db.command
 
@@ -28,6 +28,14 @@ exports.main = async (event, context) => {
       is_verified,
     } = item
     try {
+      // 检查booked_by是否在manager表中存在
+      const managerCheck = await db.collection('manager').where({
+        phoneNumber: booked_by
+      }).get()
+
+      // 如果是管理员，将状态设置为booked
+      const finalStatus = (managerCheck.data && managerCheck.data.length > 0) ? 'booked' : status
+
       // 查询是否已存在
       const existRes = await db.collection('court_order_collection').where({ court_id }).get()
       if (existRes.data && existRes.data.length > 0) {
@@ -39,7 +47,7 @@ exports.main = async (event, context) => {
             date,
             start_time,
             end_time,
-            status,
+            status: finalStatus,
             price,
             booked_by,
             is_verified,
@@ -62,7 +70,7 @@ exports.main = async (event, context) => {
             date,
             start_time,
             end_time,
-            status,
+            status: finalStatus,
             price,
             booked_by,
             is_verified,

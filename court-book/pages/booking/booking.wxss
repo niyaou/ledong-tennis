@@ -304,6 +304,7 @@ color: #103f6b;
   border-right: 1rpx solid #d6d6d6;
   background-color: #e9f56e;
   flex-shrink: 0;
+  text-align: center;
 }
 
 /* 时间列样式 */
@@ -621,4 +622,11 @@ color: #103f6b;
 .court-status-item.other-locked {
   background: #c7c7c7;
   color: #3a3535;
+}
+
+.court-status-item.disabled {
+  background: #f5f5f5 !important;
+  color: #999 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
 }

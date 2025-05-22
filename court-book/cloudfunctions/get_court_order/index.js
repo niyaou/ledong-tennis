@@ -26,7 +26,23 @@ function generateTimeSlots(start, end, interval) {
 }
 
 function getPrice(court, slot) {
-  return 60;
+  const court_price_mapping={
+    "1号风雨棚":90,
+    "2号室外":60,
+    "3号室外":60,
+    "4号风雨棚":90,
+    "5号风雨棚":90,
+    "6号风雨棚":90,
+    "7号室外":60,
+    "8号室外":60,
+    "9号室外":60,
+    "10号室外":60,
+    "11号红土风雨棚":100,
+   
+  }
+  const basePrice = court_price_mapping[court];
+  const [hour] = slot.start.split(':').map(Number);
+  return hour >= 19 ? basePrice + 10 : basePrice;
 }
 
 // 云函数入口函数
@@ -40,7 +56,7 @@ exports.main = async (event, context) => {
   const courtList = await db.collection('court').where({ campus }).get()
 
   // 2. 生成时间段
-  const timeSlots = generateTimeSlots('06:00', '24:00', 30) // 30分钟一段
+  const timeSlots = generateTimeSlots('07:00', '24:00', 30) // 30分钟一段
 
   // 3. 查询预订状态
   const orderRes = await db.collection('court_order_collection').where({
@@ -90,7 +106,7 @@ exports.main = async (event, context) => {
           start_time: slot.start,
           end_time: slot.end,
           status: 'free',
-          price: getPrice(court, slot), // 可查配置
+          price: getPrice(court.courtNumber, slot), // 可查配置
         })
       }
     }

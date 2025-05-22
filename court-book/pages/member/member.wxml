@@ -37,10 +37,11 @@
     </view>
     <view class="menu-item" bindtap="navigateToSettings">
       <text>设置</text>
-    </view> -->
+    </view>
     <view class="menu-item">
       <button bindtap="showAddCourtModal">添加场地</button>
     </view>
+     -->
   </view>
 
   <modal
