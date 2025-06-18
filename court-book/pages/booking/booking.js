@@ -213,17 +213,44 @@ Page({
   },
 
   onCourtTimeTap: function (e) {
-    
-    const courtNumber = e.currentTarget.dataset.courtnumber;
-    const time = e.currentTarget.dataset.time;
-    const text = e.currentTarget.dataset.time;
-    const status = e.currentTarget.dataset.time;
-    console.log('----courtNumber---time', courtNumber, time, text, status, this.data.currentDate)
+    const { courtnumber, time } = e.currentTarget.dataset;
+    const courtStatusAll = this.data.courtStatus;
+    const times = courtStatusAll[courtnumber] || [];
+    const item = times.find(i => i.time === time);
+    const phoneNumber = this.data.phoneNumber;
+
+    // Get global managerList and check if user is manager
+    const app = getApp();
+    const managerList = app.globalData.managerList;
+    const isManager = managerList && managerList.includes(phoneNumber);
+
+    if (item.booked_by && item.booked_by !== phoneNumber) {
+      if (isManager) {
+        wx.showModal({
+          title: '已被预订',
+          content: `预订人电话：${item.booked_by}`,
+          showCancel: false
+        });
+      }
+      return;
+    }
+
+    // 检查日期和时间是否在当前时间之后
+    const now = new Date();
+    const selectedDate = new Date(this.data.currentDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
+    const [selectedHour, selectedMinute] = time.split(':').map(Number);
+    selectedDate.setHours(selectedHour, selectedMinute, 0, 0);
+
+    if (selectedDate <= now) {
+      wx.showToast({
+        title: '无法预订过去的时间',
+        icon: 'none'
+      });
+      return;
+    }
 
     // 检查日期是否超过2天
-    const today = new Date();
-    const selectedDate = new Date(this.data.currentDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
-    const twoDaysFromNow = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
+    const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
     
     if (selectedDate > twoDaysFromNow) {
       wx.showToast({
@@ -234,7 +261,6 @@ Page({
     }
 
     let courtStatus = this.data.courtStatus;
-    const times = courtStatus[courtNumber] || [];
     const idx = times.findIndex(item => item.time === time);
     if (idx !== -1) {
       const item = times[idx];
@@ -248,7 +274,7 @@ Page({
       };
       //   // 切换选中状态onOrderSubmit
       item.selected = !item.selected;
-      courtStatus = { ...courtStatus, [courtNumber]: [...times] };
+      courtStatus = { ...courtStatus, [courtnumber]: [...times] };
       this.setData({ courtStatus });
       this.updateSelectedSummary();
     }
@@ -267,6 +293,8 @@ Page({
         }
       });
     });
+    // Round totalPrice to 2 decimal places
+    totalPrice = Math.round(totalPrice * 100) / 100;
     this.setData({ selectedCount, totalPrice });
   },
 
@@ -317,6 +345,8 @@ Page({
         }
       });
     });
+    // Round total_fee to 2 decimal places
+    total_fee = Math.round(total_fee * 100) / 100;
     console.log('已选中的场地时间段:', selectedList);
 
     if (selectedList.length === 0) {
@@ -333,7 +363,7 @@ Page({
       success: res => {
         wx.hideLoading();
         wx.showModal({
-          title: '提示',
+          title: '特别提醒：24小时内开始的预订无法取消',
           content: '场地已锁定，请尽快支付',
           showCancel: false,
           success: (modalRes) => {

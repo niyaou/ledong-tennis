@@ -6,8 +6,8 @@
         <text class="header-title">场地预约</text>
       </view>
       <view class="venue-info">
-        <view class="venue-name">S Ace Tennis 网球学练馆</view>
-        <view class="venue-desc">距离您&gt;1000km</view>
+        <view class="venue-name">乐动网球·麓坊校区</view>
+        <view class="venue-desc">距离您 10km</view>
       </view>
     </view>
     <view class="date-scroll sticky-date">
