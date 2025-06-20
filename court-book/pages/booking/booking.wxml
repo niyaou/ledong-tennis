@@ -7,7 +7,11 @@
       </view>
       <view class="venue-info">
         <view class="venue-name">乐动网球·麓坊校区</view>
-        <view class="venue-desc">距离您 10km</view>
+        <view class="venue-desc" bindtap="openLocation">
+         点击查看球场位置
+            <icon class="icon-box-img" type="info_circle" size="24"></icon>
+        
+        </view>
       </view>
     </view>
     <view class="date-scroll sticky-date">

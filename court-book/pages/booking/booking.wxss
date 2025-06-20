@@ -130,8 +130,22 @@
   font-weight: 500;
 }
 .venue-desc {
-  font-size: 22rpx;
-  color: #aaa;
+  font-size: 24rpx;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.location-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10rpx;
+  padding: 4rpx;
+}
+
+.location-icon .iconfont {
+  font-size: 44rpx;
+  color: #333;
 }
 
 /* 日期横向滚动，固定顶部 */

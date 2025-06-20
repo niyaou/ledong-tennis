@@ -49,6 +49,16 @@ Page({
     app.globalData.eventBus.off('refreshBooking');
   },
 
+  openLocation: function() {
+    wx.openLocation({
+      latitude:30.461094427278926,  // 麓坊校区的纬度
+      longitude: 104.05406090412829, // 麓坊校区的经度
+      name: '乐动网球·麓坊校区',
+      address: '麓坊街93号',
+      scale: 18
+    })
+  },
+
   // Add refresh method
   refreshPage: function() {
     console.log('Refreshing booking page...');
