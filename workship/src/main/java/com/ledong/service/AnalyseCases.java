@@ -275,19 +275,19 @@ public class AnalyseCases {
     }
 
     // 内部静态类用于结构化结果
-    private static class AnalyseResult {
-        float workTime = 0f;
-        float courses = 0f;
-        float members = 0f;
-        float analyse = 0f;
-        float trial = 0f;
-        float deal = 0f;
+    public static class AnalyseResult {
+        public float workTime = 0f;
+        public float courses = 0f;
+        public float members = 0f;
+        public float analyse = 0f;
+        public float trial = 0f;
+        public float deal = 0f;
     }
 
-    private static class RevenueResult {
-        float spend = 0f;
-        float charge = 0f;
-        float equival = 0f;
+    public static class RevenueResult {
+        public float spend = 0f;
+        public float charge = 0f;
+        public float equival = 0f;
     }
 
     public Object analyseOptimizedEfficiancy(String startTime, String endTime) {
