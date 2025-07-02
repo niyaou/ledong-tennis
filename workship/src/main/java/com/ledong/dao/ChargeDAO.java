@@ -27,10 +27,6 @@ public interface ChargeDAO extends JpaRepository<Charge, Serializable>, JpaSpeci
     @Query("select a from Charge a where a.chargedTime >= :startTime and a.chargedTime <=:endTime")
     List<Charge> findAllWithTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime );
 
-    @Query("SELECT c.court, SUM(CASE WHEN c.charge = 0 THEN c.worth ELSE c.charge END) as totalCharge FROM Charge c WHERE c.time BETWEEN :start AND :end GROUP BY c.court")
-    java.util.List<Object[]> statCourtCharge(@Param("start") java.time.LocalDateTime start, @Param("end") java.time.LocalDateTime end);
-
-    @Query("SELECT c.coach.name, SUM(CASE WHEN c.charge = 0 THEN c.worth ELSE c.charge END) as totalCharge FROM Charge c WHERE c.time BETWEEN :start AND :end AND c.coach IS NOT NULL GROUP BY c.coach.name")
-    java.util.List<Object[]> statCoachCharge(@Param("start") java.time.LocalDateTime start, @Param("end") java.time.LocalDateTime end);
+   
 
 }

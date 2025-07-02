@@ -14,7 +14,6 @@ public interface UserDAO extends JpaRepository<PrepaidCard, Serializable>, JpaSp
 
     public List<PrepaidCard> findAllByCourt(String court);
 
-    @Query("SELECT u.court, SUM(u.equivalentBalance + u.restCharge) as totalEquival FROM PrepaidCard u GROUP BY u.court")
-    java.util.List<Object[]> statCourtEquival();
+
 
 }
