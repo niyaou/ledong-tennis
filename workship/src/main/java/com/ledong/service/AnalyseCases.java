@@ -292,101 +292,47 @@ public class AnalyseCases {
 
     public Object analyseOptimizedEfficiancy(String startTime, String endTime) {
         Map<String, Object> total = new HashMap<>();
-        var courseList = courseDao.findAllWithTimeRange(DateUtil.parse(startTime).toLocalDateTime(), DateUtil.parse(endTime).toLocalDateTime());
-        var chargeList = chargeDao.findAllWithTimeRange(DateUtil.parse(startTime).toLocalDateTime(), DateUtil.parse(endTime).toLocalDateTime());
+        var start = DateUtil.parse(startTime).toLocalDateTime();
+        var end = DateUtil.parse(endTime).toLocalDateTime();
 
-        // 批量查出所有用户并按court分组
-        List<com.ledong.entity.PrepaidCard> allUsers = userDao.findAll();
-        Map<String, List<com.ledong.entity.PrepaidCard>> usersByCourt = allUsers.stream()
-            .filter(u -> u.getCourt() != null)
-            .collect(java.util.stream.Collectors.groupingBy(com.ledong.entity.PrepaidCard::getCourt));
+        // 1. 收入统计
+        var courtChargeList = chargeDao.statCourtCharge(start, end);
+        var coachChargeList = chargeDao.statCoachCharge(start, end);
 
-        Map<String, AnalyseResult> analyseMap = new LinkedHashMap<>();
+        // 2. 消课统计
+        var courtSpendList = spendDao.statCourtSpend(start, end);
+        var coachSpendList = spendDao.statCoachSpend(start, end);
+
+        // 3. 校区等价余额
+        var courtEquivalList = userDao.statCourtEquival();
+
+        // 4. 课程统计
+        var courseStatList = courseDao.statCourse(start, end);
+
+        // 组装revenue
         Map<String, RevenueResult> revenueMap = new LinkedHashMap<>();
         RevenueResult totalRevenue = new RevenueResult();
-
-        // 收入统计
-        for (var charge : chargeList) {
-            if (charge.getCoach() == null || charge.getCoach().getIsActive() > 0) {
-                // 校区统计
-                String courtName = charge.getCourt();
-                RevenueResult courtRevenue = revenueMap.computeIfAbsent(courtName, k -> new RevenueResult());
-                courtRevenue.charge += (charge.getCharge() == 0f ? charge.getWorth() : charge.getCharge());
-
-                // 教练统计
-                if (charge.getCoach() != null) {
-                    String coachName = charge.getCoach().getName();
-                    RevenueResult coachRevenue = revenueMap.computeIfAbsent(coachName, k -> new RevenueResult());
-                    coachRevenue.charge += (charge.getCharge() == 0f ? charge.getWorth() : charge.getCharge());
-                }
-            }
+        // 校区收入
+        for (Object[] row : courtChargeList) {
+            String court = (String) row[0];
+            float charge = row[1] == null ? 0f : ((Number) row[1]).floatValue();
+            revenueMap.computeIfAbsent(court, k -> new RevenueResult()).charge = charge;
         }
-
-        // 校区等价余额统计（用分组后的usersByCourt）
-        for (var court : revenueMap.keySet()) {
-            List<com.ledong.entity.PrepaidCard> users = usersByCourt.getOrDefault(court, java.util.Collections.emptyList());
-            float equival = 0f;
-            for (var u : users) {
-                equival += (u.getEquivalentBalance() == null ? 0 : u.getEquivalentBalance());
-                equival += u.getRestCharge();
-            }
-            revenueMap.get(court).equival += equival;
+        // 校区消课
+        for (Object[] row : courtSpendList) {
+            String court = (String) row[0];
+            float spend = row[1] == null ? 0f : ((Number) row[1]).floatValue();
+            revenueMap.computeIfAbsent(court, k -> new RevenueResult()).spend = spend;
         }
-
-        // 课程统计
-        for (var course : courseList) {
-            if (course.getCoach() == null || course.getCoach().getIsActive() > 0) {
-                String coachName = course.getCoach() != null ? course.getCoach().getName() : "无教练";
-                String courtName = course.getCourt() != null ? course.getCourt().getName() : "无校区";
-                int courseType = course.getCourseType();
-                float duration = course.getDuration();
-                int memberQuantities = 0;
-                if (course.getSpend() != null) {
-                    for (var spend : course.getSpend()) {
-                        memberQuantities += spend.getQuantities();
-                    }
-                }
-
-                // 体验课
-                if (courseType < 0) {
-                    updateAnalyseResult(analyseMap, coachName, duration, 0, 0, 0, courseType < 0 ? 1 : 0, courseType == -1 ? 1 : 0);
-                    updateAnalyseResult(analyseMap, courtName, duration, 0, 0, 0, courseType < 0 ? 1 : 0, courseType == -1 ? 1 : 0);
-                }
-                // 正式课
-                if (courseType > 0) {
-                    float members = ((memberQuantities > 1 ? 1 : courseType) * memberQuantities) * 1f;
-                    float courses = memberQuantities > 0 ? 1f : 0f;
-                    updateAnalyseResult(analyseMap, coachName, duration, courses, members, 0, courseType < 0 ? 1 : 0, courseType == -1 ? 1 : 0);
-                    updateAnalyseResult(analyseMap, courtName, duration, courses, members, 0, courseType < 0 ? 1 : 0, courseType == -1 ? 1 : 0);
-
-                    // 校区/教练消课统计
-                    if (course.getSpend() != null) {
-                        for (var spend : course.getSpend()) {
-                            float spendValue = spend.getCharge() == 0F ? spend.getDescription() : spend.getCharge();
-                            revenueMap.computeIfAbsent(courtName, k -> new RevenueResult()).spend += spendValue;
-                            revenueMap.computeIfAbsent(coachName, k -> new RevenueResult()).spend += spendValue;
-                        }
-                    }
-                }
-            }
+        // 校区等价余额
+        for (Object[] row : courtEquivalList) {
+            String court = (String) row[0];
+            float equival = row[1] == null ? 0f : ((Number) row[1]).floatValue();
+            revenueMap.computeIfAbsent(court, k -> new RevenueResult()).equival = equival;
         }
-
-        // 计算 analyse 字段
-        for (var entry : analyseMap.entrySet()) {
-            AnalyseResult ar = entry.getValue();
-            if (ar.courses > 0) {
-                ar.analyse = ar.members / ar.courses;
-            }
-        }
-
-        // 排序
-        List<Map.Entry<String, AnalyseResult>> analyseList = new ArrayList<>(analyseMap.entrySet());
-        analyseList.sort((m1, m2) -> Float.compare(m2.getValue().analyse, m1.getValue().analyse));
-        total.put("analyse", analyseList);
-
         // 汇总校区
         for (var entry : revenueMap.entrySet()) {
-            if (entry.getKey().contains("校区")) {
+            if (entry.getKey() != null && entry.getKey().contains("校区")) {
                 RevenueResult value = entry.getValue();
                 totalRevenue.spend += value.spend;
                 totalRevenue.charge += value.charge;
@@ -394,12 +340,53 @@ public class AnalyseCases {
             }
         }
         revenueMap.put("总共", totalRevenue);
-
+        // 教练收入/消课
+        for (Object[] row : coachChargeList) {
+            String coach = (String) row[0];
+            float charge = row[1] == null ? 0f : ((Number) row[1]).floatValue();
+            revenueMap.computeIfAbsent(coach, k -> new RevenueResult()).charge = charge;
+        }
+        for (Object[] row : coachSpendList) {
+            String coach = (String) row[0];
+            float spend = row[1] == null ? 0f : ((Number) row[1]).floatValue();
+            revenueMap.computeIfAbsent(coach, k -> new RevenueResult()).spend = spend;
+        }
         // 收入排序
         List<Map.Entry<String, RevenueResult>> revenueList = new ArrayList<>(revenueMap.entrySet());
         revenueList.sort((m1, m2) -> Float.compare(m2.getValue().spend, m1.getValue().spend));
         total.put("revenue", revenueList);
 
+        // 组装analyse
+        Map<String, AnalyseResult> analyseMap = new LinkedHashMap<>();
+        for (Object[] row : courseStatList) {
+            String court = (String) row[0];
+            String coach = (String) row[1];
+            long courseCount = row[2] == null ? 0L : ((Number) row[2]).longValue();
+            float totalDuration = row[3] == null ? 0f : ((Number) row[3]).floatValue();
+            float memberCount = row[4] == null ? 0f : ((Number) row[4]).floatValue();
+            // 校区
+            AnalyseResult courtResult = analyseMap.computeIfAbsent(court, k -> new AnalyseResult());
+            courtResult.courses += courseCount;
+            courtResult.workTime += totalDuration;
+            courtResult.members += memberCount;
+            // 教练
+            if (coach != null) {
+                AnalyseResult coachResult = analyseMap.computeIfAbsent(coach, k -> new AnalyseResult());
+                coachResult.courses += courseCount;
+                coachResult.workTime += totalDuration;
+                coachResult.members += memberCount;
+            }
+        }
+        // 计算满班率
+        for (var entry : analyseMap.entrySet()) {
+            AnalyseResult ar = entry.getValue();
+            if (ar.courses > 0) {
+                ar.analyse = ar.members / ar.courses;
+            }
+        }
+        List<Map.Entry<String, AnalyseResult>> analyseList = new ArrayList<>(analyseMap.entrySet());
+        analyseList.sort((m1, m2) -> Float.compare(m2.getValue().analyse, m1.getValue().analyse));
+        total.put("analyse", analyseList);
         return total;
     }
 

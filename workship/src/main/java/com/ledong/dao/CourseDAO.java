@@ -35,4 +35,7 @@ public interface CourseDAO extends JpaRepository<Course, Serializable>,JpaSpecif
 
 //    @Query("select a from Course a where a.startTime >= :startTime and a.course.number = :number")
 //    Page<Course> findMemberWithStartTimeAfter(@Param("startTime") LocalDateTime startTime, @Param("number") String number,Pageable pageParams);
+
+    @org.springframework.data.jpa.repository.Query("SELECT c.court.name, c.coach.name, COUNT(c), SUM(c.duration), SUM(s.quantities) FROM Course c LEFT JOIN c.spend s WHERE c.startTime BETWEEN :start AND :end GROUP BY c.court.name, c.coach.name")
+    java.util.List<Object[]> statCourse(@org.springframework.data.repository.query.Param("start") java.time.LocalDateTime start, @org.springframework.data.repository.query.Param("end") java.time.LocalDateTime end);
 }
