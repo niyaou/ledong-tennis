@@ -49,6 +49,7 @@ export const exploreCourseAnalyse = createAsyncThunk(
             let formdata = new FormData()
             var startTime = moment().startOf('month').format('YYYY-MM-DD')
             var endTime = moment().endOf('month').format('YYYY-MM-DD')
+            // const response = await Axios.get(`/api/prepaidCard/coach/optimized/efficient?startTime=${params.startTime}&endTime=${params.endTime}`,{timeout:50*60*1000})
             const response = await Axios.get(`/api/prepaidCard/coach/efficient?startTime=${params.startTime}&endTime=${params.endTime}`,{timeout:50*60*1000})
             return response.data;
         } catch (err) {
