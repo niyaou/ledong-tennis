@@ -26,6 +26,10 @@ public interface SpendDAO extends JpaRepository<Spend, Serializable>, JpaSpecifi
     @Query("select a from Charge a where a.chargedTime >= :startTime and a.chargedTime <=:endTime")
     List<Course> findAllWithTimeRange(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime );
 
+    @Query("SELECT s.court, SUM(CASE WHEN s.charge = 0 THEN s.description ELSE s.charge END) as totalSpend FROM Spend s WHERE s.time BETWEEN :start AND :end GROUP BY s.court")
+    java.util.List<Object[]> statCourtSpend(@Param("start") java.time.LocalDateTime start, @Param("end") java.time.LocalDateTime end);
 
+    @Query("SELECT s.coach.name, SUM(CASE WHEN s.charge = 0 THEN s.description ELSE s.charge END) as totalSpend FROM Spend s WHERE s.time BETWEEN :start AND :end AND s.coach IS NOT NULL GROUP BY s.coach.name")
+    java.util.List<Object[]> statCoachSpend(@Param("start") java.time.LocalDateTime start, @Param("end") java.time.LocalDateTime end);
 
 }
