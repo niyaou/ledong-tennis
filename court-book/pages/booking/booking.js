@@ -11,6 +11,7 @@ Page({
     phoneNumber: '', // Add phone number field
     needRefresh: false, // Add flag to control refresh
     eventChannel: null, // Add event channel
+    lastUpdateTime: 0, // 记录最后更新时间，用于防抖
   },
 
   onLoad: function () {
@@ -40,6 +41,9 @@ Page({
     app.globalData.eventBus.on('refreshBookingPage', () => {
       this.refreshPage();
     });
+
+    // 启动自动刷新定时器（每30秒刷新一次）
+    this.startAutoRefresh();
   },
 
   onUnload: function() {
@@ -47,6 +51,9 @@ Page({
     const app = getApp();
     app.globalData.eventBus.off('refreshBookingPage');
     app.globalData.eventBus.off('refreshBooking');
+    
+    // 清除自动刷新定时器
+    this.stopAutoRefresh();
   },
 
   openLocation: function() {
@@ -259,12 +266,22 @@ Page({
       return;
     }
 
-    // 检查日期是否超过2天
-    const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
-    
-    if (selectedDate > twoDaysFromNow) {
+    // 检查用户权限（只有管理员可以预订）
+    if (!isManager) {
       wx.showToast({
-        title: '只能预约2天内的场地',
+        title: '订场暂未开放，尽请期待',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // 检查日期是否超过限制（管理员7天）
+    const maxDays = 7;
+    const maxDaysFromNow = new Date(now.getTime() + maxDays * 24 * 60 * 60 * 1000);
+    
+    if (selectedDate > maxDaysFromNow) {
+      wx.showToast({
+        title: `只能预约${maxDays}天内的场地`,
         icon: 'none'
       });
       return;
@@ -306,6 +323,170 @@ Page({
     // Round totalPrice to 2 decimal places
     totalPrice = Math.round(totalPrice * 100) / 100;
     this.setData({ selectedCount, totalPrice });
+  },
+
+  clearSelectedStatus: function () {
+    // 清空所有选中状态
+    const courtStatus = this.data.courtStatus;
+    Object.keys(courtStatus).forEach(courtNumber => {
+      courtStatus[courtNumber].forEach(item => {
+        item.selected = false;
+      });
+    });
+    this.setData({ 
+      courtStatus,
+      selectedCount: 0,
+      totalPrice: 0
+    });
+  },
+
+  startAutoRefresh: function () {
+    // 启动自动刷新定时器
+    this.autoRefreshTimer = setInterval(() => {
+      if (this.data.currentDate) {
+        console.log('自动刷新场地状态...');
+        this.updateCourtStatusIncrementally(this.data.currentDate);
+      }
+    }, 20000); // 每10秒刷新一次，但只更新状态，不重新渲染
+  },
+
+  stopAutoRefresh: function () {
+    // 停止自动刷新定时器
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
+    }
+  },
+
+  updateCourtStatusIncrementally: function (date) {
+    // 防抖：如果距离上次更新不足5秒，则跳过
+    const now = Date.now();
+    if (now - this.data.lastUpdateTime < 5000) {
+      return;
+    }
+    
+    // 增量更新场地状态，不重新渲染整个页面
+    wx.cloud.callFunction({
+      name: 'get_court_order',
+      data: {
+        date: date,
+        campus: '麓坊校区'
+      },
+      success: res => {
+        if (res.result && res.result.success) {
+          // 更新最后更新时间
+          this.setData({ lastUpdateTime: now });
+          
+          // 先获取所有场地号
+          const courtNumbers = [...new Set(res.result.data.map(item => ({courtNumber:item.courtNumber, price:item.price})))];
+          // 获取所有时间点
+          const timeList = this.data.timeList.map(t => t.time);
+          
+          // 构造新的状态数据
+          const newCourtStatus = {};
+          courtNumbers.forEach((order) => {
+            const courtData = res.result.data.filter(item => item.courtNumber === order.courtNumber);
+            const times = timeList.map(time => {
+              const found = courtData.find(item => item.start_time === time);
+              if (found) {
+                return {
+                  time: found.start_time,
+                  status: found.status === 'free' ? 'available' : found.status,
+                  text: found.status === 'free' ? `${found.price}` : found.status === 'locked' ? '已锁定' : '已预定',
+                  courtNumber: order.courtNumber,
+                  booked_by: found.booked_by || ''
+                }
+              } else {
+                return {
+                  time,
+                  status: 'available',
+                  text: order.price,
+                  courtNumber: order.courtNumber,
+                  booked_by: ''
+                }
+              }
+            });
+            newCourtStatus[order.courtNumber] = times;
+          });
+
+          // 智能更新：只更新状态发生变化的部分
+          this.updateCourtStatusSmartly(newCourtStatus);
+        }
+      },
+      fail: err => {
+        console.error('增量更新失败:', err);
+      }
+    });
+  },
+
+  updateCourtStatusSmartly: function (newCourtStatus) {
+    const currentCourtStatus = this.data.courtStatus;
+    let hasChanges = false;
+    let hasImportantChanges = false; // 重要变化（如锁定状态变化）
+    const updatedCourtStatus = { ...currentCourtStatus };
+
+    // 遍历新状态，只更新发生变化的部分
+    Object.keys(newCourtStatus).forEach(courtNumber => {
+      const newTimes = newCourtStatus[courtNumber];
+      const currentTimes = currentCourtStatus[courtNumber];
+      
+      if (!currentTimes) {
+        // 新场地，直接添加
+        updatedCourtStatus[courtNumber] = newTimes;
+        hasChanges = true;
+        return;
+      }
+
+      // 检查时间点状态是否有变化
+      const updatedTimes = [];
+      let courtHasChanges = false;
+      
+      newTimes.forEach((newTime, index) => {
+        const currentTime = currentTimes[index];
+        if (!currentTime || 
+            currentTime.status !== newTime.status || 
+            currentTime.text !== newTime.text ||
+            currentTime.booked_by !== newTime.booked_by) {
+          // 状态发生变化，但保持选中状态
+          updatedTimes.push({
+            ...newTime,
+            selected: currentTime ? currentTime.selected : false
+          });
+          courtHasChanges = true;
+          
+          // 检查是否是重要变化（状态从可用变为锁定或预订）
+          if (currentTime && 
+              (currentTime.status === 'available' || currentTime.status === 'free') && 
+              (newTime.status === 'locked' || newTime.status === 'booked')) {
+            hasImportantChanges = true;
+          }
+        } else {
+          // 状态未变化，保持原有状态
+          updatedTimes.push(currentTime);
+        }
+      });
+
+      if (courtHasChanges) {
+        updatedCourtStatus[courtNumber] = updatedTimes;
+        hasChanges = true;
+      }
+    });
+
+    // 只有在有变化时才更新数据
+    if (hasChanges) {
+      console.log('检测到场地状态变化，更新中...');
+      this.setData({ courtStatus: updatedCourtStatus });
+      this.updateSelectedSummary(); // 重新计算选中状态
+      
+      // 如果有重要变化，显示轻微提示
+      if (hasImportantChanges) {
+        wx.showToast({
+          title: '场地状态已更新',
+          icon: 'none',
+          duration: 1500
+        });
+      }
+    }
   },
 
   onOrderSubmit: function () {
@@ -372,6 +553,50 @@ Page({
       },
       success: res => {
         wx.hideLoading();
+        
+        // 检查是否有冲突错误
+        const hasConflict = res.result.results.some(result => 
+          result.type === 'conflict' || 
+          (result.success === false && result.error && 
+           (result.error.includes('冲突') || result.error.includes('锁定')))
+        );
+        
+        if (hasConflict) {
+          // 收集所有冲突的错误信息
+          const conflictErrors = res.result.results
+            .filter(result => result.success === false && result.error)
+            .map(result => result.error)
+            .filter((error, index, arr) => arr.indexOf(error) === index); // 去重
+          
+          // 有冲突，使用增量更新刷新页面状态并提示用户
+          this.updateCourtStatusIncrementally(date);
+          wx.showModal({
+            title: '预订冲突',
+            content: conflictErrors.length > 0 ? conflictErrors.join('\n') : '场地已被预订',
+            showCancel: false,
+            success: () => {
+              // 清空选中状态
+              this.clearSelectedStatus();
+            }
+          });
+          return;
+        }
+        
+        // 检查是否所有操作都成功
+        const allSuccess = res.result.results.every(result => result.success);
+        if (!allSuccess) {
+          wx.showModal({
+            title: '部分预订失败',
+            content: '部分场地预订失败，请重试',
+            showCancel: false,
+            success: () => {
+              this.updateCourtStatusIncrementally(date);
+              this.clearSelectedStatus();
+            }
+          });
+          return;
+        }
+        
         wx.showModal({
           title: '特别提醒：24小时内开始的预订无法取消',
           content: '场地已锁定，请尽快支付',
@@ -379,7 +604,7 @@ Page({
           success: (modalRes) => {
             if (modalRes.confirm) {
               wx.showLoading({ title: '加载中...' });
-              this.initCourtStatusByCloud(date);
+              this.updateCourtStatusIncrementally(date);
               console.log('云函数返回:', res.result.results);
               this.onCreateOrderPayment(res.result.results, date,total_fee);
               wx.hideLoading();

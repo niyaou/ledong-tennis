@@ -26,34 +26,34 @@ function generateTimeSlots(start, end, interval) {
 }
 
 function getPrice(court, slot) {
+  const court_price_mapping={
+    "1号风雨棚":90,
+    "2号室外":60,
+    "3号室外":60,
+    "4号风雨棚":90,
+    "5号风雨棚":90,
+    "6号风雨棚":90,
+    "7号室外":60,
+    "8号室外":60,
+    "9号室外":60,
+    "10号室外":60,
+    "11号红土风雨棚":100,
+  
+  }
   // const court_price_mapping={
-  //   "1号风雨棚":90,
-  //   "2号室外":60,
-  //   "3号室外":60,
-  //   "4号风雨棚":90,
-  //   "5号风雨棚":90,
-  //   "6号风雨棚":90,
-  //   "7号室外":60,
-  //   "8号室外":60,
-  //   "9号室外":60,
-  //   "10号室外":60,
-  //   "11号红土风雨棚":100,
+  //   "1号风雨棚":0.09,
+  //   "2号室外":0.06,
+  //   "3号室外":0.06,
+  //   "4号风雨棚":0.09,
+  //   "5号风雨棚":0.09,
+  //   "6号风雨棚":0.09,
+  //   "7号室外":0.06,
+  //   "8号室外":0.06,
+  //   "9号室外":0.06,
+  //   "10号室外":0.06,
+  //   "11号红土风雨棚":0.1,
    
   // }
-  const court_price_mapping={
-    "1号风雨棚":0.09,
-    "2号室外":0.06,
-    "3号室外":0.06,
-    "4号风雨棚":0.09,
-    "5号风雨棚":0.09,
-    "6号风雨棚":0.09,
-    "7号室外":0.06,
-    "8号室外":0.06,
-    "9号室外":0.06,
-    "10号室外":0.06,
-    "11号红土风雨棚":0.1,
-   
-  }
   const basePrice = court_price_mapping[court];
   const [hour] = slot.start.split(':').map(Number);
   return hour >= 19 ? basePrice + 10 : basePrice;
@@ -103,11 +103,31 @@ exports.main = async (event, context) => {
 
   // 3.1 过滤并删除过期的锁定订单
   const now = new Date()
+  
+  // 获取所有锁定订单的预订者手机号，用于检查管理员权限
+  const lockedOrders = orderList.filter(order => order.status === 'locked')
+  const phoneNumbers = [...new Set(lockedOrders.map(order => order.booked_by))]
+  
+  let managerPhones = new Set()
+  if (phoneNumbers.length > 0) {
+    const managerCheck = await db.collection('manager')
+      .where({
+        phoneNumber: db.command.in(phoneNumbers)
+      })
+      .get()
+    managerPhones = new Set(managerCheck.data.map(m => m.phoneNumber))
+  }
+  
   const expiredLockedOrders = orderList.filter(order => {
     if (order.status === 'locked') {
       const orderTime = new Date(order.updated_at)
       const diffMinutes = (now - orderTime) / (1000 * 60)
-      return diffMinutes > 10
+      
+      // 根据预订者类型确定锁定时间
+      const isManager = managerPhones.has(order.booked_by)
+      const lockTimeLimit = isManager ? 10 : 5 // 管理员10分钟，普通用户5分钟
+      
+      return diffMinutes > lockTimeLimit
     }
     return false
   })

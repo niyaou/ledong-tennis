@@ -50,6 +50,27 @@ exports.main = async (event, ) => {
     // 如果不是管理员，使用原有逻辑
     // 如果订单状态是PENDING，则更新为CANCEL
     if (orderResult.data.status === 'PENDING') {
+      // 检查普通用户是否只能取消自己的锁定订单
+      for (const court_id of court_ids) {
+        const courtOrder = await db.collection('court_order_collection')
+          .where({
+            court_id: court_id,
+            status: 'locked'
+          })
+          .get()
+        
+        // 检查是否存在锁定订单，且是否为当前用户创建的
+        if (courtOrder.data.length > 0) {
+          const lockedOrder = courtOrder.data[0]
+          if (lockedOrder.booked_by !== phoneNumber) {
+            return {
+              success: false,
+              message: '只能取消自己的预订'
+            }
+          }
+        }
+      }
+      
       await db.collection('pay_order').doc(_id).update({
         data: {
           status: 'CANCEL'
@@ -61,9 +82,15 @@ exports.main = async (event, ) => {
         await db.collection('court_order_collection')
           .where({
             court_id: court_id,
-            status: 'locked'
+            status: 'locked',
+            booked_by: phoneNumber // 确保只能删除自己的锁定订单
           })
           .remove()
+      }
+    } else {
+      return {
+        success: false,
+        message: '只能取消待支付的订单'
       }
     }
   }

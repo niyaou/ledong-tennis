@@ -10,6 +10,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
  * 2. 检查预订者是否为管理员
  * 3. 处理订单的创建和更新
  * 4. 使用版本号控制并发
+ * 5. 防止管理员之间的场地冲突
  * 
  * @param {Object} event - 事件对象
  * @param {Object|Array} event.data - 单个订单对象或订单数组
@@ -73,6 +74,19 @@ exports.main = async (event, ) => {
 
       const existingOrder = existingOrders.get(court_id)
       if (existingOrder) {
+        // 订单已存在，检查是否可以更新
+        const canUpdate = checkCanUpdate(existingOrder, booked_by, managerPhones)
+        
+        if (!canUpdate.success) {
+          results.push({
+            court_id,
+            success: false,
+            error: canUpdate.error,
+            type: 'conflict'
+          })
+          continue
+        }
+
         // 订单已存在，准备更新操作
         const oldVersion = existingOrder.version || 1
         updateOperations.push({
@@ -206,4 +220,57 @@ exports.main = async (event, ) => {
   }
 
   return { results }
+}
+
+/**
+ * 检查是否可以更新订单
+ * @param {Object} existingOrder - 现有订单
+ * @param {String} newBookedBy - 新的预订者
+ * @param {Set} managerPhones - 管理员手机号集合
+ * @returns {Object} 检查结果
+ */
+function checkCanUpdate(existingOrder, newBookedBy, managerPhones) {
+  // 如果现有订单状态是 booked，不允许任何更新
+  if (existingOrder.status === 'booked') {
+    return {
+      success: false,
+      error: '场地已被预订，无法修改'
+    }
+  }
+
+  // 如果现有订单状态是 locked
+  if (existingOrder.status === 'locked') {
+    // 检查是否是同一个用户
+    if (existingOrder.booked_by === newBookedBy) {
+      return { success: true }
+    }
+    
+    // 检查锁定时间是否超过限制
+    const now = new Date()
+    const lockTime = new Date(existingOrder.updated_at)
+    const diffMinutes = (now - lockTime) / (1000 * 60)
+    
+    // 统一锁定时间：管理员10分钟，普通用户5分钟
+    const isNewUserManager = managerPhones.has(newBookedBy)
+    const isExistingUserManager = managerPhones.has(existingOrder.booked_by)
+    
+    let lockTimeLimit = 5 // 默认5分钟
+    if (isExistingUserManager) {
+      lockTimeLimit = 10 // 管理员锁定10分钟
+    }
+    
+    if (diffMinutes <= lockTimeLimit) {
+      const userType = isExistingUserManager ? '管理员' : '用户'
+      return {
+        success: false,
+        error: `场地已被其他${userType}锁定，请稍后再试`
+      }
+    }
+    
+    // 超过锁定时间，允许更新
+    return { success: true }
+  }
+
+  // 其他状态（如 free）允许更新
+  return { success: true }
 }
