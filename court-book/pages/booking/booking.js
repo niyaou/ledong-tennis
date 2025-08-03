@@ -266,25 +266,44 @@ Page({
       return;
     }
 
-    // 检查用户权限（只有管理员可以预订）
-    if (!isManager) {
-      wx.showToast({
-        title: '订场暂未开放，尽请期待',
-        icon: 'none'
-      });
-      return;
-    }
+    // // 检查用户权限（只有管理员可以预订）
+    // if (!isManager) {
+    //   wx.showToast({
+    //     title: '订场暂未开放，尽请期待',
+    //     icon: 'none'
+    //   });
+    //   return;
+    // }
 
-    // 检查日期是否超过限制（管理员7天）
-    const maxDays = 7;
-    const maxDaysFromNow = new Date(now.getTime() + maxDays * 24 * 60 * 60 * 1000);
-    
-    if (selectedDate > maxDaysFromNow) {
-      wx.showToast({
-        title: `只能预约${maxDays}天内的场地`,
-        icon: 'none'
-      });
-      return;
+    // 检查日期是否超过限制（管理员7天，普通用户只能预约今天和明天）
+    if (isManager) {
+      // 管理员可以预约7天内
+      const maxDays = 7;
+      const maxDaysFromNow = new Date(now.getTime() + maxDays * 24 * 60 * 60 * 1000);
+      
+      if (selectedDate > maxDaysFromNow) {
+        wx.showToast({
+          title: `只能预约${maxDays}天内的场地`,
+          icon: 'none'
+        });
+        return;
+      }
+    } else {
+      // 普通用户只能预约今天和明天
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+      const dayAfterTomorrow = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
+      
+      const selectedDateOnly = new Date(selectedDate);
+      selectedDateOnly.setHours(0, 0, 0, 0);
+      if (selectedDateOnly >= dayAfterTomorrow) {
+        wx.showToast({
+          title: '只能预约今明两天场地',
+          icon: 'none'
+        });
+        return;
+      }
     }
 
     let courtStatus = this.data.courtStatus;
