@@ -23,16 +23,23 @@ exports.main = async (event) => {
   const isManager = managerCheck.data && managerCheck.data.length > 0
 
   if (isManager) {
-    // 如果是管理员，查询7天内的数据
+    // 如果是管理员，查询前后7天的数据
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const sevenDaysLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     query._ = db.command.or([
       {
         status: 'PAIDED',
-        createTime: db.command.gte(sevenDaysAgo)
+        createTime: db.command.and([
+          db.command.gte(sevenDaysAgo),
+          db.command.lte(sevenDaysLater)
+        ])
       },
       {
         status: 'PENDING',
-        createTime: db.command.gte(sevenDaysAgo)
+        createTime: db.command.and([
+          db.command.gte(sevenDaysAgo),
+          db.command.lte(sevenDaysLater)
+        ])
       }
     ])
   } else {

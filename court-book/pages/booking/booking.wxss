@@ -609,8 +609,8 @@ color: #103f6b;
   flex-shrink: 0;
 }
 .court-status-item.booked {
-  background: #a29e9e;
-  color: #101010;
+  background:rgb(73, 136, 87);
+  color:rgb(224, 224, 224);
 }
   /**background: #abb53e40;*/
 .court-status-item.available {
@@ -636,6 +636,11 @@ color: #103f6b;
 .court-status-item.other-locked {
   background: #c7c7c7;
   color: #3a3535;
+}
+
+.court-status-item.manager-locked {
+  background:rgb(131, 108, 7) !important; /* 暗色橙色背景 */
+  color: #fff3e0 !important; /* 亮色字体 */
 }
 
 .court-status-item.disabled {

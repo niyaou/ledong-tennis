@@ -77,7 +77,7 @@ App({
       wx.cloud.callFunction({
         name: "manager_list",
         success: res => {
-          const newManagerList = res.result
+          const newManagerList = res.result || [];
           // 保存到本地存储
           wx.setStorageSync('managerList', newManagerList)
           // 加载到全局变量

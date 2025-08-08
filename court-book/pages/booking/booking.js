@@ -130,25 +130,31 @@ Page({
       },
       success: res => {
         if (res.result && res.result.success) {
+          // 获取管理员列表
+          const app = getApp();
+          const managerList = app.globalData.managerList || [];
+          
           // 先获取所有场地号
           const courtNumbers = [...new Set(res.result.data.map(item => ({courtNumber:item.courtNumber, price:item.price})))];
           // 获取所有时间点
           const timeList = this.data.timeList.map(t => t.time);
-          console.log('----courtNumbers---', courtNumbers)
           // 构造结构，courtStatus为对象，key为courtNumber，value为times数组
           const courtStatus = {};
           courtNumbers.forEach((order) => {
-            // console.log('----order---', order)
             const courtData = res.result.data.filter(item => item.courtNumber === order.courtNumber);
             const times = timeList.map(time => {
               const found = courtData.find(item => item.start_time === time);
               if (found) {
+                // 判断订场人是否为管理员
+                const isBookedByManager = found.booked_by && managerList.includes(found.booked_by);
+                
                 return {
                   time: found.start_time,
-                  status: found.status === 'free' ? 'available' :found.status,
-                  text: found.status === 'free' ? `${found.price}` :  found.status === 'locked' ? '已锁定' : '已预定',
+                  status: found.status === 'free' ? 'available' : found.status,
+                  text: found.status === 'free' ? `${found.price}` : found.status === 'locked' ? '已锁定' : '已预定',
                   courtNumber: order.courtNumber,
-                  booked_by: found.booked_by || ''
+                  booked_by: found.booked_by || '',
+                  isBookedByManager: isBookedByManager
                 }
               } else {
                 return {
@@ -156,7 +162,8 @@ Page({
                   status: 'available',
                   text: order.price,
                   courtNumber: order.courtNumber,
-                  booked_by: ''
+                  booked_by: '',
+                  isBookedByManager: false
                 }
               }
             });
@@ -164,7 +171,6 @@ Page({
           });
 
           this.setData({ courtStatus });
-          console.log('云函数返回场地状态:', courtStatus);
         } else {
           wx.showToast({ title: '获取场地状态失败', icon: 'none' });
           console.error('云函数返回失败:', res.result);
@@ -224,7 +230,6 @@ Page({
   },
 
   getTimesByCourtNumber: function (courtNumber) {
-    console.log('----courtNumber---', this.data.courtStatus)
     const found = this.data.courtStatus.find(item => item.courtNumber == courtNumber);
     return found ? found.times : [];
   },
@@ -393,6 +398,10 @@ Page({
       },
       success: res => {
         if (res.result && res.result.success) {
+          // 获取管理员列表
+          const app = getApp();
+          const managerList = app.globalData.managerList || [];
+          
           // 更新最后更新时间
           this.setData({ lastUpdateTime: now });
           
@@ -408,12 +417,16 @@ Page({
             const times = timeList.map(time => {
               const found = courtData.find(item => item.start_time === time);
               if (found) {
+                // 判断订场人是否为管理员
+                const isBookedByManager = found.booked_by && managerList.includes(found.booked_by);
+                
                 return {
                   time: found.start_time,
                   status: found.status === 'free' ? 'available' : found.status,
                   text: found.status === 'free' ? `${found.price}` : found.status === 'locked' ? '已锁定' : '已预定',
                   courtNumber: order.courtNumber,
-                  booked_by: found.booked_by || ''
+                  booked_by: found.booked_by || '',
+                  isBookedByManager: isBookedByManager
                 }
               } else {
                 return {
@@ -421,7 +434,8 @@ Page({
                   status: 'available',
                   text: order.price,
                   courtNumber: order.courtNumber,
-                  booked_by: ''
+                  booked_by: '',
+                  isBookedByManager: false
                 }
               }
             });
@@ -465,7 +479,8 @@ Page({
         if (!currentTime || 
             currentTime.status !== newTime.status || 
             currentTime.text !== newTime.text ||
-            currentTime.booked_by !== newTime.booked_by) {
+            currentTime.booked_by !== newTime.booked_by ||
+            currentTime.isBookedByManager !== newTime.isBookedByManager) {
           // 状态发生变化，但保持选中状态
           updatedTimes.push({
             ...newTime,
