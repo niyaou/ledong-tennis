@@ -11,6 +11,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
  * 3. 处理订单的创建和更新
  * 4. 使用版本号控制并发
  * 5. 防止管理员之间的场地冲突
+ * 6. 实现事务性操作，确保数据一致性
  * 
  * @param {Object} event - 事件对象
  * @param {Object|Array} event.data - 单个订单对象或订单数组
@@ -23,7 +24,55 @@ exports.main = async (event, ) => {
   // 支持批量：event.data 为数组，单个为对象
   const dataList = Array.isArray(event.data) ? event.data : [event]
   const now = new Date()
+
+  try {
+    // 第一阶段：预检查所有操作
+    const preCheckResult = await preCheckOperations(dataList, db, _)
+    
+    if (!preCheckResult.success) {
+      return {
+        success: false,
+        error: '预检查失败',
+        results: preCheckResult.results
+      }
+    }
+
+    // 第二阶段：执行事务性操作
+    const transactionResult = await executeTransaction(
+      preCheckResult.operations,
+      db,
+      _
+    )
+
+    return {
+      success: true,
+      results: transactionResult.results
+    }
+
+  } catch (error) {
+    console.error('事务执行失败:', error)
+    return {
+      success: false,
+      error: error.message,
+      results: []
+    }
+  }
+}
+
+/**
+ * 预检查所有操作
+ * @param {Array} dataList - 数据列表
+ * @param {Object} db - 数据库对象
+ * @param {Object} _ - 数据库命令对象
+ * @returns {Object} 预检查结果
+ */
+async function preCheckOperations(dataList, db, _) {
   const results = []
+  const operations = {
+    updates: [],
+    adds: []
+  }
+  const now = new Date()
 
   // 批量获取所有booked_by的手机号，用于检查管理员权限
   const phoneNumbers = [...new Set(dataList.map(item => item.booked_by))]
@@ -33,7 +82,7 @@ exports.main = async (event, ) => {
     })
     .get()
   
-  // 创建管理员手机号集合，用于快速查找（O(1)时间复杂度）
+  // 创建管理员手机号集合，用于快速查找
   const managerPhones = new Set(managerCheck.data.map(m => m.phoneNumber))
 
   // 批量获取所有court_ids，检查订单是否已存在
@@ -44,16 +93,12 @@ exports.main = async (event, ) => {
     })
     .get()
 
-  // 创建现有订单的Map，用于快速查找（O(1)时间复杂度）
+  // 创建现有订单的Map，用于快速查找
   const existingOrders = new Map(
     existRes.data.map(order => [order.court_id, order])
   )
 
-  // 准备批量操作
-  const addOperations = [] // 需要新增的订单
-  const updateOperations = [] // 需要更新的订单
-
-  // 第一阶段：准备所有操作
+  // 检查每个操作
   for (const item of dataList) {
     const {
       court_id,
@@ -89,7 +134,7 @@ exports.main = async (event, ) => {
 
         // 订单已存在，准备更新操作
         const oldVersion = existingOrder.version || 1
-        updateOperations.push({
+        operations.updates.push({
           court_id,
           data: {
             campus,
@@ -101,14 +146,15 @@ exports.main = async (event, ) => {
             price,
             booked_by,
             is_verified,
-            version: oldVersion + 1, // 版本号+1，用于并发控制
+            version: oldVersion + 1,
             updated_at: now,
           },
-          version: oldVersion // 保存当前版本号，用于更新时的条件判断
+          version: oldVersion,
+          originalOrder: existingOrder
         })
       } else {
         // 订单不存在，准备插入操作
-        addOperations.push({
+        operations.adds.push({
           court_id,
           data: {
             court_id,
@@ -121,7 +167,7 @@ exports.main = async (event, ) => {
             price,
             booked_by,
             is_verified,
-            version: 1, // 新订单版本号从1开始
+            version: 1,
             created_at: now,
             updated_at: now,
           }
@@ -136,90 +182,233 @@ exports.main = async (event, ) => {
     }
   }
 
-  // 第二阶段：执行更新操作
-  // 注意：更新操作需要单独执行，因为每个更新都需要检查版本号
-  for (const op of updateOperations) {
-    try {
-      const updateRes = await db.collection('court_order_collection')
-        .where({
-          court_id: op.court_id,
-          version: op.version // 使用版本号作为条件，确保并发安全
-        })
-        .update({
-          data: op.data
-        })
-
-      results.push({
-        court_id: op.court_id,
-        success: updateRes.stats.updated > 0,
-        type: 'update',
-        updated: updateRes.stats.updated,
-        error: updateRes.stats.updated === 0 ? '并发冲突，订单已被修改或抢订' : undefined
-      })
-    } catch (e) {
-      results.push({
-        court_id: op.court_id,
-        success: false,
-        error: e.message,
-      })
+  // 如果有任何预检查失败，返回失败
+  if (results.some(r => !r.success)) {
+    return {
+      success: false,
+      results: results
     }
   }
 
-  // 第三阶段：执行插入操作
-  // 注意：在插入之前，需要再次检查订单是否已存在，防止并发问题
-  if (addOperations.length > 0) {
-    // 再次检查所有要插入的订单是否已存在
-    const finalCheck = await db.collection('court_order_collection')
-      .where({
-        court_id: _.in(addOperations.map(op => op.court_id))
-      })
-      .get()
+  return {
+    success: true,
+    operations: operations
+  }
+}
 
-    const existingIds = new Set(finalCheck.data.map(order => order.court_id))
-    
-    // 过滤掉已经存在的订单
-    const validAddOperations = addOperations.filter(op => !existingIds.has(op.court_id))
+/**
+ * 执行事务性操作
+ * @param {Object} operations - 操作对象
+ * @param {Object} db - 数据库对象
+ * @param {Object} _ - 数据库命令对象
+ * @returns {Object} 执行结果
+ */
+async function executeTransaction(operations, db, _) {
+  const results = []
+  const successfulUpdates = []
+  const successfulAdds = []
 
-    if (validAddOperations.length > 0) {
+  try {
+    // 第一步：执行所有更新操作
+    for (const op of operations.updates) {
       try {
-        // 批量插入有效的订单
-        const addRes = await db.collection('court_order_collection').add({
-          data: validAddOperations.map(op => op.data)
-        })
-        
-        // 记录成功的插入操作
-        validAddOperations.forEach((op, index) => {
+        const updateRes = await db.collection('court_order_collection')
+          .where({
+            court_id: op.court_id,
+            version: op.version
+          })
+          .update({
+            data: op.data
+          })
+
+        if (updateRes.stats.updated > 0) {
+          successfulUpdates.push({
+            ...op,
+            updateResult: updateRes
+          })
           results.push({
             court_id: op.court_id,
             success: true,
-            type: 'add',
-            id: addRes._id
+            type: 'update',
+            updated: updateRes.stats.updated
           })
-        })
-
-        // 记录被过滤掉的订单（因为并发冲突）
-        addOperations
-          .filter(op => existingIds.has(op.court_id))
-          .forEach(op => {
-            results.push({
+        } else {
+          // 更新失败，需要回滚所有已成功的操作
+          await rollbackUpdates(successfulUpdates, db)
+          return {
+            success: false,
+            results: [{
               court_id: op.court_id,
               success: false,
-              error: '并发冲突，订单已被其他用户创建'
-            })
-          })
+              error: '并发冲突，订单已被修改或抢订',
+              type: 'update'
+            }]
+          }
+        }
       } catch (e) {
-        validAddOperations.forEach(op => {
-          results.push({
+        // 更新异常，需要回滚所有已成功的操作
+        await rollbackUpdates(successfulUpdates, db)
+        return {
+          success: false,
+          results: [{
             court_id: op.court_id,
             success: false,
             error: e.message,
-          })
-        })
+            type: 'update'
+          }]
+        }
       }
     }
-  }
 
-  return { results }
+    // 第二步：执行所有插入操作
+    if (operations.adds.length > 0) {
+      try {
+        // 再次检查所有要插入的订单是否已存在
+        const finalCheck = await db.collection('court_order_collection')
+          .where({
+            court_id: _.in(operations.adds.map(op => op.court_id))
+          })
+          .get()
+
+        const existingIds = new Set(finalCheck.data.map(order => order.court_id))
+        
+        // 过滤掉已经存在的订单
+        const validAddOperations = operations.adds.filter(op => !existingIds.has(op.court_id))
+
+        if (validAddOperations.length > 0) {
+          // 批量插入有效的订单
+          const addRes = await db.collection('court_order_collection').add({
+            data: validAddOperations.map(op => op.data)
+          })
+          
+          // 记录成功的插入操作
+          validAddOperations.forEach((op, index) => {
+            successfulAdds.push(op)
+            results.push({
+              court_id: op.court_id,
+              success: true,
+              type: 'add',
+              id: addRes._id
+            })
+          })
+
+          // 记录被过滤掉的订单（因为并发冲突）
+          operations.adds
+            .filter(op => existingIds.has(op.court_id))
+            .forEach(op => {
+              results.push({
+                court_id: op.court_id,
+                success: false,
+                error: '并发冲突，订单已被其他用户创建',
+                type: 'add'
+              })
+            })
+        }
+      } catch (e) {
+        // 插入异常，需要回滚所有已成功的操作
+        await rollbackUpdates(successfulUpdates, db)
+        await rollbackAdds(successfulAdds, db)
+        return {
+          success: false,
+          results: [{
+            court_id: 'batch',
+            success: false,
+            error: e.message,
+            type: 'add'
+          }]
+        }
+      }
+    }
+
+    // 第三步：检查是否有任何操作失败
+    if (results.some(r => !r.success)) {
+      // 如果有任何操作失败，回滚所有操作
+      await rollbackUpdates(successfulUpdates, db)
+      await rollbackAdds(successfulAdds, db)
+      
+      return {
+        success: false,
+        results: results.map(r => ({
+          ...r,
+          success: false,
+          error: r.error || '部分操作失败，已回滚所有操作'
+        }))
+      }
+    }
+
+    return {
+      success: true,
+      results: results
+    }
+
+  } catch (error) {
+    // 发生异常，回滚所有操作
+    await rollbackUpdates(successfulUpdates, db)
+    await rollbackAdds(successfulAdds, db)
+    
+    return {
+      success: false,
+      results: [{
+        court_id: 'batch',
+        success: false,
+        error: error.message,
+        type: 'transaction'
+      }]
+    }
+  }
+}
+
+/**
+ * 回滚更新操作
+ * @param {Array} successfulUpdates - 成功的更新操作列表
+ * @param {Object} db - 数据库对象
+ */
+async function rollbackUpdates(successfulUpdates, db) {
+  const now = new Date()
+  for (const update of successfulUpdates) {
+    try {
+      await db.collection('court_order_collection')
+        .where({
+          court_id: update.court_id
+        })
+        .update({
+          data: {
+            campus: update.originalOrder.campus,
+            courtNumber: update.originalOrder.courtNumber,
+            date: update.originalOrder.date,
+            start_time: update.originalOrder.start_time,
+            end_time: update.originalOrder.end_time,
+            status: update.originalOrder.status,
+            price: update.originalOrder.price,
+            booked_by: update.originalOrder.booked_by,
+            is_verified: update.originalOrder.is_verified,
+            version: update.originalOrder.version,
+            updated_at: now,
+          }
+        })
+    } catch (e) {
+      console.error('回滚更新操作失败:', e)
+    }
+  }
+}
+
+/**
+ * 回滚插入操作
+ * @param {Array} successfulAdds - 成功的插入操作列表
+ * @param {Object} db - 数据库对象
+ */
+async function rollbackAdds(successfulAdds, db) {
+  for (const add of successfulAdds) {
+    try {
+      await db.collection('court_order_collection')
+        .where({
+          court_id: add.court_id
+        })
+        .remove()
+    } catch (e) {
+      console.error('回滚插入操作失败:', e)
+    }
+  }
 }
 
 /**

@@ -44,6 +44,7 @@ exports.main = async (event, ) => {
       outTradeNo,
       payment_parmas:res.payment,
       createTime: db.serverDate(),
+      paymentQueryTime: null, // 支付查询时间，初始为null
       status: 'PENDING' // 初始状态为待支付
     }
   })
@@ -54,6 +55,7 @@ exports.main = async (event, ) => {
     outTradeNo,
     payment_parmas:res.payment,
     createTime: db.serverDate(),
+    paymentQueryTime: null,
     status: 'PENDING' // 初始状态为待支付
   })
   return res

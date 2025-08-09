@@ -15,6 +15,12 @@ Page({
   },
 
   onLoad: function () {
+    // 初始化时读取手机号
+    const phoneNumber = wx.getStorageSync('phoneNumber');
+    this.setData({ 
+      phoneNumber: phoneNumber 
+    });
+    
     this.initDateList();
     this.initTimeList();
     this.initCourtListByCloud();
@@ -365,13 +371,16 @@ Page({
   },
 
   startAutoRefresh: function () {
+    // 防抖：如果已经有定时器在运行，先停止
+    this.stopAutoRefresh();
+    
     // 启动自动刷新定时器
     this.autoRefreshTimer = setInterval(() => {
       if (this.data.currentDate) {
         console.log('自动刷新场地状态...');
         this.updateCourtStatusIncrementally(this.data.currentDate);
       }
-    }, 20000); // 每10秒刷新一次，但只更新状态，不重新渲染
+    }, 30000); // 每30秒刷新一次，但只更新状态，不重新渲染
   },
 
   stopAutoRefresh: function () {

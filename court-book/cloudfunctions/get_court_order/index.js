@@ -125,7 +125,7 @@ exports.main = async (event, context) => {
       
       // 根据预订者类型确定锁定时间
       const isManager = managerPhones.has(order.booked_by)
-      const lockTimeLimit = isManager ? 10 : 5 // 管理员10分钟，普通用户5分钟
+      const lockTimeLimit = isManager ? 10 : 6 // 管理员10分钟，普通用户5分钟
       
       return diffMinutes > lockTimeLimit
     }
@@ -145,7 +145,63 @@ exports.main = async (event, context) => {
     const filteredOrderList = orderList.filter(order => !expiredOrderIdSet.has(order._id))
     orderList.length = 0
     orderList.push(...filteredOrderList)
-    console.log('删除过期订单后的订单列表数量:', orderList.length)
+    console.log('删除过期锁定订单后的订单列表数量:', orderList.length)
+  }
+
+  // 3.2 过滤并删除过期的pending订单 - 从pay_order表查询
+  // 先获取所有管理员手机号
+  const managerResult = await db.collection('manager').get()
+  const allManagerPhones = managerResult.data.map(m => m.phoneNumber)
+  console.log('管理员手机号列表:', allManagerPhones)
+  
+  // 计算4分钟前的时间戳
+  const fourMinutesAgo = new Date(now.getTime() - 4 * 60 * 1000)
+  
+  // 查询条件：status为PENDING，且满足以下条件之一：
+  // 1. 创建时间超过4分钟且未开始支付（paymentQueryTime为null）
+  // 2. 支付查询时间超过1分钟（给用户1分钟支付时间）
+  const pendingOrdersResult = await db.collection('pay_order').where({
+    status: 'PENDING',
+    phoneNumber: db.command.nin(allManagerPhones), // 排除管理员手机号
+    _: db.command.or([
+      {
+        createTime: db.command.lt(fourMinutesAgo),
+        paymentQueryTime: null // 未开始支付且创建时间超过4分钟
+      },
+      {
+        createTime: db.command.lt(fourMinutesAgo),
+        paymentQueryTime: db.command.lt(new Date(now.getTime() - 1 * 60 * 1000)) // 支付查询时间超过1分钟
+      }
+    ])
+  }).get()
+  
+  const expiredPendingOrders = pendingOrdersResult.data
+  console.log('从pay_order表查询到的过期pending订单数量:', expiredPendingOrders.length)
+  
+  // 记录要删除的订单信息
+  expiredPendingOrders.forEach(order => {
+    const orderTime = new Date(order.created_at)
+    const diffMinutes = (now - orderTime) / (1000 * 60)
+    console.log('删除过期pending订单:', order.court_id, order.booked_by, '过期时间:', diffMinutes.toFixed(2), '分钟')
+  })
+
+  // 删除过期的pending订单
+  if (expiredPendingOrders.length > 0) {
+    const expiredPendingOrderIds = expiredPendingOrders.map(order => order._id)
+    try {
+      // 删除pay_order表中的过期订单
+      const deletePayOrderResult = await db.collection('pay_order').where({
+        _id: db.command.in(expiredPendingOrderIds)
+      }).remove()
+      console.log('删除pay_order表中过期pending订单结果:', deletePayOrderResult)
+      
+
+
+  
+     
+    } catch (error) {
+      console.error('删除过期pending订单失败:', error)
+    }
   }
 
   // 4. 补全空闲状态

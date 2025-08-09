@@ -626,7 +626,11 @@ color: #103f6b;
   color: #61540a !important;
 } 
 .court-status-item.self-booked {
-  background-color: #4CAF50 !important; /* Green color for self-booked slots */
+  background-color: #326934 !important; /* Green color for self-booked slots */
+  color: white !important;
+}
+.court-status-item.manager-self-booked {
+  background-color: #326934 !important; /* Same green color as self-booked */
   color: white !important;
 }
 .court-status-item.self-locked {

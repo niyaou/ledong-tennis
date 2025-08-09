@@ -10,7 +10,8 @@ Page({
     pageNum: 1,
     pageSize: 10,
     hasMore: true,
-    isAdmin: false
+    isAdmin: false,
+    lastUpdateTime: 0 // 记录最后更新时间，用于防抖
   },
 
   /**
@@ -29,6 +30,9 @@ Page({
     }, () => {
       this.loadOrders();
     });
+
+    // 启动自动刷新定时器（每20秒刷新一次）
+    this.startAutoRefresh();
   },
 
   /**
@@ -50,31 +54,40 @@ Page({
       phoneNumber: phoneNumber ,
       isAdmin
     });
+    
+    // 页面显示时重新启动自动刷新
+    this.startAutoRefresh();
   },
 
   /**
    * 生命周期函数--监听页面隐藏
    */
   onHide() {
-
+    // 页面隐藏时停止自动刷新
+    this.stopAutoRefresh();
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
-  onUnload() {
+  onUnload: function() {
     const app = getApp();
     app.globalData.eventBus.emit('refreshBookingPage');
+    
+    // 清除自动刷新定时器
+    this.stopAutoRefresh();
   },
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function() {
+    // 更新最后更新时间，避免与自动刷新冲突
     this.setData({
       orderList: [],
       pageNum: 1,
-      hasMore: true
+      hasMore: true,
+      lastUpdateTime: Date.now()
     }, () => {
       this.loadOrders();
       wx.stopPullDownRefresh();
@@ -114,7 +127,8 @@ Page({
       const newOrders = res.result.data || [];
       this.setData({
         orderList: pageNum === 1 ? newOrders : [...this.data.orderList, ...newOrders],
-        hasMore: newOrders.length === pageSize
+        hasMore: newOrders.length === pageSize,
+        lastUpdateTime: Date.now() // 更新最后更新时间
       });
     }).catch(err => {
       console.error('加载订单失败', err);
@@ -160,20 +174,54 @@ Page({
   onPayClick: function(e) {
     const order = e.currentTarget.dataset.order;
     if (order.payment_parmas) {
-      wx.requestPayment({
-        ...order.payment_parmas,
-        success: (res) => {
-          console.log('支付成功', res);
-          // 支付成功后刷新订单列表
-          this.onPullDownRefresh();
-        },
-        fail: (err) => {
-          console.error('支付失败', err);
+      // 付款前先查询订单是否还存在
+      wx.showLoading({ title: '验证订单中...' });
+      wx.cloud.callFunction({
+        name: 'pay_order_query',
+        data: {
+          orderId: order._id
+        }
+      }).then(res => {
+        wx.hideLoading();
+        
+        if (!res.result.success) {
           wx.showToast({
-            title: '支付失败',
+            title: res.result.message || '订单验证失败',
             icon: 'none'
           });
+          // 刷新订单列表
+          this.onPullDownRefresh();
+          return;
         }
+        
+        // 订单验证成功，继续支付流程
+        const paymentParams = res.result.order.payment_parmas;
+        wx.requestPayment({
+          ...paymentParams,
+          success: (res) => {
+            console.log('支付成功', res);
+            wx.showToast({
+              title: '支付成功',
+              icon: 'success'
+            });
+            // 支付成功后刷新订单列表
+            this.onPullDownRefresh();
+          },
+          fail: (err) => {
+            console.error('支付失败', err);
+            wx.showToast({
+              title: '支付失败',
+              icon: 'none'
+            });
+          }
+        });
+      }).catch(err => {
+        wx.hideLoading();
+        console.error('查询订单失败', err);
+        wx.showToast({
+          title: '查询订单失败',
+          icon: 'none'
+        });
       });
     }
   },
@@ -257,6 +305,57 @@ Page({
           });
         }
       }
+    });
+  },
+
+  startAutoRefresh: function() {
+    // 防抖：如果已经有定时器在运行，先停止
+    this.stopAutoRefresh();
+    
+    // 启动自动刷新定时器
+    this.autoRefreshTimer = setInterval(() => {
+      console.log('自动刷新订单列表...');
+      this.refreshOrdersIncrementally();
+    }, 30000); // 每30秒刷新一次
+  },
+
+  stopAutoRefresh: function() {
+    // 停止自动刷新定时器
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
+    }
+  },
+
+  refreshOrdersIncrementally: function() {
+    // 防抖：如果距离上次更新不足10秒，则跳过
+    const now = Date.now();
+    if (now - this.data.lastUpdateTime < 10000) {
+      console.log('防抖：距离上次更新不足10秒，跳过自动刷新');
+      return;
+    }
+    
+    // 更新最后更新时间
+    this.setData({ lastUpdateTime: now });
+    
+    // 只刷新第一页数据，保持当前分页状态
+    const { phoneNumber, pageSize } = this.data;
+    wx.cloud.callFunction({
+      name: 'my_order_list',
+      data: {
+        phoneNumber,
+        pageNum: 1,
+        pageSize
+      }
+    }).then(res => {
+      const newOrders = res.result.data || [];
+      this.setData({
+        orderList: newOrders,
+        hasMore: newOrders.length === pageSize
+      });
+      console.log('自动刷新完成，更新了', newOrders.length, '条订单');
+    }).catch(err => {
+      console.error('自动刷新订单失败', err);
     });
   }
 })
