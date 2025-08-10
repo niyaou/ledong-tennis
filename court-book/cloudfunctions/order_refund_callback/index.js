@@ -23,7 +23,7 @@ exports.main = async (event) => {
   }
   const order = orderRes.data[0];
   // 更新 pay_order 的 status 字段为 'PAIDED'
-  const updateOrderRes = await db.collection('pay_order').where({ outTradeNo }).update({ data: { status: 'REFUNDED' } });
+  const updateOrderRes = await db.collection('pay_order').where({ outTradeNo }).update({ data: { status: 'REFUNDED' ,refundStatus:'SUCCESS'} });
   console.log('pay_order 状态更新结果:', updateOrderRes);
   const court_ids = order.court_ids;
   console.log('court_ids:', court_ids);

@@ -250,3 +250,21 @@
   pointer-events: none;
 
 }
+
+/* 版本号样式 */
+.version-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20rpx;
+  margin-top: 20rpx;
+  opacity: 0.6;
+}
+
+.version-text {
+  font-size: 20rpx;
+  color: #999;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1rpx;
+  padding: 8rpx 16rpx;
+}

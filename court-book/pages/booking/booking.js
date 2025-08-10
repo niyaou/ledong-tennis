@@ -52,6 +52,23 @@ Page({
     this.startAutoRefresh();
   },
 
+  // 分享给朋友
+  onShareAppMessage() {
+    return {
+      title: '乐动网球-麓坊校区-场地预约',
+      desc: '麓坊校区所有场地都开放预约！',
+      path: '/pages/booking/booking'
+    }
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '乐动网球-麓坊校区-场地预约',
+      query: '麓坊校区所有场地都开放预约！'
+    }
+  },
+
   onUnload: function() {
     // Clean up event bus listener
     const app = getApp();
