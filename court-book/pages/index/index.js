@@ -161,7 +161,7 @@ Page({
       // 使用微信API获取小程序版本号
       const accountInfo = wx.getAccountInfoSync()
       console.log("-------accountInfo",accountInfo)
-      const version = accountInfo.miniProgram.version || '3.1.4'
+      const version = accountInfo.miniProgram.version || '3.1.7'
       
       this.setData({
         version: version

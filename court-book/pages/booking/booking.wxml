@@ -6,11 +6,27 @@
         <text class="header-title">场地预约</text>
       </view>
       <view class="venue-info">
-        <view class="venue-name">乐动网球·麓坊校区</view>
-        <view class="venue-desc" bindtap="openLocation">
-         点击查看球场位置
-            <icon class="icon-box-img" type="info_circle" size="24"></icon>
-        
+        <view class="venue-left" bindtap="openLocation">
+          <view class="venue-name">乐动网球·麓坊校区</view>
+          <view class="venue-desc">
+            <view class="venue-desc-text">查看球场位置</view>
+            <view class="venue-desc-icon">
+              <icon class="icon-box-img" type="search" size="20"></icon>
+            </view>
+           
+          </view>
+        </view>
+        <view class="venue-right" bindtap="showVenueDistribution">
+   <view class="venue-name">乐动网球·麓坊校区</view>
+
+          <view class="venue-distribution">
+           <view class="venue-desc-text">
+            查看场馆分布
+            </view>
+            <view class="venue-desc-icon">
+            <icon class="icon-box-img" type="info" size="20"></icon>
+            </view>
+          </view>
         </view>
       </view>
     </view>
@@ -80,6 +96,23 @@
         </button>
       </view>
 
+    </view>
+  </view>
+
+  <!-- 场馆分布图片轮播弹窗 -->
+  <view class="venue-modal" wx:if="{{showVenueModal}}" bindtap="hideVenueModal">
+    <view class="venue-modal-content" catchtap="stopPropagation">
+      <view class="venue-modal-header">
+        <text class="venue-modal-title">场馆分布图</text>
+        <view class="venue-modal-close" bindtap="hideVenueModal">×</view>
+      </view>
+      <view class="venue-modal-body">
+        <swiper class="venue-swiper" indicator-dots="{{true}}" autoplay="{{false}}" interval="3000" duration="500">
+          <swiper-item wx:for="{{venueImages}}" wx:key="index">
+            <image class="venue-image" src="{{item}}" mode="aspectFit" bindtap="previewImage" data-url="{{item}}"></image>
+          </swiper-item>
+        </swiper>
+      </view>
     </view>
   </view>
 </view>

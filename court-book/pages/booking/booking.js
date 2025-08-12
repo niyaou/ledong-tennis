@@ -12,6 +12,13 @@ Page({
     needRefresh: false, // Add flag to control refresh
     eventChannel: null, // Add event channel
     lastUpdateTime: 0, // 记录最后更新时间，用于防抖
+    showVenueModal: false, // 控制场馆分布弹窗显示
+    venueImages: [
+     'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_2025-08-10_213705_306.jpg',
+    'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_2025-08-10_213716_234.jpg',
+    'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_20250810213727_62.jpg',
+    'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_20250810213734_65.jpg',
+    ], // 场馆分布图片数组
   },
 
   onLoad: function () {
@@ -788,5 +795,33 @@ Page({
       url: '/pages/member/member'
     });
     console.log('--------onGoToLogin-------')
+  },
+
+  // 显示场馆分布弹窗
+  showVenueDistribution: function() {
+    this.setData({
+      showVenueModal: true
+    });
+  },
+
+  // 隐藏场馆分布弹窗
+  hideVenueModal: function() {
+    this.setData({
+      showVenueModal: false
+    });
+  },
+
+  // 阻止事件冒泡
+  stopPropagation: function() {
+    // 空函数，用于阻止事件冒泡
+  },
+
+  // 预览图片
+  previewImage: function(e) {
+    const current = e.currentTarget.dataset.url;
+    wx.previewImage({
+      current: current,
+      urls: this.data.venueImages
+    });
   },
 }); 
