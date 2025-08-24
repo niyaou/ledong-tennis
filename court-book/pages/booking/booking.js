@@ -13,6 +13,7 @@ Page({
     eventChannel: null, // Add event channel
     lastUpdateTime: 0, // 记录最后更新时间，用于防抖
     showVenueModal: false, // 控制场馆分布弹窗显示
+    isProcessingOrder: false, // 是否正在处理订单（创建订单到付款完成期间）
     venueImages: [
      'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_2025-08-10_213705_306.jpg',
     'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_2025-08-10_213716_234.jpg',
@@ -84,6 +85,9 @@ Page({
     
     // 清除自动刷新定时器
     this.stopAutoRefresh();
+    
+    // 重置处理订单状态
+    this.setData({ isProcessingOrder: false });
   },
 
   openLocation: function() {
@@ -265,6 +269,16 @@ Page({
   },
 
   onCourtTimeTap: function (e) {
+    // 如果正在处理订单，不允许选择场地
+    if (this.data.isProcessingOrder) {
+      // wx.showToast({
+      //   title: '正在处理订单，请稍候',
+      //   icon: 'none',
+      //   duration: 2000
+      // });
+      return;
+    }
+
     const { courtnumber, time } = e.currentTarget.dataset;
     const courtStatusAll = this.data.courtStatus;
     const times = courtStatusAll[courtnumber] || [];
@@ -348,8 +362,10 @@ Page({
       // if (item.status === 'booked' || item.status === 'locked') return; // 已预定不可选
       if (item.status === 'booked' || item.status === 'locked') {
         this.setData({ needRefresh: true }); // Set flag before navigation
+        // 构造court_id用于定位订单
+        const court_id = `${courtnumber}_${this.data.currentDate}_${time}`;
         wx.navigateTo({
-          url: '/pages/myOrder/orderlist'
+          url: `/pages/myOrder/orderlist?targetCourtId=${encodeURIComponent(court_id)}`
         });
         return
       };
@@ -557,6 +573,9 @@ Page({
   },
 
   onOrderSubmit: function () {
+    // 设置正在处理订单状态
+    this.setData({ isProcessingOrder: true });
+
     // Get global managerList
     const app = getApp();
     const managerList = app.globalData.managerList;
@@ -644,6 +663,8 @@ Page({
             success: () => {
               // 清空选中状态
               this.clearSelectedStatus();
+              // 重置处理订单状态
+              this.setData({ isProcessingOrder: false });
             }
           });
           return;
@@ -659,6 +680,8 @@ Page({
             success: () => {
               this.updateCourtStatusIncrementally(date);
               this.clearSelectedStatus();
+              // 重置处理订单状态
+              this.setData({ isProcessingOrder: false });
             }
           });
           return;
@@ -682,6 +705,9 @@ Page({
       fail: err => {
         wx.showToast({ title: '预订失败', icon: 'none' });
         console.error('预订失败:', err);
+        // 重置处理订单状态
+        this.setData({ isProcessingOrder: false });
+        this.clearSelectedStatus();
       }
     });
   },
@@ -731,6 +757,22 @@ Page({
       data: orderParams,
       success: (res) => {
         console.log('创建订单成功', res);
+        
+        // 检查是否有重复订单错误
+        if (res.result && res.result.success === false && res.result.error === 'DUPLICATE_ORDER') {
+          wx.hideLoading();
+          wx.showToast({
+            title: res.result.message || '所选场地已被预订',
+            icon: 'none',
+            duration: 3000
+          });
+          // 清空所有临时选中的场地
+          this.clearSelectedStatus();
+          // 重置处理订单状态
+          this.setData({ isProcessingOrder: false });
+          return;
+        }
+        
         if (res.result && res.result.payment) {
           if (isManager) {
             // Skip payment for managers
@@ -740,6 +782,9 @@ Page({
               icon: 'success'
             });
             console.log('管理员预订成功');
+            // 重置处理订单状态
+            this.setData({ isProcessingOrder: false });
+            this.clearSelectedStatus();
             setTimeout(() => {
               this.initCourtStatusByCloud(date);
             }, 1500);
@@ -747,25 +792,33 @@ Page({
             // 调用微信支付
             wx.requestPayment({
               ...res.result.payment,
-              success: (payRes) => {
-                wx.hideLoading();
-                wx.showToast({
-                  title: '支付成功',
-                  icon: 'success'
-                });
-                console.log('支付成功', payRes);
-                setTimeout(() => {
-                  this.initCourtStatusByCloud(date);
-                }, 1500);
-              },
-              fail: (err) => {
-                wx.hideLoading();
-                wx.showToast({
-                  title: '支付失败',
-                  icon: 'error'
-                });
-                console.error('支付失败', err);
-              }
+                             success: (payRes) => {
+                 wx.hideLoading();
+                 wx.showToast({
+                   title: '支付成功',
+                   icon: 'success'
+                 });
+                 console.log('支付成功', payRes);
+                 // 重置处理订单状态
+                 this.setData({ isProcessingOrder: false });
+                 // 清空所有临时选中的场地
+                 this.clearSelectedStatus();
+                 setTimeout(() => {
+                   this.initCourtStatusByCloud(date);
+                 }, 1500);
+               },
+                             fail: (err) => {
+                 wx.hideLoading();
+                 wx.showToast({
+                   title: '支付失败',
+                   icon: 'error'
+                 });
+                 console.error('支付失败', err);
+                 // 重置处理订单状态
+                 this.setData({ isProcessingOrder: false });
+                 // 清空所有临时选中的场地
+                 this.clearSelectedStatus();
+               }
             });
           }
         } else {
@@ -774,6 +827,9 @@ Page({
             title: '创建订单失败',
             icon: 'error'
           });
+          // 重置处理订单状态
+          this.setData({ isProcessingOrder: false });
+          this.clearSelectedStatus();
         }
       },
       fail: (err) => {
@@ -783,6 +839,9 @@ Page({
           icon: 'error'
         });
         console.error('创建订单失败', err);
+        // 重置处理订单状态
+        this.setData({ isProcessingOrder: false });
+        this.clearSelectedStatus();
       }
     });
 

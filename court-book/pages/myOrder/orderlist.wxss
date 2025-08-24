@@ -168,3 +168,20 @@
   background-color: #ff4d4f;
   color: white;
 }
+
+/* 目标订单高亮样式 */
+.target-order {
+  background-color: #fff3cd !important;
+  border: 2px solid #ffc107 !important;
+  box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3) !important;
+  animation: highlight-pulse 2s ease-in-out;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}

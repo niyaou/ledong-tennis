@@ -8,25 +8,31 @@ Page({
     orderList: [],
     phoneNumber: '',
     pageNum: 1,
-    pageSize: 10,
+    pageSize: 25,
     hasMore: true,
     isAdmin: false,
-    lastUpdateTime: 0 // 记录最后更新时间，用于防抖
+    lastUpdateTime: 0, // 记录最后更新时间，用于防抖
+    targetCourtId: null, // 目标场地ID，用于定位订单
+    targetOrderIndex: -1 // 目标订单索引，用于高亮显示
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function() {
+  onLoad: function(options) {
     const phoneNumber = wx.getStorageSync('phoneNumber') || '';
     const app = getApp();
 
     const managerList = app.globalData.managerList;
     const isAdmin = managerList && managerList.includes(phoneNumber);
     
+    // 获取目标场地ID参数
+    const targetCourtId = options.targetCourtId ? decodeURIComponent(options.targetCourtId) : null;
+    
     this.setData({ 
       phoneNumber,
-      isAdmin
+      isAdmin,
+      targetCourtId
     }, () => {
       this.loadOrders();
     });
@@ -129,6 +135,11 @@ Page({
         orderList: pageNum === 1 ? newOrders : [...this.data.orderList, ...newOrders],
         hasMore: newOrders.length === pageSize,
         lastUpdateTime: Date.now() // 更新最后更新时间
+      }, () => {
+        // 如果有目标场地ID，尝试定位到对应订单
+        if (this.data.targetCourtId) {
+          this.scrollToTargetOrder();
+        }
       });
     }).catch(err => {
       console.error('加载订单失败', err);
@@ -169,6 +180,51 @@ Page({
   onOrderItemClick: function(e) {
     const order = e.currentTarget.dataset.order;
     console.log('订单详情:', order);
+  },
+
+  scrollToTargetOrder: function() {
+    const { targetCourtId, orderList } = this.data;
+    if (!targetCourtId || !orderList || orderList.length === 0) {
+      return;
+    }
+
+    // 查找包含目标场地ID的订单
+    const targetOrderIndex = orderList.findIndex(order => {
+      return order.court_ids && order.court_ids.includes(targetCourtId);
+    });
+
+    if (targetOrderIndex !== -1) {
+      // 使用选择器定位到对应订单元素
+      const query = wx.createSelectorQuery();
+      query.selectAll('.order-item').boundingClientRect();
+      query.exec((res) => {
+        if (res && res[0] && res[0][targetOrderIndex]) {
+          const targetRect = res[0][targetOrderIndex];
+          // 滚动到目标位置，留出一些顶部空间
+          wx.pageScrollTo({
+            scrollTop: targetRect.top - 100,
+            duration: 500
+          });
+          
+          // 高亮显示目标订单
+          this.setData({
+            targetOrderIndex: targetOrderIndex
+          });
+          
+          // 清除目标场地ID，避免重复定位
+          this.setData({
+            targetCourtId: null
+          });
+        }
+      });
+    } else if (this.data.hasMore) {
+      // 如果当前页面没找到目标订单，且还有更多数据，继续加载下一页
+      this.setData({
+        pageNum: this.data.pageNum + 1
+      }, () => {
+        this.loadOrders();
+      });
+    }
   },
 
   onPayClick: function(e) {

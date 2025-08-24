@@ -277,6 +277,12 @@
 color: #103f6b;
 }
 
+.footer-btn.processing {
+  background: #ccc !important;
+  color: #999 !important;
+  cursor: not-allowed;
+}
+
 /* 页面整体布局 */
 .booking-page {
   display: flex;
@@ -673,7 +679,7 @@ color: #103f6b;
   flex-shrink: 0;
 }
 .court-status-item.booked {
-  background:rgb(73, 136, 87);
+  background:rgb(122, 29, 243);
   color:rgb(224, 224, 224);
 }
   /**background: #abb53e40;*/
@@ -716,6 +722,23 @@ color: #103f6b;
   color: #999 !important;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.court-status-item.processing {
+  opacity: 0.5;
+  pointer-events: none;
+  position: relative;
+}
+
+.court-status-item.processing::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 1;
 }
 
 /* 场馆分布弹窗样式 */

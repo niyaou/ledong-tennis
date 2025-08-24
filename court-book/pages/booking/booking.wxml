@@ -89,10 +89,10 @@
         <view>已选:  <text> {{selectedCount}}小时 </text></view>
       </view>
       <view>
-        <button class="footer-btn {{selectedCount > 0 ? ' active' : ''}}" 
-                disabled="{{selectedCount <= 0}}" 
+        <button class="footer-btn {{selectedCount > 0 ? ' active' : ''}} {{isProcessingOrder ? ' processing' : ''}}" 
+                disabled="{{selectedCount <= 0 || isProcessingOrder}}" 
                 bindtap="{{phoneNumber ? 'onOrderSubmit' : 'onGoToLogin'}}">
-          {{phoneNumber ? '下单' : '登录'}}
+          {{isProcessingOrder ? '处理中...' : (phoneNumber ? '下单' : '登录')}}
         </button>
       </view>
 

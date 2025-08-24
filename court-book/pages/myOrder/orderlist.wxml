@@ -3,7 +3,7 @@
 <view class="container">
   <view class="order-list">
     <block wx:for="{{orderList}}" wx:key="index">
-      <view class="order-item {{ item.status === 'PAIDED' ? 'paided' :  ''}}" bindtap="onOrderItemClick" data-order="{{item}}">
+      <view class="order-item {{ item.status === 'PAIDED' ? 'paided' :  ''}} {{ index === targetOrderIndex ? 'target-order' : '' }}" bindtap="onOrderItemClick" data-order="{{item}}">
         <view class="order-header">
           <text class="order-time">创建时间: {{utils.formatTime(item.createTime)}}</text>
         </view>

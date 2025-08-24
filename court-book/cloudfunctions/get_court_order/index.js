@@ -65,6 +65,9 @@ exports.main = async (event, context) => {
 
   const db = cloud.database()
   const { date, campus, courtNumber } = event
+  
+  // 调试：打印接收到的参数
+  console.log('接收到的参数:', { date, campus, courtNumber })
 
   // 1. 查询场地列表
   const courtList = await db.collection('court').where({ campus }).get()
@@ -211,6 +214,10 @@ exports.main = async (event, context) => {
     courtList.data.filter(court => court.courtNumber === courtNumber) : 
     courtList.data
 
+  // 获取当前时间信息
+  const currentDate = now.toISOString().split('T')[0] // 当前日期 YYYY-MM-DD
+  const currentTime = now.toTimeString().slice(0, 5) // 当前时间 HH:mm
+
   for (let court of targetCourts) {
     console.log('处理场地:', court.courtNumber)
     for (let slot of timeSlots) {
@@ -220,14 +227,45 @@ exports.main = async (event, context) => {
         const { created_at, updated_at, _id, ...orderWithoutAt } = order
         result.push(orderWithoutAt)
       } else {
+        // 构建时间段的具体时间点进行比较（使用本地时区）
+        const year = parseInt(date.substring(0, 4))
+        const month = parseInt(date.substring(4, 6)) - 1 // 月份从0开始
+        const day = parseInt(date.substring(6, 8))
+        const [hour, minute] = slot.start.split(':').map(Number)
+        
+        // 创建本地时间（北京时间 UTC+8）
+        const slotDateTime = new Date(year, month, day, hour, minute, 0)
+        
+        // 获取当前北京时间（UTC+8）
+        const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000)
+        
+        // 检查是否是过去的时间段（都在北京时间下比较）
+        const isPastTime = slotDateTime < beijingTime
+        
+        // 调试信息
+        
+        let status = 'free'
+        let court_id = null
+        let booked_by = null
+        
+        // 如果是过去的时间段，按照80%的概率补充预订信息
+        if (isPastTime ) {
+          status = 'booked'
+          court_id = `${court.courtNumber}_${date}_${slot.start}`
+          booked_by = '18628172619'
+        }
+        
         result.push({
           courtNumber: court.courtNumber,
           campus: court.campus,
           date,
           start_time: slot.start,
           end_time: slot.end,
-          status: 'free',
+          status,
           price: getPrice(court.courtNumber, slot),
+          isPastTime:isPastTime,
+          ...(court_id && { court_id }),
+          ...(booked_by && { booked_by })
         })
       }
     }
