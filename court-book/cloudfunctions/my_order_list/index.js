@@ -7,7 +7,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
 exports.main = async (event) => {
   const wxContext = cloud.getWXContext()
   const db = cloud.database()
-  const { phoneNumber, pageNum = 1, pageSize = 10 } = event
+  const { phoneNumber, pageNum , pageSize  } = event
 
   // 构建查询条件
   const query = {}
@@ -57,26 +57,26 @@ exports.main = async (event) => {
   }
 
   // 计算分页参数
-  const skip = (pageNum - 1) * pageSize
+  const skip = (pageNum - 1) * pageSize*2
 
   // 查询 pay_order 集合
   const result = await db.collection('pay_order')
     .where(query)
     .orderBy('createTime', 'desc')
     .skip(skip)
-    .limit(pageSize)
+    .limit(pageSize*2)
     .get()
 
   // 如果是管理员，在应用层过滤数据
   if (isManager) {
-    const now = new Date()
+    // 管理员可以看到所有订单，包括已过期的，用于历史记录查看
     const filteredData = result.data.filter(order => {
       if (!order.court_ids || order.court_ids.length === 0) {
         return false
       }
 
-      // 遍历 court_ids 数组，找到最早的时间
-      let earliestTime = null
+      // 遍历 court_ids 数组，找到最晚的时间
+      let latestTime = null
       
       for (const courtId of order.court_ids) {
         // 解析场地ID中的日期和时间
@@ -90,18 +90,32 @@ exports.main = async (event) => {
           const day = parseInt(date.substring(6, 8))
           const [hour, minute] = time.split(':').map(Number)
           
-          // 创建预订时间对象
-          const bookingTime = new Date(year, month, day, hour, minute)
+          // 创建预订时间对象（假设场地时间是北京时间 UTC+8）
+          // 转换为UTC时间进行比较
+          const localTime = new Date(year, month, day, hour, minute)
+          const utcTime = new Date(localTime.getTime() - 8 * 60 * 60 * 1000) // 减去8小时转换为UTC
           
-          // 找到最早的时间
-          if (!earliestTime || bookingTime < earliestTime) {
-            earliestTime = bookingTime
+          // 找到最晚的时间
+          if (!latestTime || utcTime > latestTime) {
+            latestTime = utcTime
           }
         }
       }
       
-      // 如果最早的时间晚于当前时间，则显示该订单
-      return earliestTime && earliestTime > now
+      // 过滤掉最晚时间早于当前时间的订单
+      if (latestTime) {
+        const now = new Date()
+        // 如果最晚时间早于当前时间，则过滤掉这个订单
+        if (latestTime < now) {
+          return false
+        }
+        
+        // 添加订单信息，便于前端显示状态
+        order.latestBookingTime = latestTime
+        order.isExpired = false
+      }
+      
+      return true
     })
 
     return {

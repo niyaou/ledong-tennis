@@ -8,7 +8,7 @@ Page({
     orderList: [],
     phoneNumber: '',
     pageNum: 1,
-    pageSize: 25,
+    pageSize: 35,
     hasMore: true,
     isAdmin: false,
     lastUpdateTime: 0, // 记录最后更新时间，用于防抖
@@ -30,7 +30,7 @@ Page({
     const targetCourtId = options.targetCourtId ? decodeURIComponent(options.targetCourtId) : null;
     
     this.setData({ 
-      phoneNumber,
+      phoneNumber:"18228048214",
       isAdmin,
       targetCourtId
     }, () => {
@@ -57,7 +57,7 @@ Page({
     const managerList = app.globalData.managerList;
     const isAdmin = managerList && managerList.includes(phoneNumber);
     this.setData({ 
-      phoneNumber: phoneNumber ,
+      phoneNumber: "18228048214" ,
       isAdmin
     });
     
@@ -125,7 +125,7 @@ Page({
     wx.cloud.callFunction({
       name: 'my_order_list',
       data: {
-        phoneNumber,
+        phoneNumber:"18228048214",
         pageNum,
         pageSize
       }
@@ -399,7 +399,7 @@ Page({
     wx.cloud.callFunction({
       name: 'my_order_list',
       data: {
-        phoneNumber,
+        phoneNumber:"18228048214",
         pageNum: 1,
         pageSize
       }
