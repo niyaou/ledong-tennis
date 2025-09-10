@@ -4,15 +4,18 @@
   <image src="cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_20250517203940.jpg" mode="widthFix"></image>
    
     <view class="main-title">订场小程序</view>
-    <view class="subtitle">已开放麓坊校区·其他校区敬请期待</view>
+    <view class="subtitle">已开放麓坊和桐梓林校区·其他校区敬请期待</view>
   </view>
   <view class="info-section">
     <view class="business-hours">营业时间: 08:00-24:00</view>
     <view class="address">成都市天府新区麓坊运动公园内</view>
   </view>
   <view class="quick-nav-grid">
-    <view class="nav-item" bindtap="navigateToBooking">
-      <text>订场</text>
+    <view class="nav-item" bindtap="navigateToBooking" data-campus="麓坊校区">
+      <text>麓坊订场</text>
+    </view>
+    <view class="nav-item" bindtap="navigateToBooking" data-campus="桐梓林校区">
+      <text>桐梓林订场</text>
     </view>
     <!-- <button class="nav-item" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">获取电话</button> -->
    

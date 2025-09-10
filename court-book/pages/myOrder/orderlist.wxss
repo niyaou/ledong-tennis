@@ -48,10 +48,32 @@
 
 .court-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
   width: 70%;
   margin-right: 15px;
+}
+
+.campus-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: #f0f8ff;
+  border-radius: 6px;
+  border-left: 3px solid #007aff;
+}
+
+.campus-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 8px;
+}
+
+.campus-name {
+  font-size: 28rpx;
+  color: #007aff;
+  font-weight: bold;
 }
 
 .court-module {

@@ -10,6 +10,10 @@
         <view class="order-content">
           <view class="order-main">
             <view class="court-list">
+              <view class="campus-info" wx:if="{{item.campus}}">
+                <text class="campus-label">校区：</text>
+                <text class="campus-name">{{item.campus}}</text>
+              </view>
               <block wx:for="{{item.court_ids}}" wx:for-item="court" wx:key="*this">
                 <view class="court-module">
                   <text class="court-icon">🏸</text>

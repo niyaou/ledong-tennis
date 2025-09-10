@@ -67,7 +67,7 @@ async function checkDuplicateOrders(db, court_ids) {
 
 // 云函数入口函数
 exports.main = async (event, ) => {
-  const { phoneNumber,  total_fee,  openid,  court_ids  ,nonceStr } = event
+  const { phoneNumber,  total_fee,  openid,  court_ids  ,nonceStr,campus } = event
   const outTradeNo = generateOrderNo(event)
 
   const db = cloud.database()
@@ -102,6 +102,7 @@ exports.main = async (event, ) => {
       phoneNumber,
       total_fee,
       court_ids,
+      campus:campus,
       outTradeNo,
       payment_parmas:res.payment,
       createTime: db.serverDate(),
@@ -117,6 +118,7 @@ exports.main = async (event, ) => {
     payment_parmas:res.payment,
     createTime: db.serverDate(),
     paymentQueryTime: null,
+    campus:campus,
     status: 'PENDING' // 初始状态为待支付
   })
   return res

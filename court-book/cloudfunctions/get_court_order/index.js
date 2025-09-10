@@ -25,36 +25,33 @@ function generateTimeSlots(start, end, interval) {
   return slots
 }
 
-function getPrice(court, slot) {
-  const court_price_mapping={
-    "1号风雨棚":90,
-    "2号室外":60,
-    "3号室外":60,
-    "4号风雨棚":90,
-    "5号风雨棚":90,
-    "6号风雨棚":90,
-    "7号室外":60,
-    "8号室外":60,
-    "9号室外":60,
-    "10号室外":60,
-    "11号红土风雨棚":100,
-  
+function getPrice(court, slot, campus) {
+  // 根据校区配置不同的价格
+  const court_price_mapping = {
+    "麓坊校区": {
+      "1号风雨棚": 90,
+      "2号风雨棚": 90,
+      "3号风雨棚": 90,
+      "4号风雨棚": 90,
+      "5号风雨棚": 90,
+      "6号风雨棚": 90,
+      "7号室外": 60,
+      "8号室外": 60,
+      "9号室外": 60,
+      "10号室外": 60,
+      "11号红土风雨棚": 100,
+    },
+    "桐梓林校区": {
+      "1号风雨棚": 60,
+      "2号风雨棚": 60,
+     
+    }
   }
-  // const court_price_mapping={
-  //   "1号风雨棚":0.09,
-  //   "2号室外":0.06,
-  //   "3号室外":0.06,
-  //   "4号风雨棚":0.09,
-  //   "5号风雨棚":0.09,
-  //   "6号风雨棚":0.09,
-  //   "7号室外":0.06,
-  //   "8号室外":0.06,
-  //   "9号室外":0.06,
-  //   "10号室外":0.06,
-  //   "11号红土风雨棚":0.1,
-   
-  // }
-  const basePrice = court_price_mapping[court];
+
+  // 获取对应校区的价格配置
+  const campusPrices = court_price_mapping[campus] || court_price_mapping["麓坊校区"]; // 默认使用麓坊校区价格
+  const basePrice = campusPrices[court] || 60; // 默认价格60元
+  
   const [hour] = slot.start.split(':').map(Number);
   return hour >= 19 ? basePrice + 10 : basePrice;
 }
@@ -248,12 +245,12 @@ exports.main = async (event, context) => {
         let court_id = null
         let booked_by = null
         
-        // 如果是过去的时间段，按照80%的概率补充预订信息
-        if (isPastTime ) {
-          status = 'booked'
-          court_id = `${court.courtNumber}_${date}_${slot.start}`
-          booked_by = '18628172619'
-        }
+        // // 如果是过去的时间段，按照80%的概率补充预订信息
+        // if (isPastTime ) {
+        //   status = 'booked'
+        //   court_id = `${court.courtNumber}_${date}_${slot.start}`
+        //   booked_by = '18628172619'
+        // }
         
         result.push({
           courtNumber: court.courtNumber,
@@ -262,7 +259,7 @@ exports.main = async (event, context) => {
           start_time: slot.start,
           end_time: slot.end,
           status,
-          price: getPrice(court.courtNumber, slot),
+          price: getPrice(court.courtNumber, slot, court.campus),
           isPastTime:isPastTime,
           ...(court_id && { court_id }),
           ...(booked_by && { booked_by })

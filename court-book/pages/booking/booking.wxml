@@ -4,10 +4,14 @@
     <view class="booking-header">
       <view class="header-row">
         <text class="header-title">场地预约</text>
+        <view class="campus-selector" bindtap="showCampusPicker">
+          <text class="campus-name">{{currentCampus}}</text>
+          <view class="campus-arrow">▼</view>
+        </view>
       </view>
       <view class="venue-info">
         <view class="venue-left" bindtap="openLocation">
-          <view class="venue-name">乐动网球·麓坊校区</view>
+          <view class="venue-name">乐动网球·{{currentCampus}}</view>
           <view class="venue-desc">
             <view class="venue-desc-text">查看球场位置</view>
             <view class="venue-desc-icon">
@@ -112,6 +116,28 @@
             <image class="venue-image" src="{{item}}" mode="aspectFit" bindtap="previewImage" data-url="{{item}}"></image>
           </swiper-item>
         </swiper>
+      </view>
+    </view>
+  </view>
+
+  <!-- 校区选择弹窗 -->
+  <view class="campus-modal" wx:if="{{showCampusPicker}}" bindtap="hideCampusPicker">
+    <view class="campus-modal-content" catchtap="stopCampusPickerPropagation">
+      <view class="campus-modal-header">
+        <text class="campus-modal-title">选择校区</text>
+        <view class="campus-modal-close" bindtap="hideCampusPicker">×</view>
+      </view>
+      <view class="campus-modal-body">
+        <view class="campus-item {{item.name === currentCampus ? 'active' : ''}}"
+              wx:for="{{campusList}}"
+              wx:key="name"
+              bindtap="onCampusSelect"
+              data-campus="{{item.name}}">
+          <text class="campus-item-name">{{item.name}}</text>
+          <view class="campus-item-check" wx:if="{{item.name === currentCampus}}">
+            <text>✓</text>
+          </view>
+        </view>
       </view>
     </view>
   </view>

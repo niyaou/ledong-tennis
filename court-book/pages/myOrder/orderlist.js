@@ -30,7 +30,7 @@ Page({
     const targetCourtId = options.targetCourtId ? decodeURIComponent(options.targetCourtId) : null;
     
     this.setData({ 
-      phoneNumber:"18228048214",
+      phoneNumber:phoneNumber,
       isAdmin,
       targetCourtId
     }, () => {
@@ -57,7 +57,7 @@ Page({
     const managerList = app.globalData.managerList;
     const isAdmin = managerList && managerList.includes(phoneNumber);
     this.setData({ 
-      phoneNumber: "18228048214" ,
+      phoneNumber: phoneNumber,
       isAdmin
     });
     
@@ -125,7 +125,7 @@ Page({
     wx.cloud.callFunction({
       name: 'my_order_list',
       data: {
-        phoneNumber:"18228048214",
+        phoneNumber:phoneNumber,
         pageNum,
         pageSize
       }
@@ -399,7 +399,7 @@ Page({
     wx.cloud.callFunction({
       name: 'my_order_list',
       data: {
-        phoneNumber:"18228048214",
+        phoneNumber:phoneNumber,
         pageNum: 1,
         pageSize
       }

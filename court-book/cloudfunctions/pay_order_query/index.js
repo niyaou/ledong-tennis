@@ -65,6 +65,7 @@ exports.main = async (event) => {
       order: {
         _id: order._id,
         outTradeNo: order.outTradeNo,
+        campus: order.campus,
         payment_parmas: order.payment_parmas,
         total_fee: order.total_fee,
         court_ids: order.court_ids

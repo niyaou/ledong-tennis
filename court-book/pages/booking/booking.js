@@ -20,15 +20,29 @@ Page({
     'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_20250810213727_62.jpg',
     'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_20250810213734_65.jpg',
     ], // 场馆分布图片数组
+    currentCampus: '麓坊校区', // 当前选择的校区
+    showCampusPicker: false, // 控制校区选择器显示
+    campusList: [
+      { name: '麓坊校区', latitude: 30.461094427278926, longitude: 104.05406090412829, address: '麓坊街93号' },
+      { name: '桐梓林校区', latitude:30.61597, longitude:104.07435, address: '桐梓林路123号' },
+    ], // 校区列表
+   
   },
 
-  onLoad: function () {
+  onLoad: function (options) {
     // 初始化时读取手机号
     const phoneNumber = wx.getStorageSync('phoneNumber');
-    this.setData({ 
-      phoneNumber: phoneNumber 
+    this.setData({
+      phoneNumber: phoneNumber
     });
-    
+
+    // 从全局状态中获取校区信息，如果没有则使用默认值
+    const app = getApp();
+    const campus = app.globalData.selectedCampus || '麓坊校区';
+    this.setData({
+      currentCampus: campus
+    });
+
     this.initDateList();
     this.initTimeList();
     this.initCourtListByCloud();
@@ -41,7 +55,6 @@ Page({
     this.onDateTabChange({ currentTarget: { dataset: { index: 0, fullDate } } });
 
 
-    const app = getApp();
     const eventChannel = app.globalData.eventBus;
     if (eventChannel) {
       this.setData({ eventChannel });
@@ -63,8 +76,8 @@ Page({
   // 分享给朋友
   onShareAppMessage() {
     return {
-      title: '乐动网球-麓坊校区-场地预约',
-      desc: '麓坊校区所有场地都开放预约！',
+      title: `乐动网球-${this.data.currentCampus}-场地预约`,
+      desc: `${this.data.currentCampus}所有场地都开放预约！`,
       path: '/pages/booking/booking'
     }
   },
@@ -72,8 +85,8 @@ Page({
   // 分享到朋友圈
   onShareTimeline() {
     return {
-      title: '乐动网球-麓坊校区-场地预约',
-      query: '麓坊校区所有场地都开放预约！'
+      title: `乐动网球-${this.data.currentCampus}-场地预约`,
+      query: `${this.data.currentCampus}所有场地都开放预约！`
     }
   },
 
@@ -91,13 +104,26 @@ Page({
   },
 
   openLocation: function() {
-    wx.openLocation({
-      latitude:30.461094427278926,  // 麓坊校区的纬度
-      longitude: 104.05406090412829, // 麓坊校区的经度
-      name: '乐动网球·麓坊校区',
-      address: '麓坊街93号',
-      scale: 18
-    })
+    // 根据当前校区获取对应的位置信息
+    const currentCampusInfo = this.data.campusList.find(campus => campus.name === this.data.currentCampus);
+    if (currentCampusInfo) {
+      wx.openLocation({
+        latitude: currentCampusInfo.latitude,
+        longitude: currentCampusInfo.longitude,
+        name: `乐动网球·${this.data.currentCampus}`,
+        address: currentCampusInfo.address,
+        scale: 18
+      });
+    } else {
+      // 如果找不到校区信息，使用默认的麓坊校区
+      wx.openLocation({
+        latitude: 30.461094427278926,
+        longitude: 104.05406090412829,
+        name: `乐动网球·${this.data.currentCampus}`,
+        address: '麓坊街93号',
+        scale: 18
+      });
+    }
   },
 
   // Add refresh method
@@ -117,6 +143,31 @@ Page({
     this.setData({ 
       phoneNumber: phoneNumber 
     });
+    
+    // 检查是否需要切换校区
+    const app = getApp();
+    if (app.globalData.needSwitchCampus && app.globalData.selectedCampus) {
+      const newCampus = app.globalData.selectedCampus;
+      console.log('检测到校区切换:', this.data.currentCampus, '->', newCampus);
+      
+      this.setData({
+        currentCampus: newCampus
+      });
+      
+      // 清空选中状态并重新加载数据
+      this.clearSelectedStatus();
+      this.initCourtListByCloud();
+      
+      // 确保有有效的currentDate
+      if (this.data.currentDate) {
+        this.initCourtStatusByCloud(this.data.currentDate);
+      }
+      
+      // 清除标记和全局状态中的校区信息
+      app.globalData.needSwitchCampus = false;
+      app.globalData.selectedCampus = null;
+      console.log('校区切换完成，已清除标记和全局状态');
+    }
     
     // Only refresh if needed
     if (this.data.needRefresh) {
@@ -160,7 +211,7 @@ Page({
       name: 'get_court_order',
       data: {
         date: date,
-        campus: '麓坊校区'
+        campus: this.data.currentCampus
       },
       success: res => {
         if (res.result && res.result.success) {
@@ -223,7 +274,7 @@ Page({
     wx.cloud.callFunction({
       name: 'get_court_list_by_section',
       data: {
-        campus: '麓坊校区'
+        campus: this.data.currentCampus
       },
       success: res => {
         if (res.result && res.result.success) {
@@ -443,7 +494,7 @@ Page({
       name: 'get_court_order',
       data: {
         date: date,
-        campus: '麓坊校区'
+        campus: this.data.currentCampus
       },
       success: res => {
         if (res.result && res.result.success) {
@@ -591,7 +642,7 @@ Page({
     const selectedList = [];
     let total_fee = 0;
     const courtStatus = this.data.courtStatus;
-    const campus = '麓坊校区';
+    const campus = this.data.currentCampus;
     const date = this.data.currentDate;
  
     Object.keys(courtStatus).forEach(courtNumber => {
@@ -748,6 +799,7 @@ Page({
       // total_fee: court_ids.length/100,
       total_fee: price,
       court_ids,
+      campus: this.data.currentCampus,
       nonceStr: this.generateNonceStr()
     };
     wx.showLoading({ title: '加载中...' });
@@ -882,5 +934,44 @@ Page({
       current: current,
       urls: this.data.venueImages
     });
+  },
+
+  // 显示校区选择器
+  showCampusPicker: function() {
+    this.setData({
+      showCampusPicker: true
+    });
+  },
+
+  // 隐藏校区选择器
+  hideCampusPicker: function() {
+    this.setData({
+      showCampusPicker: false
+    });
+  },
+
+  // 选择校区
+  onCampusSelect: function(e) {
+    const selectedCampus = e.currentTarget.dataset.campus;
+    if (selectedCampus !== this.data.currentCampus) {
+      this.setData({
+        currentCampus: selectedCampus,
+        showCampusPicker: false
+      });
+
+      // 清空选中状态并重新加载数据
+      this.clearSelectedStatus();
+      this.initCourtListByCloud();
+      this.initCourtStatusByCloud(this.data.currentDate);
+    } else {
+      this.setData({
+        showCampusPicker: false
+      });
+    }
+  },
+
+  // 阻止校区选择器事件冒泡
+  stopCampusPickerPropagation: function() {
+    // 空函数，用于阻止事件冒泡
   },
 }); 
