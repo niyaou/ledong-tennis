@@ -180,7 +180,7 @@ Page({
     const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const dateList = [];
     const today = new Date();
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 14; i++) {
       const d = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
       const month = d.getMonth() + 1;
       const day = d.getDate();
@@ -336,10 +336,12 @@ Page({
     const item = times.find(i => i.time === time);
     const phoneNumber = this.data.phoneNumber;
 
-    // Get global managerList and check if user is manager
+    // Get global managerList and specialManagerList and check if user is manager or special manager
     const app = getApp();
     const managerList = app.globalData.managerList;
+    const specialManagerList = app.globalData.specialManagerList;
     const isManager = managerList && managerList.includes(phoneNumber);
+    const isSpecialManager = specialManagerList && specialManagerList.includes(phoneNumber);
 
     if (item.booked_by && item.booked_by !== phoneNumber) {
       if (isManager) {
@@ -375,8 +377,20 @@ Page({
     //   return;
     // }
 
-    // 检查日期是否超过限制（管理员7天，普通用户只能预约今天和明天）
-    if (isManager) {
+    // 检查日期是否超过限制（特殊管理员14天，管理员7天，普通用户只能预约今天和明天）
+    if (isSpecialManager) {
+      // 特殊管理员可以预约14天内
+      const maxDays = 14;
+      const maxDaysFromNow = new Date(now.getTime() + maxDays * 24 * 60 * 60 * 1000);
+      
+      if (selectedDate > maxDaysFromNow) {
+        wx.showToast({
+          title: `只能预约${maxDays}天内的场地`,
+          icon: 'none'
+        });
+        return;
+      }
+    } else if (isManager) {
       // 管理员可以预约7天内
       const maxDays = 7;
       const maxDaysFromNow = new Date(now.getTime() + maxDays * 24 * 60 * 60 * 1000);
@@ -627,16 +641,20 @@ Page({
     // 设置正在处理订单状态
     this.setData({ isProcessingOrder: true });
 
-    // Get global managerList
+    // Get global managerList and specialManagerList
     const app = getApp();
     const managerList = app.globalData.managerList;
+    const specialManagerList = app.globalData.specialManagerList;
     console.log('Global managerList:', managerList);
+    console.log('Global specialManagerList:', specialManagerList);
 
-    // Get user's phone number and check if in managerList
+    // Get user's phone number and check if in managerList or specialManagerList
     const userPhone = this.data.phoneNumber;
     const isManager = managerList && managerList.includes(userPhone);
+    const isSpecialManager = specialManagerList && specialManagerList.includes(userPhone);
     console.log('User phone:', userPhone);
     console.log('Is user a manager:', isManager);
+    console.log('Is user a special manager:', isSpecialManager);
 
     // 收集所有选中的项
     const selectedList = [];

@@ -4,6 +4,7 @@ App({
     userInfo: null,
     openid: null,
     managerList: [],
+    specialManagerList: [],
     eventBus: {
       listeners: {},
       on(event, callback) {
@@ -86,6 +87,30 @@ App({
         },
         fail: err => {
           console.error('获取管理员列表失败：', err)
+        }
+      })
+
+      // 先检查本地存储是否有特殊管理员列表
+      const specialManagerList = wx.getStorageSync('specialManagerList')
+      if (specialManagerList) {
+        // 如果有，直接加载到全局变量
+        this.globalData.specialManagerList = specialManagerList
+        console.log('从本地存储加载特殊管理员列表:', specialManagerList)
+      }
+
+      // 调用special_manager云函数获取特殊管理员列表
+      wx.cloud.callFunction({
+        name: "special_manager",
+        success: res => {
+          const newSpecialManagerList = res.result || [];
+          // 保存到本地存储
+          wx.setStorageSync('specialManagerList', newSpecialManagerList)
+          // 加载到全局变量
+          this.globalData.specialManagerList = newSpecialManagerList
+          console.log('获取并保存特殊管理员列表:', newSpecialManagerList)
+        },
+        fail: err => {
+          console.error('获取特殊管理员列表失败：', err)
         }
       })
     }
