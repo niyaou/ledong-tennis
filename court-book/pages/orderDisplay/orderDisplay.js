@@ -287,7 +287,7 @@ Page({
     this.autoRefreshTimer = setInterval(() => {
       console.log('自动刷新订单列表...');
       this.refreshOrdersIncrementally();
-    }, 30000);
+    }, 50000);
   },
 
   stopAutoRefresh: function() {

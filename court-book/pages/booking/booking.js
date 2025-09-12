@@ -485,8 +485,9 @@ Page({
         console.log('自动刷新场地状态...');
         this.updateCourtStatusIncrementally(this.data.currentDate);
       }
-    }, 30000); // 每30秒刷新一次，但只更新状态，不重新渲染
+    }, 50000); // 每30秒刷新一次，但只更新状态，不重新渲染
   },
+  
 
   stopAutoRefresh: function () {
     // 停止自动刷新定时器
