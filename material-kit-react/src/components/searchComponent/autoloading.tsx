@@ -82,8 +82,19 @@ function Autoloading(props) {
         }
 
         // console.log('--------excel===11111111', excelD)
+        // 去掉每个数组末尾的所有空字符串
+        const processedExcelD = excelD.map(row => {
+          // 从后往前找到第一个非空字符串的位置
+          let lastNonEmptyIndex = row.length - 1;
+          while (lastNonEmptyIndex >= 0 && row[lastNonEmptyIndex] === '') {
+            lastNonEmptyIndex--;
+          }
+          // 返回截取到最后一个非空元素的数组
+          return row.slice(0, lastNonEmptyIndex + 1);
+        });
+        
         // setExcelData(res.data)
-        unSubmittedCourse(excelD)
+        unSubmittedCourse(processedExcelD)
 
       };
       reader.onerror = (e) => {
