@@ -125,7 +125,7 @@ Page({
       });
     }
   },
-
+ 
   // Add refresh method
   refreshPage: function() {
     console.log('Refreshing booking page...');
@@ -197,7 +197,11 @@ Page({
 
   initTimeList: function () {
     const timeList = [];
-    for (let h = 7; h < 24; h++) {
+    // 根据校区设置不同的时间段：麓坊校区7-24点，桐梓林校区9-22点
+    const startHour = this.data.currentCampus === '桐梓林校区' ? 9 : 7;
+    const endHour = this.data.currentCampus === '桐梓林校区' ? 22 : 24;
+    
+    for (let h = startHour; h < endHour; h++) {
       timeList.push({ time: `${h < 10 ? '0' + h : h}:00` });
       timeList.push({ time: `${h < 10 ? '0' + h : h}:30` });
     }
@@ -977,6 +981,9 @@ Page({
         currentCampus: selectedCampus,
         showCampusPicker: false
       });
+
+      // 重新初始化时间列表（根据新校区）
+      this.initTimeList();
 
       // 清空选中状态并重新加载数据
       this.clearSelectedStatus();

@@ -24,8 +24,8 @@ exports.main = async (event) => {
 
   if (isManager) {
     // 如果是管理员，查询前后7天的数据
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    const sevenDaysLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    const sevenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
+    const sevenDaysLater = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     query._ = db.command.or([
       {
         status: 'PAIDED',
