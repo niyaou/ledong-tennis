@@ -120,8 +120,8 @@ const unSubmittedCourse=async (excelD)=>{
   const handleSubmitCourse = (item) => {
     const coureseType = ['体验课未成单', '体验课成单', '订场','班课', '私教' ]
 
-    let coachId = find(coach, { 'name': item[0] })
-    coachId = coachId.number
+    let coachObj = find(coach, { 'name': item[0] })
+    let coachId = coachObj ? coachObj.number : null
     let course = {
       startTime: item[2], endTime: item[3], coach: coachId, spendingTime: item[4], courtSpend: 0, coachSpend: 0, descript: item[10] || '备注无',
       court: item[6], courseType: coureseType.indexOf(item[5]) - 2, membersObj: null
@@ -154,9 +154,9 @@ const unSubmittedCourse=async (excelD)=>{
 
     console.log("🚀 ~ handleSubmitCourse ~ item:", item, course)
     
-    if(course.court===null || course.coach===null||course.courseType===null){
-
-      alert('数据错误，请修改日志')
+    // 检查必填字段是否有效（包括空字符串、undefined、null等情况）
+    if(!course.court || !course.coach || course.courseType === null || course.courseType === undefined || course.courseType < -2){
+      alert('数据错误，请修改日志 - 教练、场地或课程类型不正确')
       return
     }
     dispatch(createCard(course))
