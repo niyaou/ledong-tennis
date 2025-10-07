@@ -122,9 +122,13 @@ const unSubmittedCourse=async (excelD)=>{
 
     let coachObj = find(coach, { 'name': item[0] })
     let coachId = coachObj ? coachObj.number : null
+    
+    let courtObj = find(court, { 'name': item[6] })
+    let courtName = courtObj ? courtObj.name : null
+    
     let course = {
       startTime: item[2], endTime: item[3], coach: coachId, spendingTime: item[4], courtSpend: 0, coachSpend: 0, descript: item[10] || '备注无',
-      court: item[6], courseType: coureseType.indexOf(item[5]) - 2, membersObj: null
+      court: courtName, courseType: coureseType.indexOf(item[5]) - 2, membersObj: null
     }
 
     let membersObj = {}
