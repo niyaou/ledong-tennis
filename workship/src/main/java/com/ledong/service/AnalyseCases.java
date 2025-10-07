@@ -2,6 +2,7 @@ package com.ledong.service;
 
 import cn.hutool.core.date.DateUtil;
 import com.ledong.dao.*;
+import com.ledong.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -298,16 +299,16 @@ public class AnalyseCases {
 
     public Object analyseOptimizedEfficiancy(String startTime, String endTime) {
         var total = new ConcurrentHashMap<String, Object>();
-        
+       
         // 一次性加载所有需要的数据，避免在循环中查询数据库
         var course = courseDao.findAllWithTimeRange(DateUtil.parse(startTime).toLocalDateTime(), DateUtil.parse(endTime).toLocalDateTime());
         var charge = chargeDao.findAllWithTimeRange(DateUtil.parse(startTime).toLocalDateTime(), DateUtil.parse(endTime).toLocalDateTime());
-        
+
         // 一次性查询所有用户，避免N+1问题
         var allUsers = userDao.findAll();
         
         // 按校区分组用户，提前在内存中建立索引
-        var usersByCourtMap = allUsers.stream()
+        Map<String, List<PrepaidCard>> usersByCourtMap = allUsers.stream()
             .collect(Collectors.groupingBy(
                 user -> user.getCourt(),
                 ConcurrentHashMap::new,
@@ -356,7 +357,7 @@ public class AnalyseCases {
     /**
      * 处理充值数据，统计校区和教练的充值金额
      */
-    private void processChargeData(List charge, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue) {
+    private void processChargeData(List<Charge> charge, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue) {
         charge.parallelStream().filter(member->member.getCoach()==null || member.getCoach().getIsActive()>0).forEach(charge1 -> {
             // 统计校区充值
             revenue.compute(charge1.getCourt(), (k, court) -> {
@@ -392,7 +393,7 @@ public class AnalyseCases {
      */
     private void calculateEquivalentBalance(
             ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue,
-            ConcurrentHashMap<String, List> usersByCourtMap) {
+            Map<String, List<PrepaidCard>> usersByCourtMap) {
         
         revenue.keySet().parallelStream().forEach(court -> {
             // 从预加载的Map中获取用户列表，避免数据库查询
@@ -418,7 +419,7 @@ public class AnalyseCases {
     /**
      * 处理课程数据（包括体验课和正式课）- 使用并行流
      */
-    private void processCourseData(List course, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue) {
+    private void processCourseData(List<Course> course, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue) {
         course.parallelStream().filter(c->c.getCoach()==null||c.getCoach().getIsActive()>0).forEach(course1 -> {
             // 处理体验课
             if (course1.getCourseType() < 0) {
@@ -434,7 +435,7 @@ public class AnalyseCases {
     /**
      * 处理体验课数据 - 线程安全
      */
-    private void processTrialCourse(Object course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys) {
+    private void processTrialCourse(Course course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys) {
         // 统计教练的满班率
         analys.compute(course1.getCoach().getName(), (k, coach) -> {
             if (coach == null) {
@@ -463,7 +464,7 @@ public class AnalyseCases {
                 school.put("analyse", 0f);
                 school.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                 school.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
-            } else {
+                } else {
                 school.merge("workTime", course1.getDuration(), Float::sum);
                 school.merge("trial", course1.getCourseType() < 0f ? 1f : 0f, Float::sum);
                 school.merge("deal", course1.getCourseType() == -1f ? 1f : 0f, Float::sum);
@@ -475,7 +476,7 @@ public class AnalyseCases {
     /**
      * 处理正式课数据 - 优化后避免重复计算
      */
-    private void processFormalCourse(Object course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue) {
+    private void processFormalCourse(Course course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue) {
         var spends = course1.getSpend();
         
         // 一次性计算所有需要的值，避免重复遍历
@@ -495,7 +496,7 @@ public class AnalyseCases {
     /**
      * 计算总消费金额 - 提取公共方法避免重复计算
      */
-    private float calculateTotalSpend(List spends) {
+    private float calculateTotalSpend(List<Spend> spends) {
         return spends.stream()
             .map(spend1 -> spend1.getCharge() == 0F ? spend1.getDescription() : spend1.getCharge())
             .reduce(0f, Float::sum);
@@ -504,7 +505,7 @@ public class AnalyseCases {
     /**
      * 更新校区消费金额
      */
-    private void updateCourtSpend(Object course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue, float totalSpend) {
+    private void updateCourtSpend(Course course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue, float totalSpend) {
         revenue.compute(course1.getCourt().getName(), (k, court) -> {
             if (court == null) {
                 court = new ConcurrentHashMap<>();
@@ -519,13 +520,13 @@ public class AnalyseCases {
     /**
      * 更新教练消费金额
      */
-    private void updateCoachSpend(Object course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue, float totalSpend) {
+    private void updateCoachSpend(Course course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> revenue, float totalSpend) {
         revenue.compute(course1.getCoach().getName(), (k, coachRevenue) -> {
             if (coachRevenue == null) {
                 coachRevenue = new ConcurrentHashMap<>();
                 coachRevenue.put("spend", totalSpend);
                 coachRevenue.put("charge", 0f);
-            } else {
+                } else {
                 coachRevenue.merge("spend", totalSpend, Float::sum);
             }
             return coachRevenue;
@@ -535,7 +536,7 @@ public class AnalyseCases {
     /**
      * 计算课程的会员数量 - 使用流式计算优化
      */
-    private int calculateMemberQuantities(List spends) {
+    private int calculateMemberQuantities(List<Spend> spends) {
         return spends.stream()
             .mapToInt(spend -> spend.getQuantities())
             .sum();
@@ -544,7 +545,7 @@ public class AnalyseCases {
     /**
      * 统计教练满班率 - 线程安全
      */
-    private void processCoachAnalysis(Object course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, int memberQuantities) {
+    private void processCoachAnalysis(Course course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, int memberQuantities) {
         analys.compute(course1.getCoach().getName(), (k, coach) -> {
             if (coach == null) {
                 coach = new ConcurrentHashMap<>();
@@ -559,7 +560,7 @@ public class AnalyseCases {
                 coach.put("analyse",0f);
                 coach.put("trial", course1.getCourseType() < 0f ? 1f : 0f);
                 coach.put("deal", course1.getCourseType() == -1f ? 1f : 0f);
-            } else {
+                } else {
                 coach.merge("workTime", course1.getDuration(), Float::sum);
                 if(memberQuantities>0){
                     coach.merge("courses", 1F, Float::sum);
@@ -576,7 +577,7 @@ public class AnalyseCases {
     /**
      * 统计校区满班率 - 线程安全
      */
-    private void processSchoolAnalysis(Object course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, int memberQuantities) {
+    private void processSchoolAnalysis(Course course1, ConcurrentHashMap<String, ConcurrentHashMap<String, Float>> analys, int memberQuantities) {
         analys.compute(course1.getCourt().getName(), (k, school) -> {
             if (school == null) {
                 school = new ConcurrentHashMap<>();
