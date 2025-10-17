@@ -57,14 +57,14 @@ exports.main = async (event) => {
   }
 
   // 计算分页参数
-  const skip = (pageNum - 1) * pageSize*2
+  const skip = (pageNum - 1) * pageSize*5
 
   // 查询 pay_order 集合
   const result = await db.collection('pay_order')
     .where(query)
     .orderBy('createTime', 'desc')
     .skip(skip)
-    .limit(pageSize*2)
+    .limit(pageSize*5)
     .get()
 
   // 如果是管理员，在应用层过滤数据
