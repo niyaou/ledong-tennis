@@ -44,6 +44,10 @@ function getPrice(court, slot, campus) {
     "桐梓林校区": {
       "1号风雨棚": 60,
       "2号风雨棚": 60,
+    },
+    "雅居乐校区": {
+      "1号风雨棚": 90,
+      "2号室外": 60,
     }
   }
 
@@ -70,10 +74,14 @@ exports.main = async (event, context) => {
   console.log('场地列表:', courtList.data)
 
   // 2. 生成时间段
-  // 根据校区设置不同的时间段：麓坊校区07:00-24:00，桐梓林校区09:00-22:00
-  const timeSlots = campus === '桐梓林校区' 
-    ? generateTimeSlots('09:00', '22:00', 30) // 桐梓林校区：09:00-22:00，30分钟一段
-    : generateTimeSlots('07:00', '24:00', 30) // 麓坊校区：07:00-24:00，30分钟一段
+  // 根据校区设置不同的时间段：麓坊、雅居乐07:00-24:00，桐梓林09:00-22:00
+  const campusTimeConfig = {
+    '麓坊校区': { start: '07:00', end: '24:00' },
+    '雅居乐校区': { start: '07:00', end: '24:00' },
+    '桐梓林校区': { start: '09:00', end: '22:00' }
+  };
+  const { start, end } = campusTimeConfig[campus] || campusTimeConfig['麓坊校区'];
+  const timeSlots = generateTimeSlots(start, end, 30);
   // console.log('生成的时间段:', timeSlots)
 
   // 3. 查询预订状态

@@ -3,6 +3,22 @@ const cloud = require('wx-server-sdk')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
 
+function formatTimeExpire(date) {
+  // 确保使用北京时间（UTC+8）
+  // 将UTC时间转换为北京时间：UTC+8
+  const beijingOffset = 8 * 60 * 60 * 1000 // UTC+8 的毫秒偏移（8小时）
+  const beijingTime = new Date(date.getTime() + beijingOffset)
+  
+  const pad = (num) => num.toString().padStart(2, '0')
+  const year = beijingTime.getUTCFullYear()
+  const month = pad(beijingTime.getUTCMonth() + 1)
+  const day = pad(beijingTime.getUTCDate())
+  const hour = pad(beijingTime.getUTCHours())
+  const minute = pad(beijingTime.getUTCMinutes())
+  const second = pad(beijingTime.getUTCSeconds())
+  return `${year}${month}${day}${hour}${minute}${second}`
+}
+
 // 生成32位订单号
 function generateOrderNo(params) {
   const { phoneNumber, openid, total_fee, campus, courtNumber, date, timeSeries } = params;
@@ -82,6 +98,18 @@ exports.main = async (event, ) => {
     };
   }
 
+  // 根据支付方式设置超时时间：刷卡至少1分钟，其他5分钟
+  const tradeType = "JSAPI" // 当前使用小程序支付
+  // 确保满足微信支付最小时间要求：刷卡至少1分钟，其他至少5分钟
+  const minTimeoutMinutes = tradeType === "MICROPAY" ? 1 : 5.1
+  const paymentTimeoutMinutes = tradeType === "MICROPAY" ? 1 : 5.2
+  // 确保至少满足最小时间要求，向上取整到秒
+  const timeoutSeconds = Math.max(minTimeoutMinutes * 60, Math.ceil(paymentTimeoutMinutes * 60))
+  
+  const now = Date.now()
+  const paymentExpireTime = new Date(now + timeoutSeconds * 1000)
+  const timeExpire = formatTimeExpire(paymentExpireTime)
+
   const res = await cloud.cloudPay.unifiedOrder({
     outTradeNo,
     body: `订场-在线支付`,
@@ -92,9 +120,21 @@ exports.main = async (event, ) => {
     spbillCreateIp: '127.0.0.1',
     envId:"cloud1-6gebob4m4ba8f3de",
     tradeType: "JSAPI",
+    timeExpire,
     functionName: "order_create_callback", // 支付结果通知回调云函数名,
   })
-
+  console.log( {
+    phoneNumber,
+    total_fee,
+    court_ids,
+    outTradeNo,
+    payment_parmas:res.payment,
+    createTime: db.serverDate(),
+    timeExpire,
+    paymentQueryTime: null,
+    campus:campus,
+    status: 'PENDING' // 初始状态为待支付
+  })
   // 创建订单记录
   console.log(res.payment)
   await db.collection('pay_order').add({
@@ -105,21 +145,14 @@ exports.main = async (event, ) => {
       campus:campus,
       outTradeNo,
       payment_parmas:res.payment,
+      paymentTimeoutMinutes,
+      paymentExpireTime,
       createTime: db.serverDate(),
+      timeExpire,
       paymentQueryTime: null, // 支付查询时间，初始为null
       status: 'PENDING' // 初始状态为待支付
     }
   })
-  console.log( {
-    phoneNumber,
-    total_fee,
-    court_ids,
-    outTradeNo,
-    payment_parmas:res.payment,
-    createTime: db.serverDate(),
-    paymentQueryTime: null,
-    campus:campus,
-    status: 'PENDING' // 初始状态为待支付
-  })
+
   return res
 }

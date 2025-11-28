@@ -45,11 +45,20 @@
 
 .order-header {
   margin-bottom: 10rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .order-time {
   font-size: 24rpx;
   color: #666;
+}
+
+.campus-info {
+  font-size: 24rpx;
+  color: #666;
+  margin-left: 20rpx;
 }
 
 .order-content {

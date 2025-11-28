@@ -24,7 +24,8 @@ Page({
     showCampusPicker: false, // 控制校区选择器显示
     campusList: [
       { name: '麓坊校区', latitude: 30.461094427278926, longitude: 104.05406090412829, address: '麓坊街93号' },
-      { name: '桐梓林校区', latitude:30.61597, longitude:104.07435, address: '桐梓林路123号' },
+      { name: '桐梓林校区', latitude: 30.61597, longitude: 104.07435, address: '桐梓林路123号' },
+      { name: '雅居乐校区', latitude: 30.0, longitude: 104.0, address: '雅居乐城内（待更新）' },
     ], // 校区列表
    
   },
@@ -197,9 +198,13 @@ Page({
 
   initTimeList: function () {
     const timeList = [];
-    // 根据校区设置不同的时间段：麓坊校区7-24点，桐梓林校区9-22点
-    const startHour = this.data.currentCampus === '桐梓林校区' ? 9 : 7;
-    const endHour = this.data.currentCampus === '桐梓林校区' ? 22 : 24;
+    // 根据校区设置不同的时间段：麓坊、雅居乐7-24点，桐梓林9-22点
+    const campusTimeConfig = {
+      '麓坊校区': { start: 7, end: 24 },
+      '雅居乐校区': { start: 7, end: 24 },
+      '桐梓林校区': { start: 9, end: 22 }
+    };
+    const { start: startHour, end: endHour } = campusTimeConfig[this.data.currentCampus] || campusTimeConfig['麓坊校区'];
     
     for (let h = startHour; h < endHour; h++) {
       timeList.push({ time: `${h < 10 ? '0' + h : h}:00` });

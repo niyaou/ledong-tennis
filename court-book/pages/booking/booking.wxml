@@ -21,7 +21,7 @@
           </view>
         </view>
         <view class="venue-right" bindtap="showVenueDistribution">
-   <view class="venue-name">乐动网球·麓坊校区</view>
+          <view class="venue-name">乐动网球·{{currentCampus}}</view>
 
           <view class="venue-distribution">
            <view class="venue-desc-text">

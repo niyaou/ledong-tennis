@@ -13,6 +13,7 @@
       <view class="order-item {{ item.status === 'PAIDED' ? 'paided' :  ''}}" bindtap="onOrderItemClick" data-order="{{item}}">
         <view class="order-header">
           <text class="order-time">创建时间: {{utils.formatTime(item.createTime)}}</text>
+          <text class="campus-info" wx:if="{{item.campus}}">校区: {{item.campus}}</text>
         </view>
         <view class="order-content">
           <view class="order-main">
