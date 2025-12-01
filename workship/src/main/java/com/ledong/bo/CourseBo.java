@@ -1,6 +1,5 @@
 package com.ledong.bo;
 
-import cn.hutool.core.date.DateTime;
 import com.ledong.entity.Coach;
 import com.ledong.entity.Court;
 import com.ledong.entity.PrepaidCard;
@@ -24,6 +23,7 @@ public class CourseBo {
     private LocalDateTime endTime;
     private float duration;
     private int courseType;
+    private Integer isAdult;
     private Court court;
     private Coach coach;
     private List<PrepaidCard> member;

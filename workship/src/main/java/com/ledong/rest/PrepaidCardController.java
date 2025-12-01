@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.ArrayList;
 
-import static com.alibaba.druid.sql.ast.SQLPartitionValue.Operator.List;
 
 
 @RestController
@@ -51,9 +50,10 @@ public class PrepaidCardController extends BaseController{
                                       @RequestParam  String courtName,
                                       @RequestParam  String descript,
                                       @RequestParam  int courseType,
-                                      @RequestParam  String membersObj){
+                                      @RequestParam  String membersObj,
+                                      @RequestParam(required = false) Integer isAdult){
         verifiedSecure(secure);
-        var course = Course.fromBO(courseCases.createCourse(startTime,endTime,coachName,spendingTime,courtName,descript,courseType,membersObj));
+        var course = Course.fromBO(courseCases.createCourse(startTime,endTime,coachName,spendingTime,courtName,descript,courseType,membersObj,isAdult));
         return CourseResponseDTO.builder()
                .build();
     }

@@ -1,7 +1,6 @@
 package com.ledong.service;
 
 import com.ledong.bo.PrepaidCardBo;
-import com.ledong.bo.SpendBo;
 import com.ledong.dao.SpendDAO;
 import com.ledong.dao.UserDAO;
 import com.ledong.entity.PrepaidCard;

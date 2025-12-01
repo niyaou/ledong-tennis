@@ -1,9 +1,6 @@
 package com.ledong.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ledong.bo.CourseBo;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -39,6 +36,9 @@ public class Course {
     @Column(name = "course_type",  columnDefinition = "int COMMENT '类型:-2体验课未成单,-1体验课成单,0,订场，1，班课；2，私教'")
     private int courseType;
 
+    @Column(name = "is_adult", columnDefinition = "tinyint(1) DEFAULT 1 COMMENT '1=成人课程, 0=儿童课程'")
+    private Integer isAdult;
+
     @ManyToOne
     @JoinColumn(name = "court_id")
     private Court court;
@@ -71,6 +71,7 @@ public class Course {
                 .member(bo.getMember())
                 .notified(bo.getNotified())
                 .spend(bo.getSpend())
+                .isAdult(bo.getIsAdult())
                 .build();
     }
 

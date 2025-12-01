@@ -251,9 +251,9 @@ export const notifyCourse = createAsyncThunk(
 
 
 
-export const createCard = createAsyncThunk(
+export const createCard = createAsyncThunk<any, any>(
     'lduser/createCard',
-    async (payload, { rejectWithValue }) => {
+    async (payload: any, { rejectWithValue }) => {
         console.log("🚀 ~ payload:", payload)
         try {
 
@@ -275,6 +275,7 @@ export const createCard = createAsyncThunk(
             formdata.append("courseType", payload.courseType)
             formdata.append("descript", payload.descript)
             formdata.append("membersObj", JSON.stringify(payload.membersObj))
+            formdata.append("isAdult", payload.isAdult !== undefined && payload.isAdult !== null ? payload.isAdult : 1)
 
 
             const response = await Axios.post(`/api/prepaidCard/course/create`, formdata)

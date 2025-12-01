@@ -5,7 +5,6 @@ import com.ledong.dao.CourtDAO;
 import com.ledong.entity.PrepaidCard;
 import com.ledong.entity.response.ChargedResponseDTO;
 import com.ledong.entity.response.UserResponseDTO;
-import com.ledong.exception.UseCaseCode;
 import com.ledong.service.CardCases;
 import com.ledong.service.CourseCases;
 import com.ledong.service.UserCases;
@@ -15,7 +14,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/user")

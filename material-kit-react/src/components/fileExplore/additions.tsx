@@ -132,7 +132,7 @@ function Additions(props) {
 
   const [courseEdit, setCourseEdit] = React.useState({
     startTime: new Date(), endTime: new Date(), coach: '', spendingTime: 1, courtSpend: 0, coachSpend: 0, descript: '',
-    court: '', courseType: 0, membersObj: null
+    court: '', courseType: 0, membersObj: null, isAdult: 1
   });
 
 
@@ -617,6 +617,20 @@ function Additions(props) {
         }}
         value={[courseEdit.courseType]}>
         {['体验课未成单', '体验课成单', '订场', '班课', '私教'].map((dict, index) => { return (<MenuItem key={`courseType-${dict}`} value={index - 2}>{dict}</MenuItem>) })}
+      </Select>
+    </FormControl>
+
+    <FormControl sx={{ width: '100%' }}>
+      <InputLabel>课程类型</InputLabel>
+      <Select
+        value={courseEdit.isAdult}
+        onChange={(e) => {
+          let after = { ...courseEdit, isAdult: e.target.value };
+          setCourseEdit(after);
+        }}
+      >
+        <MenuItem value={1}>成人课程</MenuItem>
+        <MenuItem value={0}>儿童课程</MenuItem>
       </Select>
     </FormControl>
 

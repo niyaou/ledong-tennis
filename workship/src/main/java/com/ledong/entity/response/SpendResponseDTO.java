@@ -1,7 +1,6 @@
 package com.ledong.entity.response;
 
 import com.ledong.entity.Course;
-import com.ledong.entity.PrepaidCard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -3,8 +3,6 @@ package com.ledong.service;
 import cn.hutool.core.convert.Convert;
 import lombok.SneakyThrows;
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
@@ -14,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 public class WsHandler {
 
     private WebSocketClient cc;
-    private StringBuffer recvStringBuffer = new StringBuffer();
     private ByteBuffer recvByteBuffer =ByteBuffer.allocate(4);
     private ByteBuffer stringCacheByteBuffer = ByteBuffer.allocate(1024);
     @SneakyThrows

@@ -60,10 +60,10 @@ function Autoloading(props) {
         const data = new Uint8Array(e.target!.result as ArrayBuffer);
         const workbook = read(data, { type: 'array' });
         // console.log('----sheet length,',workbook, workbook.SheetNames.length)
-        for (let i in workbook.SheetNames) {
+        for (let i = 0; i < workbook.SheetNames.length; i++) {
           const sheetName = workbook.SheetNames[i];
           // console.log("🚀 ~ handleFileUpload ~ sheetName:", sheetName)
-          if ((i as number) > 4) {
+          if (i > 4) {
             console.log("🚀 ~ handleFileUpload ~ sheetName:    and break", sheetName)
             break
           }
@@ -126,16 +126,24 @@ const unSubmittedCourse=async (excelD)=>{
     let courtObj = find(court, { 'name': item[6] })
     let courtName = courtObj ? courtObj.name : null
     
+    const adultFieldValue = item[8]
+    const hasAdultField = (adultFieldValue === '成人' || adultFieldValue === '儿童') || (item.length > 11 && (item.length - 11) % 5 !== 0)
+    const remarkIndex = hasAdultField ? 11 : 10
+    const memberStartIndex = hasAdultField ? 12 : 11
+    const membersDataLength = item.length - memberStartIndex
+    const isAdult = hasAdultField ? (adultFieldValue === '儿童' ? 0 : 1) : 1
+    
     let course = {
-      startTime: item[2], endTime: item[3], coach: coachId, spendingTime: item[4], courtSpend: 0, coachSpend: 0, descript: item[10] || '备注无',
-      court: courtName, courseType: coureseType.indexOf(item[5]) - 2, membersObj: null
+      startTime: item[2], endTime: item[3], coach: coachId, spendingTime: item[4], courtSpend: 0, coachSpend: 0, descript: item[remarkIndex] || '备注无',
+      court: courtName, courseType: coureseType.indexOf(item[5]) - 2, membersObj: null, isAdult: isAdult
     }
 
     let membersObj = {}
-    if (course.courseType > 0) {
-      let membs = Math.ceil((item.length - 11) / 5)
+    if (course.courseType > 0 && membersDataLength > 0) {
+      let membs = Math.ceil(membersDataLength / 5)
       for (let i = 0; i < membs; i++) {
-        let membId = find(users, { 'name': item[i * 5 + 11] })
+        let memberBaseIndex = i * 5 + memberStartIndex
+        let membId = find(users, { 'name': item[memberBaseIndex] })
         if(  typeof membId==='undefined'){
           console.log("🚀 ~ error submit ~ item:数据错误，请修改日志", )
           return 
@@ -143,9 +151,9 @@ const unSubmittedCourse=async (excelD)=>{
         membId = membId.number
      
 
-        membersObj[membId] = [0, 0, 0, item[i * 5 + 11 + 3], item[i * 5 + 11 + 4]]
-        let idx = ['课时费', '次卡', '年卡'].indexOf(item[i * 5 + 11 + 1])
-        membersObj[membId][idx] = item[i * 5 + 11 + 2]
+        membersObj[membId] = [0, 0, 0, item[memberBaseIndex + 3], item[memberBaseIndex + 4]]
+        let idx = ['课时费', '次卡', '年卡'].indexOf(item[memberBaseIndex + 1])
+        membersObj[membId][idx] = item[memberBaseIndex + 2]
         for (let j = 0;j < membersObj[membId].length; j++) {
           if(  membersObj[membId][idx]===null){
             console.log("🚀 ~ error submit ~ item:数据错误，请修改日志", )
@@ -175,6 +183,16 @@ const unSubmittedCourse=async (excelD)=>{
   // }, [excelData])
 
   const courseItem = (item) => {
+    const adultFieldValue = item[8]
+    const hasAdultField = (adultFieldValue === '成人' || adultFieldValue === '儿童') || (item.length > 11 && (item.length - 11) % 5 !== 0)
+    const courseTypeLabel = hasAdultField ? (adultFieldValue || '成人') : '成人'
+    const lightIndex = hasAdultField ? 9 : 8
+    const fieldFeeIndex = hasAdultField ? 10 : 9
+    const remarkIndex = hasAdultField ? 11 : 10
+    const memberStartIndex = hasAdultField ? 12 : 11
+    const memberDisplayCount = Math.max(0, Math.floor((item.length - memberStartIndex) / 5))
+    const membersToShow = Math.min(12, memberDisplayCount)
+
     return (<Paper key={`item-course-${item[0]}-${item[2]}-${item[3]}`} elevation={3} sx={{
       minWidth: '850px',
       background: 'transparent',
@@ -198,7 +216,7 @@ const unSubmittedCourse=async (excelD)=>{
         alignItems="center"
         sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
       ><Typography >
-          {item[2]}~{item[3]}, 上课 {item[4]}小时，  课程类别: {item[5]} , 校区： {item[6]}  上课人数:{item[7]}  <br />, 灯光:{item[8]}，场地费:{item[9]} ,  备注:{item[10]}
+          {item[2]}~{item[3]}, 上课 {item[4]}小时，  课程类别: {item[5]} , 校区： {item[6]}  上课人数:{item[7]}  <br />, 课程类型:{courseTypeLabel}, 灯光:{item[lightIndex] ?? '--'}，场地费:{item[fieldFeeIndex] ?? '--'} ,  备注:{item[remarkIndex] ?? '无'}
         </Typography>
       </Stack>
       <Stack
@@ -208,8 +226,9 @@ const unSubmittedCourse=async (excelD)=>{
         alignItems="center"
         sx={{ padding: 1, background: 'transparent', '& :hover': { background: 'transparent' } }}
       >
-        {Array.from({ length: Math.min(12, Math.floor((item.length - 11) / 5)) }, (_, index) => index).map(idx => {
-          return (<Stack><Typography>{`${item[11 + idx * 5]}, 课型（ ${item[12 + idx * 5]}）, 扣费数量 ${item[13 + idx * 5]}， 等效价格：${item[14 + idx * 5]}， 上课人数：${item[15 + idx * 5]} `}</Typography></Stack>)
+        {Array.from({ length: membersToShow }, (_, index) => index).map(idx => {
+          const memberBaseIndex = memberStartIndex + idx * 5
+          return (<Stack><Typography>{`${item[memberBaseIndex]}, 课型（ ${item[memberBaseIndex + 1]}）, 扣费数量 ${item[memberBaseIndex + 2]}， 等效价格：${item[memberBaseIndex + 3]}， 上课人数：${item[memberBaseIndex + 4]} `}</Typography></Stack>)
         })}
       </Stack>
       <Button variant='contained' onClick={() => { handleSubmitCourse(item) }}>提交</Button>

@@ -1,6 +1,5 @@
 package com.ledong.bo;
 
-import cn.hutool.core.date.DateTime;
 import com.ledong.entity.Coach;
 import com.ledong.entity.PrepaidCard;
 import lombok.AllArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 

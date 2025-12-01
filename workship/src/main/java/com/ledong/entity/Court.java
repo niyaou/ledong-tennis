@@ -1,11 +1,8 @@
 package com.ledong.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import lombok.experimental.Accessors;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;

@@ -1,7 +1,6 @@
 package com.ledong.service;
 
 
-import com.ledong.dao.ChargeDAO;
 import com.ledong.dao.CourseDAO;
 import com.ledong.entity.Course;
 import com.tencentcloudapi.common.Credential;
@@ -13,7 +12,6 @@ import com.tencentcloudapi.sms.v20190711.models.SendSmsRequest;
 import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 

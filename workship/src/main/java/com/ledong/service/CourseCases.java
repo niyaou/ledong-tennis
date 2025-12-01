@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class CourseCases {
@@ -68,7 +67,8 @@ public class CourseCases {
             String courtName,
             String descript,
             int courseType,
-            String membersObj
+            String membersObj,
+            Integer isAdult
     ) {
         var coach = coachDao.findByNumber(coachName);
         var court = courtDao.findByName(courtName);
@@ -80,6 +80,7 @@ public class CourseCases {
                 .duration(spendingTime)
                 .description(descript)
                 .courseType(courseType)
+                .isAdult(isAdult != null ? isAdult : 1)
                 .member(new ArrayList<>())
                 .build();
         var course = Course.fromBO(courseBo);
