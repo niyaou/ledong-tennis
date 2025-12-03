@@ -72,7 +72,8 @@ function Autoloading(props) {
           const sheet = workbook.Sheets[sheetName];
           const jsonData = utils.sheet_to_json(sheet, { header: 1, range: 1 });
           console.log('---------sheetName', sheetName, jsonData)
-          const filt = jsonData.filter(j => j[5] !== '单独订场')
+          // const filt = jsonData.filter(j => j[5] !== '单独订场') //奇怪为啥要过滤
+          const filt = [...jsonData]
           console.log('---------sheetName', sheetName, filt)
           excelD = [...excelD, ...filt]
           // if (jsonData.length > 1) {
