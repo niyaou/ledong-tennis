@@ -25,7 +25,7 @@ Page({
     campusList: [
       { name: '麓坊校区', latitude: 30.461094427278926, longitude: 104.05406090412829, address: '麓坊街93号' },
       { name: '桐梓林校区', latitude: 30.61597, longitude: 104.07435, address: '桐梓林路123号' },
-      { name: '雅居乐校区', latitude: 30.0, longitude: 104.0, address: '雅居乐城内（待更新）' },
+      { name: '雅居乐校区', latitude: 30.48023, longitude: 104.1375, address: '雅居乐城内（待更新）' },
     ], // 校区列表
    
   },

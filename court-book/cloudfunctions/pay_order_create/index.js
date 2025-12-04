@@ -32,20 +32,23 @@ function generateOrderNo(params) {
 }
 
 // 检查重复订单
-async function checkDuplicateOrders(db, court_ids) {
+async function checkDuplicateOrders(db, court_ids, campus) {
   // 计算7天前的时间
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   
   console.log('检查重复订单 - 7天前时间:', sevenDaysAgo);
   console.log('检查的court_ids:', court_ids);
+  console.log('检查的campus:', campus);
   console.log('court_ids类型:', Array.isArray(court_ids) ? '数组' : typeof court_ids);
   
   // 查询7天内状态为PENDING或PAIDED的订单，检查是否有court_ids重叠
   // court_ids是一个字符串数组，每个元素格式为: "场地号_日期_时间"
   // 使用 db.command.in(court_ids) 查找订单的court_ids数组中包含我们要预订的任何一个court_id的订单
+  // 同时检查校区是否相同，只有相同校区的订单才会被认为是重复订单
   const existingOrders = await db.collection('pay_order').where({
     status: db.command.in(['PENDING', 'PAIDED']),
     createTime: db.command.gte(sevenDaysAgo),
+    campus: campus, // 添加校区条件，确保只有相同校区的订单才会被检查
     court_ids: db.command.in(court_ids) // 查找court_ids数组中包含我们要预订的任何一个court_id的订单
   }).get();
   
@@ -55,7 +58,9 @@ async function checkDuplicateOrders(db, court_ids) {
   for (const order of existingOrders.data) {
     console.log('检查订单:', order.outTradeNo);
     console.log('订单court_ids:', order.court_ids);
+    console.log('订单campus:', order.campus);
     console.log('我们要预订的court_ids:', court_ids);
+    console.log('我们要预订的campus:', campus);
     
     // 检查是否有重叠
     const overlap = court_ids.filter(id => order.court_ids.includes(id));
@@ -64,6 +69,7 @@ async function checkDuplicateOrders(db, court_ids) {
     if (overlap.length > 0) {
       console.log('发现重复订单冲突:', order.outTradeNo);
       console.log('冲突订单的court_ids:', order.court_ids);
+      console.log('冲突订单的campus:', order.campus);
       console.log('冲突订单状态:', order.status);
       console.log('冲突订单创建时间:', order.createTime);
       
@@ -89,7 +95,7 @@ exports.main = async (event, ) => {
   const db = cloud.database()
   
   // 检查重复订单
-  const duplicateCheck = await checkDuplicateOrders(db, court_ids);
+  const duplicateCheck = await checkDuplicateOrders(db, court_ids, campus);
   if (duplicateCheck.isDuplicate) {
     return {
       success: false,

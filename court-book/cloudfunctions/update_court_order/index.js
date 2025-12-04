@@ -85,17 +85,32 @@ async function preCheckOperations(dataList, db, _) {
   // 创建管理员手机号集合，用于快速查找
   const managerPhones = new Set(managerCheck.data.map(m => m.phoneNumber))
 
-  // 批量获取所有court_ids，检查订单是否已存在
-  const courtIds = dataList.map(item => item.court_id)
-  const existRes = await db.collection('court_order_collection')
-    .where({
-      court_id: _.in(courtIds)
-    })
-    .get()
+  // 批量获取所有订单，按校区分组查询，在数据库层面就加上校区过滤
+  // 按 campus 分组，构建查询条件
+  const campusGroups = {}
+  dataList.forEach(item => {
+    if (!campusGroups[item.campus]) {
+      campusGroups[item.campus] = []
+    }
+    campusGroups[item.campus].push(item.court_id)
+  })
 
-  // 创建现有订单的Map，用于快速查找
+  // 对每个校区分别查询，在数据库层面就过滤校区
+  const allExistingOrders = []
+  for (const [campus, courtIds] of Object.entries(campusGroups)) {
+    const uniqueCourtIds = [...new Set(courtIds)]
+    const existRes = await db.collection('court_order_collection')
+      .where({
+        court_id: _.in(uniqueCourtIds),
+        campus: campus
+      })
+      .get()
+    allExistingOrders.push(...existRes.data)
+  }
+
+  // 创建现有订单的Map，直接使用 court_id 作为 key（因为已经按校区过滤了）
   const existingOrders = new Map(
-    existRes.data.map(order => [order.court_id, order])
+    allExistingOrders.map(order => [order.court_id, order])
   )
 
   // 检查每个操作
@@ -117,6 +132,7 @@ async function preCheckOperations(dataList, db, _) {
       // 快速检查是否是管理员，如果是管理员则状态设为booked
       const finalStatus = managerPhones.has(booked_by) ? 'booked' : status
 
+      // 直接使用 court_id 查找（因为查询时已经按校区过滤了）
       const existingOrder = existingOrders.get(court_id)
       if (existingOrder) {
         // 订单已存在，检查是否可以更新
@@ -136,6 +152,7 @@ async function preCheckOperations(dataList, db, _) {
         const oldVersion = existingOrder.version || 1
         operations.updates.push({
           court_id,
+          campus,
           data: {
             campus,
             courtNumber,
@@ -156,6 +173,7 @@ async function preCheckOperations(dataList, db, _) {
         // 订单不存在，准备插入操作
         operations.adds.push({
           court_id,
+          campus,
           data: {
             court_id,
             campus,
@@ -215,6 +233,7 @@ async function executeTransaction(operations, db, _) {
         const updateRes = await db.collection('court_order_collection')
           .where({
             court_id: op.court_id,
+            campus: op.campus,
             version: op.version
           })
           .update({
@@ -263,17 +282,35 @@ async function executeTransaction(operations, db, _) {
     // 第二步：执行所有插入操作
     if (operations.adds.length > 0) {
       try {
-        // 再次检查所有要插入的订单是否已存在
-        const finalCheck = await db.collection('court_order_collection')
-          .where({
-            court_id: _.in(operations.adds.map(op => op.court_id))
-          })
-          .get()
+        // 再次检查所有要插入的订单是否已存在，按校区分组查询，在数据库层面就加上校区过滤
+        const addCampusGroups = {}
+        operations.adds.forEach(op => {
+          if (!addCampusGroups[op.campus]) {
+            addCampusGroups[op.campus] = []
+          }
+          addCampusGroups[op.campus].push(op.court_id)
+        })
 
-        const existingIds = new Set(finalCheck.data.map(order => order.court_id))
+        // 对每个校区分别查询，在数据库层面就过滤校区
+        const allExistingAddOrders = []
+        for (const [campus, courtIds] of Object.entries(addCampusGroups)) {
+          const uniqueCourtIds = [...new Set(courtIds)]
+          const finalCheck = await db.collection('court_order_collection')
+            .where({
+              court_id: _.in(uniqueCourtIds),
+              campus: campus
+            })
+            .get()
+          allExistingAddOrders.push(...finalCheck.data)
+        }
+
+        // 使用 court_id 作为 key（因为查询时已经按校区过滤了）
+        const existingIds = new Set(allExistingAddOrders.map(order => order.court_id))
         
         // 过滤掉已经存在的订单
-        const validAddOperations = operations.adds.filter(op => !existingIds.has(op.court_id))
+        const validAddOperations = operations.adds.filter(
+          op => !existingIds.has(op.court_id)
+        )
 
         if (validAddOperations.length > 0) {
           // 批量插入有效的订单
@@ -369,7 +406,8 @@ async function rollbackUpdates(successfulUpdates, db) {
     try {
       await db.collection('court_order_collection')
         .where({
-          court_id: update.court_id
+          court_id: update.court_id,
+          campus: update.campus
         })
         .update({
           data: {
@@ -402,7 +440,8 @@ async function rollbackAdds(successfulAdds, db) {
     try {
       await db.collection('court_order_collection')
         .where({
-          court_id: add.court_id
+          court_id: add.court_id,
+          campus: add.campus
         })
         .remove()
     } catch (e) {
