@@ -136,11 +136,11 @@ const unSubmittedCourse=async (excelD)=>{
     
     let course = {
       startTime: item[2], endTime: item[3], coach: coachId, spendingTime: item[4], courtSpend: 0, coachSpend: 0, descript: item[remarkIndex] || '备注无',
-      court: courtName, courseType: coureseType.indexOf(item[5]) - 2, membersObj: null, isAdult: isAdult
+      court: courtName, courseType: coureseType.indexOf(item[5].replace('单独', '')) - 2, membersObj: null, isAdult: isAdult
     }
 
     let membersObj = {}
-    if (course.courseType > 0 && membersDataLength > 0) {
+    if (course.courseType > -1 && membersDataLength > 0) {
       let membs = Math.ceil(membersDataLength / 5)
       for (let i = 0; i < membs; i++) {
         let memberBaseIndex = i * 5 + memberStartIndex

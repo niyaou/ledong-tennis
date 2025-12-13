@@ -14,6 +14,8 @@ Page({
     lastUpdateTime: 0, // 记录最后更新时间，用于防抖
     showVenueModal: false, // 控制场馆分布弹窗显示
     isProcessingOrder: false, // 是否正在处理订单（创建订单到付款完成期间）
+    showPaymentModal: false, // 控制支付提醒弹窗显示
+    paymentModalData: null, // 保存弹窗确认后的回调数据
     venueImages: [
      'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_2025-08-10_213705_306.jpg',
     'cloud://cloud1-6gebob4m4ba8f3de.636c-cloud1-6gebob4m4ba8f3de-1357716382/mp_asset/微信图片_2025-08-10_213716_234.jpg',
@@ -766,18 +768,13 @@ Page({
           return;
         }
         
-        wx.showModal({
-          title: '特别提醒：24小时内开始的预订无法取消',
-          content: '场地已锁定，请尽快支付',
-          showCancel: false,
-          success: (modalRes) => {
-            if (modalRes.confirm) {
-              wx.showLoading({ title: '加载中...' });
-              this.updateCourtStatusIncrementally(date);
-              console.log('云函数返回:', res.result.results);
-              this.onCreateOrderPayment(res.result.results, date,total_fee);
-              wx.hideLoading();
-            }
+        // 保存回调数据
+        this.setData({
+          showPaymentModal: true,
+          paymentModalData: {
+            results: res.result.results,
+            date: date,
+            total_fee: total_fee
           }
         });
       },
@@ -953,6 +950,23 @@ Page({
   // 阻止事件冒泡
   stopPropagation: function() {
     // 空函数，用于阻止事件冒泡
+  },
+
+  // 确认支付提醒弹窗
+  confirmPaymentModal: function() {
+    const { paymentModalData } = this.data;
+    if (paymentModalData) {
+      wx.showLoading({ title: '加载中...' });
+      this.updateCourtStatusIncrementally(paymentModalData.date);
+      console.log('云函数返回:', paymentModalData.results);
+      this.onCreateOrderPayment(paymentModalData.results, paymentModalData.date, paymentModalData.total_fee);
+      wx.hideLoading();
+    }
+    // 关闭弹窗
+    this.setData({
+      showPaymentModal: false,
+      paymentModalData: null
+    });
   },
 
   // 预览图片

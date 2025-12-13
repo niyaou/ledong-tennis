@@ -141,4 +141,26 @@
       </view>
     </view>
   </view>
+
+  <!-- 支付提醒弹窗 -->
+  <view class="payment-modal" wx:if="{{showPaymentModal}}">
+    <view class="payment-modal-content">
+      <view class="payment-modal-header">
+        <text class="payment-modal-title">请注意:24小时内开始的预订无法取消</text>
+      </view>
+      <view class="payment-modal-body">
+        <view class="payment-modal-main-text">场地已锁定，请尽快支付</view>
+        <view class="payment-modal-special-note">
+          <view class="payment-modal-note-title">特殊说明：</view>
+          <view class="payment-modal-note-item">1.一片场地最多服务6人。</view>
+          <view class="payment-modal-note-item">2.如举办商业活动或比赛，请联系客服。</view>
+          <view class="payment-modal-note-item">3.单次订场超过三小时请联系客服。</view>
+          <view class="payment-modal-note-item">4.违反上述规定，本俱乐部有权终止服务</view>
+        </view>
+      </view>
+      <view class="payment-modal-footer">
+        <button class="payment-modal-btn" bindtap="confirmPaymentModal">确定</button>
+      </view>
+    </view>
+  </view>
 </view>

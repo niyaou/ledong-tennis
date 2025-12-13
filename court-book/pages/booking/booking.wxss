@@ -973,3 +973,88 @@ color: #103f6b;
   font-size: 24rpx;
   font-weight: bold;
 }
+
+/* 支付提醒弹窗样式 */
+.payment-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-modal-content {
+  background: #fff;
+  border-radius: 20rpx;
+  width: 90%;
+  max-width: 600rpx;
+  overflow: hidden;
+}
+
+.payment-modal-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  text-align: center;
+}
+
+.payment-modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.payment-modal-body {
+  padding: 30rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.payment-modal-main-text {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 30rpx;
+  line-height: 1.6;
+}
+
+.payment-modal-special-note {
+  margin-top: 20rpx;
+}
+
+.payment-modal-note-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.payment-modal-note-item {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 15rpx;
+}
+
+.payment-modal-note-item:last-child {
+  margin-bottom: 0;
+}
+
+.payment-modal-footer {
+  padding: 20rpx 30rpx 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.payment-modal-btn {
+  width: 100%;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 10rpx;
+  font-size: 30rpx;
+  padding: 20rpx 0;
+  line-height: 1;
+}
