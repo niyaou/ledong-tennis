@@ -146,7 +146,7 @@ const unSubmittedCourse=async (excelD)=>{
         let memberBaseIndex = i * 5 + memberStartIndex
         let membId = find(users, { 'name': item[memberBaseIndex] })
         if(  typeof membId==='undefined'){
-          console.log("🚀 ~ error submit ~ item:数据错误，请修改日志", )
+          console.log("🚀 ~ error submit ~ item:数据错误，请修改日志  ", )
           return 
         }
         membId = membId.number
