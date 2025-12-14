@@ -140,8 +140,9 @@ const unSubmittedCourse=async (excelD)=>{
     }
 
     let membersObj = {}
-    if (course.courseType > -1 && membersDataLength > 0) {
+    if (course.courseType > -1 ) {
       course.membersObj = membersObj
+      if(membersDataLength > 0){
       let membs = Math.ceil(membersDataLength / 5)
       for (let i = 0; i < membs; i++) {
         let memberBaseIndex = i * 5 + memberStartIndex
@@ -163,6 +164,7 @@ const unSubmittedCourse=async (excelD)=>{
           }
         }
       }
+    }
       course.membersObj = membersObj
     }
 
