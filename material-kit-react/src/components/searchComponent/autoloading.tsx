@@ -141,6 +141,7 @@ const unSubmittedCourse=async (excelD)=>{
 
     let membersObj = {}
     if (course.courseType > -1 && membersDataLength > 0) {
+      course.membersObj = membersObj
       let membs = Math.ceil(membersDataLength / 5)
       for (let i = 0; i < membs; i++) {
         let memberBaseIndex = i * 5 + memberStartIndex
