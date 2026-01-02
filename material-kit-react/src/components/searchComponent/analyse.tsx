@@ -379,10 +379,12 @@ function Analyse(props) {
                                 if (key === '总共' || typeof key === 'undefined') {
                                     continue
                                 }
-                                courtItem = Object.assign(courtItem, { name: key })
-                                // 如果属性值是对象，则继续遍历
-                                for (let subKey in item[key]) {
-                                    courtItem[subKey] = item[key][subKey]
+                                var member = item[key]
+                                courtItem = {
+                                    name: key,
+                                    充值: member.charge,
+                                    消费: member.spend,
+                                    未消费: member.equival
                                 }
                             }
                         }
