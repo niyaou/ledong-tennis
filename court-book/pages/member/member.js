@@ -13,7 +13,9 @@ Page({
     courtNumber: '',
     phoneNumber: '',
     maskedPhoneNumber: '',
-    orders: []
+    orders: [],
+    memberInfo: null,
+    loading: false
   },
 
   maskPhoneNumber: function(phoneNumber) {
@@ -29,6 +31,7 @@ Page({
         phoneNumber,
         maskedPhoneNumber: this.maskPhoneNumber(phoneNumber)
       });
+      this.getMemberInfo();
     }
   },
   onShow: function() {
@@ -38,6 +41,9 @@ Page({
       phoneNumber: phoneNumber,
       maskedPhoneNumber: this.maskPhoneNumber(phoneNumber)
     });
+    if (phoneNumber) {
+      this.getMemberInfo();
+    }
   },
   getUserProfile: function() {
     wx.getUserProfile({
@@ -57,6 +63,18 @@ Page({
   navigateToMyBookings: function() {
     wx.navigateTo({
       url: '/pages/myOrder/orderlist'
+    });
+  },
+
+  navigateToChargedList: function() {
+    wx.navigateTo({
+      url: '/pages/chargedList/chargedList'
+    });
+  },
+
+  navigateToSpendList: function() {
+    wx.navigateTo({
+      url: '/pages/spendList/spendList'
     });
   },
 
@@ -148,6 +166,8 @@ Page({
               icon: 'success'
             });
             console.log('手机号:',  res.result.phoneInfo.phoneNumber);
+            // 获取手机号成功后，查询会员信息
+            this.getMemberInfo();
           } else {
             wx.showToast({
               title: '获取手机号失败',
@@ -172,5 +192,37 @@ Page({
       });
       console.warn('用户拒绝授权手机号');
     }
+  },
+  // 查询会员信息
+  getMemberInfo: function() {
+    const { phoneNumber } = this.data;
+    if (!phoneNumber) {
+      return;
+    }
+
+    this.setData({ loading: true });
+    wx.cloud.callFunction({
+      name: 'club_member',
+      data: {
+        phoneNumber: phoneNumber
+      },
+      success: (res) => {
+        this.setData({ loading: false });
+        if (res.result && res.result.success) {
+          this.setData({
+            memberInfo: res.result.data
+          });
+        } else {
+          this.setData({ memberInfo: null });
+          if (res.result && res.result.message) {
+            console.log('查询会员信息失败:', res.result.message);
+          }
+        }
+      },
+      fail: (err) => {
+        this.setData({ loading: false, memberInfo: null });
+        console.error('查询会员信息失败:', err);
+      }
+    });
   },
 }); 

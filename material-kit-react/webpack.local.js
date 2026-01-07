@@ -81,6 +81,16 @@ module.exports = env => {
         //     origin: "http://www.ledongtennis.cn:9968"
         //   }
         // },
+        // '/api': {
+        //   target: 'http://localhost:31168',
+        //   pathRewrite: { '^/api': '/api' },
+        //   changeOrigin: true,
+        //   secure: false,
+        //   headers: {
+        //     host: "http://localhost:31168",
+        //     origin: "http://localhost:31168"
+        //   }
+        // },
         '/api': {
           target: 'http://124.221.103.110:31168',
           pathRewrite: { '^/api': '/api' },

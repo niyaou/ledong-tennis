@@ -4,7 +4,9 @@
     "pages/booking/booking",
     "pages/member/member",
     "pages/myOrder/orderlist",
-    "pages/orderDisplay/orderDisplay"
+    "pages/orderDisplay/orderDisplay",
+    "pages/chargedList/chargedList",
+    "pages/spendList/spendList"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
