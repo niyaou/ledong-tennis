@@ -62,10 +62,10 @@ function Analyse(props) {
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
-    const [timeRange, setTimeRange] = React.useState([moment().subtract(1, 'year').startOf('month').format('YYYY-MM-DD'), moment().subtract(1, 'year').endOf('month').add(1, 'days').format('YYYY-MM-DD')]);
+    const [timeRange, setTimeRange] = React.useState([moment().startOf('month').format('YYYY-MM-DD'), moment().endOf('month').add(1, 'days').format('YYYY-MM-DD')]);
     const [coachName, setCoachName] = React.useState('');
     useEffect(() => {
-        dispatch(exploreCourseAnalyse({ startTime: moment().subtract(1, 'year').startOf('month').format('YYYY-MM-DD'), endTime: moment().subtract(1, 'year').endOf('month').add(1, 'days').format('YYYY-MM-DD') }))
+        dispatch(exploreCourseAnalyse({ startTime: moment().startOf('month').format('YYYY-MM-DD'), endTime: moment().endOf('month').add(1, 'days').format('YYYY-MM-DD') }))
     }, [])
 
 
@@ -105,15 +105,15 @@ function Analyse(props) {
                                 console.log(e.target.value, idx, def,1)
                                 if (idx === 12) {
                                     dispatch(exploreCourseAnalyse({
-                                        startTime: moment().subtract(1, 'year').startOf('year').format('YYYY-MM-DD'),
-                                        endTime: moment().subtract(1, 'year').endOf('year').format('YYYY-MM-DD')
+                                        startTime: moment().startOf('year').format('YYYY-MM-DD'),
+                                        endTime: moment().endOf('year').format('YYYY-MM-DD')
                                     }))
                                 } else {
                                     dispatch(exploreCourseAnalyse({
-                                        startTime: moment().subtract(1, 'year').add(def, "month").startOf('month').format('YYYY-MM-DD'),
-                                        endTime: moment().subtract(1, 'year').add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')
+                                        startTime: moment().add(def, "month").startOf('month').format('YYYY-MM-DD'),
+                                        endTime: moment().add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')
                                     }))
-                                    setTimeRange([moment().subtract(1, 'year').add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().subtract(1, 'year').add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')])
+                                    setTimeRange([moment().add(def, "month").startOf('month').format('YYYY-MM-DD'), moment().add(def, "month").endOf('month').add(1, 'days').format('YYYY-MM-DD')])
                                 }
 
                                 // if (!values.includes(e.target.value)) {
