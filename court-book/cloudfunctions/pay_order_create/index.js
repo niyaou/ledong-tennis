@@ -90,9 +90,20 @@ async function checkDuplicateOrders(db, court_ids, campus) {
 // 云函数入口函数
 exports.main = async (event, ) => {
   const { phoneNumber,  total_fee,  openid,  court_ids  ,nonceStr,campus } = event
-  const outTradeNo = generateOrderNo(event)
-
   const db = cloud.database()
+  
+  // 管理员预订时 pay_order 已在 update_court_order 中创建，此处不应重复调用
+  const managerCheck = await db.collection('manager').where({ phoneNumber }).get()
+  const isManager = managerCheck.data && managerCheck.data.length > 0
+  if (isManager) {
+    return {
+      success: false,
+      message: '管理员预订已完成，无需再次确认',
+      error: 'ADMIN_ORDER_ALREADY_CREATED'
+    }
+  }
+
+  const outTradeNo = generateOrderNo(event)
   
   // 检查重复订单
   const duplicateCheck = await checkDuplicateOrders(db, court_ids, campus);

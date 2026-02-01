@@ -768,7 +768,21 @@ Page({
           return;
         }
         
-        // 保存回调数据
+        // 管理员预订：已在 update_court_order 中创建 pay_order，无需显示支付弹窗
+        if (res.result.isAdminBooking) {
+          wx.showToast({
+            title: '管理员预订成功',
+            icon: 'success'
+          });
+          this.setData({ isProcessingOrder: false });
+          this.clearSelectedStatus();
+          setTimeout(() => {
+            this.initCourtStatusByCloud(date);
+          }, 1500);
+          return;
+        }
+        
+        // 普通会员：显示支付弹窗，需点击确定后创建 pay_order
         this.setData({
           showPaymentModal: true,
           paymentModalData: {

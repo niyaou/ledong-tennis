@@ -17,6 +17,13 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV }) // 使用当前云环境
  * @param {Object|Array} event.data - 单个订单对象或订单数组
  * @returns {Object} 处理结果
  */
+// 生成管理员订单号（无需 openid）
+function generateAdminOrderNo(phoneNumber, court_ids) {
+  const crypto = require('crypto')
+  const baseStr = `${phoneNumber}${court_ids.join(',')}${Date.now()}${Math.random()}`
+  return crypto.createHash('md5').update(baseStr).digest('hex').substring(0, 32)
+}
+
 exports.main = async (event, ) => {
   const db = cloud.database()
   const _ = db.command
@@ -26,6 +33,13 @@ exports.main = async (event, ) => {
   const now = new Date()
 
   try {
+    // 检查是否为管理员（用于后续创建 pay_order）
+    const phoneNumbers = [...new Set(dataList.map(item => item.booked_by))]
+    const managerCheck = await db.collection('manager')
+      .where({ phoneNumber: _.in(phoneNumbers) })
+      .get()
+    const managerPhones = new Set(managerCheck.data.map(m => m.phoneNumber))
+
     // 第一阶段：预检查所有操作
     const preCheckResult = await preCheckOperations(dataList, db, _)
     
@@ -44,9 +58,36 @@ exports.main = async (event, ) => {
       _
     )
 
+    // 第三阶段：管理员预订时，直接创建 pay_order 记录（只建立一条）
+    // 解决：管理员场地已 booked 但未点确定导致无法取消的问题
+    const bookedBy = dataList[0]?.booked_by
+    const isAdminBooking = bookedBy && managerPhones.has(bookedBy)
+    
+    if (isAdminBooking) {
+      const court_ids = dataList.map(item => item.court_id)
+      const total_fee = dataList.reduce((sum, item) => sum + (item.price || 0), 0)
+      const campus = dataList[0].campus
+      const outTradeNo = generateAdminOrderNo(bookedBy, court_ids)
+
+      await db.collection('pay_order').add({
+        data: {
+          phoneNumber: bookedBy,
+          total_fee: Math.round(total_fee * 100) / 100,
+          court_ids,
+          campus,
+          outTradeNo,
+          createTime: db.serverDate(),
+          status: 'PENDING', // 管理员预订无需支付，直接视为已支付
+          paided_at: db.serverDate()
+        }
+      })
+      console.log('管理员预订已创建 pay_order:', outTradeNo)
+    }
+
     return {
       success: true,
-      results: transactionResult.results
+      results: transactionResult.results,
+      isAdminBooking: !!isAdminBooking
     }
 
   } catch (error) {
