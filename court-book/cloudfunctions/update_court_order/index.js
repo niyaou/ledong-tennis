@@ -170,6 +170,20 @@ async function preCheckOperations(dataList, db, _) {
     } = item
 
     try {
+      // 检查春节期间暂停营业，一旦发现立即返回错误
+      const holidayCheck = checkHolidayRestriction(campus, date)
+      if (!holidayCheck.success) {
+        return {
+          success: false,
+          results: [{
+            court_id,
+            success: false,
+            error: holidayCheck.error,
+            type: 'holiday_restriction'
+          }]
+        }
+      }
+
       // 快速检查是否是管理员，如果是管理员则状态设为booked
       const finalStatus = managerPhones.has(booked_by) ? 'booked' : status
 
@@ -489,6 +503,74 @@ async function rollbackAdds(successfulAdds, db) {
       console.error('回滚插入操作失败:', e)
     }
   }
+}
+
+/**
+ * 检查校区和日期是否在春节期间暂停营业
+ * @param {String} campus - 校区名称
+ * @param {String} date - 日期字符串（支持格式：YYYY-MM-DD、YYYY.MM.DD、YYYYMMDD）
+ * @returns {Object} 检查结果
+ */
+function checkHolidayRestriction(campus, date) {
+  // 春节期间暂停营业配置
+  const holidayRestrictions = {
+    '桐梓林校区': {
+      start: '2026-02-10',
+      end: '2026-02-23'
+    },
+    '雅居乐校区': {
+      start: '2026-02-14',
+      end: '2026-02-22'
+    },
+    '麓坊校区': {
+      start: '2026-02-15',
+      end: '2026-02-19'
+    }
+  }
+
+  const restriction = holidayRestrictions[campus]
+  if (!restriction) {
+    return { success: true }
+  }
+
+  // 统一日期格式为 YYYY-MM-DD，支持多种输入格式
+  let normalizedDate = date.replace(/\./g, '-')
+  
+  // 处理 YYYYMMDD 格式（如：20260215）
+  if (/^\d{8}$/.test(normalizedDate)) {
+    normalizedDate = `${normalizedDate.substring(0, 4)}-${normalizedDate.substring(4, 6)}-${normalizedDate.substring(6, 8)}`
+  }
+  
+  // 提取日期部分（YYYY-MM-DD格式），避免时区问题
+  const checkDateStr = normalizedDate.split(' ')[0]
+  
+  // 使用 UTC 时间进行日期比较，避免服务器时区和小程序本地时区差异
+  // 将日期字符串转换为 UTC 时间戳进行比较
+  const checkDateUTC = Date.UTC(
+    parseInt(checkDateStr.substring(0, 4)),
+    parseInt(checkDateStr.substring(5, 7)) - 1, // 月份从0开始
+    parseInt(checkDateStr.substring(8, 10))
+  )
+  const startDateUTC = Date.UTC(
+    parseInt(restriction.start.substring(0, 4)),
+    parseInt(restriction.start.substring(5, 7)) - 1,
+    parseInt(restriction.start.substring(8, 10))
+  )
+  const endDateUTC = Date.UTC(
+    parseInt(restriction.end.substring(0, 4)),
+    parseInt(restriction.end.substring(5, 7)) - 1,
+    parseInt(restriction.end.substring(8, 10))
+  )
+
+  // 检查日期是否在暂停营业期间（包含起止日期）
+  if (checkDateUTC >= startDateUTC && checkDateUTC <= endDateUTC) {
+    return {
+      success: false,
+      error: '春节期间暂停营业'
+    }
+  }
+
+  return { success: true }
 }
 
 /**

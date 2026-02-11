@@ -22,7 +22,7 @@ isProject: false
 
 ## 一、现有表与流程（简要）
 
-- **court_order_collection**：场地订单集合，字段含 court_id、status(free/locked/booked)、booked_by、campus、courtNumber、date、start_time、end_time、price、version、created_at、updated_at。
+- **court_order_collection**：场地订单集合，字段含 court_id、status(free/locked/booked)、booked_by、**source_type**（COURT_RUSH=畅打占用 / PAY_ORDER=普通预订 / 空=管理员订场）、campus、courtNumber、date、start_time、end_time、price、version、created_at、updated_at。
 - **pay_order**：支付订单，字段含 outTradeNo、phoneNumber、court_ids、campus、total_fee、status(PENDING/PAIDED/CANCEL/REFUNDED) 等；支付成功回调 order_create_callback 把 court_order_collection 中对应 court_ids 更新为 booked；退款回调 order_refund_callback 删除对应 court_order_collection 记录。
 - **管理员订场**：update_court_order 直接写入 court_order_collection 为 booked，无需支付。
 
@@ -43,15 +43,12 @@ isProject: false
 | price_per_person_yuan | Number | 每人报名费（元） |
 | status | String | OPEN / FULL / ENDED / CANCELLED |
 | created_by | String | 创建者手机号（管理员） |
-| venue_total_fee_yuan | Number | 场地总价值（元）：创建时汇总 court_ids 对应 price |
-| total_revenue_yuan | Number | 报名费总收入（元）（可选缓存） |
-| start_at | Date | 开始时间（冗余，便于筛选/展示） |
-| end_at | Date | 结束时间（冗余，便于筛选/展示） |
-| enroll_deadline_at | Date | 报名截止时间（可选：开场前 X 分钟） |
+| start_at | Date | 开始时间（便于筛选/展示） |
+| end_at | Date | 结束时间（便于筛选/展示） |
 | created_at | Date | 创建时间 |
 | updated_at | Date | 更新时间 |
 
-**名额闸门（并发安全核心）**：将并发控制的唯一闸门集中在 court_rush 单条记录上，使用**带条件的单文档 update + 原子 inc** 控制名额。报名发起时：对 court_rush 执行条件 update（条件为 `status=OPEN 且 held_participants+current_participants < max_participants`），更新操作为 `held_participants` 原子 +1；**update 返回的成功条数（如 updated 数量）作为是否抢位成功的唯一依据**（成功条数为 1 即抢位成功，为 0 即满员）。该做法依赖的是**云数据库对单文档 update 原子性的官方保证**（单次 update 原子、inc 等字段更新指令原子执行），不依赖跨集合事务或锁模型。支付成功/退款/超时释放时同样通过带条件的单文档 update 做 held↔current 的原子迁移或扣减。total_revenue_yuan 可聚合或由回调条件更新维护；对账任务可修正计数偏差（见“对账/修复”章节）。
+**名额闸门（并发安全核心）**：将并发控制的唯一闸门集中在 court_rush 单条记录上，使用**带条件的单文档 update + 原子 inc** 控制名额。报名发起时：对 court_rush 执行条件 update（条件为 `status=OPEN 且 held_participants+current_participants < max_participants`），更新操作为 `held_participants` 原子 +1；**update 返回的成功条数（如 updated 数量）作为是否抢位成功的唯一依据**（成功条数为 1 即抢位成功，为 0 即满员）。该做法依赖的是**云数据库对单文档 update 原子性的官方保证**（单次 update 原子、inc 等字段更新指令原子执行），不依赖跨集合事务或锁模型。支付成功/退款/超时释放时同样通过带条件的单文档 update 做 held↔current 的原子迁移或扣减。对账任务可修正计数偏差（见“对账/修复”章节）。
 
 ### 2. court_rush_enrollment（畅打报名表）
 
@@ -61,14 +58,15 @@ isProject: false
 | court_rush_id | String | 关联 court_rush._id |
 | phoneNumber | String | 会员手机号 |
 | status | String | PENDING_PAYMENT / PAID / CANCEL_REQUESTED / CANCELLED / EXPIRED / REFUND_FAILED |
-| payment_id | String | 关联 court_rush_payment._id |
 | is_vip | Boolean | 是否 VIP（可选留痕） |
 | actual_fee_yuan | Number | 实收金额（元，VIP 五折等） |
 | expires_at | Date | 占位过期时间（仅 PENDING_PAYMENT） |
 | created_at | Date | 创建时间 |
 | updated_at | Date | 更新时间 |
 
-**占位 + 过期机制**：enrollment 采用占位模型（PENDING_PAYMENT + expires_at）。流程为：**先对 court_rush 做带条件的原子 update 抢位（held_participants += 1），以 update 成功条数为抢位唯一依据；抢位成功后再创建 enrollment(PENDING_PAYMENT + expires_at) 与 payment(PENDING)**。若 enrollment/payment 创建失败，需通过**补偿逻辑**对 court_rush 执行 held_participants 回滚（带条件 update，避免重复扣减）。**超时未支付的占位**通过**条件 update 原子释放**：仅当 enrollment.status=PENDING_PAYMENT 且 expires_at&lt;now 时置 EXPIRED，并对 court_rush 执行 held_participants 原子 -1（条件 held_participants&gt;0）；可由定时云函数或报名/列表时顺带执行。
+**占位 + 过期机制**：enrollment 采用占位模型（PENDING_PAYMENT + expires_at）。流程为：**先对 court_rush 做带条件的原子 update 抢位（held_participants += 1），以 update 成功条数为抢位唯一依据；抢位成功后再创建 enrollment(PENDING_PAYMENT + expires_at) 与 payment(PENDING)**。若 enrollment/payment 创建失败，需通过**补偿逻辑**对 court_rush 执行 held_participants 回滚（带条件 update，避免重复扣减）。**超时未支付的占位**通过**业务触发 + 条件 update + 对账兜底**释放：仅当 enrollment.status=PENDING_PAYMENT 且 expires_at&lt;now 时置 EXPIRED，并对 court_rush 执行 held_participants 原子 -1（条件 held_participants&gt;0）；**报名、列表、详情**等业务入口顺带执行条件 update；对账 court_rush_reconcile 兜底修正。
+唯一索引：(court_rush_id, phoneNumber) 唯一
+作用：同一场同一手机号只保留一条报名记录，用状态流转（PENDING_PAYMENT / PAID / CANCELLED / EXPIRED）来复用，防止重复报名 / 占位。
 
 ### 3. court_rush_payment（畅打报名支付表）
 
@@ -92,9 +90,8 @@ isProject: false
 | created_at | Date | 创建时间（冗余可统一） |
 | updated_at | Date | 更新时间 |
 
-不包含 court_ids：支付/退款回调只更新本表 + enrollment + rush，不操作 court_order_collection。
+**f**: 不包含 court_ids：支付/退款回调只更新本表 + enrollment + rush，不操作 court_order_collection。唯一索引：outTradeNo 唯一作用：支付/退款回调通过 outTradeNo 幂等定位，防止重复回调产生重复加减。唯一索引：enrollment_id 唯一作用：一个 enrollment 只能绑定一条支付记录，防止一条报名挂多笔支付单
 
----
 
 ## 三、索引与唯一约束（必须落地）
 
@@ -117,17 +114,17 @@ isProject: false
 ### 1. court_order_collection 联动
 
 **创建畅打（锁场地并确定）**
+- **畅打权限**：仅 manager.courtRushManager=1 或 specialManager=1 可发起；权限低于退款（admin_refund_order 需 specialManager=1）。
 - 校验所选 court_ids 冲突规则改为：**仅当存在记录且 status in ('locked','booked') 才冲突**。
 - 如果存在 status=free 的记录：应 **update 为 booked**（不要 add 新记录）。
 - 如果无记录：可 **add booked 记录**。
-- 写入/更新字段与 update_court_order 一致：status: 'booked'，booked_by: 'court_rush:{court_rush_id}'，其他字段 campus、courtNumber、date、start_time、end_time、price、version、created_at、updated_at 与现有一致。
+- 写入/更新字段与 update_court_order 一致：status: 'booked'，booked_by: court_rush_id，**source_type: 'COURT_RUSH'**，其他字段 campus、courtNumber、date、start_time、end_time、price、version、created_at、updated_at 与现有一致。
 
 **畅打取消/终止（整场取消）**  
-允许取消整场时：court_rush.status = CANCELLED；从 court_order_collection remove：court_id in court_ids 且 booked_by === 'court_rush:{court_rush_id}'；对已支付用户批量退款（见“整场取消流程”）。
+允许取消整场时：court_rush.status = CANCELLED；从 court_order_collection remove：court_id in court_ids 且 booked_by === court_rush_id；对已支付用户批量退款（见“整场取消流程”）。
 
 **查询场地占用**  
-现有 get_court_order 仅按 court_order_collection 展示状态；booked_by = court_rush:xxx 的条目仍为 booked，前端可据此显示“畅打占用”。可选增强（不改现有逻辑）：在 court_order_collection 冗余 source_type='COURT_RUSH'、source_id=court_rush_id，便于索引与统计。
-
+现有 get_court_order 仅按 court_order_collection 展示状态；source_type='COURT_RUSH' 的条目表示畅打占用，前端可直接据此显示“畅打占用”
 ### 2. pay_order 不参与畅打
 
 畅打报名费只写 court_rush_payment，不写 pay_order。order_create_callback / order_refund_callback 仅处理 pay_order，不需改分支。我的订单/订单列表继续只查 pay_order；畅打报名列表单独查 enrollment + rush（或 payment）。
@@ -142,7 +139,7 @@ isProject: false
 |------|------|----------------|
 | **原子性** | 单条 update 级别：一次 update 要么完整生效，要么不生效；执行过程中同一条文档不会被其他并发写同时修改。 | 依赖云数据库对**单次 update 原子操作**及**字段更新指令（如 inc）原子执行**的官方保证。 |
 | **并发安全** | 高并发下名额不超卖、计数不重复加减。 | 将名额闸门集中在 **court_rush 单条记录**上，仅通过**带条件的单文档 update + 原子 inc** 修改 held_participants/current_participants；以 update 成功条数作为抢位/扣减是否生效的唯一依据。不依赖跨集合事务或锁模型。 |
-| **最终一致性** | 跨集合数据允许短暂不一致，通过后续动作收敛到一致。 | **幂等门禁**（支付/退款回调仅当 payment.status 处于指定前置状态才执行；重复回调直接返回成功、不再修改计数）+ **补偿**（报名后续步骤失败则回滚 held_participants）+ **对账**（定时扫描 enrollment/payment 状态，修正 court_rush 计数）。 |
+| **最终一致性** | 跨集合数据允许短暂不一致，通过后续动作收敛到一致。 | **幂等门禁**（支付/退款回调仅当 payment.status 处于指定前置状态才执行；重复回调直接返回成功、不再修改计数）+ **补偿**（报名后续步骤失败则回滚 held_participants）+ **对账兜底**（业务触发或按需调用 court_rush_reconcile，以 enrollment/payment 为准修正 rush 计数）。 |
 
 ### 5.2 报名流程
 
@@ -165,12 +162,12 @@ isProject: false
 
 ### 5.5 超时释放
 
-- 仅当 enrollment.status=PENDING_PAYMENT 且 expires_at&lt;now 时置 EXPIRED，并对 court_rush 执行 held_participants 原子 -1（带条件 update）；见“占位 + 过期机制”。
+- **业务触发**（报名、列表、详情时顺带）+ **条件 update**（仅当 enrollment.status=PENDING_PAYMENT 且 expires_at&lt;now 时置 EXPIRED，并对 court_rush 执行 held_participants 原子 -1）+ **对账兜底**；不用定时云函数。
 
 ### 5.6 补偿 / 对账机制（court_rush_reconcile）
 
 - **允许短暂不一致**：因无跨集合事务，可能出现“court_rush.held 已 +1 但 enrollment 尚未写入”等瞬态；通过补偿与对账收敛。
-- **对账云函数**：定时任务或定时云函数扫描以下不一致并修复：
+- **对账云函数（对账兜底）**：由业务触发或按需调用，扫描以下不一致并修复：
   - rush.held_participants 与 enrollment 中未过期 PENDING_PAYMENT 数不一致；
   - rush.current_participants 与 enrollment 中 PAID 数不一致；
   - payment=PAIDED 但 enrollment 非 PAID；
@@ -203,7 +200,7 @@ flowchart TB
         C3 --> C4[条件 update payment→REFUNDED enrollment→CANCELLED paid-=1]
     end
     subgraph expire [占位过期释放]
-        D1[定时或触发清理] --> D2["条件 update: 仅 PENDING_PAYMENT 且 expires_at<now 置 EXPIRED"]
+        D1[业务触发: 报名/列表/详情顺带] --> D2["条件 update: 仅 PENDING_PAYMENT 且 expires_at<now 置 EXPIRED"]
         D2 --> D3[条件 update court_rush held 原子 -1]
     end
 ```
@@ -311,12 +308,12 @@ flowchart TD
 
 | 云函数 | 职责 |
 |--------|------|
-| court_rush_create | 校验管理员；校验 court_ids 冲突仅看 locked/booked；事务内对 free 记录做 update 为 booked、缺失记录 add booked；插入 court_rush 并写入 venue_total_fee_yuan/start_at/end_at |
+| court_rush_create | 校验畅打权限（manager.courtRushManager=1 或 specialManager=1）；校验 court_ids 冲突仅看 locked/booked；事务内对 free 记录做 update 为 booked、缺失记录 add booked；插入 court_rush 并写入 venue_total_fee_yuan/start_at/end_at |
 | court_rush_enroll | 清理过期占位（可选）；校验重复 enrollment；**先对 court_rush 带条件 update+原子 inc held+1（条件 status=OPEN 且 held+paid&lt;max），以 update 成功条数为抢位依据**；抢位成功后再创建 enrollment(PENDING_PAYMENT+expires_at)、payment(PENDING)；失败则补偿 held-1；返回支付参数 |
 | court_rush_order_callback | 支付回调：按 outTradeNo 定位；**幂等门禁仅当 payment.status=PENDING 执行**，重复回调直接返回成功、不修改计数；条件更新：payment→PAIDED、enrollment→PAID、court_rush held-=1 paid+=1；任一步失败记录 pending_fix/对账修复 |
 | court_rush_refund | 用户取消报名：条件更新 payment→REFUNDING、enrollment→CANCEL_REQUESTED；调微信退款 |
 | court_rush_refund_callback | 退款回调：按 outTradeNo 定位；**幂等门禁仅当 payment.status=REFUNDING 执行**，重复回调直接返回成功、不修改计数；条件更新 payment→REFUNDED、enrollment→CANCELLED、court_rush paid-=1 |
-| court_rush_cleanup_expired | 清理过期占位：**条件 update** 仅当 enrollment.status=PENDING_PAYMENT 且 expires_at&lt;now 置 EXPIRED，并 court_rush held 原子 -1；定时或报名/列表时顺带 |
+| court_rush_cleanup_expired | 清理过期占位：**条件 update** 仅当 enrollment.status=PENDING_PAYMENT 且 expires_at&lt;now 置 EXPIRED，并 court_rush held 原子 -1；由 court_rush_enroll、court_rush_list、court_rush_detail 等业务入口顺带调用，非定时 |
 | court_rush_reconcile | 对账/修复：扫描 rush.held 与未过期 PENDING_PAYMENT 数、rush.paid 与 PAID 数、payment=PAIDED 但 enrollment 非 PAID、enrollment=PAID 但 payment 非 PAIDED；以 payment/enrollment 为准修正 rush 计数，保证最终一致；异常单标记人工处理 |
 | court_rush_cancel | 管理员整场取消：rush 到 CANCELLED、释放场地、批量对已支付报名发起退款并跟踪 cancel_refund_status |
 | court_rush_list / court_rush_detail | 列表与详情查询（按需） |
@@ -327,13 +324,13 @@ flowchart TD
 
 ## 十、兼容与约束小结（修订）
 
-- **兼容现有表**：不增加 court_order_collection、pay_order 字段；不修改 get_court_order、order_create_callback、order_refund_callback、cancel_order 逻辑。
-- **联动点**：court_order_collection 通过 court_id + booked_by='court_rush:{court_rush_id}' 与畅打绑定。
+- **兼容现有表**：court_order_collection 仅新增 source_type 字段以标识畅打占用；pay_order 不改；get_court_order、order_create_callback、order_refund_callback、cancel_order 逻辑不改。
+- **联动点**：court_order_collection 通过 court_id + booked_by=court_rush_id（source_type=COURT_RUSH）与畅打绑定。
 - **无跨集合事务下的并发与一致性**：实现的是**最终一致性**。**并发安全**（高并发报名不超卖）来自将名额闸门集中在 **court_rush 单条记录**上，仅通过**带条件的单文档 update + 原子 inc** 修改 held/paid，依赖云数据库对单文档 update 原子性的官方保证；以 update 成功条数作为抢位/扣减是否生效的唯一依据。**支付/退款回调不重复加减计数**：通过幂等门禁（仅当 payment.status 处于指定前置状态才执行，重复回调直接返回成功、不修改计数）。**占位超时释放**：通过条件 update 原子释放 held。**跨集合最终一致**：报名先带条件 update held+1、再写 enrollment/payment，失败补偿 held-1；回调分步条件更新，失败由对账 court_rush_reconcile 修复。
 - **创建畅打**：冲突判断仅 locked/booked；free 记录 update；缺失记录 add；尽量事务化。
 - **报名**：先带条件 update+原子 inc held+1（以成功条数为依据），再创建 enrollment+payment；超时清理条件 update EXPIRED + held 原子 -1。
 - **支付/取消**：回调幂等门禁（仅指定前置状态执行）+ 条件更新；计数迁移 held↔paid 在 court_rush 上带条件原子 update。
-- **对账**：定时 court_rush_reconcile 以 payment/enrollment 状态为准修正 rush 计数，保证最终一致。
+- **对账兜底**：业务触发或按需调用 court_rush_reconcile，以 payment/enrollment 状态为准修正 rush 计数，保证最终一致。
 
 ---
 
@@ -343,7 +340,7 @@ flowchart TD
 
 | 序号 | 需求描述 | 对应设计要点 |
 |------|----------|--------------|
-| 1 | 锁场地后**立即确定**，无需用户支付确认，效果等同管理员订场 | 创建畅打时直接向 court_order_collection 写入/更新 status=booked，booked_by='court_rush:{id}'；冲突仅看 locked/booked，free 则 update |
+| 1 | 锁场地后**立即确定**，无需用户支付确认，效果等同管理员订场 | 创建畅打时直接向 court_order_collection 写入/更新 status=booked，booked_by=court_rush_id、source_type=COURT_RUSH；冲突仅看 locked/booked，free 则 update |
 | 2 | 一场畅打包含**多个连续时间段**的场地 | court_rush.court_ids 数组，与 court_order_collection.court_id 同格式 |
 | 3 | 畅打有**独立主记录**，记录本场定了哪些场地、多少人、价格等 | court_rush 表：court_ids、max_participants、current_participants、price_per_person_yuan、status、venue_total_fee_yuan 等 |
 | 4 | 畅打需**指定参与人数上限**，满员后不可再报名 | max_participants；名额 = PAID + 未过期 PENDING_PAYMENT |
@@ -360,8 +357,8 @@ flowchart TD
 |------|----------|----------|
 | 无跨集合事务 | 云开发不支持跨集合事务；实现最终一致性，仍保证高并发不超卖、回调不重复加减 | 名额闸门集中在 court_rush 单条记录：带条件的单文档 update+原子 inc，以 update 成功条数为抢位依据，依赖云数据库单文档 update 原子性（非锁/非官方 CAS）；跨集合动作幂等门禁+补偿+对账 court_rush_reconcile 收敛 |
 | 兼容现有系统 | 不改动现有场地预订、支付、取消、回调逻辑 | 畅打支付使用独立集合 court_rush_payment，独立回调 court_rush_*_callback |
-| 与场地表联动 | 畅打占用场地在场地表中可查；free 记录 update 为 booked 不重复 add | 冲突仅 locked/booked；存在 free 则 update，无记录则 add；booked_by='court_rush:{court_rush_id}' |
+| 与场地表联动 | 畅打占用场地在场地表中可查；free 记录 update 为 booked 不重复 add | 冲突仅 locked/booked；存在 free 则 update，无记录则 add；booked_by=court_rush_id，source_type=COURT_RUSH |
 | 幂等与补偿 | 支付/退款回调不重复计数、不串单；跨集合失败可补偿 | 支付回调仅当 payment.status=PENDING 执行，重复回调直接返回成功、不修改计数；退款仅 REFUNDING；每步条件更新；报名抢位成功后若 enrollment/payment 失败则补偿 held-1；对账修正计数 |
 | 索引与唯一 | 不超卖、不重复报名、1 enrollment 1 payment | outTradeNo 唯一；enrollment_id 唯一；(court_rush_id, phoneNumber) 唯一；court_id 应用层或库层唯一 |
-| 占位与过期 | 未支付占位不永久占满名额；超时可释放 | PENDING_PAYMENT+expires_at；清理仅当 PENDING_PAYMENT 且 expires_at&lt;now 置 EXPIRED 并 held-=1（条件更新） |
+| 占位与过期 | 未支付占位不永久占满名额；超时可释放；不用定时云函数 | PENDING_PAYMENT+expires_at；**业务触发**（报名/列表/详情顺带）+ **条件 update**（expires_at&lt;now 置 EXPIRED 并 held-=1）+ **对账兜底** |
 | 整场取消 | 场地释放 + 已支付批量退款可追踪 | court_rush_cancel；cancel_refund_status、cancelled_at；PARTIAL_FAILED 人工重试 |

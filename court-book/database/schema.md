@@ -35,8 +35,8 @@
 | end_time | string | 是 | 结束时间 HH:mm |
 | status | string | 是 | free / locked / booked。locked=用户锁定待支付，booked=已确定（支付成功或管理员订场） |
 | price | number | 否 | 该时段价格（元） |
-| booked_by | string | 否 | 预订者标识：用户为手机号；管理员订场为手机号；畅打占用为 `court_rush:{court_rush_id}` |
-| is_verified | boolean | 否 | 是否已核销等扩展标记 |
+| booked_by | string | 否 | 预订者标识：用户/管理员订场为手机号；畅打占用为 court_rush._id（由 source_type 区分） |
+| source_type | string | 否 | 占用来源：COURT_RUSH=畅打占用，PAY_ORDER=普通预订，空=管理员订场 |
 | version | number | 否 | 乐观锁版本号，更新时自增，默认 1 |
 | created_at | date | 否 | 创建时间 |
 | updated_at | date | 否 | 更新时间，locked 订单据此判断超时释放 |
@@ -44,6 +44,8 @@
 **使用云函数**：update_court_order（增/改/版本控制）、get_court_order（按 date/campus/courtNumber 查、删过期 locked）、order_create_callback（支付成功将 court_ids 对应记录 status 改为 booked）、order_refund_callback（退款成功按 court_ids 删除记录）、cancel_order（删 locked 或管理员取消时删记录并改 pay_order 状态）。
 
 **注意**：同一 (court_id, campus) 仅一条有效记录；get_court_order 会清理超时 locked（管理员 10 分钟、普通用户 6 分钟）。
+
+**唯一索引**：建议 (court_id, campus) 唯一（court_id 已含 courtNumber）。若用 (court_id, campus, courtNumber) 建唯一索引报重复，说明历史有重复数据，可调云函数 `find_duplicate_court_orders` 查出后人工清理。
 
 ---
 
@@ -87,9 +89,12 @@
 | _id | string | 是 | 云开发主键 |
 | phoneNumber | string | 是 | 管理员手机号，用于权限校验 |
 | password | string | 否 | 管理员密码，admin_refund_order 校验用 |
-| specialManager | number | 否 | 0 或 1，1 表示特殊管理员（可查全部已支付订单等） |
+| specialManager | number | 否 | 0 或 1，1 表示特殊管理员（可查全部已支付订单、可退款） |
+| courtRushManager | number | 否 | 0 或 1，1 表示畅打管理员（可发起畅打）；权限低于 specialManager，specialManager=1 时天然具备畅打权限 |
 
-**使用云函数**：update_court_order、get_court_order、cancel_order、manager_list、special_manager、special_manager_check、admin_refund_order。
+**权限层级**：普通管理员 &lt; courtRushManager=1（畅打） &lt; specialManager=1（退款）。
+
+**使用云函数**：update_court_order、get_court_order、cancel_order、manager_list、special_manager、special_manager_check、admin_refund_order、court_rush_create。
 
 ---
 
@@ -113,16 +118,20 @@
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | _id | string | 主键 |
-| court_ids | array\<string\> | 连续时间段场地 court_id 列表，与 court_order_collection 一致 |
+| court_ids | array\<string\> | 连续时间段场地 ID，与 court_order_collection.court_id 同格式 |
 | campus | string | 校区 |
 | max_participants | number | 参与人数上限 |
-| current_participants | number | 已报名成功人数（仅统计 PAID） |
-| price_per_person | number | 每人报名费（元） |
+| current_participants | number | 已付人数（PAID enrollment 数）；闸门计数 |
+| held_participants | number | 占位数（PENDING_PAYMENT 且未过期）；闸门计数 |
+| price_per_person_yuan | number | 每人报名费（元） |
 | status | string | OPEN / FULL / ENDED / CANCELLED |
 | created_by | string | 创建者手机号（管理员） |
-| created_at / updated_at | date | 创建、更新时间 |
+| start_at | date | 开始时间（便于筛选/展示） |
+| end_at | date | 结束时间（便于筛选/展示） |
+| created_at | date | 创建时间 |
+| updated_at | date | 更新时间 |
 
-创建畅打时需在 court_order_collection 中批量写入 booked，booked_by 为 `court_rush:{_id}`。
+创建畅打时需在 court_order_collection 中批量写入 booked，booked_by 为 court_rush._id，source_type 为 `COURT_RUSH`。
 
 ### 7. court_rush_enrollment（畅打报名表）
 
@@ -131,9 +140,12 @@
 | _id | string | 主键 |
 | court_rush_id | string | 关联 court_rush._id |
 | phoneNumber | string | 会员手机号 |
-| status | string | PENDING_PAYMENT / PAID / CANCELLED |
-| payment_id | string | 关联 court_rush_payment._id |
-| created_at / updated_at | date | 创建、更新时间 |
+| status | string | PENDING_PAYMENT / PAID / CANCEL_REQUESTED / CANCELLED / EXPIRED / REFUND_FAILED |
+| is_vip | boolean | 是否 VIP（可选留痕） |
+| actual_fee_yuan | number | 实收金额（元，VIP 五折等） |
+| expires_at | date | 占位过期时间（仅 PENDING_PAYMENT） |
+| created_at | date | 创建时间 |
+| updated_at | date | 更新时间 |
 
 ### 8. court_rush_payment（畅打报名支付表）
 
@@ -142,13 +154,20 @@
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | _id | string | 主键 |
-| outTradeNo | string | 商户订单号 |
+| outTradeNo | string | 商户订单号（微信）唯一 |
+| wx_transaction_id | string | 微信支付单号（建议） |
 | court_rush_id | string | 关联 court_rush._id |
 | enrollment_id | string | 关联 court_rush_enrollment._id |
 | phoneNumber | string | 用户手机号 |
-| total_fee | number | 金额（元） |
-| status | string | PENDING / PAIDED / CANCEL / REFUNDED |
-| createTime / paided_at / refundTime | date | 创建、支付成功、退款时间 |
+| total_fee_yuan | number | 金额（元） |
+| status | string | PENDING / PAIDED / CANCEL / REFUNDING / REFUNDED / FAILED |
+| createTime | date | 创建时间 |
+| paided_at | date | 支付成功时间 |
+| refundTime | date | 退款成功时间（可选） |
+| wx_refund_id | string | 微信退款单号（建议） |
+| notify_time | date | 回调时间（建议） |
+| created_at | date | 创建时间（冗余可统一） |
+| updated_at | date | 更新时间 |
 
 ---
 
