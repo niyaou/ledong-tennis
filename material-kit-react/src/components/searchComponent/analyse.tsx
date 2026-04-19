@@ -9,7 +9,7 @@
  */
 import React, { useEffect } from 'react';
 
-import { Button, Card, Stack, MenuItem, NoSsr, Paper, Box, Typography, Select, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
+import { Button, Card, Stack, MenuItem, NoSsr, Paper, Box, Typography, Select, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal, Chip } from '@mui/material';
 
 import { keyframes, styled } from '@mui/material/styles';
 
@@ -78,6 +78,14 @@ function Analyse(props) {
         dispatch(exploreCourseDetail({ coach, startTime: timeRange[0], endTime: timeRange[1] }))
     }
 
+    const hasAdjusted = (member, key) => {
+        if (!key || key.includes('校区') || key.includes('总共') || key.trim() === '') {
+            return false;
+        }
+        return member.adjustedAnalyse !== undefined && member.adjustedAnalyse !== null
+            && Math.abs(member.analyse - member.adjustedAnalyse) > 0.01;
+    }
+
 
     const generateExcel = (jsonData, fileName) => {
         const worksheet = XLSX.utils.json_to_sheet(jsonData);
@@ -138,6 +146,7 @@ function Analyse(props) {
     const fileItem = (user, index) => {
 
         var member = Object.values(user)[0]
+        var key = Object.keys(user)[0]
         // console.log(user, member)
         return (<Grid item xs={6} key={index} space={1}>
             <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
@@ -201,9 +210,15 @@ function Analyse(props) {
                             // background: 'transparent',
                             '& :hover': { background: '#985541' },
                             // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
+                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '20%', textAlign: 'center'
                         }} >
                         满班率：{member.analyse.toFixed(4)}
+                        {hasAdjusted(member, key) && (
+                            <span style={{ color: '#ed6c02', marginLeft: 4 }}>
+                                {'→'}{member.adjustedAnalyse.toFixed(4)}
+                                <Chip label="已调整" size="small" sx={{ height: 18, fontSize: '10px', color: '#ed6c02', borderColor: '#ed6c02', marginLeft: 0.5 }} variant="outlined" />
+                            </span>
+                        )}
                     </Typography>
                     <Typography gutterBottom variant="body2"
                         sx={{
