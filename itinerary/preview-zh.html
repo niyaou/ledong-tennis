@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>旅行行程模板</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0c2d57;
+      --navy2:#123e73;
+      --coral:#ff6b4a;
+      --coral2:#ff8b72;
+      --text:#243244;
+      --muted:#7a8594;
+      --card:#ffffff;
+      --line:#e9edf3;
+      --shadow:0 18px 40px rgba(5,22,51,.18);
+      --radius-xl:34px;
+      --radius-lg:28px;
+      --radius-md:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:'Montserrat',Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(255,255,255,.07) 0 100px, transparent 101px),
+        radial-gradient(circle at 84% 14%, rgba(255,107,74,.10) 0 150px, transparent 151px),
+        radial-gradient(circle at 92% 80%, rgba(255,255,255,.05) 0 120px, transparent 121px),
+        linear-gradient(180deg, #0a2548 0%, #0c2d57 60%, #092242 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    .page{
+      max-width:1180px;
+      margin:0 auto;
+      padding:42px 28px 54px;
+      position:relative;
+    }
+    .left-rail{
+      position:absolute;
+      left:-10px;
+      top:50%;
+      transform:translateY(-50%) rotate(-90deg);
+      color:#fff;
+      font-weight:800;
+      letter-spacing:.22em;
+      font-size:18px;
+      white-space:nowrap;
+      z-index:3;
+    }
+    .left-rail .accent{color:var(--coral)}
+    .side-trail{
+      position:absolute;
+      left:-55px;
+      top:64px;
+      height:88%;
+      width:170px;
+      pointer-events:none;
+      z-index:0;
+      opacity:.95;
+      object-fit:cover;
+      object-position:right center;
+    }
+    .plane-left,.plane-right{
+      position:absolute;
+      color:rgba(255,255,255,.95);
+      font-size:42px;
+      z-index:3;
+      filter:drop-shadow(0 8px 16px rgba(0,0,0,.14));
+    }
+    .plane-left{left:8px;top:108px;transform:rotate(-12deg)}
+    .plane-right{right:18px;bottom:140px;transform:rotate(20deg)}
+    .dot-cluster,.dot-cluster::before,.dot-cluster::after{
+      content:"";
+      position:absolute;
+      width:10px;height:10px;border-radius:50%;
+      background:var(--coral);
+      z-index:1;
+    }
+    .dot-cluster{right:74px;top:300px;z-index:3}
+    .dot-cluster::before{right:22px;top:28px;background:#ffd3ca}
+    .dot-cluster::after{right:-10px;top:58px;background:#ff9c85}
+    .dot-cluster.bottom{right:auto;left:34px;top:auto;bottom:120px}
+    .dot-cluster.bottom::before{right:auto;left:24px;top:22px}
+    .dot-cluster.bottom::after{right:auto;left:44px;top:52px}
+
+    .side-illustration{
+      position:absolute;
+      right:-10px;
+      bottom:20px;
+      width:170px;
+      height:220px;
+      z-index:3;
+      opacity:.95;
+      pointer-events:none;
+    }
+    .leaf1,.leaf2{
+      position:absolute;
+      background:linear-gradient(180deg,#2a8b65,#1f6f52);
+      border-radius:100% 0 100% 0;
+      transform-origin:bottom left;
+    }
+    .leaf1{width:72px;height:130px;right:10px;bottom:10px;transform:rotate(-18deg)}
+    .leaf2{width:56px;height:104px;right:62px;bottom:0;transform:rotate(12deg)}
+    .suitcase{
+      position:absolute;right:38px;bottom:18px;width:68px;height:92px;
+      background:linear-gradient(180deg,#ff7a58,#e85a36);
+      border-radius:14px;
+      box-shadow:0 12px 22px rgba(0,0,0,.18);
+    }
+    .suitcase:before{
+      content:"";
+      position:absolute;left:20px;top:-16px;width:24px;height:18px;
+      border:5px solid #1b2f49;border-bottom:none;border-radius:14px 14px 0 0;
+    }
+    .camera{
+      position:absolute;right:92px;bottom:28px;width:52px;height:36px;
+      background:#2c3440;border-radius:8px;box-shadow:0 8px 16px rgba(0,0,0,.18);
+    }
+    .camera:before{
+      content:"";position:absolute;left:16px;top:8px;width:18px;height:18px;border-radius:50%;
+      border:4px solid #cfd5dd;
+    }
+    .camera:after{
+      content:"";position:absolute;left:8px;top:-6px;width:14px;height:8px;background:#2c3440;border-radius:4px 4px 0 0;
+    }
+    .passport{
+      position:absolute;right:8px;bottom:16px;width:60px;height:82px;
+      background:#163c74;border-radius:8px;transform:rotate(12deg);
+      box-shadow:0 10px 18px rgba(0,0,0,.2);
+    }
+    .passport:before{
+      content:"";position:absolute;left:18px;top:24px;width:24px;height:24px;border:2px solid #e8c46c;border-radius:50%;
+    }
+    .passport:after{
+      content:"PASSPORT";position:absolute;left:8px;bottom:10px;color:#f2d88d;font-size:8px;font-weight:700;letter-spacing:.08em;
+    }
+
+    /* Casual trail markers along the dashed paths */
+    .trail-marker{
+      position:absolute;
+      font-size:20px;
+      z-index:3;
+      filter:drop-shadow(0 6px 10px rgba(0,0,0,.18));
+      pointer-events:none;
+    }
+    .trail-marker.m1{left:18px;top:26%;transform:rotate(-18deg)}
+    .trail-marker.m2{left:6px;top:52%;transform:rotate(14deg);font-size:16px;opacity:.85}
+    .trail-marker.m3{left:22px;top:78%;transform:rotate(-10deg)}
+    .trail-marker.m4{right:14px;top:32%;transform:rotate(22deg)}
+    .trail-marker.m5{right:8px;top:58%;transform:rotate(-14deg);font-size:16px;opacity:.85}
+    .trail-marker.m6{right:20px;top:82%;transform:rotate(18deg)}
+
+    /* A few scattered soft dots for a playful feel */
+    .soft-dot{
+      position:absolute;
+      width:8px;height:8px;
+      border-radius:50%;
+      background:rgba(255,255,255,.55);
+      z-index:3;
+      pointer-events:none;
+    }
+    .soft-dot.s1{left:36px;top:18%}
+    .soft-dot.s2{left:12px;top:38%}
+    .soft-dot.s3{left:42px;top:66%}
+    .soft-dot.s4{right:38px;top:22%}
+    .soft-dot.s5{right:14px;top:46%}
+    .soft-dot.s6{right:44px;top:72%}
+
+    .header-card{
+      background:var(--card);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      padding:24px;
+      display:grid;
+      grid-template-columns:240px 1fr;
+      gap:24px;
+      position:relative;
+      z-index:2;
+    }
+    .header-photo{
+      width:100%;
+      aspect-ratio:1/1;
+      border-radius:24px;
+      overflow:hidden;
+      background:linear-gradient(135deg,#c5d9f8,#88b0e8 55%,#ffbc99);
+      position:relative;
+    }
+    .header-photo img.hero{width:100%;height:100%;object-fit:cover;display:block}
+    .logo-wrap{
+      position:absolute;
+      top:18px;left:18px;
+      background:rgba(255,255,255,.94);
+      border-radius:16px;
+      padding:8px 12px;
+      box-shadow:0 10px 22px rgba(15,45,87,.16);
+      max-width:200px;
+      z-index:2;
+    }
+    .logo-wrap img{display:block;width:100%;height:auto;max-height:64px;object-fit:contain}
+    .header-copy{
+      display:flex;flex-direction:column;justify-content:center;gap:14px;min-width:0;
+    }
+    .title{
+      margin:0;
+      font-size:clamp(34px,4vw,64px);
+      line-height:.96;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+    .title .coral{color:var(--coral)}
+    .title .navy{color:var(--navy)}
+    .trip-length{
+      font-size:24px;font-weight:700;color:var(--navy);letter-spacing:.04em;text-transform:uppercase;
+    }
+    .meta-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:14px;margin-top:8px;
+    }
+    .meta-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px 18px;
+      background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%);
+    }
+    .meta-label{
+      display:block;color:var(--coral);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;
+    }
+    .meta-value{font-size:16px;color:var(--text);font-weight:600;line-height:1.55}
+    .cards{margin-top:28px;display:grid;gap:22px;position:relative;z-index:2}
+    .day-card{
+      background:var(--card);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:16px;
+      display:grid;
+      grid-template-columns:240px 1fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    .thumb{
+      position:relative;overflow:hidden;border-radius:22px;min-height:220px;
+      background:linear-gradient(135deg,#86a8d7,#91eae4);
+    }
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .day-label{
+      position:absolute;left:14px;bottom:14px;background:var(--coral);color:#fff;font-weight:800;font-size:28px;line-height:1;
+      padding:12px 16px;border-radius:16px;box-shadow:0 12px 24px rgba(255,107,74,.28);text-transform:uppercase;
+    }
+    .table-wrap{
+      overflow-x:auto;border-radius:20px;border:1px solid var(--line);background:#fff;
+    }
+    table{width:100%;border-collapse:collapse;min-width:640px}
+    th{
+      background:var(--coral);color:#fff;text-align:left;padding:14px 16px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+    }
+    td{
+      padding:13px 16px;border-top:1px solid var(--line);font-size:14px;vertical-align:top;background:#fff;
+    }
+    tbody tr:nth-child(even) td{background:#fbfcff}
+    td.time{width:150px;font-weight:700;color:var(--navy);white-space:nowrap}
+    td.activity{width:42%;font-weight:600}
+    td.notes{color:var(--muted)}
+    [contenteditable="true"]{outline:none;cursor:text}
+    [contenteditable="true"]:focus{
+      box-shadow:inset 0 0 0 2px rgba(255,107,74,.22);border-radius:8px;background:#fff8f5;
+    }
+    .footer-note{
+      margin-top:24px;color:rgba(255,255,255,.92);font-size:13px;text-align:center;letter-spacing:.02em;position:relative;z-index:2;
+    }
+    .footer-note strong{color:#fff}
+    .editor-actions{
+      position:sticky;
+      top:14px;
+      z-index:5;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .editor-btn{
+      border:none;
+      border-radius:999px;
+      padding:10px 16px;
+      font:600 13px/1 'Montserrat',Arial,sans-serif;
+      cursor:pointer;
+      color:#fff;
+      box-shadow:0 10px 20px rgba(5,22,51,.22);
+    }
+    .editor-btn.save{background:linear-gradient(180deg,#ff6b4a,#e85a36)}
+    .editor-btn.copy{background:linear-gradient(180deg,#2f6fb4,#1f4f87)}
+    .save-status{
+      align-self:center;
+      font-size:12px;
+      font-weight:600;
+      color:rgba(255,255,255,.92);
+      min-width:130px;
+      text-align:right;
+    }
+    @media (max-width:980px){
+      .left-rail,.side-illustration,.trail-marker,.soft-dot,.side-trail{display:none}
+      .header-card,.day-card{grid-template-columns:1fr}
+      .header-photo{aspect-ratio:16/9}
+      .thumb{min-height:200px}
+      .meta-grid{grid-template-columns:1fr}
+      .page{padding-left:18px;padding-right:18px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <!-- <div class="editor-actions">
+      <button id="copyHtmlBtn" class="editor-btn copy" type="button">复制 HTML</button>
+      <button id="saveHtmlBtn" class="editor-btn save" type="button">保存 HTML</button>
+      <span id="saveStatus" class="save-status">保存中...</span>
+    </div> -->
+    <!-- <div class="left-rail"><span class="accent">FREE DOWNLOAD</span> ITINERARY TEMPLATE</div> -->
+    <img class="side-trail" src="dashed_curve.svg" alt="" aria-hidden="true">
+    <!-- <div class="plane-left">✈</div> -->
+    <div class="plane-right">✈</div>
+    <div class="dot-cluster"></div>
+    <div class="dot-cluster bottom"></div>
+
+    <div class="side-illustration" aria-hidden="true">
+      <div class="leaf1"></div>
+      <div class="leaf2"></div>
+      <div class="camera"></div>
+      <div class="suitcase"></div>
+      <div class="passport"></div>
+    </div>
+
+    <div class="trail-marker m1">✈</div>
+    <div class="trail-marker m2">📍</div>
+    <div class="trail-marker m3">✈</div>
+    <div class="trail-marker m4">🌟</div>
+    <div class="trail-marker m5">📍</div>
+    <div class="trail-marker m6">✈</div>
+    <div class="soft-dot s1"></div>
+    <div class="soft-dot s2"></div>
+    <div class="soft-dot s3"></div>
+    <div class="soft-dot s4"></div>
+    <div class="soft-dot s5"></div>
+    <div class="soft-dot s6"></div>
+
+    <section class="header-card">
+      <div class="header-photo">
+        <div class="logo-wrap">
+          <img src="微信图片_20250517203940.jpg" alt="乐动网球标志">
+        </div>
+        <img class="hero" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="天空中的飞机">
+      </div>
+      <div class="header-copy">
+        <h1 class="title"><span class="coral">旅行</span> <span class="navy">行程</span></h1>
+        <div class="trip-length" contenteditable="true">6 天 — 长途旅行</div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">出发</span>
+            <div class="meta-value" contenteditable="true">2026 年 5 月 23 日（周六）· 下午 2:00 · 吉隆坡国际机场</div>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">抵达 / 结束</span>
+            <div class="meta-value" contenteditable="true">2026 年 5 月 28 日（周四）· 下午 5:00 · 星耀樟宜机场</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cards">
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://lansonplace.com/wp-content/uploads/Screenshot-2025-10-27-164806.png" alt="第 1 天">
+          <div class="day-label" contenteditable="true">DAY 01</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>时间</th><th>活动</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">下午 2:30</td><td class="activity" contenteditable="true">抵达吉隆坡国际机场</td><td class="notes" contenteditable="true">办理入境、提取行李、团队集合</td></tr>
+              <tr><td class="time" contenteditable="true">下午 3:30</td><td class="activity" contenteditable="true">入住 KLIA 附近 Tune 酒店</td><td class="notes" contenteditable="true">短暂休息并整理仪容后再出发</td></tr>
+              <tr><td class="time" contenteditable="true">下午 4:30</td><td class="activity" contenteditable="true">参观国家汽车博物馆</td><td class="notes" contenteditable="true">乘坐 Grab 前往，需在下午 4:30 前到达</td></tr>
+              <tr><td class="time" contenteditable="true">下午 5:30</td><td class="activity" contenteditable="true">探索雪邦赛道</td><td class="notes" contenteditable="true">在主入口售票处购买门票</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 7:30</td><td class="activity" contenteditable="true">在 KLIA2 航站楼陆侧用餐</td><td class="notes" contenteditable="true">餐饮选择丰富，尤其是出发层区域</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://i.redd.it/ptpari99b2t51.jpg" alt="第 2 天">
+          <div class="day-label" contenteditable="true">DAY 02</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>时间</th><th>活动</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">上午 8:30</td><td class="activity" contenteditable="true">乘地铁前往吉隆坡市区</td><td class="notes" contenteditable="true">KLIA Transit 转市区地铁</td></tr>
+              <tr><td class="time" contenteditable="true">上午 10:00</td><td class="activity" contenteditable="true">马来西亚国家清真寺</td><td class="notes" contenteditable="true">比赛前的轻松活动</td></tr>
+              <tr><td class="time" contenteditable="true">中午 12:00</td><td class="activity" contenteditable="true">在丽丰茶冰室用午餐</td><td class="notes" contenteditable="true">粤菜风格茶餐厅，步行可达</td></tr>
+              <tr><td class="time" contenteditable="true">下午 1:30</td><td class="activity" contenteditable="true">在 Axiata 体育馆观看羽毛球超级 500 赛</td><td class="notes" contenteditable="true">观赛至约下午 6:00，之后乘坐 Grab</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 7:30</td><td class="activity" contenteditable="true">武吉免登与双子塔，亚罗美食街,changkat酒吧街</td><td class="notes" contenteditable="true">乘铁路前往市中心，再转地铁返回 KLIA</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://www.mouratoglou.com/wp-content/uploads/2024/11/8dd81da7-1944-4b78-ac55-c07954a06526-DJI202312131131140029D2.jpg" alt="第 3 天">
+          <div class="day-label" contenteditable="true">DAY 03</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>时间</th><th>活动</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">上午 9:00</td><td class="activity" contenteditable="true">参观莫拉托格鲁网球学院</td><td class="notes" contenteditable="true">全天沉浸式体验学院训练</td></tr>
+              <tr><td class="time" contenteditable="true">中午 12:30</td><td class="activity" contenteditable="true">在学院内用午餐</td><td class="notes" contenteditable="true">便于统一团队时间安排</td></tr>
+              <tr><td class="time" contenteditable="true">下午 2:00</td><td class="activity" contenteditable="true">观摩训练并进行教练交流</td><td class="notes" contenteditable="true">交流训练方法、设施条件与教学理念</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 6:30</td><td class="activity" contenteditable="true">返程并用晚餐，在&nbsp;KLIA2航站楼</td><td class="notes" contenteditable="true">海鲜或马来西亚中式菜肴</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 9:00</td><td class="activity" contenteditable="true">收拾行李准备前往新加坡</td><td class="notes" contenteditable="true">整理好旅行证件与行李物品</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://img.static-kl.com/transform/e09aba7f-d6d2-44ea-826e-076b1f616512/" alt="第 4 天">
+          <div class="day-label" contenteditable="true">DAY 04</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>时间</th><th>活动</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">上午 8:00</td><td class="activity" contenteditable="true">从 KLIA 2 出发</td><td class="notes" contenteditable="true">预留 2 小时办理值机与出境手续</td></tr>
+              <tr><td class="time" contenteditable="true">下午 2:30</td><td class="activity" contenteditable="true">在武吉士附近办理入住</td><td class="notes" contenteditable="true">工作坊前先行放下行李</td></tr>
+              <tr><td class="time" contenteditable="true">下午 3:30</td><td class="activity" contenteditable="true">赞美广场，旧喜街，克拉码头，牛车水,老巴刹食阁用餐</td><td class="notes" contenteditable="true">city walk</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 6:00</td><td class="activity" contenteditable="true">鱼尾狮、滨海湾金沙、幻彩生辉灯光秀与空中花园</td><td class="notes" contenteditable="true">城市天际景观与赌场</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 8:30</td><td class="activity" contenteditable="true">滨海花园，夜间漫步</td><td class="notes" contenteditable="true">多元文化氛围与夜景欣赏</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://www.travelawaits.com/wp-content/uploads/2021/04/fdfc242ffd612382c212e04702e4dfdfc24.jpg" alt="第 5 天">
+          <div class="day-label" contenteditable="true">DAY 05</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>时间</th><th>活动</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">上午 9:00</td><td class="activity" contenteditable="true">参观南洋理工大学与新加坡国立大学</td><td class="notes" contenteditable="true">新加坡顶尖大学校园参访</td></tr>
+              <tr><td class="time" contenteditable="true">中午 12:00</td><td class="activity" contenteditable="true">在食阁午餐</td><td class="notes" contenteditable="true">沙爹、叻沙及经典小贩美食</td></tr>
+              <tr><td class="time" contenteditable="true">下午 3:00</td><td class="activity" contenteditable="true">在kallang tennis hub与当地网球俱乐部比赛</td><td class="notes" contenteditable="true">预定时段为下午 3:00 至 5:00</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 6:30</td><td class="activity" contenteditable="true">哈芝巷晚餐</td><td class="notes" contenteditable="true">著名本地美食街区，多元料理汇聚</td></tr>
+              <tr><td class="time" contenteditable="true">晚上 8:30</td><td class="activity" contenteditable="true">滨海湾夜景灯光</td><td class="notes" contenteditable="true">可选观看灯光秀或漫步赏景</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://bostonglobe-prod.cdn.arcpublishing.com/resizer/v2/6QMAHLQMZFAXZJ3KNW4T5LGBDA.JPG?auth=df8b5733b95c93c659525120756dd91286a69fab9b79a5f334f7e5c70c8f9e4c&amp;width=1440" alt="第 6 天">
+          <div class="day-label" contenteditable="true">DAY 06</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>时间</th><th>活动</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">上午 9:00</td><td class="activity" contenteditable="true">本地教练指导网球训练</td><td class="notes" contenteditable="true">乘地铁前往网球场</td></tr>
+              <tr><td class="time" contenteditable="true">中午 12:00</td><td class="activity" contenteditable="true">午餐并前往机场</td><td class="notes" contenteditable="true">大团队出行请预留充足缓冲时间</td></tr>
+              <tr><td class="time" contenteditable="true">下午 1:30</td><td class="activity" contenteditable="true">游览星耀樟宜</td><td class="notes" contenteditable="true">雨漩涡、购物、咖啡与拍照</td></tr>
+              <tr><td class="time" contenteditable="true">下午 3:30</td><td class="activity" contenteditable="true">提前用晚餐</td><td class="notes" contenteditable="true">出发前的轻松简餐</td></tr>
+              <tr><td class="time" contenteditable="true">下午 5:00</td><td class="activity" contenteditable="true">启程离开</td><td class="notes" contenteditable="true">旅程结束</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <!-- <p class="footer-note"><strong>可编辑模板：</strong>直接点击标题、日期、日程标签及表格中的任意单元格，即可将示例行程替换为您自己的内容。</p> -->
+  </main>
+  <script>
+    const saveBtn = document.getElementById('saveHtmlBtn');
+    const copyBtn = document.getElementById('copyHtmlBtn');
+    const saveStatus = document.getElementById('saveStatus');
+    let fileHandle = null;
+
+    function getHtmlSource() {
+      return '<!DOCTYPE html>\n' + document.documentElement.outerHTML + '\n';
+    }
+
+    function setStatus(text) {
+      saveStatus.textContent = text;
+    }
+
+    async function saveWithPicker() {
+      if (!window.showSaveFilePicker) return false;
+      if (!fileHandle) {
+        fileHandle = await window.showSaveFilePicker({
+          suggestedName: 'preview-zh.html',
+          types: [{ description: 'HTML 文件', accept: { 'text/html': ['.html'] } }]
+        });
+      }
+      const writable = await fileHandle.createWritable();
+      await writable.write(getHtmlSource());
+      await writable.close();
+      return true;
+    }
+
+    function saveAsDownload() {
+      const blob = new Blob([getHtmlSource()], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'preview-zh-edited.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    saveBtn.addEventListener('click', async () => {
+      try {
+        setStatus('保存中...');
+        const ok = await saveWithPicker();
+        if (ok) {
+          setStatus('已保存');
+          return;
+        }
+        saveAsDownload();
+        setStatus('已下载');
+      } catch (error) {
+        setStatus('保存已取消');
+      }
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(getHtmlSource());
+        setStatus('已复制');
+      } catch (error) {
+        setStatus('复制失败');
+      }
+    });
+  </script>
+
+
+
+
+
+
+</body></html>

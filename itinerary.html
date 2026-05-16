@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel Itinerary Template</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0c2d57;
+      --navy-2: #123e73;
+      --coral: #ff6b4a;
+      --coral-2: #ff8b72;
+      --text: #243244;
+      --muted: #7a8594;
+      --card: #ffffff;
+      --line: #e9edf3;
+      --shadow: 0 18px 40px rgba(5, 22, 51, 0.18);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255,255,255,0.06) 0 90px, transparent 91px),
+        radial-gradient(circle at 85% 18%, rgba(255,107,74,0.10) 0 130px, transparent 131px),
+        radial-gradient(circle at 90% 78%, rgba(255,255,255,0.05) 0 110px, transparent 111px),
+        linear-gradient(180deg, #0a2548 0%, #0c2d57 55%, #092242 100%);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 42px 28px 52px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page::before,
+    .page::after {
+      content: "";
+      position: absolute;
+      border: 2px dashed rgba(255,255,255,0.45);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .page::before {
+      width: 220px;
+      height: 620px;
+      left: -160px;
+      top: 160px;
+      transform: rotate(8deg);
+    }
+
+    .page::after {
+      width: 260px;
+      height: 720px;
+      right: -180px;
+      top: 220px;
+      transform: rotate(-10deg);
+    }
+
+    .left-rail {
+      position: absolute;
+      left: -58px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: center;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      font-size: 18px;
+      opacity: 0.92;
+      white-space: nowrap;
+    }
+
+    .left-rail .accent { color: var(--coral); }
+
+    .decor-dot,
+    .decor-dot::before,
+    .decor-dot::after {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--coral);
+      content: "";
+    }
+
+    .decor-dot { right: 70px; top: 280px; }
+    .decor-dot::before { right: 28px; top: 28px; background: #ffd7ce; }
+    .decor-dot::after { right: -12px; top: 58px; background: #ff9c85; }
+
+    .plane-badge {
+      position: absolute;
+      left: 14px;
+      top: 120px;
+      font-size: 40px;
+      color: rgba(255,255,255,0.92);
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12));
+    }
+
+    .header-card {
+      background: var(--card);
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-photo {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #c5d9f8, #88b0e8 55%, #ffbc99);
+      position: relative;
+    }
+
+    .header-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .logo-wrap {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 16px;
+      padding: 8px 10px;
+      box-shadow: 0 10px 22px rgba(15, 45, 87, 0.16);
+      max-width: 170px;
+    }
+
+    .logo-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .header-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 64px);
+      line-height: 0.96;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .title .coral { color: var(--coral); }
+    .title .navy { color: var(--navy); }
+
+    .trip-length {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .meta-item {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px 18px;
+      background: linear-gradient(180deg, #fff 0%, #fbfcfe 100%);
+    }
+
+    .meta-label {
+      display: block;
+      color: var(--coral);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .meta-value {
+      font-size: 16px;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .cards {
+      margin-top: 28px;
+      display: grid;
+      gap: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .day-card {
+      background: var(--card);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .thumb {
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      min-height: 220px;
+      background: linear-gradient(135deg, #86a8d7, #91eae4);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .day-label {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      background: var(--coral);
+      color: #fff;
+      font-weight: 800;
+      font-size: 28px;
+      line-height: 1;
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: 0 12px 24px rgba(255, 107, 74, 0.28);
+      text-transform: uppercase;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    th {
+      background: var(--coral);
+      color: #fff;
+      text-align: left;
+      padding: 14px 16px;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 13px 16px;
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+      vertical-align: top;
+      background: #fff;
+    }
+
+    tbody tr:nth-child(even) td { background: #fbfcff; }
+
+    td.time {
+      width: 150px;
+      font-weight: 700;
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    td.activity { width: 42%; font-weight: 600; }
+    td.notes { color: var(--muted); }
+
+    [contenteditable="true"] {
+      outline: none;
+      cursor: text;
+    }
+
+    [contenteditable="true"]:focus {
+      box-shadow: inset 0 0 0 2px rgba(255, 107, 74, 0.22);
+      border-radius: 8px;
+      background: #fff8f5;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      color: rgba(255,255,255,0.92);
+      font-size: 13px;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-note strong { color: #fff; }
+
+    @media (max-width: 980px) {
+      .left-rail { display: none; }
+      .header-card, .day-card { grid-template-columns: 1fr; }
+      .header-photo { aspect-ratio: 16 / 9; }
+      .thumb { min-height: 200px; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .page { padding-left: 18px; padding-right: 18px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page::before, .page::after, .decor-dot, .plane-badge, .left-rail { display: none; }
+      .page { max-width: none; padding: 0; }
+      .header-card, .day-card { box-shadow: none; border: 1px solid #dfe5ee; }
+      .footer-note { color: #4d5a69; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="left-rail"><span class="accent">FREE DOWNLOAD</span> ITINERARY TEMPLATE</div>
+    <div class="plane-badge">✈</div>
+    <div class="decor-dot"></div>
+
+    <section class="header-card">
+      <div class="header-photo">
+        <div class="logo-wrap">
+          <img src="ldtennis-logo.jpg" alt="LD Tennis logo" />
+        </div>
+        <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80" alt="Airplane in the sky" />
+      </div>
+
+      <div class="header-copy">
+        <h1 class="title"><span class="coral">Travel</span> <span class="navy">Itinerary</span></h1>
+        <div class="trip-length" contenteditable="true">[6 Days - Long Trip]</div>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Departure</span>
+            <div class="meta-value" contenteditable="true">May 23, 2026 (Sat) · 02:00 PM · Kuala Lumpur International Airport</div>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Arrival / End</span>
+            <div class="meta-value" contenteditable="true">May 28, 2026 (Thu) · 05:00 PM · Jewel Changi Airport</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cards">
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80" alt="Kuala Lumpur skyline" />
+          <div class="day-label" contenteditable="true">DAY 01</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">2:00 PM</td><td class="activity" contenteditable="true">Arrive at Kuala Lumpur International Airport</td><td class="notes" contenteditable="true">Immigration, baggage claim, group assembly</td></tr>
+              <tr><td class="time" contenteditable="true">3:15 PM</td><td class="activity" contenteditable="true">Check in at Tune Hotel near KLIA</td><td class="notes" contenteditable="true">Short rest and freshen up</td></tr>
+              <tr><td class="time" contenteditable="true">4:30 PM</td><td class="activity" contenteditable="true">Visit Muzium Automobil Nasional</td><td class="notes" contenteditable="true">Great stop for engineering and automotive interest</td></tr>
+              <tr><td class="time" contenteditable="true">6:00 PM</td><td class="activity" contenteditable="true">Visit Epsom Education</td><td class="notes" contenteditable="true">School visit or meeting slot</td></tr>
+              <tr><td class="time" contenteditable="true">7:30 PM</td><td class="activity" contenteditable="true">Dinner near KLIA / Mitsui Outlet Park</td><td class="notes" contenteditable="true">Nasi lemak, satay, local comfort dishes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=80" alt="Sports and city atmosphere" />
+          <div class="day-label" contenteditable="true">DAY 02</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">8:30 AM</td><td class="activity" contenteditable="true">Travel into Kuala Lumpur by rail</td><td class="notes" contenteditable="true">KLIA Transit + city rail connection</td></tr>
+              <tr><td class="time" contenteditable="true">10:30 AM</td><td class="activity" contenteditable="true">Morning walk / sightseeing in central KL</td><td class="notes" contenteditable="true">Light activity before the tournament</td></tr>
+              <tr><td class="time" contenteditable="true">12:00 PM</td><td class="activity" contenteditable="true">Lunch near Bukit Jalil</td><td class="notes" contenteditable="true">Choose a group-friendly mall or local café</td></tr>
+              <tr><td class="time" contenteditable="true">1:30 PM</td><td class="activity" contenteditable="true">Attend Badminton Super 500 tournament</td><td class="notes" contenteditable="true">Stay until around 6:00 PM</td></tr>
+              <tr><td class="time" contenteditable="true">7:30 PM</td><td class="activity" contenteditable="true">Dinner + KL evening plan</td><td class="notes" contenteditable="true">Street food, skyline, or team debrief</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1200&q=80" alt="Tennis court" />
+          <div class="day-label" contenteditable="true">DAY 03</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">9:00 AM</td><td class="activity" contenteditable="true">Visit Mouratoglou Tennis Academy</td><td class="notes" contenteditable="true">Full-day academy immersion</td></tr>
+              <tr><td class="time" contenteditable="true">12:30 PM</td><td class="activity" contenteditable="true">Lunch at the academy</td><td class="notes" contenteditable="true">Convenient for group timing</td></tr>
+              <tr><td class="time" contenteditable="true">2:00 PM</td><td class="activity" contenteditable="true">Observe training / coaching exchange</td><td class="notes" contenteditable="true">Methods, facilities, and discussion</td></tr>
+              <tr><td class="time" contenteditable="true">6:30 PM</td><td class="activity" contenteditable="true">Return and dinner</td><td class="notes" contenteditable="true">Seafood or Malaysian Chinese meal</td></tr>
+              <tr><td class="time" contenteditable="true">9:00 PM</td><td class="activity" contenteditable="true">Pack for Singapore transfer</td><td class="notes" contenteditable="true">Prepare documents and luggage</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80" alt="Singapore city view" />
+          <div class="day-label" contenteditable="true">DAY 04</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">1:00 PM</td><td class="activity" contenteditable="true">Arrive in Singapore</td><td class="notes" contenteditable="true">Changi Airport arrival and transfer</td></tr>
+              <tr><td class="time" contenteditable="true">2:30 PM</td><td class="activity" contenteditable="true">Check in near Bugis</td><td class="notes" contenteditable="true">Drop bags before workshop</td></tr>
+              <tr><td class="time" contenteditable="true">3:30 PM</td><td class="activity" contenteditable="true">Attend afternoon workshop</td><td class="notes" contenteditable="true">Pre-arranged session</td></tr>
+              <tr><td class="time" contenteditable="true">7:00 PM</td><td class="activity" contenteditable="true">Dinner at Bugis</td><td class="notes" contenteditable="true">Street food and local favorites</td></tr>
+              <tr><td class="time" contenteditable="true">8:30 PM</td><td class="activity" contenteditable="true">Kampong Glam / night stroll</td><td class="notes" contenteditable="true">Multicultural atmosphere and night scenes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&w=1200&q=80" alt="Marina Bay area" />
+          <div class="day-label" contenteditable="true">DAY 05</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">9:00 AM</td><td class="activity" contenteditable="true">Visit Marina Bay Sands / Merlion area</td><td class="notes" contenteditable="true">Best for skyline photos and landmark views</td></tr>
+              <tr><td class="time" contenteditable="true">12:00 PM</td><td class="activity" contenteditable="true">Lunch at Lau Pa Sat</td><td class="notes" contenteditable="true">Satay, laksa, and classic hawker choices</td></tr>
+              <tr><td class="time" contenteditable="true">3:00 PM</td><td class="activity" contenteditable="true">Visit tennis club in northern Singapore</td><td class="notes" contenteditable="true">Planned slot from 3:00 PM to 5:00 PM</td></tr>
+              <tr><td class="time" contenteditable="true">6:30 PM</td><td class="activity" contenteditable="true">Kallang area dinner</td><td class="notes" contenteditable="true">Sports atmosphere and riverside setting</td></tr>
+              <tr><td class="time" contenteditable="true">8:30 PM</td><td class="activity" contenteditable="true">Marina Bay evening lights</td><td class="notes" contenteditable="true">Optional light show or scenic walk</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="day-card">
+        <div class="thumb">
+          <img src="https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=1200&q=80" alt="Jewel Changi waterfall" />
+          <div class="day-label" contenteditable="true">DAY 06</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="time" contenteditable="true">9:00 AM</td><td class="activity" contenteditable="true">Optional cultural stop</td><td class="notes" contenteditable="true">Chinatown or Little India</td></tr>
+              <tr><td class="time" contenteditable="true">12:00 PM</td><td class="activity" contenteditable="true">Lunch and transfer to the airport</td><td class="notes" contenteditable="true">Keep enough buffer for a large group</td></tr>
+              <tr><td class="time" contenteditable="true">1:30 PM</td><td class="activity" contenteditable="true">Explore Jewel Changi</td><td class="notes" contenteditable="true">Rain Vortex, shopping, coffee, photos</td></tr>
+              <tr><td class="time" contenteditable="true">3:30 PM</td><td class="activity" contenteditable="true">Early dinner</td><td class="notes" contenteditable="true">Easy final meal before departure</td></tr>
+              <tr><td class="time" contenteditable="true">5:00 PM</td><td class="activity" contenteditable="true">Departure</td><td class="notes" contenteditable="true">End of trip</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <p class="footer-note"><strong>Editable template:</strong> click directly into the title, dates, day labels, and all table cells to replace the sample itinerary with your own content.</p>
+  </main>
+</body>
+</html>

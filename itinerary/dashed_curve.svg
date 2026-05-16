@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 1400" width="180" height="1400">
+  <!-- Flight route path -->
+  <path id="route" d="M 90,40 C 150,200 40,370 120,540 S 30,740 110,920 S 50,1120 95,1300 S 75,1380 88,1395" 
+        fill="none" stroke="#ffffff" stroke-width="1.6" stroke-dasharray="6 5" stroke-opacity="0.55" stroke-linecap="round"/>
+
+  <!-- Waypoint dots along the route -->
+  <circle cx="108" cy="200" r="3.5" fill="#ffffff" fill-opacity="0.7"/>
+  <circle cx="62" cy="360" r="3" fill="#ffffff" fill-opacity="0.6"/>
+  <circle cx="125" cy="520" r="3.5" fill="#ffffff" fill-opacity="0.7"/>
+  <circle cx="45" cy="700" r="3" fill="#ffffff" fill-opacity="0.6"/>
+  <circle cx="118" cy="880" r="3.5" fill="#ffffff" fill-opacity="0.7"/>
+  <circle cx="52" cy="1060" r="3" fill="#ffffff" fill-opacity="0.6"/>
+  <circle cx="98" cy="1240" r="3.5" fill="#ffffff" fill-opacity="0.7"/>
+
+  <!-- Small plane at the top start of route -->
+  <g transform="translate(78, 10) rotate(-25)" fill="#ffffff" fill-opacity="0.85">
+    <path d="M 10,0 L 14,8 L 10,6 L 10,14 L 12,18 L 10,17 L 8,18 L 10,14 L 10,6 L 6,8 Z"/>
+  </g>
+</svg>

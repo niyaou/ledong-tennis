@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Itinerary - LD Tennis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Montserrat', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0c1e36 0%, #1a3a5c 50%, #0c1e36 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #f0f4f8;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        /* Header Section */
+        .header {
+            background: #0a1f38;
+            padding: 30px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: url('a679dbc8-ac5a-4308-9d22-c492c7344bf7.png') no-repeat center;
+            background-size: cover;
+            opacity: 0.08;
+            border-radius: 50%;
+        }
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo img {
+            height: 60px;
+            width: auto;
+        }
+        .logo-text {
+            color: white;
+        }
+        .logo-text .cn {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .logo-text .en {
+            font-size: 12px;
+            letter-spacing: 6px;
+            opacity: 0.9;
+        }
+        .title-section {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .main-title {
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .main-title .travel {
+            color: #e85d3e;
+        }
+        .main-title .itinerary {
+            color: #ffffff;
+        }
+        .subtitle {
+            color: #a0c4e8;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        .trip-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .info-badge {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            padding: 10px 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 14px;
+        }
+        .info-badge .icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .departure .icon { background: #e85d3e; }
+        .arrival .icon { background: #2a9d8f; }
+        .info-badge .label {
+            font-weight: 700;
+            color: #e85d3e;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 30px 40px;
+            background: #eef3f9;
+        }
+        .day-card {
+            display: flex;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .day-sidebar {
+            width: 180px;
+            min-width: 180px;
+            background: linear-gradient(180deg, #1e4a75 0%, #0f2b47 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .day-sidebar::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .day-number {
+            background: #e85d3e;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+        .day-date {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        .day-weekday {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        .day-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 15px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        .day-table-wrap {
+            flex: 1;
+            padding: 0;
+        }
+        .day-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .day-table thead th {
+            background: #f8fafc;
+            color: #1a3a5c;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .day-table thead th:first-child {
+            width: 130px;
+        }
+        .day-table tbody td {
+            padding: 10px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+        }
+        .day-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .day-table tbody tr:hover td {
+            background: #f8fafc;
+        }
+        .time-cell {
+            font-weight: 700;
+            color: #1a3a5c;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .time-icon {
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+        }
+        .activity-cell {
+            color: #334155;
+            font-weight: 500;
+        }
+        .notes-cell {
+            color: #64748b;
+            font-size: 12px;
+        }
+        [contenteditable="true"] {
+            outline: none;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            transition: background 0.2s;
+        }
+        [contenteditable="true"]:hover {
+            background: #e0f2fe;
+        }
+        [contenteditable="true"]:focus {
+            background: #dbeafe;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+
+        /* Special styling for end row */
+        .end-row td {
+            text-align: center;
+            font-weight: 700;
+            color: #e85d3e;
+            padding: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #0a1f38;
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* Print styles */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border-radius: 0; }
+            [contenteditable="true"] { background: transparent !important; box-shadow: none !important; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .day-card { flex-direction: column; }
+            .day-sidebar { width: 100%; flex-direction: row; gap: 15px; padding: 15px; }
+            .day-image { display: none; }
+            .content { padding: 15px; }
+            .header { padding: 20px; }
+            .main-title { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="logo">
+                    <img src="微信图片_20250517203940.jpg" alt="LD Tennis Logo">
+                </div>
+            </div>
+            <div class="title-section">
+                <h1 class="main-title">
+                    <span class="travel">TRAVEL</span> <span class="itinerary">ITINERARY</span>
+                </h1>
+                <div class="subtitle">[ 6 DAYS – STUDY, SPORTS &amp; CULTURAL TRIP ]</div>
+                <div class="trip-info">
+                    <div class="info-badge departure">
+                        <div class="icon">✈</div>
+                        <div><span class="label">DEPARTURE:</span> <span contenteditable="true">May 23, 2025 (Sat) 02:00 PM</span></div>
+                    </div>
+                    <div class="info-badge arrival">
+                        <div class="icon">📍</div>
+                        <div><span class="label">ARRIVAL:</span> <span contenteditable="true">May 28, 2025 (Thu) 05:00 PM</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- DAY 01 -->
+            <div class="day-card">
+                <div class="day-sidebar">
+                    <div class="day-number" contenteditable="true">DAY 01</div>
+                    <div class="day-date" contenteditable="true">Sat, May 23</div>
+                    <img class="day-image" src="day01_airplane.jpg" alt="Airplane Arrival">
+                </div>
+                <div class="day-table-wrap">
+                    <table class="day-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Activity</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">✈</span> <span contenteditable="true">02:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Arrive at Kuala Lumpur International Airport</td>
+                                <td class="notes-cell" contenteditable="true">Flight arrival &amp; immigration</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍴</span> <span contenteditable="true">03:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Lunch at KLIA</td>
+                                <td class="notes-cell" contenteditable="true">Nasi lemak, laksa, local food</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏨</span> <span contenteditable="true">04:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Check-in at Tune Hotel KLIA</td>
+                                <td class="notes-cell" contenteditable="true">Rest &amp; refresh</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏛</span> <span contenteditable="true">04:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Visit Muzium Automobil Nasional</td>
+                                <td class="notes-cell" contenteditable="true">Malaysia's national car museum</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏫</span> <span contenteditable="true">06:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Visit Empson Education</td>
+                                <td class="notes-cell" contenteditable="true">Education visit</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍽</span> <span contenteditable="true">07:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Dinner at Mitsui Outlet Park</td>
+                                <td class="notes-cell" contenteditable="true">Local cuisine &amp; variety</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🛌</span> <span contenteditable="true">09:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Return to hotel &amp; rest</td>
+                                <td class="notes-cell" contenteditable="true">Early night</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DAY 02 -->
+            <div class="day-card">
+                <div class="day-sidebar">
+                    <div class="day-number" contenteditable="true">DAY 02</div>
+                    <div class="day-date" contenteditable="true">Sun, May 24</div>
+                    <img class="day-image" src="day02_petronas.jpg" alt="Petronas Towers">
+                </div>
+                <div class="day-table-wrap">
+                    <table class="day-table">
+                        <thead>
+                            <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🚌</span> <span contenteditable="true">08:30 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Transfer to Kuala Lumpur (City)</td>
+                                <td class="notes-cell" contenteditable="true">KLIA Transit + LRT</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">📸</span> <span contenteditable="true">10:00 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Explore Putrajaya (Pink Mosque)</td>
+                                <td class="notes-cell" contenteditable="true">Scenic visit &amp; photos</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍴</span> <span contenteditable="true">12:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Lunch in Putrajaya</td>
+                                <td class="notes-cell" contenteditable="true">Local Malaysian food</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏸</span> <span contenteditable="true">01:30 PM – 06:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Attend BWF Super 500 Badminton</td>
+                                <td class="notes-cell" contenteditable="true">Axiata Arena (1:30 – 6:00 PM)</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍽</span> <span contenteditable="true">06:15 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Dinner near Bukit Jalil</td>
+                                <td class="notes-cell" contenteditable="true">Street food &amp; local dishes</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🌃</span> <span contenteditable="true">08:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Visit Bukit Bintang Night Street</td>
+                                <td class="notes-cell" contenteditable="true">Shopping &amp; night scenes</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🛌</span> <span contenteditable="true">10:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Overnight in Kuala Lumpur</td>
+                                <td class="notes-cell" contenteditable="true">Rest</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DAY 03 -->
+            <div class="day-card">
+                <div class="day-sidebar">
+                    <div class="day-number" contenteditable="true">DAY 03</div>
+                    <div class="day-date" contenteditable="true">Mon, May 25</div>
+                    <img class="day-image" src="day03_mouratoglou.jpg" alt="Mouratoglou Tennis Academy">
+                </div>
+                <div class="day-table-wrap">
+                    <table class="day-table">
+                        <thead>
+                            <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🚌</span> <span contenteditable="true">08:30 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Transfer to Mouratoglou Tennis Academy</td>
+                                <td class="notes-cell" contenteditable="true">Private van / Grab</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏫</span> <span contenteditable="true">09:00 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Academy Tour &amp; Facilities Visit</td>
+                                <td class="notes-cell" contenteditable="true">Observe training environment</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍴</span> <span contenteditable="true">12:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Lunch at Academy</td>
+                                <td class="notes-cell" contenteditable="true">On-campus dining</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🎾</span> <span contenteditable="true">02:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Coaching Session &amp; Exchange</td>
+                                <td class="notes-cell" contenteditable="true">Methodology &amp; discussions</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🚌</span> <span contenteditable="true">06:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Return to Kuala Lumpur</td>
+                                <td class="notes-cell" contenteditable="true">Check-in hotel</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍽</span> <span contenteditable="true">07:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Dinner</td>
+                                <td class="notes-cell" contenteditable="true">Local cuisine</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🛌</span> <span contenteditable="true">10:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Team meeting / Rest</td>
+                                <td class="notes-cell" contenteditable="true">Review &amp; preparation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DAY 04 -->
+            <div class="day-card">
+                <div class="day-sidebar">
+                    <div class="day-number" contenteditable="true">DAY 04</div>
+                    <div class="day-date" contenteditable="true">Tue, May 26</div>
+                    <img class="day-image" src="day04_singapore.jpg" alt="Singapore Skyline">
+                </div>
+                <div class="day-table-wrap">
+                    <table class="day-table">
+                        <thead>
+                            <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">✈</span> <span contenteditable="true">08:30 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Flight to Singapore</td>
+                                <td class="notes-cell" contenteditable="true">KL → Singapore</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🛬</span> <span contenteditable="true">01:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Arrive at Changi Airport</td>
+                                <td class="notes-cell" contenteditable="true">Immigration &amp; transfer</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🚌</span> <span contenteditable="true">02:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Transfer to Hotel (Bugis)</td>
+                                <td class="notes-cell" contenteditable="true">MRT Downtown Line</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">📚</span> <span contenteditable="true">03:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Workshop (Afternoon Session)</td>
+                                <td class="notes-cell" contenteditable="true">Pre-arranged</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍽</span> <span contenteditable="true">07:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Dinner at Bugis Street</td>
+                                <td class="notes-cell" contenteditable="true">Street food &amp; local dishes</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🚶</span> <span contenteditable="true">06:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Retore b Kampong Glam</td>
+                                <td class="notes-cell" contenteditable="true">Cultural &amp; heritage walk</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🛌</span> <span contenteditable="true">10:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Return to hotel</td>
+                                <td class="notes-cell" contenteditable="true">Rest</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DAY 05 -->
+            <div class="day-card">
+                <div class="day-sidebar">
+                    <div class="day-number" contenteditable="true">DAY 05</div>
+                    <div class="day-date" contenteditable="true">Wed, May 27</div>
+                    <img class="day-image" src="day05_tennis.jpg" alt="Tennis Court">
+                </div>
+                <div class="day-table-wrap">
+                    <table class="day-table">
+                        <thead>
+                            <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏙</span> <span contenteditable="true">09:30 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Visit Marina Bay Sands</td>
+                                <td class="notes-cell" contenteditable="true">Skyline &amp; architecture</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🦁</span> <span contenteditable="true">11:00 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Merlion Park</td>
+                                <td class="notes-cell" contenteditable="true">Iconic landmark</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍴</span> <span contenteditable="true">12:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Lunch at Lau Pa Sat</td>
+                                <td class="notes-cell" contenteditable="true">Satay, laksa, chilli crab</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🎾</span> <span contenteditable="true">03:00 PM – 05:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Visit North Singapore Tennis Club</td>
+                                <td class="notes-cell" contenteditable="true">Tennis visit &amp; exchange</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏟</span> <span contenteditable="true">05:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Explore Kallang Area</td>
+                                <td class="notes-cell" contenteditable="true">Sports &amp; lifestyle</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍽</span> <span contenteditable="true">07:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Dinner in Kallang</td>
+                                <td class="notes-cell" contenteditable="true">Riverside dining</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🌃</span> <span contenteditable="true">18:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Marina Bay Light Show</td>
+                                <td class="notes-cell" contenteditable="true">Spectra – A Light &amp; Water Show</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DAY 06 -->
+            <div class="day-card">
+                <div class="day-sidebar">
+                    <div class="day-number" contenteditable="true">DAY 06</div>
+                    <div class="day-date" contenteditable="true">Thu, May 28</div>
+                    <img class="day-image" src="day06_jewel.jpg" alt="Jewel Changi Airport">
+                </div>
+                <div class="day-table-wrap">
+                    <table class="day-table">
+                        <thead>
+                            <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🏮</span> <span contenteditable="true">09:00 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Visit Chinatown / Little India</td>
+                                <td class="notes-cell" contenteditable="true">Multicultural experience</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍴</span> <span contenteditable="true">11:30 AM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Lunch</td>
+                                <td class="notes-cell" contenteditable="true">Local favorites</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🚌</span> <span contenteditable="true">01:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Transfer to Jewel Changi Airport</td>
+                                <td class="notes-cell" contenteditable="true">MRT / Grab</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">💎</span> <span contenteditable="true">02:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Explore Jewel Changi</td>
+                                <td class="notes-cell" contenteditable="true">Rain Vortex, shopping</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">🍽</span> <span contenteditable="true">03:30 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Early Dinner</td>
+                                <td class="notes-cell" contenteditable="true">At Jewel</td>
+                            </tr>
+                            <tr>
+                                <td><div class="time-cell"><span class="time-icon">✈</span> <span contenteditable="true">05:00 PM</span></div></td>
+                                <td class="activity-cell" contenteditable="true">Departure from Changi Airport</td>
+                                <td class="notes-cell" contenteditable="true">Flight departure</td>
+                            </tr>
+                            <tr class="end-row">
+                                <td colspan="3">
+                                    <span contenteditable="true">❤ – – – End of Trip – – – Memories for a lifetime ✈</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <div contenteditable="true">© LD Tennis 乐动网球 | Designed for Educational &amp; Sports Exchange</div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to allow saving edited content to localStorage
+        document.querySelectorAll('[contenteditable="true"]').forEach((el, index) => {
+            const key = 'itinerary_' + index;
+            const saved = localStorage.getItem(key);
+            if (saved) el.innerText = saved;
+            
+            el.addEventListener('blur', () => {
+                localStorage.setItem(key, el.innerText);
+            });
+        });
+    </script>
+</body>
+</html>
