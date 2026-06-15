@@ -7,13 +7,14 @@
  * @LastEditTime: 2022-04-29 15:53:43
  * @content: edit your page content
  */
-import { Box, Button, FormControl, Grid, MenuItem, Modal, Paper, Select, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, Collapse, FormControl, MenuItem, Modal, Paper, Select, Stack, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useEffect } from 'react';
 import InputBase from '@mui/material/InputBase';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CachedIcon from '@mui/icons-material/Cached';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import IconButton from '@mui/material/IconButton';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -42,6 +43,40 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     },
 }));
 
+const TIMES_CARD_UNIT_PRICE = 200
+const ANNUAL_CARD_UNIT_PRICE = 150
+const UNKNOWN_COURT = '未设置校区'
+
+const toNumber = (value, defaultValue = 0) => {
+    const numberValue = parseFloat(value)
+    return Number.isFinite(numberValue) ? numberValue : defaultValue
+}
+
+const calculateTotalBalance = (user) => {
+    return toNumber(user.restCharge) + toNumber(user.timesCount) * TIMES_CARD_UNIT_PRICE + toNumber(user.annualCount) * ANNUAL_CARD_UNIT_PRICE
+}
+
+const isDebtUser = (user) => {
+    return calculateTotalBalance(user) < 0
+}
+
+const formatNumber = (value) => {
+    const numberValue = toNumber(value)
+    return Number.isInteger(numberValue) ? numberValue : numberValue.toFixed(1)
+}
+
+const getMemberInitial = (name) => {
+    return name ? String(name).substring(0, 1) : '?'
+}
+
+const compareMemberPriority = (a, b) => {
+    const debtCompare = Number(isDebtUser(b)) - Number(isDebtUser(a))
+    if (debtCompare !== 0) {
+        return debtCompare
+    }
+    return moment(a.timesExpireTime).isAfter(moment(b.timesExpireTime)) ? -1 : 1
+}
+
 
 function SearchTask(props) {
     const dispatch = useDispatch()
@@ -65,7 +100,7 @@ function SearchTask(props) {
     const [currentAdult, setCurrentAdult] = React.useState(0);
     const [courseList, setCourseList] = React.useState([]);
     const [detailMode, setDetailMode] = React.useState(false);
-    const [userSort, setUserSort] = React.useState(false);
+    const [userSort, setUserSort] = React.useState<any[]>([]);
     const [customerName, setCustomerName] = React.useState('');
     const [customerOpenId, setCustomerOpenId] = React.useState('');
     const [annualTimes, setAnnualTimes] = React.useState(prepaidCard.annualCount || 0);
@@ -83,6 +118,7 @@ function SearchTask(props) {
     const [chargeDate, setChargeDate] = React.useState(moment().format('YYYY-MM-DD HH:mm:ss'));
     const [yonth, setYonth] = React.useState(0);
     const [adult, setAdult] = React.useState(0);
+    const [groupExpanded, setGroupExpanded] = React.useState({ 'debt-users': true });
     const [createUser, setCreateUser] = React.useState({ number: '', name: '', court: '' });//创建用户数据
     useEffect(() => {
 
@@ -109,6 +145,41 @@ function SearchTask(props) {
             setUserSort([])
         }
     }, [users])
+
+    const debtUsers = React.useMemo(() => {
+        if (!userSort) {
+            return []
+        }
+        return userSort.filter((user) => isDebtUser(user)).sort(compareMemberPriority)
+    }, [userSort])
+
+    const userGroupsByCourt = React.useMemo(() => {
+        if (!userSort) {
+            return []
+        }
+
+        const courtSortValues = (court || []).map((courtItem) => courtItem.name)
+        const grouped = userSort.reduce((result, user) => {
+            const courtName = user.court || UNKNOWN_COURT
+            if (!result[courtName]) {
+                result[courtName] = []
+            }
+            result[courtName].push(user)
+            return result
+        }, {})
+
+        const orderedCourtNames = courtSortValues.filter((courtName) => grouped[courtName])
+        Object.keys(grouped).forEach((courtName) => {
+            if (!orderedCourtNames.includes(courtName)) {
+                orderedCourtNames.push(courtName)
+            }
+        })
+
+        return orderedCourtNames.map((courtName) => ({
+            name: courtName,
+            users: grouped[courtName].sort(compareMemberPriority),
+        }))
+    }, [court, userSort])
 
 
     useEffect(() => {
@@ -326,80 +397,170 @@ function SearchTask(props) {
         </Stack>)
 
 
-    const fileItem = (user, index) => {
-        // console.log(user)
-        return (<Grid item xs={6} key={index} space={1}>
-            <Paper elevation={1} sx={{ background: user.prepaidCard ? 'transparent' : 'rgba(0,0,0,0.1)', '& :hover': { background: 'rgb(0,0,0,0.1)' } }}>
+    const fileItem = (user, index, keyPrefix = 'user') => {
+        const debt = isDebtUser(user)
+        const expired = user.timesExpireTime && moment().isAfter(user.timesExpireTime)
+        const totalBalance = calculateTotalBalance(user)
 
+        return (
+            <Paper
+                key={`${keyPrefix}-${user.number || index}`}
+                elevation={0}
+                onClick={() => {
+                    setPrepaidCard(user)
+                    setCustomerName(user.name)
+                    setCustomerOpenId(user.number)
+                    dispatch(exploreRecentCharge(user.number))
+                    dispatch(exploreRecentSpend(user.number))
+                    setCurrentYonth(user.younths)
+                    setCurrentAdult(user.adults)
+                }}
+                sx={{
+                    width: '100%',
+                    minHeight: 104,
+                    border: '1px solid',
+                    borderColor: debt ? 'rgba(211, 47, 47, 0.35)' : expired ? 'rgba(237, 108, 2, 0.35)' : 'rgba(0, 0, 0, 0.08)',
+                    background: debt ? 'rgba(211, 47, 47, 0.06)' : expired ? 'rgba(237, 108, 2, 0.06)' : '#fff',
+                    cursor: 'pointer',
+                    transition: 'background 120ms ease, border-color 120ms ease, box-shadow 120ms ease',
+                    '&:hover': {
+                        background: debt ? 'rgba(211, 47, 47, 0.1)' : expired ? 'rgba(237, 108, 2, 0.1)' : 'rgba(25, 118, 210, 0.04)',
+                        borderColor: debt ? 'rgba(211, 47, 47, 0.55)' : expired ? 'rgba(237, 108, 2, 0.55)' : 'rgba(25, 118, 210, 0.24)',
+                        boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+                    },
+                }}
+            >
+                <Stack
+                    direction="column"
+                    justifyContent="flex-start"
+                    alignItems="stretch"
+                    spacing={1}
+                    sx={{ p: 1.5 }}
+                >
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
+                        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
+                            <Avatar
+                                sx={{
+                                    width: 36,
+                                    height: 36,
+                                    bgcolor: debt ? 'error.main' : expired ? 'warning.main' : 'primary.main',
+                                    fontSize: 17,
+                                }}
+                            >
+                                {getMemberInitial(user.name)}
+                            </Avatar>
+                            <Box sx={{ minWidth: 0 }}>
+                                <Stack direction="row" alignItems="center" spacing={1} sx={{ flexWrap: 'wrap' }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{ fontWeight: 700, maxWidth: 150, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                    >
+                                        {user.name || '未命名'}
+                                    </Typography>
+                                    {debt && <Chip label="欠费" size="small" color="error" />}
+                                    {!debt && expired && <Chip label="已过期" size="small" color="warning" />}
+                                    {!debt && !expired && <Chip label="正常" size="small" color="success" />}
+                                </Stack>
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                    {user.number || '无手机号'}
+                                </Typography>
+                            </Box>
+                        </Stack>
+
+                        <Chip
+                            label={`折算余额 ${formatNumber(totalBalance)}`}
+                            size="small"
+                            color={debt ? 'error' : 'default'}
+                            variant={debt ? 'filled' : 'outlined'}
+                        />
+                    </Stack>
+
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{
+                            flexWrap: 'wrap',
+                            justifyContent: 'flex-start',
+                        }}
+                    >
+                        <Chip label={user.court || UNKNOWN_COURT} size="small" variant="outlined" />
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>余额：{formatNumber(user.restCharge)}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>次卡：{formatNumber(user.timesCount)}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>年卡：{formatNumber(user.annualCount)}</Typography>
+                        <Typography variant="body2" sx={{ color: expired ? 'warning.main' : 'text.secondary' }}>
+                            到期：{user.timesExpireTime || '-'}
+                        </Typography>
+                    </Stack>
+                </Stack>
+            </Paper>
+        )
+    }
+
+    const userGroupItem = (title, groupUsers, keyPrefix) => {
+        const expanded = groupExpanded[keyPrefix] !== false
+        const debtCount = groupUsers.filter((user) => isDebtUser(user)).length
+
+        return (
+            <Stack
+                key={keyPrefix}
+                justifyContent="flex-start"
+                alignItems="flex-start"
+                spacing={1}
+                sx={{ width: '100%' }}
+            >
                 <Stack
                     direction="row"
-                    justifyContent="center"
+                    justifyContent="space-between"
                     alignItems="center"
-                    spacing={0}
-                    // sx={{ background: (user.equivalentBalance + user.restCharge) < 1000 ? '#e7d4c8' : 'inheri', cursor: 'pointer', '& :hover': { background: 'transparent' } }}
-                    sx={{ background: moment().isAfter(user.timesExpireTime)  ? '#e7d4c8' : 'inheri', cursor: 'pointer', '& :hover': { background: 'transparent' } }}
-                    onMouseEnter={() => {
-
+                    onClick={() => {
+                        setGroupExpanded({ ...groupExpanded, [keyPrefix]: !expanded })
                     }}
-                    onMouseLeave={() => {
-
+                    sx={{
+                        width: '100%',
+                        pt: 1,
+                        cursor: 'pointer',
+                        userSelect: 'none',
                     }}
-                    onClick={(event) => {
-                        setPrepaidCard(user)
-                        setCustomerName(user.name)
-                        setCustomerOpenId(user.number)
-                        dispatch(exploreRecentCharge(user.number))
-                        dispatch(exploreRecentSpend(user.number))
-
-
-                        setCurrentYonth(user.younths)
-                        setCurrentAdult(user.adults)
-
-                    }}>
-                    {/* <Avatar alt="Remy Sharp" src={user.avator} /> */}
-
-
-                    <Typography gutterBottom variant="body2"
-                        sx={{
-                            // background: 'transparent',
-                            '& :hover': { background: '#985541' },
-                            // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '12%', textAlign: 'center'
-                        }} >
-                        {user.name}
-                    </Typography>
-                    <Typography gutterBottom variant="body2"
-                        sx={{
-                            // background: 'transparent',
-                            '& :hover': { background: '#985541' },
-                            // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '13%', textAlign: 'center'
-                        }} >
-                        {user.court}
-                    </Typography>
-                     <Typography gutterBottom variant="body2"
-                        sx={{
-                            // background: 'transparent',
-                            '& :hover': { background: '#985541' },
-                            // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '15%', textAlign: 'center'
-                        }} >
-                        {user.number}
-                    </Typography> 
-                    <Typography gutterBottom variant="body2"
-                        sx={{
-                            // background: 'transparent',
-                            '& :hover': { background: '#985541' },
-                            // color: 'rgba(0, 0, 0, 0.6)',
-                            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '60%', textAlign: 'center'
-                        }} >
-                        余额：{user.restCharge} , 次卡：{user.timesCount}, 年卡：{user.annualCount}，过期:{user.timesExpireTime}
-                    </Typography>
+                >
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <IconButton
+                            size="small"
+                            sx={{
+                                transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                transition: 'transform 120ms ease',
+                            }}
+                        >
+                            <ExpandMoreIcon fontSize="small" />
+                        </IconButton>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                            {title}
+                        </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        {debtCount > 0 && <Chip label={`欠费 ${debtCount}`} size="small" color="error" />}
+                        <Chip label={`${groupUsers.length} 人`} size="small" variant="outlined" />
+                    </Stack>
                 </Stack>
-
-
-            </Paper>
-        </Grid>
+                <Divider sx={{ width: '100%' }} />
+                <Collapse in={expanded} timeout={120} unmountOnExit sx={{ width: '100%' }}>
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
+                            gap: 1,
+                            width: '100%',
+                        }}
+                    >
+                        {groupUsers.map((file, index) => fileItem(file, index, keyPrefix))}
+                    </Box>
+                    {groupUsers.length === 0 && (
+                        <Typography variant="body2" sx={{ color: 'text.secondary', py: 1 }}>
+                            暂无会员
+                        </Typography>
+                    )}
+                </Collapse>
+            </Stack>
         )
     }
     const style = {
@@ -720,15 +881,14 @@ function SearchTask(props) {
                     direction="row"
                 >小朋友：{yonth} || 成年人：{adult}</Stack>)}
             </Stack>
-            {!detailMode && (<Grid
-                container
-                direction="row"
+            {!detailMode && (<Stack
                 justifyContent="flex-start"
                 alignItems="flex-start"
-                spacing={4}
-                sx={{ height: '10%', width: '100%' }}>
-                {userSort && userSort.map((file, index) => fileItem(file, index))}
-            </Grid>)}
+                spacing={3}
+                sx={{ width: '100%' }}>
+                {userGroupItem('欠费会员', debtUsers, 'debt-users')}
+                {userGroupsByCourt.map((group) => userGroupItem(group.name, group.users, `court-${group.name}`))}
+            </Stack>)}
 
             {detailMode && finacialItem}
             {detailMode && memberItem}

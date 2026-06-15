@@ -9,7 +9,7 @@
  */
 import React, { useEffect, useState } from 'react';
 
-import { Button, Card, Stack, MenuItem, NoSsr, Paper, Box, Typography, Select, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal } from '@mui/material';
+import { Button, Card, Stack, MenuItem, NoSsr, Paper, Box, Typography, Select, AvatarGroup, TextField, Avatar, FormControl, Checkbox, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Modal, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 import { keyframes, styled } from '@mui/material/styles';
 
@@ -48,6 +48,70 @@ function Autoloading(props) {
 
   const [excelData, setExcelData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [balanceWarningOpen, setBalanceWarningOpen] = useState<boolean>(false);
+  const [balanceWarnings, setBalanceWarnings] = useState<any>({ currentDebt: [], afterDebt: [] });
+  const [pendingCourse, setPendingCourse] = useState<any>(null);
+
+  const toNumber = (value, defaultValue = 0) => {
+    const numberValue = parseFloat(value)
+    return Number.isFinite(numberValue) ? numberValue : defaultValue
+  }
+
+  const TIMES_CARD_UNIT_PRICE = 200
+  const ANNUAL_CARD_UNIT_PRICE = 150
+
+  const calculateTotalBalance = (restCharge, timesCount, annualCount) => {
+    return toNumber(restCharge) + toNumber(timesCount) * TIMES_CARD_UNIT_PRICE + toNumber(annualCount) * ANNUAL_CARD_UNIT_PRICE
+  }
+
+  const calculateBalanceWarnings = (membersObj) => {
+    const currentDebt = []
+    const afterDebt = []
+
+    Object.entries(membersObj || {}).forEach(([memberNumber, spendInfo]: any) => {
+      const user = find(users, (u) => String(u.number) === String(memberNumber))
+      if (!user) {
+        return
+      }
+
+      const currentBalance = calculateTotalBalance(user.restCharge, user.timesCount, user.annualCount)
+      const deduction = calculateTotalBalance(spendInfo?.[0], spendInfo?.[1], spendInfo?.[2])
+      const afterBalance = currentBalance - deduction
+
+      if (currentBalance < 0) {
+        currentDebt.push({
+          name: user.name,
+          number: user.number,
+          currentBalance,
+          restCharge: toNumber(user.restCharge),
+          timesCount: toNumber(user.timesCount),
+          annualCount: toNumber(user.annualCount),
+        })
+      }
+
+      if (currentBalance >= 0 && afterBalance < 0) {
+        afterDebt.push({
+          name: user.name,
+          number: user.number,
+          currentBalance,
+          deduction,
+          afterBalance,
+          spendFee: toNumber(spendInfo?.[0]),
+          times: toNumber(spendInfo?.[1]),
+          annual: toNumber(spendInfo?.[2]),
+        })
+      }
+    })
+
+    return { currentDebt, afterDebt }
+  }
+
+  const submitCourse = (course) => {
+    dispatch(createCard(course))
+    setTimeout(() => {
+      unSubmittedCourse(excelData)
+    }, 3000)
+  }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -175,11 +239,15 @@ const unSubmittedCourse=async (excelD)=>{
       alert('数据错误，请修改日志 - 教练、场地或课程类型不正确')
       return
     }
-    dispatch(createCard(course))
-    setTimeout(()=>{
-      unSubmittedCourse(excelData)
+    const warnings = calculateBalanceWarnings(course.membersObj)
+    if (warnings.currentDebt.length > 0 || warnings.afterDebt.length > 0) {
+      setBalanceWarnings(warnings)
+      setPendingCourse(course)
+      setBalanceWarningOpen(true)
+      return
+    }
 
-    },3000)
+    submitCourse(course)
   }
 
   // useEffect(() => {
@@ -232,7 +300,7 @@ const unSubmittedCourse=async (excelD)=>{
       >
         {Array.from({ length: membersToShow }, (_, index) => index).map(idx => {
           const memberBaseIndex = memberStartIndex + idx * 5
-          return (<Stack><Typography>{`${item[memberBaseIndex]}, 课型（ ${item[memberBaseIndex + 1]}）, 扣费数量 ${item[memberBaseIndex + 2]}， 等效价格：${item[memberBaseIndex + 3]}， 上课人数：${item[memberBaseIndex + 4]} `}</Typography></Stack>)
+          return (<Stack key={`course-member-${item[0]}-${item[2]}-${idx}`}><Typography>{`${item[memberBaseIndex]}, 课型（ ${item[memberBaseIndex + 1]}）, 扣费数量 ${item[memberBaseIndex + 2]}， 等效价格：${item[memberBaseIndex + 3]}， 上课人数：${item[memberBaseIndex + 4]} `}</Typography></Stack>)
         })}
       </Stack>
       <Button variant='contained' onClick={() => { handleSubmitCourse(item) }}>提交</Button>
@@ -262,6 +330,69 @@ const unSubmittedCourse=async (excelD)=>{
         </Button>
       </label>
       {excelData.map(item => { return courseItem(item) })}
+      <Dialog
+        open={balanceWarningOpen}
+        onClose={() => {
+          setBalanceWarningOpen(false)
+          setPendingCourse(null)
+        }}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>客户余额不足确认</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            {balanceWarnings.currentDebt.length > 0 && (
+              <Box>
+                <Typography variant="subtitle1">已经欠费</Typography>
+                {balanceWarnings.currentDebt.map((customer) => (
+                  <Box key={`current-debt-${customer.number}`} sx={{ mt: 1 }}>
+                    <Typography variant="body2">{customer.name}（{customer.number}）</Typography>
+                    <Typography variant="body2" sx={{ color: 'error.main', ml: 2 }}>
+                      当前折算余额 {customer.currentBalance} = 余额 {customer.restCharge} + 次卡 {customer.timesCount} * {TIMES_CARD_UNIT_PRICE} + 年卡 {customer.annualCount} * {ANNUAL_CARD_UNIT_PRICE}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+            {balanceWarnings.afterDebt.length > 0 && (
+              <Box>
+                <Typography variant="subtitle1">扣除后会欠费</Typography>
+                {balanceWarnings.afterDebt.map((customer) => (
+                  <Box key={`after-debt-${customer.number}`} sx={{ mt: 1 }}>
+                    <Typography variant="body2">{customer.name}（{customer.number}）</Typography>
+                    <Typography variant="body2" sx={{ color: 'error.main', ml: 2 }}>
+                      当前折算余额 {customer.currentBalance}，本次扣除 {customer.deduction} = 课时费 {customer.spendFee} + 次卡 {customer.times} * {TIMES_CARD_UNIT_PRICE} + 年卡 {customer.annual} * {ANNUAL_CARD_UNIT_PRICE}，扣后 {customer.afterBalance}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setBalanceWarningOpen(false)
+              setPendingCourse(null)
+            }}
+          >
+            取消
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (pendingCourse) {
+                submitCourse(pendingCourse)
+              }
+              setBalanceWarningOpen(false)
+              setPendingCourse(null)
+            }}
+          >
+            继续
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack >
   );
 }
