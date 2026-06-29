@@ -46,6 +46,217 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 const TIMES_CARD_UNIT_PRICE = 200
 const ANNUAL_CARD_UNIT_PRICE = 150
 const UNKNOWN_COURT = '未设置校区'
+const MEMBER_CARD_HEIGHT = 124
+const MEMBER_GRID_GAP = 8
+const MEMBER_LIST_MAX_HEIGHT = 640
+const MEMBER_OVERSCAN_ROWS = 3
+const MEMBER_GRID_TWO_COLUMN_WIDTH = 900
+
+const createEmptyUser = () => ({ number: '', name: '', court: '' })
+
+const CircleButton = styled(Button)({ borderRadius: '20px', })
+
+const VirtualizedMemberGrid = React.memo(({ users, keyPrefix, renderItem }: any) => {
+    const containerRef = React.useRef<HTMLDivElement | null>(null)
+    const [scrollTop, setScrollTop] = React.useState(0)
+    const [viewport, setViewport] = React.useState({ width: 0, height: MEMBER_LIST_MAX_HEIGHT })
+
+    const columns = viewport.width >= MEMBER_GRID_TWO_COLUMN_WIDTH ? 2 : 1
+    const rowStride = MEMBER_CARD_HEIGHT + MEMBER_GRID_GAP
+    const rowCount = Math.ceil(users.length / columns)
+    const totalHeight = Math.max(0, rowCount * rowStride - MEMBER_GRID_GAP)
+    const containerHeight = Math.min(totalHeight, MEMBER_LIST_MAX_HEIGHT)
+    const viewportHeight = viewport.height || containerHeight || MEMBER_LIST_MAX_HEIGHT
+    const startRow = Math.max(0, Math.floor(scrollTop / rowStride) - MEMBER_OVERSCAN_ROWS)
+    const endRow = Math.min(rowCount, Math.ceil((scrollTop + viewportHeight) / rowStride) + MEMBER_OVERSCAN_ROWS)
+    const startIndex = startRow * columns
+    const endIndex = Math.min(users.length, endRow * columns)
+    const visibleUsers = users.slice(startIndex, endIndex)
+    const topPadding = startRow * rowStride
+
+    const measureViewport = React.useCallback(() => {
+        const element = containerRef.current
+        if (!element) {
+            return
+        }
+        const nextViewport = {
+            width: element.clientWidth,
+            height: element.clientHeight,
+        }
+        setViewport((prev) => (
+            prev.width === nextViewport.width && prev.height === nextViewport.height ? prev : nextViewport
+        ))
+    }, [])
+
+    React.useEffect(() => {
+        measureViewport()
+        window.addEventListener('resize', measureViewport)
+
+        let resizeObserver = null
+        if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+            resizeObserver = new ResizeObserver(measureViewport)
+            resizeObserver.observe(containerRef.current)
+        }
+
+        return () => {
+            window.removeEventListener('resize', measureViewport)
+            if (resizeObserver) {
+                resizeObserver.disconnect()
+            }
+        }
+    }, [measureViewport])
+
+    React.useEffect(() => {
+        measureViewport()
+    }, [measureViewport, users.length, columns, containerHeight])
+
+    const handleScroll = React.useCallback((event) => {
+        setScrollTop(event.currentTarget.scrollTop)
+    }, [])
+
+    return (
+        <Box
+            ref={containerRef}
+            onScroll={handleScroll}
+            data-member-grid={keyPrefix}
+            data-rendered-count={visibleUsers.length}
+            data-total-count={users.length}
+            sx={{
+                width: '100%',
+                height: containerHeight,
+                maxHeight: MEMBER_LIST_MAX_HEIGHT,
+                overflowY: totalHeight > containerHeight ? 'auto' : 'hidden',
+                overflowX: 'hidden',
+                pr: totalHeight > containerHeight ? 1 : 0,
+            }}
+        >
+            <Box sx={{ position: 'relative', height: totalHeight, width: '100%' }}>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: topPadding,
+                        left: 0,
+                        right: 0,
+                        display: 'grid',
+                        gridTemplateColumns: columns === 2 ? 'repeat(2, minmax(0, 1fr))' : '1fr',
+                        gridAutoRows: `${MEMBER_CARD_HEIGHT}px`,
+                        gap: 1,
+                    }}
+                >
+                    {visibleUsers.map((file, index) => renderItem(file, startIndex + index, keyPrefix))}
+                </Box>
+            </Box>
+        </Box>
+    )
+})
+
+const FullMemberGrid = React.memo(({ users, keyPrefix, renderItem }: any) => (
+    <Box
+        data-member-grid={keyPrefix}
+        data-rendered-count={users.length}
+        data-total-count={users.length}
+        data-browser-find-grid="true"
+        sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
+            gridAutoRows: `${MEMBER_CARD_HEIGHT}px`,
+            gap: 1,
+            width: '100%',
+        }}
+    >
+        {users.map((file, index) => renderItem(file, index, keyPrefix))}
+    </Box>
+))
+
+const AddMemberModal = React.memo(({ open, onClose, court, onSubmit, style }: any) => {
+    const [createUser, setCreateUser] = React.useState(createEmptyUser)
+
+    useEffect(() => {
+        if (open) {
+            setCreateUser(createEmptyUser())
+        }
+    }, [open])
+
+    const updateCreateUser = React.useCallback((field) => (e) => {
+        const value = e.target.value
+        setCreateUser((prev) => ({ ...prev, [field]: value }))
+    }, [])
+
+    const handleSubmit = React.useCallback(() => {
+        onSubmit(createUser)
+    }, [onSubmit, createUser])
+
+    return (
+        <Modal
+            open={open}
+            onClose={onClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style} >
+                <Stack
+                    direction="column"
+                    justifyContent="space-around"
+                    alignItems="center"
+                    spacing={1}>
+                    <TextField
+                        id="outlined-password-input"
+                        label="名字"
+                        value={createUser.name}
+                        onChange={updateCreateUser('name')}
+                    />
+                    <TextField
+                        id="outlined-password-input2"
+                        label="电话"
+                        value={createUser.number}
+                        onChange={updateCreateUser('number')}
+                    />
+                    <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
+                        name='FileTypes'
+                        size="small"
+                        onChange={updateCreateUser('court')}
+                        value={createUser.court}>
+                        {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
+                    </Select>
+
+                    <Button variant="contained" size="small"
+                        onClick={handleSubmit}>确定添加</Button>
+
+                </Stack>
+            </Box>
+        </Modal>
+    )
+})
+
+const AddMemberControl = React.memo(({ court, onSubmit, style }: any) => {
+    const [open, setOpen] = React.useState(false)
+    const openModal = React.useCallback(() => {
+        setOpen(true)
+    }, [])
+    const closeModal = React.useCallback(() => {
+        setOpen(false)
+    }, [])
+
+    return (
+        <>
+            <CircleButton
+                size="small"
+                variant="contained"
+                sx={{ margin: '5px' }}
+                onClick={openModal}
+            >
+                添加会员
+            </CircleButton>
+            <AddMemberModal
+                open={open}
+                onClose={closeModal}
+                court={court}
+                style={style}
+                onSubmit={onSubmit}
+            />
+        </>
+    )
+})
 
 const toNumber = (value, defaultValue = 0) => {
     const numberValue = parseFloat(value)
@@ -81,7 +292,6 @@ const compareMemberPriority = (a, b) => {
 function SearchTask(props) {
     const dispatch = useDispatch()
     const index = props.index
-    const CircleButton = styled(Button)({ borderRadius: '20px', })
     const [checked, setChecked] = React.useState<readonly number[]>([]);
     const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3]);
     const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
@@ -110,8 +320,6 @@ function SearchTask(props) {
     const [expiredTime, setExpiredTime] = React.useState(prepaidCard.annualExpireTime || '');
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
-    const [create, setCreate] = React.useState(0);//0 关；  1 显示
-
     const [changeFee, setChangeFee] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
     const [changeDesc, setChangeDesc] = React.useState('');
@@ -119,7 +327,30 @@ function SearchTask(props) {
     const [yonth, setYonth] = React.useState(0);
     const [adult, setAdult] = React.useState(0);
     const [groupExpanded, setGroupExpanded] = React.useState({ 'debt-users': true });
-    const [createUser, setCreateUser] = React.useState({ number: '', name: '', court: '' });//创建用户数据
+    const [browserFindMode, setBrowserFindMode] = React.useState(false);
+
+    const handleCreateUser = React.useCallback((newUser) => {
+        dispatch(createUserAccount(newUser.name, newUser.number, newUser.court))
+        console.log('------确定添加---', newUser)
+    }, [dispatch])
+
+    useEffect(() => {
+        const handleBrowserFindKeys = (event) => {
+            const key = String(event.key || '').toLowerCase()
+            if ((event.ctrlKey || event.metaKey) && key === 'f') {
+                setBrowserFindMode(true)
+            }
+            if (key === 'escape') {
+                setBrowserFindMode(false)
+            }
+        }
+
+        window.addEventListener('keydown', handleBrowserFindKeys, true)
+        return () => {
+            window.removeEventListener('keydown', handleBrowserFindKeys, true)
+        }
+    }, [])
+
     useEffect(() => {
 
         if (users) {
@@ -405,6 +636,7 @@ function SearchTask(props) {
         return (
             <Paper
                 key={`${keyPrefix}-${user.number || index}`}
+                data-member-card={keyPrefix}
                 elevation={0}
                 onClick={() => {
                     setPrepaidCard(user)
@@ -417,7 +649,9 @@ function SearchTask(props) {
                 }}
                 sx={{
                     width: '100%',
-                    minHeight: 104,
+                    height: '100%',
+                    minHeight: MEMBER_CARD_HEIGHT,
+                    overflow: 'hidden',
                     border: '1px solid',
                     borderColor: debt ? 'rgba(211, 47, 47, 0.35)' : expired ? 'rgba(237, 108, 2, 0.35)' : 'rgba(0, 0, 0, 0.08)',
                     background: debt ? 'rgba(211, 47, 47, 0.06)' : expired ? 'rgba(237, 108, 2, 0.06)' : '#fff',
@@ -498,12 +732,15 @@ function SearchTask(props) {
     }
 
     const userGroupItem = (title, groupUsers, keyPrefix) => {
-        const expanded = groupExpanded[keyPrefix] !== false
+        const expanded = browserFindMode || (groupExpanded[keyPrefix] === undefined ? keyPrefix === 'debt-users' : groupExpanded[keyPrefix])
         const debtCount = groupUsers.filter((user) => isDebtUser(user)).length
 
         return (
             <Stack
                 key={keyPrefix}
+                data-member-group={keyPrefix}
+                data-expanded={expanded ? 'true' : 'false'}
+                data-browser-find-mode={browserFindMode ? 'true' : 'false'}
                 justifyContent="flex-start"
                 alignItems="flex-start"
                 spacing={1}
@@ -543,17 +780,21 @@ function SearchTask(props) {
                     </Stack>
                 </Stack>
                 <Divider sx={{ width: '100%' }} />
-                <Collapse in={expanded} timeout={120} unmountOnExit sx={{ width: '100%' }}>
-                    <Box
-                        sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
-                            gap: 1,
-                            width: '100%',
-                        }}
-                    >
-                        {groupUsers.map((file, index) => fileItem(file, index, keyPrefix))}
-                    </Box>
+                <Collapse in={expanded} timeout={browserFindMode ? 0 : 120} unmountOnExit sx={{ width: '100%' }}>
+                    {browserFindMode && groupUsers.length > 0 && (
+                        <FullMemberGrid
+                            users={groupUsers}
+                            keyPrefix={keyPrefix}
+                            renderItem={fileItem}
+                        />
+                    )}
+                    {!browserFindMode && groupUsers.length > 0 && (
+                        <VirtualizedMemberGrid
+                            users={groupUsers}
+                            keyPrefix={keyPrefix}
+                            renderItem={fileItem}
+                        />
+                    )}
                     {groupUsers.length === 0 && (
                         <Typography variant="body2" sx={{ color: 'text.secondary', py: 1 }}>
                             暂无会员
@@ -686,60 +927,6 @@ function SearchTask(props) {
 
 
 
-    const createModal = (
-        <Modal
-            open={create !== 0}
-            onClose={() => { setCreate(0) }}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-        >
-            <Box sx={style} >
-                <Stack
-                    direction="column"
-                    justifyContent="space-around"
-                    alignItems="center"
-                    spacing={1}>
-                    <TextField
-                        id="outlined-password-input"
-                        label="名字"
-                        value={createUser.name}
-                        onChange={(e) => {
-                            setCreateUser({ ...createUser, name: e.target.value });
-                        }}
-                    />
-                    <TextField
-                        id="outlined-password-input2"
-                        label="电话"
-                        value={createUser.number}
-                        onChange={(e) => {
-                            setCreateUser({ ...createUser, number: e.target.value });
-                        }}
-                    />
-                    <Select label="FileTypes" labelId="demo-controlled-open-select-label12"
-                        name='FileTypes'
-                        size="small"
-                        onChange={(e) => {
-                            //   let after = { ...courseEdit, court: e.target.value }
-                            //   setCourseEdit(after)
-                            setCreateUser({ ...createUser, court: e.target.value });
-                        }}
-                        value={createUser.court}>
-                        {court && court.map((dict, index) => { return (<MenuItem key={`select2-${dict.name}`} value={dict.name}>{dict.name}</MenuItem>) })}
-                    </Select>
-
-                    <Button variant="contained" size="small"
-                        onClick={() => {
-                            dispatch(createUserAccount(createUser.name, createUser.number, createUser.court))
-                            console.log('------确定添加---', createUser)
-                        }}>确定添加</Button>
-
-                </Stack>
-            </Box>
-        </Modal>
-    )
-
-
-
     const chargeItem = (charge) => {
 
         return (<Paper key={`charge-item-${charge.id}`} elevation={1} sx={{
@@ -810,27 +997,11 @@ function SearchTask(props) {
                 spacing={2}
                 direction="row"
             >
-                <CircleButton
-
-                    size="small"
-                    variant={1 === 1 ? "contained" : "outlined"}
-                    sx={{ margin: '5px' }}
-                    onClick={
-                        (e) => {
-                            setCreate(1)
-                            // if (!values.includes(e.target.value)) {
-                            //   values.push(e.target.value)
-                            // } else {
-                            //   values = values.filter(value => e.target.value !== value)
-                            // }
-                            // params[props.searchType] = values
-                            // delete params["topic"];
-                            // navigate(`/explore?${qs.stringify(params, { arrayFormat: 'brackets' })}`)
-                        }
-                    }
-                >
-                    添加会员
-                </CircleButton>
+                <AddMemberControl
+                    court={court}
+                    style={style}
+                    onSubmit={handleCreateUser}
+                />
 
 
                 {!detailMode && sortValue.map((a, ids) => {
@@ -917,7 +1088,6 @@ function SearchTask(props) {
 
             <Typography gutterBottom variant="body2">&nbsp;</Typography>
             {uploadWaitingModal}
-            {createModal}
 
         </Stack>
     );
