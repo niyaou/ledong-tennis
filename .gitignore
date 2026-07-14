@@ -175,3 +175,4 @@ workship/target/classes/com/ledong/entity/Charge.class
 workship/target/classes/com/ledong/entity/Coach.class
 .gitignore
 workship/target/classes/com/ledong/entity/PrepaidCard.class
+.DS_Store

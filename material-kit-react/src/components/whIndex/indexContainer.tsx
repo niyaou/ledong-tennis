@@ -14,6 +14,7 @@ import { Button, Card, Box,CardHeader, Checkbox, Divider, Grid, List, ListItem, 
 import SearchTask from '../searchComponent/searchTask'
 import Analyse from '../searchComponent/analyse'
 import Autoloading from '../searchComponent/autoloading'
+import PendingCourse from '../searchComponent/pendingCourse'
 function IndexContainer(props) {
     const index = props.index
   
@@ -25,7 +26,7 @@ function IndexContainer(props) {
   
     return (
       <Box   justifyContent="space-around" alignItems="center" sx={{width:'96vw',height:'97%',padding:'20px 0 0 10px'}}>
-     {index===0?<AdminComp />:index===1?<SearchTask />:index===2?<Analyse />:<Autoloading />}
+     {index===0?<AdminComp />:index===1?<SearchTask />:index===2?<Analyse />:index===3?<Autoloading />:index===4?<PendingCourse />:null}
       </Box>
     );
   }
