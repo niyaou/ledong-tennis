@@ -16,7 +16,7 @@
  * @LastEditTime: 2022-04-11 11:10:25
  * @content: edit your page content
  */
-import { Avatar, Box, Stack, Typography, Paper, IconButton } from '@mui/material';
+import { Avatar, Box, Stack, Typography, Paper, IconButton, ButtonBase } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Tooltip, { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import React, { useEffect } from 'react';
@@ -30,6 +30,7 @@ import { logOut } from '../../store/actions/usersActions';
 import FolderIcon from '@mui/icons-material/Folder';
 import AnalyticsSharp from '@mui/icons-material/AnalyticsSharp';
 import AccessAlarmsOutlined from '@mui/icons-material/AccessAlarmsOutlined';
+import AssignmentTurnedInOutlined from '@mui/icons-material/AssignmentTurnedInOutlined';
 import { clearDatasetFilesCache } from "../../store/actions/filesAndFoldersActions"
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import GridViewIcon from '@mui/icons-material/GridView';
@@ -190,6 +191,23 @@ function SideMenu(props) {
                             // navigate(`/explore`)
                         }}>
                          自动录课
+                        </Typography>
+                    </Stack>
+                    <Stack
+                        component={ButtonBase}
+                        direction="column"
+                        justifyContent="flex-start"
+                        alignItems="center"
+                        spacing={1}
+                        onClick={async () => {
+                            indexChange(4)
+                        }}
+                        aria-label="教练填报课程"
+                        sx={{ width: '100%', height: 80, color: '#8b8b8b', cursor: 'pointer', '&:hover': { background: 'rgba(0, 0, 0, 0.04)', color: '#a1a1a1' } }}
+                    >
+                        <AssignmentTurnedInOutlined fontSize="large" />
+                        <Typography variant="button" display="block" gutterBottom sx={{}}>
+                         教练填报课程
                         </Typography>
                     </Stack>
                 </Stack>
