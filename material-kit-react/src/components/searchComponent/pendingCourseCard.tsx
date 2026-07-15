@@ -16,6 +16,10 @@ type Props = {
 const PendingCourseCard = ({ course, collapsed, admitting, onToggle, onAdmit }: Props) => {
   const isBooking = course.courseType === 0
   const courtName = course.courtName || `校区已失效（${course.courtId}）`
+  const totalPeople = (course.membersData || []).reduce((total, member) => {
+    const quantities = Number(member.quantities)
+    return total + (Number.isFinite(quantities) ? quantities : 0)
+  }, 0)
 
   return <Card variant="outlined" sx={{ mb: 1.5 }}>
     <CardContent sx={{ pb: 1 }}>
@@ -24,6 +28,7 @@ const PendingCourseCard = ({ course, collapsed, admitting, onToggle, onAdmit }: 
           <Typography variant="h6">{course.coachName || `教练已失效（${course.coachId}）`}</Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
             <Chip size="small" label={courseTypeLabel(course.courseType)} />
+            <Chip size="small" color="primary" variant="outlined" label={`人数 ${totalPeople}`} />
             {!isBooking && <Chip size="small" variant="outlined" label={course.isAdult === 0 ? '儿童' : '成人'} />}
             <Chip size="small" variant="outlined" label={courtName} />
           </Stack>
