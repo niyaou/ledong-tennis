@@ -31,6 +31,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import AnalyticsSharp from '@mui/icons-material/AnalyticsSharp';
 import AccessAlarmsOutlined from '@mui/icons-material/AccessAlarmsOutlined';
 import AssignmentTurnedInOutlined from '@mui/icons-material/AssignmentTurnedInOutlined';
+import EventNoteOutlined from '@mui/icons-material/EventNoteOutlined';
 import { clearDatasetFilesCache } from "../../store/actions/filesAndFoldersActions"
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import GridViewIcon from '@mui/icons-material/GridView';
@@ -76,6 +77,7 @@ function SideMenu(props) {
         <Box
             sx={{
                 width: '4vw', height: '100%',
+                overflowY: 'auto',
                 boxShadow: '0 3px 10px 0 rgb(0 0 0 / 6%) !important'
             }}>
             <Stack
@@ -208,6 +210,23 @@ function SideMenu(props) {
                         <AssignmentTurnedInOutlined fontSize="large" />
                         <Typography variant="button" display="block" gutterBottom sx={{}}>
                          教练填报课程
+                        </Typography>
+                    </Stack>
+                    <Stack
+                        component={ButtonBase}
+                        direction="column"
+                        justifyContent="flex-start"
+                        alignItems="center"
+                        spacing={1}
+                        onClick={async () => {
+                            indexChange(5)
+                        }}
+                        aria-label="教练课程"
+                        sx={{ width: '100%', height: 80, color: '#8b8b8b', cursor: 'pointer', '&:hover': { background: 'rgba(0, 0, 0, 0.04)', color: '#a1a1a1' } }}
+                    >
+                        <EventNoteOutlined fontSize="large" />
+                        <Typography variant="button" display="block" gutterBottom>
+                         教练课程
                         </Typography>
                     </Stack>
                 </Stack>
