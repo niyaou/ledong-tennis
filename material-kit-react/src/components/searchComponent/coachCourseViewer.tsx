@@ -208,6 +208,7 @@ const CoachCourseViewer = () => {
     const row: Record<string, any> = {
       ...course,
       membersData: members,
+      duration: displayNumber(course.duration),
       startClock: timePart(course.startTime),
       endClock: timePart(course.endTime),
       courseTypeLabel: courseTypeLabels[Number(course.courseType)] || `未知类型（${course.courseType}）`,
@@ -239,7 +240,7 @@ const CoachCourseViewer = () => {
         headerName: '课时',
         type: 'number',
         width: 90,
-        valueFormatter: (params) => `${displayNumber(params.value as number)} 小时`,
+        renderCell: (params) => `${displayNumber(params.value as number)} 小时`,
       },
       { field: 'courseTypeLabel', headerName: '课程类型', width: 175 },
       { field: 'ageGroup', headerName: '成人/儿童', width: 110 },
@@ -248,7 +249,7 @@ const CoachCourseViewer = () => {
         field: 'description',
         headerName: '备注',
         width: 220,
-        renderCell: (params) => <Typography variant="body2" title={String(params.value || '')} sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere', py: 1 }}>
+        renderCell: (params) => <Typography variant="body2" noWrap title={String(params.value || '')} sx={{ width: '100%' }}>
           {params.value || '—'}
         </Typography>,
       },
@@ -264,11 +265,11 @@ const CoachCourseViewer = () => {
         const member = (params.row.membersData || [])[index] as CourseMember | undefined
         if (!member) return <Typography variant="body2" color="text.secondary">—</Typography>
         const hasDescription = member.description !== null && member.description !== undefined && String(member.description) !== ''
-        return <Box title={memberExportText(member)} sx={{ py: 1, width: '100%', overflowWrap: 'anywhere' }}>
-          <Typography variant="subtitle2">{member.memberName || '已失效会员'}{member.memberNumber ? `（${member.memberNumber}）` : ''}</Typography>
-          <Typography variant="body2" color="text.secondary">课时费 {displayNumber(member.charge)} / 次卡 {displayNumber(member.times)}</Typography>
-          <Typography variant="body2" color="text.secondary">年卡 {displayNumber(member.annualTimes)} / 数量 {displayNumber(member.quantities)}</Typography>
-          {hasDescription && <Typography variant="body2" color="text.secondary">说明：{String(member.description)}</Typography>}
+        return <Box title={memberExportText(member)} sx={{ py: 0.5, width: '100%', minWidth: 0 }}>
+          <Typography variant="subtitle2" noWrap sx={{ lineHeight: 1.3 }}>{member.memberName || '已失效会员'}{member.memberNumber ? `（${member.memberNumber}）` : ''}</Typography>
+          <Typography variant="body2" noWrap color="text.secondary" sx={{ lineHeight: 1.3 }}>课时费 {displayNumber(member.charge)} / 次卡 {displayNumber(member.times)}</Typography>
+          <Typography variant="body2" noWrap color="text.secondary" sx={{ lineHeight: 1.3 }}>年卡 {displayNumber(member.annualTimes)} / 数量 {displayNumber(member.quantities)}</Typography>
+          {hasDescription && <Typography variant="body2" noWrap color="text.secondary" sx={{ lineHeight: 1.3 }}>说明：{String(member.description)}</Typography>}
         </Box>
       },
     }))
@@ -339,14 +340,15 @@ const CoachCourseViewer = () => {
       <Grid item xs={12} sm={6} lg={3}><SummaryCard label="私教课时" value={dashboard.summary.privateHours} note="订场不计入任何授课课时" /></Grid>
     </Grid>
 
-    <Paper variant="outlined" sx={{ height: 'min(720px, 70vh)', minHeight: 460, width: '100%' }}>
+    <Paper variant="outlined" sx={{ height: { xs: 900, md: 1040 }, width: '100%' }}>
       <DataGrid
         rows={rows}
         columns={columns}
         loading={loadingCourses}
         pageSize={100}
         rowsPerPageOptions={[25, 50, 100]}
-        getRowHeight={({ densityFactor }) => Math.max(104, Math.round(112 * densityFactor))}
+        getRowHeight={({ densityFactor }) => Math.max(78, Math.round(88 * densityFactor))}
+        rowBuffer={12}
         disableSelectionOnClick
         components={{ Toolbar: GridToolbar }}
         componentsProps={{
