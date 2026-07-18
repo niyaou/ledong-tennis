@@ -1,14 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
   Box,
   Button,
   Card,
   CardContent,
-  Chip,
-  CircularProgress,
-  Collapse,
-  Divider,
   FormControl,
   Grid,
   InputLabel,
@@ -19,10 +15,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import SearchIcon from '@mui/icons-material/Search'
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridToolbar,
+} from '@mui/x-data-grid'
+import { zhCN } from '@mui/x-data-grid/locales'
 import Axios from '../../common/axios/axios'
 
 interface Coach {
@@ -53,112 +53,90 @@ interface CoachCourse {
   endTime: string
   duration: number
   courseType: number
-  isAdult: number
+  isAdult: number | null
   description: string
   membersData: CourseMember[]
 }
 
-interface CoursePage {
-  content: CoachCourse[]
-  totalElements: number
-  totalPages: number
-  size: number
-  number: number
-  numberOfElements: number
-  first: boolean
-  last: boolean
+interface CourseSummary {
+  totalHours: number
+  trialHours: number
+  groupHours: number
+  privateHours: number
+}
+
+interface CoachCourseDashboard {
+  coachId: number
+  coachName: string
+  month: string
+  summary: CourseSummary
+  courses: CoachCourse[]
+}
+
+const emptySummary: CourseSummary = {
+  totalHours: 0,
+  trialHours: 0,
+  groupHours: 0,
+  privateHours: 0,
+}
+
+const emptyDashboard: CoachCourseDashboard = {
+  coachId: 0,
+  coachName: '',
+  month: '',
+  summary: emptySummary,
+  courses: [],
 }
 
 const courseTypeLabels: Record<number, string> = {
   [-2]: '体验课未成单',
   [-1]: '体验课成单',
-  0: '订场',
+  0: '订场（不计入课时）',
   1: '班课',
   2: '私教',
 }
 
-const toDateInput = (date: Date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-const defaultDateRange = () => {
+const currentMonth = () => {
   const now = new Date()
-  const start = new Date(now.getFullYear(), now.getMonth() - 2, 1)
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  return { startDate: toDateInput(start), endDate: toDateInput(end) }
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 }
 
-const initialRange = defaultDateRange()
-const emptyPage: CoursePage = {
-  content: [], totalElements: 0, totalPages: 0, size: 50, number: 0,
-  numberOfElements: 0, first: true, last: true,
-}
-
-const validDate = (value: string) => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
-  const [year, month, day] = value.split('-').map(Number)
-  const date = new Date(year, month - 1, day)
-  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
-}
+const isValidMonth = (value: string) => /^\d{4}-(0[1-9]|1[0-2])$/.test(value)
 const errorMessage = (error: any) => error?.response?.data?.message || error?.message || '请求失败，请稍后重试'
 const displayNumber = (value: number | null | undefined) => Number(value || 0)
+const datePart = (value: string) => value ? value.slice(0, 10) : '—'
+const timePart = (value: string) => value && value.length >= 16 ? value.slice(11, 16) : (value || '—')
+
+const memberExportText = (member: CourseMember | undefined) => {
+  if (!member) return ''
+  const identity = `${member.memberName || '已失效会员'}${member.memberNumber ? `（${member.memberNumber}）` : ''}`
+  const consumption = `课时费 ${displayNumber(member.charge)}；次卡 ${displayNumber(member.times)}；年卡 ${displayNumber(member.annualTimes)}；数量 ${displayNumber(member.quantities)}`
+  const description = member.description !== null && member.description !== undefined && String(member.description) !== ''
+    ? `；说明 ${String(member.description)}`
+    : ''
+  return `${identity}；${consumption}${description}`
+}
+
+const SummaryCard = ({ label, value, note }: { label: string, value: number, note: string }) => <Card variant="outlined" sx={{ height: '100%' }}>
+  <CardContent>
+    <Typography variant="body2" color="text.secondary">{label}</Typography>
+    <Typography variant="h4" sx={{ my: 0.5 }}>{displayNumber(value)} <Typography component="span" variant="body1" color="text.secondary">小时</Typography></Typography>
+    <Typography variant="caption" color="text.secondary">{note}</Typography>
+  </CardContent>
+</Card>
 
 const CoachCourseViewer = () => {
   const [coaches, setCoaches] = useState<Coach[]>([])
   const [coachId, setCoachId] = useState('')
-  const [startDate, setStartDate] = useState(initialRange.startDate)
-  const [endDate, setEndDate] = useState(initialRange.endDate)
-  const [page, setPage] = useState<CoursePage>(emptyPage)
-  const [pageInput, setPageInput] = useState('1')
+  const [month, setMonth] = useState(currentMonth)
+  const [dashboard, setDashboard] = useState<CoachCourseDashboard>(emptyDashboard)
   const [loadingCoaches, setLoadingCoaches] = useState(true)
   const [loadingCourses, setLoadingCourses] = useState(false)
-  const [hasQueried, setHasQueried] = useState(false)
   const [coachError, setCoachError] = useState('')
   const [courseError, setCourseError] = useState('')
-  const [dateError, setDateError] = useState('')
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({})
+  const [monthError, setMonthError] = useState('')
   const requestSeqRef = useRef(0)
   const mountedRef = useRef(true)
-
-  const validateDates = useCallback(() => {
-    if (!validDate(startDate) || !validDate(endDate)) {
-      setDateError('请选择有效的开始日期和结束日期。')
-      return false
-    }
-    if (startDate > endDate) {
-      setDateError('开始日期不能晚于结束日期。')
-      return false
-    }
-    setDateError('')
-    return true
-  }, [endDate, startDate])
-
-  const loadCourses = useCallback(async (requestedPage: number, selectedCoachId = coachId) => {
-    if (!selectedCoachId || !validateDates()) return
-    const requestSeq = ++requestSeqRef.current
-    setHasQueried(true)
-    setLoadingCourses(true)
-    setCourseError('')
-    try {
-      const response = await Axios.get(`/api/prepaidCard/course/coach/${selectedCoachId}`, {
-        params: { startDate, endDate, pageNum: requestedPage },
-      })
-      if (!mountedRef.current || requestSeq !== requestSeqRef.current) return
-      const nextPage: CoursePage = response.data || emptyPage
-      const currentPage = Math.max(1, Number(nextPage.number || 0) + 1)
-      setPage({ ...emptyPage, ...nextPage, content: Array.isArray(nextPage.content) ? nextPage.content : [] })
-      setPageInput(String(currentPage))
-      setExpanded({})
-    } catch (error) {
-      if (!mountedRef.current || requestSeq !== requestSeqRef.current) return
-      setCourseError(errorMessage(error))
-    } finally {
-      if (mountedRef.current && requestSeq === requestSeqRef.current) setLoadingCourses(false)
-    }
-  }, [coachId, endDate, startDate, validateDates])
 
   const loadCoaches = useCallback(async () => {
     setLoadingCoaches(true)
@@ -169,21 +147,41 @@ const CoachCourseViewer = () => {
       const activeCoaches: Coach[] = (Array.isArray(response.data) ? response.data : [])
         .filter((coach) => Number(coach.isActive) === 1)
       setCoaches(activeCoaches)
-      if (activeCoaches.length > 0) {
-        const firstCoachId = String(activeCoaches[0].id)
-        setCoachId(firstCoachId)
-        loadCourses(1, firstCoachId)
-      } else {
-        setCoachId('')
-        setPage(emptyPage)
-        setHasQueried(false)
-      }
+      setCoachId((previous) => activeCoaches.some((coach) => String(coach.id) === previous)
+        ? previous
+        : (activeCoaches[0] ? String(activeCoaches[0].id) : ''))
     } catch (error) {
       if (mountedRef.current) setCoachError(errorMessage(error))
     } finally {
       if (mountedRef.current) setLoadingCoaches(false)
     }
-  }, [loadCourses])
+  }, [])
+
+  const loadCourses = useCallback(async (selectedCoachId: string, selectedMonth: string) => {
+    if (!selectedCoachId || !isValidMonth(selectedMonth)) return
+    const requestSeq = ++requestSeqRef.current
+    setLoadingCourses(true)
+    setCourseError('')
+    try {
+      const response = await Axios.get(`/api/prepaidCard/course/coach/${selectedCoachId}`, {
+        params: { month: selectedMonth },
+      })
+      if (!mountedRef.current || requestSeq !== requestSeqRef.current) return
+      const data = response.data || {}
+      setDashboard({
+        ...emptyDashboard,
+        ...data,
+        summary: { ...emptySummary, ...(data.summary || {}) },
+        courses: Array.isArray(data.courses) ? data.courses : [],
+      })
+    } catch (error) {
+      if (!mountedRef.current || requestSeq !== requestSeqRef.current) return
+      setDashboard(emptyDashboard)
+      setCourseError(errorMessage(error))
+    } finally {
+      if (mountedRef.current && requestSeq === requestSeqRef.current) setLoadingCourses(false)
+    }
+  }, [])
 
   useEffect(() => {
     mountedRef.current = true
@@ -192,149 +190,180 @@ const CoachCourseViewer = () => {
       mountedRef.current = false
       requestSeqRef.current += 1
     }
-  }, [])
+  }, [loadCoaches])
 
-  const currentPage = Math.max(1, Number(page.number || 0) + 1)
+  useEffect(() => {
+    if (!coachId || !isValidMonth(month)) return
+    setMonthError('')
+    loadCourses(coachId, month)
+  }, [coachId, loadCourses, month])
 
-  const selectCoach = (value: string) => {
-    setCoachId(value)
-    setPage(emptyPage)
-    setHasQueried(false)
-    setPageInput('1')
-    loadCourses(1, value)
-  }
+  const courses = Array.isArray(dashboard.courses) ? dashboard.courses : []
+  const maxMemberCount = useMemo(() => courses.reduce((maximum, course) => (
+    Math.max(maximum, Array.isArray(course.membersData) ? course.membersData.length : 0)
+  ), 0), [courses])
 
-  const query = () => {
-    setPageInput('1')
-    loadCourses(1)
-  }
+  const rows = useMemo(() => courses.map((course) => {
+    const members = Array.isArray(course.membersData) ? course.membersData : []
+    const row: Record<string, any> = {
+      ...course,
+      membersData: members,
+      startClock: timePart(course.startTime),
+      endClock: timePart(course.endTime),
+      courseTypeLabel: courseTypeLabels[Number(course.courseType)] || `未知类型（${course.courseType}）`,
+      ageGroup: Number(course.courseType) === 0
+        ? '—'
+        : (course.isAdult === null || course.isAdult === undefined ? '—' : (Number(course.isAdult) === 1 ? '成人' : '儿童')),
+      courtDisplay: course.courtName || `已失效校区（${course.courtId}）`,
+      memberCount: members.length,
+    }
+    members.forEach((member, index) => {
+      row[`member_${index}`] = memberExportText(member)
+    })
+    return row
+  }), [courses])
 
-  const changeDate = (field: 'start' | 'end', value: string) => {
-    if (field === 'start') setStartDate(value)
-    else setEndDate(value)
+  const columns = useMemo<GridColDef[]>(() => {
+    const fixedColumns: GridColDef[] = [
+      {
+        field: 'startTime',
+        headerName: '日期',
+        width: 115,
+        valueFormatter: (params) => datePart(String(params.value || '')),
+        renderCell: (params) => datePart(String(params.value || '')),
+      },
+      { field: 'startClock', headerName: '上课', width: 85 },
+      { field: 'endClock', headerName: '下课', width: 85 },
+      {
+        field: 'duration',
+        headerName: '课时',
+        type: 'number',
+        width: 90,
+        valueFormatter: (params) => `${displayNumber(params.value as number)} 小时`,
+      },
+      { field: 'courseTypeLabel', headerName: '课程类型', width: 175 },
+      { field: 'ageGroup', headerName: '成人/儿童', width: 110 },
+      { field: 'courtDisplay', headerName: '校区', width: 150 },
+      {
+        field: 'description',
+        headerName: '备注',
+        width: 220,
+        renderCell: (params) => <Typography variant="body2" title={String(params.value || '')} sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere', py: 1 }}>
+          {params.value || '—'}
+        </Typography>,
+      },
+      { field: 'memberCount', headerName: '学员记录数', type: 'number', width: 120 },
+    ]
+
+    const memberColumns: GridColDef[] = Array.from({ length: maxMemberCount }, (_, index) => ({
+      field: `member_${index}`,
+      headerName: `学员 ${index + 1}`,
+      width: 285,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const member = (params.row.membersData || [])[index] as CourseMember | undefined
+        if (!member) return <Typography variant="body2" color="text.secondary">—</Typography>
+        const hasDescription = member.description !== null && member.description !== undefined && String(member.description) !== ''
+        return <Box title={memberExportText(member)} sx={{ py: 1, width: '100%', overflowWrap: 'anywhere' }}>
+          <Typography variant="subtitle2">{member.memberName || '已失效会员'}{member.memberNumber ? `（${member.memberNumber}）` : ''}</Typography>
+          <Typography variant="body2" color="text.secondary">课时费 {displayNumber(member.charge)} / 次卡 {displayNumber(member.times)}</Typography>
+          <Typography variant="body2" color="text.secondary">年卡 {displayNumber(member.annualTimes)} / 数量 {displayNumber(member.quantities)}</Typography>
+          {hasDescription && <Typography variant="body2" color="text.secondary">说明：{String(member.description)}</Typography>}
+        </Box>
+      },
+    }))
+    return [...fixedColumns, ...memberColumns]
+  }, [maxMemberCount])
+
+  const updateMonth = (value: string) => {
     requestSeqRef.current += 1
     setLoadingCourses(false)
-    setPage(emptyPage)
-    setHasQueried(false)
-    setPageInput('1')
     setCourseError('')
-    setDateError('')
+    setDashboard(emptyDashboard)
+    setMonth(value)
+    setMonthError(isValidMonth(value) ? '' : '请选择有效的自然月。')
   }
 
-  const jumpPage = () => {
-    const target = Number(pageInput)
-    if (!Number.isInteger(target) || target < 1 || target > page.totalPages) {
-      setCourseError(`请输入 1 到 ${page.totalPages} 之间的页码。`)
-      return
-    }
-    loadCourses(target)
+  const updateCoach = (value: string) => {
+    requestSeqRef.current += 1
+    setLoadingCourses(false)
+    setCourseError('')
+    setDashboard(emptyDashboard)
+    setCoachId(value)
   }
 
   return <Box sx={{ width: '100%', height: '100%', overflow: 'auto', pr: 2, pb: 3 }}>
-    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+    <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} spacing={1} sx={{ mb: 2 }}>
       <Box>
-        <Typography variant="h5">教练课程</Typography>
-        <Typography variant="body2" color="text.secondary">按教练查看正式课程，仅供查询。</Typography>
+        <Typography variant="h5">教练课程综合看板</Typography>
+        <Typography variant="body2" color="text.secondary">查看有效教练整月正式课程及授课课时；订场仅展示，不计入授课课时。</Typography>
       </Box>
-      <Button variant="outlined" startIcon={<RefreshIcon />} disabled={!coachId || loadingCourses}
-        onClick={() => loadCourses(1)}>刷新</Button>
+      <Button variant="outlined" startIcon={<RefreshIcon />} disabled={!coachId || !isValidMonth(month) || loadingCourses}
+        onClick={() => loadCourses(coachId, month)}>刷新</Button>
     </Stack>
 
     <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} sm={4} md={3}>
+        <Grid item xs={12} sm={6} md={4}>
           <FormControl fullWidth size="small" disabled={loadingCoaches || coaches.length === 0}>
             <InputLabel id="coach-course-coach-label">教练</InputLabel>
             <Select labelId="coach-course-coach-label" value={coachId} label="教练"
-              onChange={(event) => selectCoach(String(event.target.value))}>
+              onChange={(event) => updateCoach(String(event.target.value))}>
               {coaches.map((coach) => <MenuItem key={coach.id} value={String(coach.id)}>{coach.name}（{coach.number}）</MenuItem>)}
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4} md={3}>
-          <TextField fullWidth size="small" type="date" label="开始日期" value={startDate} disabled={loadingCoaches}
-            InputLabelProps={{ shrink: true }} onChange={(event) => changeDate('start', event.target.value)} />
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField fullWidth size="small" type="month" label="自然月" value={month} disabled={loadingCoaches}
+            InputLabelProps={{ shrink: true }} inputProps={{ 'aria-label': '自然月' }} onChange={(event) => updateMonth(event.target.value)} />
         </Grid>
-        <Grid item xs={12} sm={4} md={3}>
-          <TextField fullWidth size="small" type="date" label="结束日期" value={endDate} disabled={loadingCoaches}
-            InputLabelProps={{ shrink: true }} onChange={(event) => changeDate('end', event.target.value)} />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Button fullWidth variant="contained" startIcon={<SearchIcon />} disabled={!coachId || loadingCourses} onClick={query}>查询</Button>
+        <Grid item xs={12} md={4}>
+          <Typography variant="body2" color="text.secondary">选择教练或月份后自动加载整月数据。</Typography>
         </Grid>
       </Grid>
-      {dateError && <Alert severity="warning" sx={{ mt: 2 }}>{dateError}</Alert>}
+      {monthError && <Alert severity="warning" sx={{ mt: 2 }}>{monthError}</Alert>}
     </Paper>
 
     {coachError && <Alert severity="error" action={<Button color="inherit" size="small" onClick={loadCoaches}>重新加载</Button>} sx={{ mb: 2 }}>
       教练列表加载失败：{coachError}
     </Alert>}
     {!loadingCoaches && !coachError && coaches.length === 0 && <Alert severity="info" sx={{ mb: 2 }}>暂无有效教练。</Alert>}
-    {courseError && <Alert severity="error" action={coachId ? <Button color="inherit" size="small" onClick={() => loadCourses(currentPage)}>重试</Button> : undefined} sx={{ mb: 2 }}>
+    {courseError && <Alert severity="error" action={coachId ? <Button color="inherit" size="small" onClick={() => loadCourses(coachId, month)}>重试</Button> : undefined} sx={{ mb: 2 }}>
       {courseError}
     </Alert>}
 
-    {loadingCourses && page.content.length === 0 && <Stack alignItems="center" sx={{ py: 6 }}><CircularProgress size={32} /></Stack>}
-    {!loadingCourses && hasQueried && !courseError && coachId && page.content.length === 0 && <Paper variant="outlined" sx={{ p: 4, textAlign: 'center' }}>
-      <Typography color="text.secondary">所选教练在该日期范围内暂无正式课程。</Typography>
-    </Paper>}
+    <Grid container spacing={2} sx={{ mb: 2, opacity: loadingCourses ? 0.55 : 1 }}>
+      <Grid item xs={12} sm={6} lg={3}><SummaryCard label="授课总课时" value={dashboard.summary.totalHours} note="体验课 + 班课 + 私教" /></Grid>
+      <Grid item xs={12} sm={6} lg={3}><SummaryCard label="体验课课时" value={dashboard.summary.trialHours} note="包含成单与未成单体验课" /></Grid>
+      <Grid item xs={12} sm={6} lg={3}><SummaryCard label="班课课时" value={dashboard.summary.groupHours} note="按课程专用课时字段统计" /></Grid>
+      <Grid item xs={12} sm={6} lg={3}><SummaryCard label="私教课时" value={dashboard.summary.privateHours} note="订场不计入任何授课课时" /></Grid>
+    </Grid>
 
-    <Stack spacing={2} sx={{ opacity: loadingCourses && page.content.length > 0 ? 0.55 : 1 }}>
-      {page.content.map((course) => {
-        const members = Array.isArray(course.membersData) ? course.membersData : []
-        const isExpanded = Boolean(expanded[course.id])
-        const typeLabel = courseTypeLabels[Number(course.courseType)] || '未知课程'
-        const adultLabel = Number(course.courseType) === 0 ? '' : (Number(course.isAdult) === 1 ? '成人' : '儿童')
-        return <Card key={course.id} variant="outlined">
-          <CardContent>
-            <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1} sx={{ mb: 1.5 }}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="h6">{typeLabel}</Typography>
-                <Chip size="small" color="success" variant="outlined" label="正式课" />
-                {adultLabel && <Chip size="small" label={adultLabel} />}
-              </Stack>
-              <Typography variant="body2" color="text.secondary">课程 #{course.id}</Typography>
-            </Stack>
-            <Grid container spacing={1.5}>
-              <Grid item xs={12} md={6}><Typography variant="body2" color="text.secondary">时间</Typography><Typography>{course.startTime} - {course.endTime}</Typography></Grid>
-              <Grid item xs={6} md={3}><Typography variant="body2" color="text.secondary">时长</Typography><Typography>{course.duration} 小时</Typography></Grid>
-              <Grid item xs={6} md={3}><Typography variant="body2" color="text.secondary">校区</Typography><Typography>{course.courtName || `已失效校区（${course.courtId}）`}</Typography></Grid>
-              {course.description && <Grid item xs={12}><Typography variant="body2" color="text.secondary">备注</Typography><Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{course.description}</Typography></Grid>}
-            </Grid>
-            <Divider sx={{ my: 1.5 }} />
-            <Button size="small" endIcon={isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              onClick={() => setExpanded((previous) => ({ ...previous, [course.id]: !previous[course.id] }))}>
-              会员消费明细（{members.length}）
-            </Button>
-            <Collapse in={isExpanded}>
-              <Stack spacing={1} sx={{ mt: 1 }}>
-                {members.length === 0 && <Typography variant="body2" color="text.secondary">本课程无需填写会员</Typography>}
-                {members.map((member) => <Paper key={`${course.id}-${member.memberId}`} variant="outlined" sx={{ p: 1.5 }}>
-                  <Typography variant="subtitle2">{member.memberName || '已失效会员'}{member.memberNumber ? `（${member.memberNumber}）` : ''}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    课时费 {displayNumber(member.charge)} / 次卡 {displayNumber(member.times)} / 年卡 {displayNumber(member.annualTimes)} / 数量 {displayNumber(member.quantities)}
-                  </Typography>
-                  {member.description !== null && member.description !== undefined && String(member.description) !== '' && <Typography variant="body2" color="text.secondary">说明：{String(member.description)}</Typography>}
-                </Paper>)}
-              </Stack>
-            </Collapse>
-          </CardContent>
-        </Card>
-      })}
-    </Stack>
-
-    {page.totalPages > 0 && <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" justifyContent="space-between" spacing={2}>
-        <Typography variant="body2">第 {currentPage} / {page.totalPages} 页，共 {page.totalElements} 条（每页 50 条）</Typography>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Button size="small" variant="outlined" disabled={loadingCourses || page.first} onClick={() => loadCourses(currentPage - 1)}>上一页</Button>
-          <TextField size="small" type="number" value={pageInput} inputProps={{ min: 1, max: page.totalPages, 'aria-label': '页码' }}
-            onChange={(event) => setPageInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') jumpPage() }} sx={{ width: 90 }} />
-          <Button size="small" variant="outlined" disabled={loadingCourses} onClick={jumpPage}>跳转</Button>
-          <Button size="small" variant="outlined" disabled={loadingCourses || page.last} onClick={() => loadCourses(currentPage + 1)}>下一页</Button>
-        </Stack>
-      </Stack>
-    </Paper>}
+    <Paper variant="outlined" sx={{ height: 'min(720px, 70vh)', minHeight: 460, width: '100%' }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        loading={loadingCourses}
+        pageSize={100}
+        rowsPerPageOptions={[25, 50, 100]}
+        getRowHeight={() => 'auto'}
+        disableSelectionOnClick
+        components={{ Toolbar: GridToolbar }}
+        componentsProps={{
+          toolbar: {
+            csvOptions: { utf8WithBom: true, fileName: `教练课程-${dashboard.coachName || coachId}-${month}` },
+            printOptions: { hideFooter: true, hideToolbar: true },
+          },
+        }}
+        initialState={{ sorting: { sortModel: [{ field: 'startTime', sort: 'asc' }] } }}
+        localeText={zhCN.components.MuiDataGrid.defaultProps.localeText}
+        sx={{
+          border: 0,
+          '& .MuiDataGrid-cell': { alignItems: 'flex-start', py: 0.5 },
+          '& .MuiDataGrid-columnHeaders': { backgroundColor: 'action.hover' },
+        }}
+      />
+    </Paper>
   </Box>
 }
 
