@@ -346,7 +346,7 @@ const CoachCourseViewer = () => {
         loading={loadingCourses}
         pageSize={100}
         rowsPerPageOptions={[25, 50, 100]}
-        getRowHeight={() => 'auto'}
+        getRowHeight={({ densityFactor }) => Math.max(104, Math.round(112 * densityFactor))}
         disableSelectionOnClick
         components={{ Toolbar: GridToolbar }}
         componentsProps={{
