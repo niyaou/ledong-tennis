@@ -16,6 +16,7 @@ import Analyse from '../searchComponent/analyse'
 import Autoloading from '../searchComponent/autoloading'
 import PendingCourse from '../searchComponent/pendingCourse'
 import CoachCourseViewer from '../searchComponent/coachCourseViewer'
+import SalaryCalculator from '../ldadmin/salaryCalculator'
 function IndexContainer(props) {
     const index = props.index
   
@@ -27,7 +28,7 @@ function IndexContainer(props) {
   
     return (
       <Box   justifyContent="space-around" alignItems="center" sx={{width:'96vw',height:'97%',padding:'20px 0 0 10px'}}>
-     {index===0?<AdminComp />:index===1?<SearchTask />:index===2?<Analyse />:index===3?<Autoloading />:index===4?<PendingCourse />:index===5?<CoachCourseViewer />:null}
+     {index===0?<AdminComp />:index===1?<SearchTask />:index===2?<Analyse />:index===3?<Autoloading />:index===4?<PendingCourse />:index===5?<CoachCourseViewer />:index===6?<SalaryCalculator />:null}
       </Box>
     );
   }

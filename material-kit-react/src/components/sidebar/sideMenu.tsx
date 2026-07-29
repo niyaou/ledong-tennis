@@ -32,6 +32,7 @@ import AnalyticsSharp from '@mui/icons-material/AnalyticsSharp';
 import AccessAlarmsOutlined from '@mui/icons-material/AccessAlarmsOutlined';
 import AssignmentTurnedInOutlined from '@mui/icons-material/AssignmentTurnedInOutlined';
 import EventNoteOutlined from '@mui/icons-material/EventNoteOutlined';
+import CalculateOutlined from '@mui/icons-material/CalculateOutlined';
 import { clearDatasetFilesCache } from "../../store/actions/filesAndFoldersActions"
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import GridViewIcon from '@mui/icons-material/GridView';
@@ -227,6 +228,23 @@ function SideMenu(props) {
                         <EventNoteOutlined fontSize="large" />
                         <Typography variant="button" display="block" gutterBottom>
                          教练课程
+                        </Typography>
+                    </Stack>
+                    <Stack
+                        component={ButtonBase}
+                        direction="column"
+                        justifyContent="flex-start"
+                        alignItems="center"
+                        spacing={1}
+                        onClick={async () => {
+                            indexChange(6)
+                        }}
+                        aria-label="工资计算"
+                        sx={{ width: '100%', height: 80, color: '#8b8b8b', cursor: 'pointer', '&:hover': { background: 'rgba(0, 0, 0, 0.04)', color: '#3f51b5' } }}
+                    >
+                        <CalculateOutlined fontSize="large" />
+                        <Typography variant="button" display="block" gutterBottom>
+                         工资计算
                         </Typography>
                     </Stack>
                 </Stack>
