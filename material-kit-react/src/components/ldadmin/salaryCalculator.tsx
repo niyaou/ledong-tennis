@@ -6,6 +6,7 @@ import {
   Chip,
   Divider,
   Grid,
+  FormControlLabel,
   InputAdornment,
   Paper,
   Stack,
@@ -19,6 +20,7 @@ import {
   Tabs,
   TextField,
   Typography,
+  Switch,
 } from '@mui/material';
 import AccountBalanceWalletOutlined from '@mui/icons-material/AccountBalanceWalletOutlined';
 import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
@@ -59,6 +61,7 @@ type SalaryInputs = {
   conversionRate: number;
   occupancyRate: number;
   allowance: number;
+  commissionSuspended: boolean;
 };
 
 type OvertimeDetail = OvertimeTier & {
@@ -75,6 +78,7 @@ type SalaryResult = {
   commissionPool: number;
   performanceFactor: number;
   occupancyFactor: number;
+  preSuspensionCommission: number;
   adjustedCommission: number;
   publicAccount: number;
   privateAccount: number;
@@ -83,6 +87,14 @@ type SalaryResult = {
 };
 
 const ROLE_ORDER: RoleKey[] = ['oneStar', 'twoStar', 'threeStar', 'deputyHead', 'head'];
+
+const UNIFIED_SALES_RULES = [
+  '未满 4 万：无销售额提成',
+  '4 万–不足 6 万：销售额 × 2%',
+  '6 万–不足 8 万：销售额 × 3%',
+  '8 万–不足 10 万：销售额 × 4%',
+  '10 万及以上：销售额 × 5%',
+];
 
 const ROLE_CONFIGS: Record<RoleKey, RoleConfig> = {
   oneStar: {
@@ -97,15 +109,9 @@ const ROLE_CONFIGS: Record<RoleKey, RoleConfig> = {
       { label: '超保底 100 小时以上', width: null, rate: 140 },
     ],
     hasOccupancyRate: true,
-    occupancyThresholds: { minimum: 2, full: 2.2 },
+    occupancyThresholds: { minimum: 2, full: 2.15 },
     allowanceLabel: '油费 + 其他',
-    salesRules: [
-      '低于 2.4 万：0',
-      '2.4 万–4 万：销售额 × 1%',
-      '4 万–6 万：前 4 万 × 2% + 超出部分 × 3%',
-      '6 万–8 万：再超出部分 × 4%',
-      '8 万以上：再超出部分 × 5%',
-    ],
+    salesRules: UNIFIED_SALES_RULES,
   },
   twoStar: {
     label: '二星教练',
@@ -119,15 +125,9 @@ const ROLE_CONFIGS: Record<RoleKey, RoleConfig> = {
       { label: '超保底 100 小时以上', width: null, rate: 160 },
     ],
     hasOccupancyRate: true,
-    occupancyThresholds: { minimum: 2.2, full: 2.5 },
+    occupancyThresholds: { minimum: 2.15, full: 2.3 },
     allowanceLabel: '油费 + 其他',
-    salesRules: [
-      '低于 3.6 万：0',
-      '3.6 万–6 万：销售额 × 1%',
-      '6 万–8 万：前 6 万 × 2% + 超出部分 × 3%',
-      '8 万–12 万：再超出部分 × 4%',
-      '12 万以上：再超出部分 × 5%',
-    ],
+    salesRules: UNIFIED_SALES_RULES,
   },
   threeStar: {
     label: '三星教练',
@@ -143,13 +143,7 @@ const ROLE_CONFIGS: Record<RoleKey, RoleConfig> = {
     hasOccupancyRate: true,
     occupancyThresholds: { minimum: 2.4, full: 2.65 },
     allowanceLabel: '油费 + 其他',
-    salesRules: [
-      '不高于 4.8 万：0',
-      '4.8 万–8 万：销售额 × 1%',
-      '8 万–12 万：前 8 万 × 2% + 超出部分 × 3%',
-      '12 万–18 万：再超出部分 × 4%',
-      '18 万以上：再超出部分 × 5%',
-    ],
+    salesRules: UNIFIED_SALES_RULES,
   },
   deputyHead: {
     label: '副主教练',
@@ -163,12 +157,7 @@ const ROLE_CONFIGS: Record<RoleKey, RoleConfig> = {
     ],
     hasOccupancyRate: false,
     allowanceLabel: '油费',
-    salesRules: [
-      '8 万以内：销售额 × 1%',
-      '8 万–12 万：前 8 万 × 2% + 超出部分 × 3%',
-      '12 万–18 万：再超出部分 × 4%',
-      '18 万以上：再超出部分 × 5%',
-    ],
+    salesRules: UNIFIED_SALES_RULES,
   },
   head: {
     label: '主教练',
@@ -182,12 +171,7 @@ const ROLE_CONFIGS: Record<RoleKey, RoleConfig> = {
     ],
     hasOccupancyRate: false,
     allowanceLabel: '油费',
-    salesRules: [
-      '8 万以内：销售额 × 2%',
-      '8 万–12 万：前 8 万 × 2% + 超出部分 × 3%',
-      '12 万–18 万：再超出部分 × 4%',
-      '18 万以上：再超出部分 × 5%',
-    ],
+    salesRules: UNIFIED_SALES_RULES,
   },
 };
 
@@ -199,9 +183,10 @@ const createInitialInputs = (): Record<RoleKey, SalaryInputs> =>
       sales: 0,
       bigOrder: 0,
       discount: 0,
-      conversionRate: 60,
+      conversionRate: 50,
       occupancyRate: 0,
       allowance: 0,
+      commissionSuspended: false,
     };
     return result;
   }, {} as Record<RoleKey, SalaryInputs>);
@@ -212,38 +197,30 @@ const clamp = (value: number, min: number, max: number) =>
 const toNonNegative = (value: number) =>
   Math.max(Number.isFinite(value) ? value : 0, 0);
 
-const calculateSalesCommission = (role: RoleKey, salesValue: number) => {
+const calculateSalesCommission = (salesValue: number) => {
   const sales = toNonNegative(salesValue);
-
-  if (role === 'oneStar') {
-    if (sales < 24000) return { value: 0, text: '销售额低于 24,000，基础销售提成为 0' };
-    if (sales <= 40000) return { value: sales * 0.01, text: `${sales} × 1%` };
-    if (sales <= 60000) return { value: 40000 * 0.02 + (sales - 40000) * 0.03, text: '40,000 × 2% + 超出 40,000 部分 × 3%' };
-    if (sales <= 80000) return { value: 40000 * 0.02 + 20000 * 0.03 + (sales - 60000) * 0.04, text: '40,000 × 2% + 20,000 × 3% + 超出 60,000 部分 × 4%' };
-    return { value: 40000 * 0.02 + 20000 * 0.03 + 20000 * 0.04 + (sales - 80000) * 0.05, text: '40,000 × 2% + 20,000 × 3% + 20,000 × 4% + 超出 80,000 部分 × 5%' };
+  if (sales < 40000) {
+    return { value: 0, text: '销售额未满 40,000，基础销售提成为 0' };
   }
-
-  if (role === 'twoStar') {
-    if (sales < 36000) return { value: 0, text: '销售额低于 36,000，基础销售提成为 0' };
-    if (sales <= 60000) return { value: sales * 0.01, text: `${sales} × 1%` };
-    if (sales <= 80000) return { value: 60000 * 0.02 + (sales - 60000) * 0.03, text: '60,000 × 2% + 超出 60,000 部分 × 3%' };
-    if (sales <= 120000) return { value: 60000 * 0.02 + 20000 * 0.03 + (sales - 80000) * 0.04, text: '60,000 × 2% + 20,000 × 3% + 超出 80,000 部分 × 4%' };
-    return { value: 60000 * 0.02 + 20000 * 0.03 + 40000 * 0.04 + (sales - 120000) * 0.05, text: '60,000 × 2% + 20,000 × 3% + 40,000 × 4% + 超出 120,000 部分 × 5%' };
+  if (sales < 60000) {
+    return {
+      value: sales * 0.02,
+      text: `${sales} × 2%`,
+    };
   }
-
-  if (role === 'threeStar') {
-    if (sales <= 48000) return { value: 0, text: '销售额不高于 48,000，基础销售提成为 0' };
-    if (sales <= 80000) return { value: sales * 0.01, text: `${sales} × 1%` };
-    if (sales <= 120000) return { value: 80000 * 0.02 + (sales - 80000) * 0.03, text: '80,000 × 2% + 超出 80,000 部分 × 3%' };
-    if (sales <= 180000) return { value: 80000 * 0.02 + 40000 * 0.03 + (sales - 120000) * 0.04, text: '80,000 × 2% + 40,000 × 3% + 超出 120,000 部分 × 4%' };
-    return { value: 80000 * 0.02 + 40000 * 0.03 + 60000 * 0.04 + (sales - 180000) * 0.05, text: '80,000 × 2% + 40,000 × 3% + 60,000 × 4% + 超出 180,000 部分 × 5%' };
+  if (sales < 80000) {
+    return {
+      value: sales * 0.03,
+      text: `${sales} × 3%`,
+    };
   }
-
-  const firstRate = role === 'deputyHead' ? 0.01 : 0.02;
-  if (sales <= 80000) return { value: sales * firstRate, text: `${sales} × ${firstRate * 100}%` };
-  if (sales <= 120000) return { value: 80000 * 0.02 + (sales - 80000) * 0.03, text: '80,000 × 2% + 超出 80,000 部分 × 3%' };
-  if (sales <= 180000) return { value: 80000 * 0.02 + 40000 * 0.03 + (sales - 120000) * 0.04, text: '80,000 × 2% + 40,000 × 3% + 超出 120,000 部分 × 4%' };
-  return { value: 80000 * 0.02 + 40000 * 0.03 + 60000 * 0.04 + (sales - 180000) * 0.05, text: '80,000 × 2% + 40,000 × 3% + 60,000 × 4% + 超出 180,000 部分 × 5%' };
+  if (sales < 100000) {
+    return {
+      value: sales * 0.04,
+      text: `${sales} × 4%`,
+    };
+  }
+  return { value: sales * 0.05, text: `${sales} × 5%` };
 };
 
 export const calculateSalary = (
@@ -268,11 +245,11 @@ export const calculateSalary = (
 
   const overtimePay = overtimeDetails.reduce((sum, item) => sum + item.amount, 0);
   const classPay = config.baseSalary + overtimePay;
-  const sales = calculateSalesCommission(role, rawInputs.sales);
+  const sales = calculateSalesCommission(rawInputs.sales);
   const bigOrderCommission = toNonNegative(rawInputs.bigOrder) * 0.05;
   const commissionPool = sales.value + bigOrderCommission - toNonNegative(rawInputs.discount);
   const conversionRate = clamp(rawInputs.conversionRate, 0, 100);
-  const performanceFactor = conversionRate < 50 ? 0 : conversionRate >= 60 ? 1 : 0.5;
+  const performanceFactor = conversionRate < 40 ? 0 : conversionRate >= 50 ? 1 : 0.5;
   const occupancyValue = toNonNegative(rawInputs.occupancyRate);
   const occupancyFactor = config.occupancyThresholds
     ? occupancyValue < config.occupancyThresholds.minimum
@@ -281,7 +258,8 @@ export const calculateSalary = (
         ? 1
         : 0.5
     : 1;
-  const adjustedCommission = commissionPool * performanceFactor * occupancyFactor;
+  const preSuspensionCommission = commissionPool * performanceFactor * occupancyFactor;
+  const adjustedCommission = rawInputs.commissionSuspended ? 0 : preSuspensionCommission;
   const publicAccount = config.baseSalary;
   const privateAccount = adjustedCommission
     + classPay
@@ -297,6 +275,7 @@ export const calculateSalary = (
     commissionPool,
     performanceFactor,
     occupancyFactor,
+    preSuspensionCommission,
     adjustedCommission,
     publicAccount,
     privateAccount,
@@ -383,12 +362,14 @@ function SalaryCalculator() {
     [activeRole, inputs],
   );
 
-  const updateInput = (field: keyof SalaryInputs, value: string | number) => {
+  const updateInput = (field: keyof SalaryInputs, value: string | number | boolean) => {
     setInputsByRole((current) => ({
       ...current,
       [activeRole]: {
         ...current[activeRole],
-        [field]: field === 'coachName' ? value : Number(value) || 0,
+        [field]: field === 'coachName' || field === 'commissionSuspended'
+          ? value
+          : Number(value) || 0,
       },
     }));
   };
@@ -402,10 +383,10 @@ function SalaryCalculator() {
   };
 
   const performanceText = result.performanceFactor === 0
-    ? '成单率低于 50%，绩效系数为 0'
+    ? '成单率低于 40%，提成系数为 0'
     : result.performanceFactor === 0.5
-      ? '成单率 50%–60%，绩效系数为 50%'
-      : '成单率达到 60%，绩效系数为 100%';
+      ? '成单率 40%–49%，提成系数为 0.5'
+      : '成单率达到 50%，提成系数为 1';
 
   const detailRows = [
     {
@@ -440,9 +421,11 @@ function SalaryCalculator() {
     },
     {
       item: '绩效后销售提成',
-      formula: config.hasOccupancyRate
-        ? `提成池 × ${result.performanceFactor * 100}%成单率系数 × ${result.occupancyFactor}满班率系数（输入值 ${inputs.occupancyRate}）`
-        : `提成池 × ${result.performanceFactor * 100}%绩效系数`,
+      formula: inputs.commissionSuspended
+        ? `本月处于提成取消期，原应计 ${formatMoney(result.preSuspensionCommission)}，实际按 0 计算`
+        : config.hasOccupancyRate
+          ? `提成池 × ${result.performanceFactor}成单率系数 × ${result.occupancyFactor}满班率系数（输入值 ${inputs.occupancyRate}）`
+          : `提成池 × ${result.performanceFactor}成单率系数`,
       amount: result.adjustedCommission,
     },
     {
@@ -488,7 +471,7 @@ function SalaryCalculator() {
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 800 }}>教练工资计算</Typography>
               <Typography variant="body2" color="text.secondary">
-                按 2024 工资计算表公式实时测算，金额保留两位小数
+                按 2026 年提成标准与现行课时工资公式实时测算
               </Typography>
             </Box>
           </Stack>
@@ -639,11 +622,33 @@ function SalaryCalculator() {
                   InputProps={{ startAdornment: <InputAdornment position="start">¥</InputAdornment> }}
                 />
               </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={(
+                    <Switch
+                      checked={inputs.commissionSuspended}
+                      onChange={(event) => updateInput('commissionSuspended', event.target.checked)}
+                      color="warning"
+                    />
+                  )}
+                  label="本月取消提成（投诉、差评或退费处罚期）"
+                />
+              </Grid>
             </Grid>
 
-            <Alert severity="info" sx={{ mt: 2.5, borderRadius: 2 }}>
-              Excel 公式固定支付保底基本工资；即使课时低于保底课时，也不会自动扣减底薪。
-            </Alert>
+            <Stack spacing={1.5} sx={{ mt: 2.5 }}>
+              {config.hasOccupancyRate && (
+                <Alert severity="info" sx={{ borderRadius: 2 }}>
+                  满班率原始值计算时，每月私教课时最多计入 100 小时，超出部分不计。
+                </Alert>
+              )}
+              <Alert severity="warning" sx={{ borderRadius: 2 }}>
+                客诉或差评、当月有效退费超过2单、季度有效退费累计超过3单，可取消1–3个月提成。
+              </Alert>
+              <Alert severity="info" sx={{ borderRadius: 2 }}>
+                保底基本工资仍固定支付；课时低于保底课时不会自动扣减底薪。
+              </Alert>
+            </Stack>
           </Paper>
         </Grid>
 
@@ -710,6 +715,11 @@ function SalaryCalculator() {
             {result.commissionPool < 0 && (
               <Alert severity="warning" sx={{ mt: 2.5 }}>
                 优惠金额高于销售与大单提成，Excel 公式会产生负数提成。
+              </Alert>
+            )}
+            {inputs.commissionSuspended && (
+              <Alert severity="warning" sx={{ mt: 2.5 }}>
+                本月提成已取消，课时工资和补贴仍正常计算。
               </Alert>
             )}
           </Paper>
@@ -825,7 +835,7 @@ function SalaryCalculator() {
           <Paper variant="outlined" sx={{ flex: 1, p: 2, borderRadius: 2.5, borderColor: '#e4e7ef' }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>成单率系数</Typography>
             <Typography variant="body2" color="text.secondary">
-              低于 50% → 0　｜　50%–59% → 0.5　｜　60%及以上 → 1
+              低于 40% → 0　｜　40%–49% → 0.5　｜　50%及以上 → 1
             </Typography>
           </Paper>
           {config.occupancyThresholds && (
