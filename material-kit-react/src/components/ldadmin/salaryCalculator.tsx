@@ -639,7 +639,7 @@ function SalaryCalculator() {
             <Stack spacing={1.5} sx={{ mt: 2.5 }}>
               {config.hasOccupancyRate && (
                 <Alert severity="info" sx={{ borderRadius: 2 }}>
-                  满班率原始值计算时，每月私教课时最多计入 100 小时，超出部分不计。
+                  每位教练每个自然月仅前 100 节私教课参与满班率计算，第 101 节起不计入满班率分子和分母。
                 </Alert>
               )}
               <Alert severity="warning" sx={{ borderRadius: 2 }}>
