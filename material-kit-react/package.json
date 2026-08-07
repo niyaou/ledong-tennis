@@ -6,6 +6,7 @@
   "homepage": ".",
   "scripts": {
     "start": "webpack serve --config webpack.local.js --mode development",
+    "test": "TMPDIR=/tmp jest --config jest.config.js",
     "build:dev": "webpack --config webpack.dev.js",
     "build:test": "webpack --config webpack.test.js",
     "build:prod": "webpack --config webpack.prod.js"

@@ -205,12 +205,12 @@ function SideMenu(props) {
                         onClick={async () => {
                             indexChange(4)
                         }}
-                        aria-label="教练填报课程"
+                        aria-label="教练填报"
                         sx={{ width: '100%', height: 80, color: '#8b8b8b', cursor: 'pointer', '&:hover': { background: 'rgba(0, 0, 0, 0.04)', color: '#a1a1a1' } }}
                     >
                         <AssignmentTurnedInOutlined fontSize="large" />
                         <Typography variant="button" display="block" gutterBottom sx={{}}>
-                         教练填报课程
+                         教练填报
                         </Typography>
                     </Stack>
                     <Stack
