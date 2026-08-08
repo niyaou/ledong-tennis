@@ -29,6 +29,101 @@ export type PendingCourse = {
   updatedAt: string
 }
 
+export type RechargeNoticeStatus = 'PENDING' | 'ACKNOWLEDGED'
+
+export type RechargeNotice = {
+  id: number
+  coachId: number
+  coachName?: string
+  coachActive: boolean
+  memberId: number
+  memberName?: string
+  memberNumber?: string
+  memberActive: boolean
+  rechargeDate: string
+  note: string
+  status: RechargeNoticeStatus
+  version: number
+  createdAt: string
+  updatedAt: string
+  acknowledgedAt?: string | null
+}
+
+export type CourseSubmission = {
+  submissionType: 'COURSE'
+  businessDate: string
+  submittedAt: string
+  course: PendingCourse
+  rechargeNotice?: never
+}
+
+export type RechargeNoticeSubmission = {
+  submissionType: 'RECHARGE_NOTICE'
+  businessDate: string
+  submittedAt: string
+  course?: never
+  rechargeNotice: RechargeNotice
+}
+
+export type CoachSubmission = CourseSubmission | RechargeNoticeSubmission
+
+export type Page<T> = {
+  content: T[]
+  empty: boolean
+  first: boolean
+  last: boolean
+  number: number
+  numberOfElements: number
+  size: number
+  totalElements: number
+  totalPages: number
+}
+
+export const emptyPage = <T>(): Page<T> => ({
+  content: [],
+  empty: true,
+  first: true,
+  last: true,
+  number: 0,
+  numberOfElements: 0,
+  size: 30,
+  totalElements: 0,
+  totalPages: 0,
+})
+
+export const normalizePage = <T>(payload: any): Page<T> => {
+  const body = payload?.data?.content ? payload.data : payload
+  if (Array.isArray(body)) {
+    return {
+      ...emptyPage<T>(),
+      content: body,
+      empty: body.length === 0,
+      numberOfElements: body.length,
+      totalElements: body.length,
+      totalPages: body.length ? 1 : 0,
+    }
+  }
+  const content = Array.isArray(body?.content) ? body.content : []
+  return {
+    ...emptyPage<T>(),
+    ...body,
+    content,
+    empty: body?.empty ?? content.length === 0,
+    number: Number(body?.number) || 0,
+    numberOfElements: Number(body?.numberOfElements) || content.length,
+    size: Number(body?.size) || 30,
+    totalElements: Number(body?.totalElements) || 0,
+    totalPages: Number(body?.totalPages) || 0,
+  }
+}
+
+export const submissionKey = (submission: CoachSubmission) => `${submission.submissionType}:${submission.submissionType === 'COURSE' ? submission.course.id : submission.rechargeNotice.id}`
+
+export const sortSubmissions = (submissions: CoachSubmission[]) => [...submissions].sort((left, right) =>
+  right.businessDate.localeCompare(left.businessDate)
+  || right.submittedAt.localeCompare(left.submittedAt)
+  || submissionKey(right).localeCompare(submissionKey(left)))
+
 export type AdmitRequest = {
   updatedAt: string
   course: {

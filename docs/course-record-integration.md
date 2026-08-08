@@ -1,11 +1,11 @@
-# 教练录课与管理员录取：跨项目联调说明
+# 教练填报与管理员处理：跨项目联调说明
 
 适用分支：三个仓库的 `course-record`。本文件是联调执行清单；需求以《教练小程序录课与管理员录取_最终需求共识文档_v2.1》为准，接口与实现细节以《教练小程序录课与管理员录取_详细设计文档_v1.0_文件库版》为准。
 
 ## 1. 联调范围与职责
 
 - `ledong-db`：创建 `pending_course` 表，提供管理员待审列表与录取接口；录取时适配并调用既有 `CourseService.CreateCourse`。
-- `ledong-tennis/material-kit-react`：提供“教练填报课程”管理页，按校区分组展示待审课并逐条录取。
+- `ledong-tennis/material-kit-react`：提供统一“教练填报”管理页，在待处理时间流中展示待审课程与用户充值待办；课程逐条录取，充值待办仅确认知悉。
 - `court-book`：教练身份初始化、待审课程 CRUD、会员搜索、正式课程只读查询；云函数直接连接 MySQL，不调用 `ledong-db` 的新接口。
 
 主流程：教练小程序提交待审课 → `pending_course` → 管理端查询 → 管理员逐条录取 → 既有正式录课逻辑创建 `course`、`spend`、`course_member` 并扣减余额/次数 → 物理删除待审记录。
@@ -24,12 +24,17 @@
 
 ### 管理后台 API
 
+- `GET /api/coach-submissions?pageNum=1&pageSize=30`：返回统一分页待处理时间流。`submissionType` 为 `COURSE` 或 `RECHARGE_NOTICE`，使用 `businessDate` 与 `submittedAt` 排序；课程和充值数据分别位于互斥的 `course`、`rechargeNotice` 字段。
+- `GET /api/recharge-notices?status=ACKNOWLEDGED&pageNum=1&pageSize=30&startDate=&endDate=`：查询已知悉充值历史；请求页码从 1 开始，响应 `number` 从 0 开始。
+- `POST /api/recharge-notices/{id}/acknowledge`：请求 `{ "version": 1 }`。只确认管理员已看到待办，不执行真实充值，也不创建正式课程；版本冲突或记录不存在后管理端刷新待处理时间流。
 - `GET /api/pending-course`：复用 `secure` 鉴权；返回按 `startTime DESC, id DESC` 排序的扁平待审课程 DTO，前端按校区分组。
 - `POST /api/pending-course/{id}/admit`：复用 `secure` 鉴权，使用 JSON；请求包含 `updatedAt` 与完整 `course` 数据。成功返回 `{ "id": <formalCourseId> }`。
 
 录取请求中的 `course` 至少包含：`coachId`、`courtId`、`startTime`、`endTime`、`duration`、`courseType`、`isAdult`、`description` 和 `membersData`。每个会员消费项使用 `memberId`、`charge`、`times`、`annualTimes`、`description`、`quantities`。
 
 关键错误码：`PENDING_UPDATED`、`PENDING_NOT_FOUND`、`COURSE_DUPLICATE`、`INVALID_MEMBER_SPEND`、`DUPLICATE_MEMBER`、`COACH_NOT_FOUND`、`COURT_NOT_FOUND`、`MEMBER_NOT_FOUND`、`FORMAL_CREATED_PENDING_DELETE_FAILED`、`INTERNAL_ERROR`。管理端统一使用既有 notify 展示，`PENDING_UPDATED` 与 `PENDING_NOT_FOUND` 后刷新列表。
+
+充值 DTO 固定包含 `id`、教练和会员身份及 active 标志、`rechargeDate`、`note`、`status`、`version`、创建/修改/知悉时间。所有业务日期和时间直接使用后端的 `YYYY-MM-DD`、`YYYY-MM-DD HH:mm:ss` 字符串，前端不做 JavaScript `Date` 时区换算。
 
 ### 小程序云函数
 
@@ -55,9 +60,11 @@
 ### 核心闭环
 
 1. 教练使用小程序新增班课（多人、不同扣费类型）后，在待审列表看到该课程。
-2. 管理端“教练填报课程”页面显示课程，按校区分组；展开会员明细、欠费确认、手动刷新均正常。
+2. 管理端“教练填报”页面在业务日期时间流中显示课程；展开会员明细、欠费确认、手动刷新均正常。
 3. 管理员录取后，确认正式课程可见，`spend` 与 `course_member` 已写入，余额/次数按既有逻辑扣减，待审记录被物理删除。
 4. 管理端立即刷新后不再显示已录取课程；小程序待审页刷新后也不再显示该课程。
+5. 教练提交用户充值待办后，管理端“待处理”时间流显示充值卡；点击“已知悉”并确认时携带当前 `version`，成功后记录移入“已知悉充值”历史，且不会触发课程录取或真实充值接口。
+6. 已知悉历史支持开始/结束日期和每页 30 条分页；课程与充值记录数值 ID 相同时，折叠、提交状态和 React key 互不干扰。
 
 ### 异常与边界
 
@@ -66,6 +73,8 @@
 3. 检查体验课、订场、班课、私教；特别验证订场 `isAdult` 与既有正式录课保持一致。
 4. 验证课时费为 0、次卡/年卡最小 0.5、重复会员拒绝、无效会员/校区/教练的错误提示。
 5. 在北京时间月初、跨年和二月检查正式课“三自然月”范围；云函数运行时区变化不应改变结果。
+6. 管理员打开充值卡后教练又修改该记录；旧版本知悉应失败并刷新，不得确认旧内容。
+7. 自动刷新、翻页和日期筛选发生慢响应乱序时，只允许最新请求更新页面；刷新失败时保留上次成功数据。
 
 ### 旧功能回归
 
@@ -75,10 +84,11 @@
 
 ## 6. 已确认业务边界
 
-- 当前按单管理员操作假设联调，不额外处理同一待审课的管理员并发录取。
+- 当前按单管理员操作假设联调，不额外处理同一待审课的管理员并发录取；充值待办通过 `version` 防止确认教练已经修改的旧内容。
 - 微信小程序使用既有严格认证体系；本期不额外扩展电话/token 防护方案。
 - 本期不处理小程序重复并发提交冲突。
 - 不增加消息通知、批量填报、批量录取、动态 TabBar 或旧 Excel 页面重构。
+- 管理端开发代理默认连接远端环境。构建和纯函数测试不得触发 HTTP 写请求；本地联调写操作必须显式切换到本地后端或获准的测试环境，临时代理配置不得提交。
 
 ## 7. 联调记录
 
