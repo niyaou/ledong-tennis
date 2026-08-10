@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import XLSX from 'xlsx';
 import {
   Alert,
   Box,
@@ -25,6 +26,7 @@ import {
 import AccountBalanceWalletOutlined from '@mui/icons-material/AccountBalanceWalletOutlined';
 import ArrowForwardRounded from '@mui/icons-material/ArrowForwardRounded';
 import CalculateOutlined from '@mui/icons-material/CalculateOutlined';
+import DownloadRounded from '@mui/icons-material/DownloadRounded';
 import PaymentsOutlined from '@mui/icons-material/PaymentsOutlined';
 import ReceiptLongOutlined from '@mui/icons-material/ReceiptLongOutlined';
 import RestartAltRounded from '@mui/icons-material/RestartAltRounded';
@@ -61,6 +63,7 @@ type SalaryInputs = {
   conversionRate: number;
   occupancyRate: number;
   allowance: number;
+  socialSecurityDeduction: number;
   commissionSuspended: boolean;
 };
 
@@ -80,6 +83,7 @@ type SalaryResult = {
   occupancyFactor: number;
   preSuspensionCommission: number;
   adjustedCommission: number;
+  socialSecurityDeduction: number;
   publicAccount: number;
   privateAccount: number;
   totalSalary: number;
@@ -186,6 +190,7 @@ const createInitialInputs = (): Record<RoleKey, SalaryInputs> =>
       conversionRate: 50,
       occupancyRate: 0,
       allowance: 0,
+      socialSecurityDeduction: 0,
       commissionSuspended: false,
     };
     return result;
@@ -260,10 +265,14 @@ export const calculateSalary = (
     : 1;
   const preSuspensionCommission = commissionPool * performanceFactor * occupancyFactor;
   const adjustedCommission = rawInputs.commissionSuspended ? 0 : preSuspensionCommission;
-  const publicAccount = config.baseSalary;
+  const socialSecurityDeduction = toNonNegative(rawInputs.socialSecurityDeduction);
+  const publicAccount = config.baseSalary - socialSecurityDeduction;
   const privateAccount = adjustedCommission
     + classPay
-    - publicAccount
+    - config.baseSalary
+    + toNonNegative(rawInputs.allowance);
+  const totalSalary = classPay
+    + adjustedCommission
     + toNonNegative(rawInputs.allowance);
 
   return {
@@ -277,9 +286,10 @@ export const calculateSalary = (
     occupancyFactor,
     preSuspensionCommission,
     adjustedCommission,
+    socialSecurityDeduction,
     publicAccount,
     privateAccount,
-    totalSalary: publicAccount + privateAccount,
+    totalSalary,
     salesFormulaText: sales.text,
   };
 };
@@ -380,6 +390,42 @@ function SalaryCalculator() {
       ...current,
       [activeRole]: initial[activeRole],
     }));
+  };
+
+  const downloadActiveCoach = () => {
+    const coachLabel = inputs.coachName.trim() || config.label;
+    const rows: (string | number)[][] = [
+      ['教练工资明细'],
+      ['教练姓名', coachLabel],
+      ['职级', config.label],
+      [],
+      ['录入项目', '数值'],
+      ['当月课时数', inputs.hours],
+      ['销售额（元）', inputs.sales],
+      ['大单金额（元）', inputs.bigOrder],
+      ['优惠金额（元）', inputs.discount],
+      ['体验课成单率（%）', inputs.conversionRate],
+      ...(config.hasOccupancyRate ? [['满班率', inputs.occupancyRate]] : []),
+      [`${config.allowanceLabel}（元）`, inputs.allowance],
+      ['社保扣除（元）', result.socialSecurityDeduction],
+      ['本月取消提成', inputs.commissionSuspended ? '是' : '否'],
+      [],
+      ['工资项目', '计算方式', '金额（元）'],
+      ...detailRows.map((row) => [row.item, row.formula, row.amount]),
+      ['工资总额', `课时工资 + 绩效后销售提成 + ${config.allowanceLabel}`, result.totalSalary],
+      [],
+      ['发放项目', '说明', '金额（元）'],
+      ['银行卡（扣除前）', '固定底薪', config.baseSalary],
+      ['社保扣除', '仅从银行卡金额中扣除，不影响工资总额', -result.socialSecurityDeduction],
+      ['银行卡实发', '银行卡（扣除前）− 社保扣除', result.publicAccount],
+      ['支付', '工资总额 − 银行卡（扣除前）', result.privateAccount],
+    ];
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    worksheet['!cols'] = [{ wch: 24 }, { wch: 68 }, { wch: 18 }];
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '工资明细');
+    const safeCoachLabel = coachLabel.replace(/[\\/:*?"<>|]/g, '_');
+    XLSX.writeFile(workbook, `${safeCoachLabel}_${config.shortLabel}_工资明细.xlsx`);
   };
 
   const performanceText = result.performanceFactor === 0
@@ -622,6 +668,18 @@ function SalaryCalculator() {
                   InputProps={{ startAdornment: <InputAdornment position="start">¥</InputAdornment> }}
                 />
               </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="社保扣除"
+                  value={inputs.socialSecurityDeduction}
+                  onChange={(event) => updateInput('socialSecurityDeduction', event.target.value)}
+                  inputProps={{ min: 0, step: 10 }}
+                  InputProps={{ startAdornment: <InputAdornment position="start">¥</InputAdornment> }}
+                  helperText="仅从银行卡金额中扣除，不影响工资总额"
+                />
+              </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
                   control={(
@@ -679,9 +737,9 @@ function SalaryCalculator() {
 
             <Stack direction={{ xs: 'column', sm: 'row', lg: 'column', xl: 'row' }} spacing={1.5}>
               <SummaryCard
-                label="银行卡"
+                label="银行卡实发（社保后）"
                 value={result.publicAccount}
-                color="#3146ad"
+                color={result.publicAccount < 0 ? '#c62828' : '#3146ad'}
                 icon={<AccountBalanceWalletOutlined fontSize="small" />}
               />
               <SummaryCard
@@ -697,6 +755,7 @@ function SalaryCalculator() {
                 ['课时工资', result.classPay],
                 ['绩效后销售提成', result.adjustedCommission],
                 [config.allowanceLabel, toNonNegative(inputs.allowance)],
+                ['社保扣除（仅银行卡）', -result.socialSecurityDeduction],
               ].map(([label, value]) => (
                 <Stack
                   key={label as string}
@@ -717,6 +776,11 @@ function SalaryCalculator() {
                 优惠金额高于销售与大单提成，Excel 公式会产生负数提成。
               </Alert>
             )}
+            {result.publicAccount < 0 && (
+              <Alert severity="error" sx={{ mt: 2.5 }}>
+                社保扣除高于银行卡扣除前金额，请检查录入值。
+              </Alert>
+            )}
             {inputs.commissionSuspended && (
               <Alert severity="warning" sx={{ mt: 2.5 }}>
                 本月提成已取消，课时工资和补贴仍正常计算。
@@ -730,11 +794,30 @@ function SalaryCalculator() {
         variant="outlined"
         sx={{ mt: 3, borderRadius: 3, borderColor: '#e5e7ef', overflow: 'hidden' }}
       >
-        <Box sx={{ px: 3, py: 2.5 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>计算明细</Typography>
-          <Typography variant="body2" color="text.secondary">
-            每一项都对应工资表中的输入、分段和汇总公式
-          </Typography>
+        <Box
+          sx={{
+            px: 3,
+            py: 2.5,
+            display: 'flex',
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            justifyContent: 'space-between',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 1.5,
+          }}
+        >
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>计算明细</Typography>
+            <Typography variant="body2" color="text.secondary">
+              每一项都对应工资表中的输入、分段和汇总公式
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            startIcon={<DownloadRounded />}
+            onClick={downloadActiveCoach}
+          >
+            下载当前教练
+          </Button>
         </Box>
         <TableContainer>
           <Table size="small">
@@ -822,7 +905,7 @@ function SalaryCalculator() {
           </Box>
           <FlowCard
             title="工资总额"
-            value={`${formatMoney(result.publicAccount)} 银行卡 + ${formatMoney(result.privateAccount)} 支付`}
+            value={`${formatMoney(result.totalSalary)}（社保扣除不影响总额）`}
             accent="#3f51b5"
           />
         </Stack>
