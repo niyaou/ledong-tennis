@@ -1,4 +1,4 @@
-import { CoachSubmission, normalizePage, sortSubmissions, submissionKey } from './pendingCourseTypes'
+import { CoachSubmission, PendingCourse, courseTypeLabel, normalizePage, sortSubmissions, submissionKey, toAdmitRequest } from './pendingCourseTypes'
 
 declare const test: (name: string, run: () => void) => void
 declare const expect: (actual: unknown) => {
@@ -67,4 +67,56 @@ test('normalizes a wrapped zero-based Page response', () => {
     totalElements: 61,
     size: 30,
   })
+})
+
+test('maps single class courses and admits their reported participant count without member spending', () => {
+  const course: PendingCourse = {
+    id: 9,
+    coachId: 1,
+    courtId: 2,
+    startTime: '2026-09-19 10:00:00',
+    endTime: '2026-09-19 11:00:00',
+    duration: 1,
+    courseType: 3,
+    isAdult: 1,
+    description: '单次班课',
+    participantCount: 7,
+    membersData: [{
+      memberId: 88,
+      charge: 100,
+      times: 0,
+      annualTimes: 0,
+      description: 100,
+      quantities: 2,
+    }],
+    createdAt: '2026-09-19 09:00:00',
+    updatedAt: '2026-09-19 09:30:00',
+  }
+
+  expect(courseTypeLabel(course.courseType)).toBe('单次班课')
+  expect(toAdmitRequest(course)).toMatchObject({
+    updatedAt: course.updatedAt,
+    course: {
+      courseType: 3,
+      participantCount: 7,
+      membersData: [],
+    },
+  })
+})
+
+test('keeps member spending unchanged for existing course types', () => {
+  const course = courseSubmission(10, '2026-09-19', '2026-09-19 09:30:00').course as PendingCourse
+  course.membersData = [{
+    memberId: 7,
+    charge: 80,
+    times: 0,
+    annualTimes: 0,
+    description: 80,
+    quantities: 1,
+  }]
+  course.participantCount = 9
+
+  const request = toAdmitRequest(course)
+  expect(request.course.participantCount).toBe(undefined)
+  expect(request.course.membersData).toEqual(course.membersData)
 })

@@ -1,3 +1,5 @@
+import { COURSE_TYPE_LABELS, courseTypeLabel, isSingleClassCourse, normalizedParticipantCount } from '../../common/courseTypes'
+
 export type MemberSpend = {
   memberId: number
   memberName?: string
@@ -24,6 +26,7 @@ export type PendingCourse = {
   courseType: number
   isAdult: number
   description: string
+  participantCount?: number
   membersData: MemberSpend[]
   createdAt: string
   updatedAt: string
@@ -135,19 +138,12 @@ export type AdmitRequest = {
     courseType: number
     isAdult: number
     description: string
+    participantCount?: number
     membersData: Array<Pick<MemberSpend, 'memberId' | 'charge' | 'times' | 'annualTimes' | 'description' | 'quantities'>>
   }
 }
 
-export const COURSE_TYPE_LABELS: Record<number, string> = {
-  [-2]: '体验课未成单',
-  [-1]: '体验课成单',
-  0: '订场',
-  1: '班课',
-  2: '私教',
-}
-
-export const courseTypeLabel = (courseType: number) => COURSE_TYPE_LABELS[courseType] || `未知类型（${courseType}）`
+export { COURSE_TYPE_LABELS, courseTypeLabel }
 
 export const deductionLabel = (member: MemberSpend) => {
   if (Number(member.times) > 0) return `次卡 ${member.times}`
@@ -166,7 +162,10 @@ export const toAdmitRequest = (course: PendingCourse): AdmitRequest => ({
     courseType: course.courseType,
     isAdult: course.isAdult,
     description: course.description || '',
-    membersData: (course.membersData || []).map((member) => ({
+    ...(isSingleClassCourse(course.courseType)
+      ? { participantCount: normalizedParticipantCount(course.participantCount) }
+      : {}),
+    membersData: (isSingleClassCourse(course.courseType) ? [] : (course.membersData || [])).map((member) => ({
       memberId: member.memberId,
       charge: Number(member.charge) || 0,
       times: Number(member.times) || 0,

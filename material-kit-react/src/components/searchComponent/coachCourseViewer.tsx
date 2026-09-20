@@ -24,6 +24,7 @@ import {
 } from '@mui/x-data-grid'
 import { zhCN } from '@mui/x-data-grid/locales'
 import Axios from '../../common/axios/axios'
+import { courseTypeLabel, isSingleClassCourse, normalizedParticipantCount } from '../../common/courseTypes'
 
 interface Coach {
   id: number
@@ -55,6 +56,7 @@ interface CoachCourse {
   courseType: number
   isAdult: number | null
   description: string
+  participantCount?: number
   membersData: CourseMember[]
 }
 
@@ -86,14 +88,6 @@ const emptyDashboard: CoachCourseDashboard = {
   month: '',
   summary: emptySummary,
   courses: [],
-}
-
-const courseTypeLabels: Record<number, string> = {
-  [-2]: '体验课未成单',
-  [-1]: '体验课成单',
-  0: '订场（不计入课时）',
-  1: '班课',
-  2: '私教',
 }
 
 const currentMonth = () => {
@@ -211,12 +205,14 @@ const CoachCourseViewer = () => {
       duration: displayNumber(course.duration),
       startClock: timePart(course.startTime),
       endClock: timePart(course.endTime),
-      courseTypeLabel: courseTypeLabels[Number(course.courseType)] || `未知类型（${course.courseType}）`,
+      courseTypeLabel: Number(course.courseType) === 0 ? '订场（不计入课时）' : courseTypeLabel(Number(course.courseType)),
       ageGroup: Number(course.courseType) === 0
         ? '—'
         : (course.isAdult === null || course.isAdult === undefined ? '—' : (Number(course.isAdult) === 1 ? '成人' : '儿童')),
       courtDisplay: course.courtName || `已失效校区（${course.courtId}）`,
-      memberCount: members.length,
+      participantCount: isSingleClassCourse(course.courseType)
+        ? normalizedParticipantCount(course.participantCount)
+        : members.length,
     }
     members.forEach((member, index) => {
       row[`member_${index}`] = memberExportText(member)
@@ -253,7 +249,7 @@ const CoachCourseViewer = () => {
           {params.value || '—'}
         </Typography>,
       },
-      { field: 'memberCount', headerName: '学员记录数', type: 'number', width: 120 },
+      { field: 'participantCount', headerName: '人数/学员记录', type: 'number', width: 130 },
     ]
 
     const memberColumns: GridColDef[] = Array.from({ length: maxMemberCount }, (_, index) => ({
@@ -334,7 +330,7 @@ const CoachCourseViewer = () => {
     </Alert>}
 
     <Grid container spacing={2} sx={{ mb: 2, opacity: loadingCourses ? 0.55 : 1 }}>
-      <Grid item xs={12} sm={6} lg={3}><SummaryCard label="授课总课时" value={dashboard.summary.totalHours} note="体验课 + 班课 + 私教" /></Grid>
+      <Grid item xs={12} sm={6} lg={3}><SummaryCard label="授课总课时" value={dashboard.summary.totalHours} note="按服务端课程统计口径汇总" /></Grid>
       <Grid item xs={12} sm={6} lg={3}><SummaryCard label="体验课课时" value={dashboard.summary.trialHours} note="包含成单与未成单体验课" /></Grid>
       <Grid item xs={12} sm={6} lg={3}><SummaryCard label="班课课时" value={dashboard.summary.groupHours} note="按课程专用课时字段统计" /></Grid>
       <Grid item xs={12} sm={6} lg={3}><SummaryCard label="私教课时" value={dashboard.summary.privateHours} note="订场不计入任何授课课时" /></Grid>

@@ -12,6 +12,7 @@ import { fetching, Fetching } from '../../common/interface'
 import Axios from '../../common/axios/axios'
 import { getErrorMsg } from '../../common/utils/reduxUtil'
 import moment from 'moment'
+import { courseParticipationFormFields } from '../../common/courseTypes'
 export interface DominationState extends Fetching {
     favourite: any[];
     hot: any[];
@@ -274,8 +275,9 @@ export const createCard = createAsyncThunk<any, any>(
             formdata.append("courtName", payload.court)
             formdata.append("courseType", payload.courseType)
             formdata.append("descript", payload.descript)
-            formdata.append("membersObj", JSON.stringify(payload.membersObj))
             formdata.append("isAdult", payload.isAdult !== undefined && payload.isAdult !== null ? payload.isAdult : 1)
+            Object.entries(courseParticipationFormFields(payload.courseType, payload.membersObj, payload.participantCount))
+                .forEach(([key, value]) => formdata.append(key, value))
 
 
             const response = await Axios.post(`/api/prepaidCard/course/create`, formdata)

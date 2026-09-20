@@ -22,6 +22,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 
 import moment from 'moment';
 import { findIndex, find } from 'lodash';
+import { courseTypeLabel, isSingleClassCourse, normalizedParticipantCount } from '../../common/courseTypes';
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => b.indexOf(value) === -1);
 }
@@ -88,9 +89,12 @@ function RecentCourse(props) {
 
 
   const courseItem = (item, index) => {
-    let quantities = 0
-    for(var i of item.spend){
-      quantities+=  i.quantities
+    const singleClass = isSingleClassCourse(item.courseType)
+    let quantities = singleClass ? normalizedParticipantCount(item.participantCount) : 0
+    if (!singleClass && Array.isArray(item.spend)) {
+      for (var i of item.spend) {
+        quantities += Number(i.quantities) || 0
+      }
     }
     return (
       <Paper key={`item-course-${item.id}`} elevation={1} sx={{
@@ -161,7 +165,7 @@ function RecentCourse(props) {
                   color: 'rgba(0, 0, 0, 0.6)',
                   minWidth: '180px',
                 }} >
-                {item.duration}小时  ,{item.courseType === -2 ? '体验课未成单' : item.courseType === -1 ? '体验课成单' : item.courseType === 0 ? '订场' : item.courseType === 1 ? '班课' : '私教'}
+                {item.duration}小时，{courseTypeLabel(Number(item.courseType))}
               </Typography>
               <Typography gutterBottom variant="body2"
                 sx={{
@@ -198,7 +202,7 @@ function RecentCourse(props) {
 
                 }}
               >
-                {item.member.map((m, idx) => (
+                {!singleClass && (item.member || []).map((m, idx) => (
                     <Button variant="contained" size="small"
                       disabled={item.notified > 0}
                       key={`${m}a5-${m.number}`}
@@ -226,7 +230,7 @@ function RecentCourse(props) {
 
             }}
           >
-            {item.courseType >= 0 && (<Button variant="contained" size="small"
+            {!singleClass && item.courseType >= 0 && (<Button variant="contained" size="small"
               disabled={item.notified > 0}
               onClick={() => {
                 dispatch(notifyCourse(item.id))

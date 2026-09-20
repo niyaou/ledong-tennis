@@ -100,6 +100,7 @@ import { findIndex, find } from 'lodash';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { exploreUsersAction, exploreRecentCourse, selectCourse as selectCourseAction, createCard, updateCourese } from '../../store/slices/dominationSlice'
 import moment from 'moment'
+import { COURSE_TYPE_OPTIONS, isSingleClassCourse } from '../../common/courseTypes'
 type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
   color?: string;
@@ -132,7 +133,7 @@ function Additions(props) {
 
   const [courseEdit, setCourseEdit] = React.useState({
     startTime: new Date(), endTime: new Date(), coach: '', spendingTime: 1, courtSpend: 0, coachSpend: 0, descript: '',
-    court: '', courseType: 0, membersObj: null, isAdult: 1
+    court: '', courseType: 0, membersObj: null, isAdult: 1, participantCount: ''
   });
 
 
@@ -611,14 +612,33 @@ function Additions(props) {
         name='FileTypes'
         size="small"
         onChange={(e) => {
-          let after = { ...courseEdit, courseType: e.target.value }
+          const nextCourseType = Number(e.target.value)
+          let after = { ...courseEdit, courseType: nextCourseType }
+          if (isSingleClassCourse(nextCourseType)) {
+            after = { ...after, membersObj: null }
+            setLabelArr([])
+            setMemberValue('')
+            setInputValue('')
+          }
           console.log('----课时类型---', after)
           setCourseEdit(after)
         }}
-        value={[courseEdit.courseType]}>
-        {['体验课未成单', '体验课成单', '订场', '班课', '私教'].map((dict, index) => { return (<MenuItem key={`courseType-${dict}`} value={index - 2}>{dict}</MenuItem>) })}
+        value={courseEdit.courseType}>
+        {COURSE_TYPE_OPTIONS.map((option) => <MenuItem key={`courseType-${option.value}`} value={option.value}>{option.label}</MenuItem>)}
       </Select>
     </FormControl>
+
+    {isSingleClassCourse(courseEdit.courseType) && <TextField
+      fullWidth
+      type="number"
+      label="上课人数"
+      size="small"
+      required
+      value={courseEdit.participantCount}
+      inputProps={{ min: 1, step: 1 }}
+      helperText="单次班课无需选择会员，请填写实际上课人数。"
+      onChange={(e) => setCourseEdit({ ...courseEdit, participantCount: e.target.value })}
+    />}
 
     <FormControl sx={{ width: '100%' }}>
       <InputLabel>课程类型</InputLabel>
@@ -713,7 +733,7 @@ function Additions(props) {
 
       </FormControl>
     </LocalizationProvider>
-    {!selectCourse && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}  >
+    {!selectCourse && !isSingleClassCourse(courseEdit.courseType) && <FormControl sx={{ m: 1, minWidth: 120, width: '100%' }}  >
       <Autocomplete
         sx={{ width: 350, }}
         disablePortal
@@ -736,7 +756,7 @@ function Additions(props) {
       />
     </FormControl>}
 
-    {labelArr.map((value, index) => memberItem(value, index))}
+    {!isSingleClassCourse(courseEdit.courseType) && labelArr.map((value, index) => memberItem(value, index))}
 
     {!selectCourse && <FormControl sx={{ m: 1, width: '100%' }} >
       <Button variant="contained" size="small" startIcon={<AutoAwesomeMotionIcon />}
@@ -757,6 +777,15 @@ function Additions(props) {
             courseEdit.spendingTime = diff
           }
           
+          if (isSingleClassCourse(courseEdit.courseType)) {
+            const participantCount = Number(courseEdit.participantCount)
+            if (!Number.isInteger(participantCount) || participantCount <= 0) {
+              enqueueSnackbar('请输入大于 0 的整数上课人数', { variant: 'warning' })
+              return
+            }
+            dispatch(createCard({ ...courseEdit, participantCount, membersObj: null }))
+            return
+          }
           console.log("🚀 ~ file: additions.tsx ~ line 310 ~ Additions ~  standardDateValue,uploadFiles", courseEdit)
           dispatch(createCard(courseEdit))
         }}>

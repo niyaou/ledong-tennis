@@ -17,6 +17,7 @@ import {
   submissionKey,
   toAdmitRequest,
 } from './pendingCourseTypes'
+import { isSingleClassCourse } from '../../common/courseTypes'
 
 type LoadReason = 'initial' | 'manual' | 'auto' | 'afterMutation'
 type View = 'pending' | 'history'
@@ -215,6 +216,10 @@ const PendingCoursePage = () => {
   }, [acknowledgingByKey, enqueueSnackbar, loadPending])
 
   const requestAdmit = (course: PendingCourse) => {
+    if (isSingleClassCourse(course.courseType)) {
+      admit(course)
+      return
+    }
     const warnings = calculateBalanceWarnings(course.membersData)
     if (warnings.currentDebt.length || warnings.afterDebt.length) {
       setDialogWarnings(warnings)
