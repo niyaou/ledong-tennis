@@ -33,6 +33,7 @@ import moment from 'moment';
 import { get, find } from 'lodash'
 import Axios from '../../common/axios/axios'
 import XLSX from 'xlsx'
+import { COURSE_TYPE_OPTIONS, isSingleClassCourse } from '../../common/courseTypes'
 var pinyin = require('../../common/utils/pinyinUtil.js')
 
 import { read, utils } from 'xlsx';
@@ -183,7 +184,8 @@ const unSubmittedCourse=async (excelD)=>{
 }
 
   const handleSubmitCourse = (item) => {
-    const coureseType = ['体验课未成单', '体验课成单', '订场','班课', '私教' ]
+    const courseTypeName = String(item[5] || '').replace('单独', '')
+    const courseTypeOption = COURSE_TYPE_OPTIONS.find((option) => option.label === courseTypeName)
 
     let coachObj = find(coach, { 'name': item[0] })
     let coachId = coachObj ? coachObj.number : null
@@ -198,13 +200,22 @@ const unSubmittedCourse=async (excelD)=>{
     const membersDataLength = item.length - memberStartIndex
     const isAdult = hasAdultField ? (adultFieldValue === '儿童' ? 0 : 1) : 1
     
-    let course = {
+    let course: any = {
       startTime: item[2], endTime: item[3], coach: coachId, spendingTime: item[4], courtSpend: 0, coachSpend: 0, descript: item[remarkIndex] || '备注无',
-      court: courtName, courseType: coureseType.indexOf(item[5].replace('单独', '')) - 2, membersObj: null, isAdult: isAdult
+      court: courtName, courseType: courseTypeOption?.value, membersObj: null, isAdult: isAdult
+    }
+
+    if (isSingleClassCourse(course.courseType)) {
+      const participantCount = Number(item[7])
+      if (!Number.isInteger(participantCount) || participantCount <= 0) {
+        alert('数据错误，请修改日志 - 单次班课上课人数必须是大于 0 的整数')
+        return
+      }
+      course.participantCount = participantCount
     }
 
     let membersObj = {}
-    if (course.courseType > -1 ) {
+    if (course.courseType > -1 && !isSingleClassCourse(course.courseType)) {
       course.membersObj = membersObj
       if(membersDataLength > 0){
       let membs = Math.ceil(membersDataLength / 5)
@@ -239,7 +250,9 @@ const unSubmittedCourse=async (excelD)=>{
       alert('数据错误，请修改日志 - 教练、场地或课程类型不正确')
       return
     }
-    const warnings = calculateBalanceWarnings(course.membersObj)
+    const warnings = isSingleClassCourse(course.courseType)
+      ? { currentDebt: [], afterDebt: [] }
+      : calculateBalanceWarnings(course.membersObj)
     if (warnings.currentDebt.length > 0 || warnings.afterDebt.length > 0) {
       setBalanceWarnings(warnings)
       setPendingCourse(course)

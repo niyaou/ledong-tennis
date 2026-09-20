@@ -4,6 +4,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { PendingCourse, courseTypeLabel, deductionLabel } from './pendingCourseTypes'
+import { isSingleClassCourse, normalizedParticipantCount } from '../../common/courseTypes'
 
 type Props = {
   course: PendingCourse
@@ -15,11 +16,13 @@ type Props = {
 
 const PendingCourseCard = ({ course, collapsed, admitting, onToggle, onAdmit }: Props) => {
   const isBooking = course.courseType === 0
+  const isSingleClass = isSingleClassCourse(course.courseType)
   const courtName = course.courtName || `校区已失效（${course.courtId}）`
-  const totalPeople = (course.membersData || []).reduce((total, member) => {
+  const memberPeople = (course.membersData || []).reduce((total, member) => {
     const quantities = Number(member.quantities)
     return total + (Number.isFinite(quantities) ? quantities : 0)
   }, 0)
+  const totalPeople = isSingleClass ? normalizedParticipantCount(course.participantCount) : memberPeople
 
   return <Card variant="outlined" sx={{ mb: 1.5 }}>
     <CardContent sx={{ pb: 1 }}>
@@ -33,9 +36,9 @@ const PendingCourseCard = ({ course, collapsed, admitting, onToggle, onAdmit }: 
             <Chip size="small" variant="outlined" label={courtName} />
           </Stack>
         </Stack>
-        <IconButton aria-label={collapsed ? '展开会员明细' : '收起会员明细'} onClick={onToggle} size="small">
+        {!isSingleClass && <IconButton aria-label={collapsed ? '展开会员明细' : '收起会员明细'} onClick={onToggle} size="small">
           {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
+        </IconButton>}
       </Stack>
       <Typography variant="body2" sx={{ mt: 1.5 }}>
         {course.startTime} 至 {course.endTime}（{course.duration} 小时）
@@ -43,7 +46,10 @@ const PendingCourseCard = ({ course, collapsed, admitting, onToggle, onAdmit }: 
       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
         备注：{course.description || '无'}
       </Typography>
-      <Collapse in={!collapsed} timeout="auto" unmountOnExit>
+      {isSingleClass ? <>
+        <Divider sx={{ my: 1.5 }} />
+        <Typography variant="body2" color="text.secondary">本课程无需会员消费明细；教练上报人数为 {totalPeople} 人。</Typography>
+      </> : <Collapse in={!collapsed} timeout="auto" unmountOnExit>
         <Divider sx={{ my: 1.5 }} />
         {course.membersData && course.membersData.length > 0 ? course.membersData.map((member) => (
           <Stack key={member.memberId} direction="row" justifyContent="space-between" spacing={2} sx={{ py: 0.5 }}>
@@ -53,7 +59,7 @@ const PendingCourseCard = ({ course, collapsed, admitting, onToggle, onAdmit }: 
             </Typography>
           </Stack>
         )) : <Typography variant="body2" color="text.secondary">本课程没有会员消费明细。</Typography>}
-      </Collapse>
+      </Collapse>}
     </CardContent>
     <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 1.5 }}>
       <Button variant="contained" size="small" startIcon={<CheckCircleOutlineIcon />} disabled={admitting} onClick={onAdmit}>

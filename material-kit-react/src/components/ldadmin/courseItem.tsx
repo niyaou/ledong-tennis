@@ -13,12 +13,14 @@ import {
 } from '@mui/material';
 import moment from "moment";
 import React, { useEffect } from 'react';
+import { courseTypeLabel, isSingleClassCourse, normalizedParticipantCount } from '../../common/courseTypes';
 function CourseItem(props) {
   let spend = props.item
   let item = props.item.course
   let edit = props.edit
   let deletedFunc = props.deletedFunc
   let partialDelete = props.partialDelete
+  const singleClass = isSingleClassCourse(item.courseType)
 
   return (
     <Paper key={`item-course-${item.id}`} elevation={1} sx={{
@@ -65,6 +67,9 @@ function CourseItem(props) {
               }} >
               {item.description}
             </Typography>
+            {singleClass && <Typography gutterBottom variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.6)' }}>
+              人数 {normalizedParticipantCount(item.participantCount)}
+            </Typography>}
             {spend.charge > 0 && (<Typography gutterBottom variant="body2"
               sx={{
                 color: 'rgba(0, 0, 0, 0.6)',
@@ -110,7 +115,7 @@ function CourseItem(props) {
                 color: 'rgba(0, 0, 0, 0.6)',
                 minWidth: '180px',
               }} >
-              {item.duration}小时  ,{item.courseType === -2 ? '体验课未成单' : item.courseType === -1 ? '体验课成单' : item.courseType === 0 ? '订场' : item.courseType === 1 ? '班课' : '私教'}
+              {item.duration}小时，{courseTypeLabel(Number(item.courseType))}
             </Typography>
             <Typography gutterBottom variant="body2"
               sx={{
@@ -147,7 +152,7 @@ function CourseItem(props) {
 
               }}
             >
-              {item.member.map((m, idx) => (
+              {!singleClass && (item.member || []).map((m, idx) => (
                 <Button variant="outlined" size="small" key={`${m}a5-${m.number}`}
                   onClick={() => {
                     // dispatch(selectCourse(item))
