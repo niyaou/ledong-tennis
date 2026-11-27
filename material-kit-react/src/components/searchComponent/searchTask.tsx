@@ -263,6 +263,9 @@ const toNumber = (value, defaultValue = 0) => {
     return Number.isFinite(numberValue) ? numberValue : defaultValue
 }
 
+const isValidRechargeCount = (value: string) =>
+    value === '' || (/^[+-]?(?:\d+(?:\.\d?)?|\.\d)$/.test(value) && Number.isFinite(Number(value)))
+
 const calculateTotalBalance = (user) => {
     return toNumber(user.restCharge) + toNumber(user.timesCount) * TIMES_CARD_UNIT_PRICE + toNumber(user.annualCount) * ANNUAL_CARD_UNIT_PRICE
 }
@@ -313,7 +316,7 @@ function SearchTask(props) {
     const [userSort, setUserSort] = React.useState<any[]>([]);
     const [customerName, setCustomerName] = React.useState('');
     const [customerOpenId, setCustomerOpenId] = React.useState('');
-    const [annualTimes, setAnnualTimes] = React.useState(prepaidCard.annualCount || 0);
+    const [annualTimes, setAnnualTimes] = React.useState('0');
     const [worth, setWorth] = React.useState(prepaidCard.worth || 0);
     const [courtSelect, setCourtSelect] = React.useState('');
     const [coachSelect, setCoachSelect] = React.useState('');
@@ -321,7 +324,9 @@ function SearchTask(props) {
     const [open, setOpen] = React.useState(0);//0 关；  1 金额  ；  2   次数
 
     const [changeFee, setChangeFee] = React.useState(0);//0 关；  1 金额  ；  2   次数
-    const [changeCount, setChangeCount] = React.useState(0);//0 关；  1 金额  ；  2   次数
+    const [changeCount, setChangeCount] = React.useState('0');
+    const timesInvalid = !isValidRechargeCount(changeCount);
+    const annualTimesInvalid = !isValidRechargeCount(annualTimes);
     const [changeDesc, setChangeDesc] = React.useState('');
     const [chargeDate, setChargeDate] = React.useState(moment().format('YYYY-MM-DD HH:mm:ss'));
     const [yonth, setYonth] = React.useState(0);
@@ -840,7 +845,10 @@ function SearchTask(props) {
                     />
                     <TextField
                         id="outlined-password-input2"
-                        label="充值次数"
+                        label="次卡充值次数"
+                        inputProps={{ inputMode: 'decimal' }}
+                        error={timesInvalid}
+                        helperText={timesInvalid && '请输入整数或一位小数'}
                         value={changeCount}
                         onChange={(e) => {
                             setChangeCount(e.target.value);
@@ -848,7 +856,9 @@ function SearchTask(props) {
                     />
                     <TextField
                         label="年卡次数"
-                        required
+                        inputProps={{ inputMode: 'decimal' }}
+                        error={annualTimesInvalid}
+                        helperText={annualTimesInvalid && '请输入整数或一位小数'}
                         value={annualTimes}
                         onChange={(event: any) => {
                             setAnnualTimes(event.target.value)
@@ -905,17 +915,11 @@ function SearchTask(props) {
                             setChangeDesc(e.target.value);
                         }}
                     />
-                    <Button variant="contained" size="small"
-
+                    <Button variant="contained" size="small" disabled={timesInvalid || annualTimesInvalid}
                         onClick={() => {
-                            console.log('---------', {
-                                number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect, coach: coachSelect,
-                                time: chargeDate
-                            })
                             dispatch(updateChargeAnnotation({
-                                number: customerOpenId, charged: parseInt(changeFee), annualTimes: parseInt(annualTimes),
-                                times: parseInt(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect, coach: coachSelect,
+                                number: customerOpenId, charged: parseInt(changeFee), annualTimes: Number(annualTimes),
+                                times: Number(changeCount), description: changeDesc, worth: parseInt(worth), court: courtSelect, coach: coachSelect,
                                 time: chargeDate
                             }))
                         }}>确定充值</Button>
